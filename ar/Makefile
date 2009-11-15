@@ -18,14 +18,9 @@ install: ar86
 	install -m 755 ar86 $(LIBDIR)
 
 clean realclean clobber:
-	rm -f *.o ar86 ar ar.h rel_aout.h
+	rm -f *.o ar86 ar rel_aout.h
 
-$(OBJS): ar.h rel_aout.h
-
-ar.h:
-	test -f ar.h || \
-	{ rm -f ar.h ; ln -s ../libc/include/ar.h . ; } || \
-	ln ../libc/include/ar.h .
+$(OBJS): rel_aout.h
 
 rel_aout.h:
 	test -f rel_aout.h || \
