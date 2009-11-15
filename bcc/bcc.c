@@ -58,14 +58,14 @@
 #define AS09	"as09" EXESUF
 #define LD09	"ld09" EXESUF
 
-#define CPPBCC	"bcc-cpp" EXESUF
-#define CC1BCC	"bcc-cc1" EXESUF
+#define CPPBCC	"bcc09-cpp" EXESUF
+#define CC1BCC	"bcc09-cc1" EXESUF
 #define AS86	"as86" EXESUF
 #define LD86	"ld86" EXESUF
 
 #define GCC	"gcc"
-#define UNPROTO "unproto" EXESUF
-#define OPTIM	"copt" EXESUF
+#define UNPROTO "unproto09" EXESUF
+#define OPTIM	"copt09" EXESUF
 
 #if __STDC__ == 1
 #define P(x)	x

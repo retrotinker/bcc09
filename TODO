@@ -1,0 +1,5 @@
+- Clean-up install process, make sure things are installed in normal/sane
+	locations
+- Remove x86isms
+- Get some simple startup code
+- Plenty more...

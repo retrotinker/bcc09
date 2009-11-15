@@ -1,15 +1,19 @@
 CFLAGS=-Wall -Wstrict-prototypes
 
-all: bcc-cpp
+all: bcc09-cpp
 
-bcc-cpp: main.o cpp.o hash.o token1.o token2.o
-	$(CC) $(CFLAGS) -o bcc-cpp main.o cpp.o hash.o token1.o token2.o
+bcc09-cpp: main.o cpp.o hash.o token1.o token2.o
+	$(CC) $(CFLAGS) -o bcc09-cpp main.o cpp.o hash.o token1.o token2.o
 
 clean realclean:
-	rm -f bcc-cpp main.o cpp.o hash.o token1.o token2.o tmp.h
+	rm -f bcc09-cpp main.o cpp.o hash.o token1.o token2.o tmp.h
 
 maintclean: realclean
 	rm -f token1.h token2.h
+
+install: bcc09-cpp
+	install -d $(LIBDIR)
+	install -m 755 bcc09-cpp $(LIBDIR)/bcc09-cpp
 
 main.o: cc.h
 cpp.o: cc.h

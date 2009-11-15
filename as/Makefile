@@ -9,9 +9,9 @@ OBJS		=as.o assemble.o errors.o express.o \
 		 keywords.o macro.o mops.o pops.o readsrc.o \
 		 scan.o table.o typeconv.o alloc.o
 
-all: as86 as86_encap
+all: as09
 
-as86: $(OBJS)
+as09: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
 
 as86_encap: as86_encap.sh
@@ -22,13 +22,13 @@ as86_encap: as86_encap.sh
 	
 install: all
 	install -d $(LIBDIR)
-	install -m 755 as86 $(LIBDIR)
-	install -d $(BINDIR)
-	install -m 755 as86_encap $(BINDIR)/as86_encap
+	install -m 755 as09 $(LIBDIR)
+#	install -d $(BINDIR)
+#	install -m 755 as86_encap $(BINDIR)/as86_encap
 	-@rm -f tmp
 
 clean realclean clobber:
-	rm -f *.o as86 as86_encap
+	rm -f *.o as09 as86_encap
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<

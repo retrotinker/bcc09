@@ -8,17 +8,17 @@ LDFLAGS	=
 DEFS	=
 OBJS= ar.o alloca.o
 
-all: ar86
+all: ar09
 
-ar86: $(OBJS)
+ar09: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
 
-install: ar86
+install: ar09
 	install -d $(LIBDIR)
-	install -m 755 ar86 $(LIBDIR)
+	install -m 755 ar09 $(LIBDIR)
 
 clean realclean clobber:
-	rm -f *.o ar86 ar rel_aout.h
+	rm -f *.o ar09 ar rel_aout.h
 
 $(OBJS): rel_aout.h
 

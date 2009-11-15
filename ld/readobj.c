@@ -35,7 +35,7 @@ FORWARD unsigned readfileheader P((void));
 FORWARD void readmodule P((char *filename, char *archentry));
 FORWARD void reedmodheader P((void));
 FORWARD bool_pt redsym P((struct symstruct *symptr, bin_off_t value));
-FORWARD unsigned checksum P((char *string, unsigned length));
+FORWARD unsigned char checksum P((char *string, unsigned length));
 FORWARD unsigned segbits P((unsigned seg, char *sizedesc));
 
 /* initialise object file handler */
@@ -130,7 +130,7 @@ PRIVATE unsigned readfileheader()
 	char count[2];		/* really an int */
     }
      fileheader;
-    char filechecksum;		/* part of fileheader but would unalign */
+    unsigned char filechecksum;		/* part of fileheader but would unalign */
 
     readin((char *) &fileheader, sizeof fileheader);
     readin(&filechecksum, sizeof filechecksum);
@@ -329,7 +329,7 @@ bin_off_t value;
     return TRUE;
 }
 
-PRIVATE unsigned checksum(string, length)
+PRIVATE unsigned char checksum(string, length)
 char *string;
 unsigned length;
 {

@@ -14,8 +14,8 @@
 
 #if !defined(I8088) && !defined(MC6809)
 /* The default compiler type ... */
-#define I8088			/* target processor is Intel 8088 thru 80386 */
-#undef  MC6809			/* target processor is Motorola 6809 */
+#undef  I8088			/* target processor is Intel 8088 thru 80386 */
+#define MC6809			/* target processor is Motorola 6809 */
 
 #endif
 

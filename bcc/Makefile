@@ -18,13 +18,13 @@ OBJS = bcc-cc1.o codefrag.o dbnode.o declare.o express.o exptree.o floatop.o \
 	loadexp.o longop.o output.o preproc.o preserve.o scan.o softop.o \
 	state.o table.o type.o assign.o hashcmd.o debug.o dbprintf.o
 
-all:	bcc-cc1 bcc 
+all:	bcc09-cc1 bcc09
 
 install: all
 	install -d $(BINDIR)
-	install -m 755 bcc $(BINDIR)/bcc
+	install -m 755 bcc09 $(BINDIR)/bcc09
 	install -d $(LIBDIR)
-	install -m 755 bcc-cc1 $(LIBDIR)/bcc-cc1
+	install -m 755 bcc09-cc1 $(LIBDIR)/bcc09-cc1
 
 bcc: bcc.c
 	$(CC) $(BCFLAGS) $(BCCDEFS) bcc.c -o $@
@@ -38,8 +38,8 @@ bcc09: bcc.c
 ccc: bcc.c
 	$(CC) $(BCFLAGS) -DCCC $(BCCDEFS) bcc.c -o $@
 
-bcc-cc1: $(OBJS)
-	$(CC) $(BCCARCH) $(LDFLAGS) $(OBJS) -o bcc-cc1
+bcc09-cc1: $(OBJS)
+	$(CC) $(BCCARCH) $(LDFLAGS) $(OBJS) -o bcc09-cc1
 
 debug.o: debug.c debug.h
 	$(CC) $(ANSI) $(BCCARCH) $(CFLAGS) -c debug.c
@@ -48,7 +48,7 @@ dbprintf.o: dbprintf.c
 	$(CC) $(ANSI) $(BCCARCH) $(CFLAGS) -c dbprintf.c
 
 clean realclean:
-	rm -f bcc bcc-cc1 ncc bcc09 ccc bcc.o $(OBJS)
+	rm -f bcc bcc09-cc1 ncc bcc09 ccc bcc.o $(OBJS)
 
 
 $(OBJS):  bcc.h align.h const.h types.h \
