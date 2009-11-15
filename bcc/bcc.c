@@ -33,7 +33,6 @@
 #include <sys/wait.h>
 #include <signal.h>
 #endif
-#include "version.h"
 
 #ifdef MSDOS
 #define LOCALPREFIX     /linux86

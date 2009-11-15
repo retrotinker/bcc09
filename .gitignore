@@ -1,0 +1,16 @@
+*.o
+ar/ar.h
+ar/ar86
+ar/rel_aout.h
+as/as86
+as/as86_encap
+bcc/bcc
+bcc/bcc-cc1
+copt/copt
+cpp/bcc-cpp
+ld/ar.h
+ld/catimage
+ld/ld86
+ld/objchop
+ld/objdump86
+unproto/unproto
