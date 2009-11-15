@@ -7,6 +7,8 @@ bcc/bcc09
 bcc/bcc09-cc1
 copt/copt09
 cpp/bcc09-cpp
+cpp/token1.h
+cpp/token2.h
 ld/ar.h
 ld/catimage
 ld/ld09
