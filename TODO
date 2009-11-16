@@ -3,4 +3,6 @@
 - Make "-ansi" the default
 - Remove x86isms
 - Get some simple startup code
+- Fix objdump09 and fix Makefile to install it (and nm09 and size09)
+- Change default PREFIX to /usr/local (when things actually work)
 - Plenty more...
