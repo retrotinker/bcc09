@@ -7,5 +7,5 @@ install: copt09
 	install -m 755 copt09 $(LIBDIR)/copt09
 
 realclean clean:
-	rm -f *.o copt
+	rm -f *.o copt09
 

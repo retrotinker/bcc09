@@ -5,4 +5,7 @@
 - Get some simple startup code
 - Fix objdump09 and fix Makefile to install it (and nm09 and size09)
 - Change default PREFIX to /usr/local (when things actually work)
+- Implement at least some basic copt rules
+- Add "-pic" option (for use w/ OS-9)
+- Add code generation option for 6309
 - Plenty more...
