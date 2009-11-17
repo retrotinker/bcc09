@@ -611,7 +611,7 @@ ts_s_includelist += sizeof *incnew;
 #ifdef I8088
 	definestring("__FIRST_ARG_IN_AX__");
 #endif
-#ifdef MC6808
+#ifdef MC6809
 	definestring("__FIRST_ARG_IN_X__");
 #endif
     }
