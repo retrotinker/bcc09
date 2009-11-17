@@ -148,7 +148,6 @@ register va_list ap;
 
 static char nstring[]="0123456789ABCDEF";
 
-#ifndef __AS386_16__
 #define NUMLTH 11
 
 static unsigned char *
@@ -182,76 +181,3 @@ __numout(long i, int base)
    return &out[n+1];
 }
 
-#else
-
-#asm
-! numout.s
-!
-.bss
-___out	lcomm	$C
-
-.text
-___numout:
-push	bp
-mov	bp,sp
-push	di
-push	si
-add	sp,*-4
-mov	byte ptr -8[bp],*$0	! flg = 0
-mov	si,4[bp]	; i or val.lo
-mov	di,6[bp]	; i or val.hi
-mov	cx,8[bp]	; base
-test	cx,cx			! base < 0 ?
-jge 	.3num
-neg  cx				! base = -base
-or	di,di			! i < 0 ?
-jns	.5num
-mov	byte ptr -8[bp],*1	! flg = 1
-neg	di			! i = -i
-neg	si
-sbb	di,0
-.5num:
-.3num:
-mov	byte ptr [___out+$B],*$0	! out[11] = nul
-mov	-6[bp],*$A		! n = 10
-
-.9num:
-!!!         out[n--] = nstring[val % base];
-xor  dx,dx
-xchg ax,di
-div  cx
-xchg ax,di
-xchg ax,si
-div  cx
-xchg ax,si			! val(new) = val / base
-
-mov  bx,dx			! dx = val % base
-
-mov	al,_nstring[bx]
-mov	bx,-6[bp]
-dec	word ptr -6[bp]
-mov	___out[bx],al
-
-mov  ax,si
-or   ax,di			! while (val)
-jne	.9num
-
-cmp	byte ptr -8[bp],*$0	! flg == 0 ?
-je  	.Dnum
-
-mov	bx,-6[bp]
-dec	word ptr -6[bp]
-mov	byte ptr ___out[bx],*$2D	! out[n--] = minus
-
-.Dnum:
-mov	ax,-6[bp]
-add	ax,#___out+1
-
-add	sp,*4
-pop	si
-pop	di
-pop	bp
-ret
-#endasm
-
-#endif

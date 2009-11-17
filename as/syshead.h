@@ -12,15 +12,6 @@
 #include <errno.h>
 #endif
 
-#ifdef MSDOS
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <io.h>
-#undef min
-#undef POSIX_HEADERS_MISSING
-#define VERSION "MSDOS Compile"
-#endif
 
 #if __STDC__ && !defined(__minix)
 #define P(x) x

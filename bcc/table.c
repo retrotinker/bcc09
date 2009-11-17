@@ -574,22 +574,6 @@ char *message;
 {
     error2error("compiler out of memory", message);
 
-#ifdef __AS386_16__
-    {
-	unsigned size;
-	char *ptr;
-
-	for (size = 0x1000; size != 0; --size)
-	    if ((ptr = malloc(size)) != NULL)
-	    {
-		outstr("found free memory at ");
-		outuvalue((uvalue_t) ptr);
-		outstr(" size ");
-		outuvalue((uvalue_t) size);
-		outnl();
-	    }
-    }
-#endif
 
     finishup();
 }

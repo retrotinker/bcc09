@@ -59,73 +59,10 @@ PRIVATE pfv rout_table[] =
     pset,
     psetdp,
     ptext,
-#ifdef I80386
-    puse16,
-    puse32,
-#endif
     pwarn,
     /* end of pseudo-ops */
 
-#ifdef I80386
-    mbcc,
-    mbswap,
-    mcall,
-    mcalli,
-    mdivmul,
-    menter,
-    mEwGw,
-    mExGx,
-    mf_inher,
-    mf_m,
-    mf_m2,
-    mf_m2_ax,
-    mf_m2_m4,
-    mf_m2_m4_m8,
-    mf_m4_m8_optst,
-    mf_m4_m8_st,
-    mf_m4_m8_stst,
-    mf_m4_m8_m10_st,
-    mf_m10,
-    mf_optst,
-    mf_st,
-    mf_stst,
-    mf_w_inher,
-    mf_w_m,
-    mf_w_m2,
-    mf_w_m2_ax,
-    mgroup1,
-    mgroup2,
-    mgroup6,
-    mgroup7,
-    mgroup8,
-    mGvEv,
-    mGvMa,
-    mGvMp,
-    mimul,
-    min,
-    mincdec,
-    minher,
-    minher16,
-    minher32,
-    minhera,
-    mint,
-    mjcc,
-    mjcxz,
-    mlea,
-    mmov,
-    mmovx,
-    mnegnot,
-    mout,
-    mpushpop,
-    mret,
-    mseg,
-    msetcc,
-    mshdouble,
-    mtest,
-    mxchg,
-#endif /* I80386 */
 
-#ifdef MC6809
     mall,			/* all address modes allowed, like LDA */
     malter,			/* all but immediate, like STA */
     mimmed,			/* immediate only (ANDCC, ORCC) */
@@ -136,7 +73,6 @@ PRIVATE pfv rout_table[] =
     msstak,			/* S-stack	(PSHS, PULS) */
     mswap,			/* TFR, EXG */
     mustak,			/* U-stack	(PSHU,PULU) */
-#endif /* MC6809 */
 };
 
 FORWARD void asline P((void));
@@ -160,11 +96,6 @@ PUBLIC void assemble()
 	asline();
 	if (label != NUL_PTR)	/* must be confirmed if still set */
 	{			/* it is nulled by EQU,	COMM and SET */
-#ifndef MC6809
-#define NEEDENDLABEL ILLAB
-	    if (nocolonlabel)
-		error(NEEDENDLABEL);
-#endif
 	    if(pass && label->value_reg_or_op.value != oldlabel)
 	    {
 	       dirty_pass = TRUE;
@@ -189,9 +120,6 @@ PUBLIC void assemble()
 	genbin();
 	genobj();
 	binmbuf = lc += lcjump
-#ifdef I80386
-	    + immcount
-#endif
 	    ;
     }
 }
@@ -201,13 +129,7 @@ PRIVATE void asline()
     register struct sym_s *symptr;
 
     postb = popflags = pcrflag =
-#ifdef I80386
-	sprefix = oprefix = aprefix =
-#endif
 	immcount = lastexp.data = lcjump = 0;
-#ifdef I80386
-    sib = NO_SIB;
-#endif
 #if SIZEOF_OFFSET_T > 2
     fqflag =
 #endif
@@ -256,11 +178,9 @@ PRIVATE void asline()
 	else if (checksegrel(symptr))
 	{
 	    symptr->type &= ~COMMBIT;	/* ignore COMM, PCOMM gives warning */
-#ifdef MC6809
 #if 0
 	    if (sym == COLON)
 		symptr->type |= EXPBIT;
-#endif
 #endif
 				/* remember if forward referenced */
 	    symptr->data = (symptr->data & FORBIT) | lcdata;
@@ -318,22 +238,9 @@ PRIVATE void asline()
 	}
     }
     opcode = symptr->value_reg_or_op.op.opcode;
-#ifdef I80386
-    needcpu((page==0 && ((opcode&0xF0) == 0x60||(opcode&0xF6)==0xC0))?1:0);
-#endif
     routine = rout_table[symptr->value_reg_or_op.op.routine];
     getsym();
     (*routine)();
     if (sym != EOLSYM)
 	error(JUNK_AFTER_OPERANDS);
-#ifdef I80386
-    needcpu(page==PAGE1_OPCODE?2:0);
-
-    if (aprefix != 0)
-	++mcount;
-    if (oprefix != 0)
-	++mcount;
-    if (sprefix != 0)
-	++mcount;
-#endif
 }

@@ -40,18 +40,9 @@ struct code_listing_s
     char padlinum[1];
     char lc[4];
     char padlc[1];
-#ifdef I80386
-    char lprefix[2];
-    char aprefix[2];
-    char oprefix[2];
-    char sprefix[2];
-#endif
     char page[2];
     char opcode[2];
     char postb[2];
-#ifdef I80386
-    char sib[2];
-#endif
     char padopcode[1];
 #if SIZEOF_OFFSET_T > 2
     char displ4[2];
@@ -61,14 +52,6 @@ struct code_listing_s
     char displ1[2];
     char reldispl[1];
     char paddispl[1];
-#ifdef I80386
-    char imm4[2];
-    char imm3[2];
-    char imm2[2];
-    char imm1[2];
-    char relimm[1];
-    char padimm[1];
-#endif
     char nullterm;
 };
 
@@ -248,23 +231,6 @@ PRIVATE void listcode()
     }
     else if (count != 0)
     {
-#ifdef I80386
-	if (aprefix != 0)
-	{
-	    --count;
-	    build_1hex_number(aprefix, listptr->aprefix);
-	}
-	if (oprefix != 0)
-	{
-	    --count;
-	    build_1hex_number(oprefix, listptr->oprefix);
-	}
-	if (sprefix != 0)
-	{
-	    --count;
-	    build_1hex_number(sprefix, listptr->sprefix);
-	}
-#endif
 	if (page != 0)
 	{
 	    build_1hex_number(page, listptr->page);
@@ -276,18 +242,9 @@ PRIVATE void listcode()
 	{
 	    --count;
 	    build_1hex_number(postb,
-#ifdef MC6809
 			      count == 0 ? listptr->displ1 :
-#endif
 			      listptr->postb);
 	}
-#ifdef I80386
-	if (sib != NO_SIB)
-	{
-	    --count;
-	    build_1hex_number(sib, listptr->sib);
-	}
-#endif
 	if (count > 0)
 	{
 	    build_1hex_number((opcode_pt) lastexp.offset, listptr->displ1);
@@ -306,24 +263,6 @@ PRIVATE void listcode()
 			      listptr->displ4);
 	}
 #endif
-#ifdef I80386
-	if (immcount > 0)
-	{
-	    build_1hex_number((opcode_pt) immadr.offset, listptr->imm1);
-	    if (immadr.data & RELBIT)
-		listptr->relimm[0] = '>';
-	}
-	if (immcount > 1)
-	    build_1hex_number((opcode_pt) (immadr.offset >> 0x8),
-			      listptr->imm2);
-	if (immcount > 2)
-	{
-	    build_1hex_number((opcode_pt) (immadr.offset >> 0x10),
-			      listptr->imm3);
-	    build_1hex_number((opcode_pt) (immadr.offset >> 0x18),
-			      listptr->imm4);
-	}
-#endif
     }
     writes((char *) listptr);
 }
@@ -340,11 +279,7 @@ PRIVATE void listerrors()
     char *linep;
     unsigned char remaining;
 
-#ifdef I80386
-    paderrorline(1);
-#else
     paderrorline(CODE_LIST_LENGTH - LINUM_LEN);
-#endif
     remaining = errcount;
     column = 0;			/* column to match with error column */
     errcolw = errcol = CODE_LIST_LENGTH; /* working & col number on err line */
@@ -352,21 +287,6 @@ PRIVATE void listerrors()
     linep = linebuf;
     do
     {
-#ifdef I80386
-        if(errcol != CODE_LIST_LENGTH)
-	{
-	    writenl(); paderrorline(1);
-	}
-	writes(errmsg = errptr->err_str);
-	errcol = strlen(errmsg)+LINUM_LEN+1;
-	column = 0; linep = linebuf;
-        errcolw = CODE_LIST_LENGTH;
-	while (errcolw > errcol)
-	{
-	    writec('.');
-	    ++errcol;
-	}
-#endif
 	while (errptr && errptr->position < 132 && column < errptr->position)
 	{
 	    ++column;
@@ -376,17 +296,10 @@ PRIVATE void listerrors()
 		++errcolw;
 	    while (errcolw > errcol)
 	    {
-#ifdef I80386
-	        writec('.');
-#else
 		writec(' ');
-#endif
 		++errcol;
 	    }
 	}
-#ifdef I80386
-	writec('^'); ++errcol;
-#else
 	if (errcolw < errcol)	/* position under error on new line */
 	{
 	    writenl();
@@ -395,18 +308,13 @@ PRIVATE void listerrors()
 	writec('^');
 	writes(errmsg = errptr->err_str);
 	errcol += strlen(errmsg);
-#endif
 	++errptr;
     }
     while (--remaining != 0);
     writenl();
     if (erroverflow)
     {
-#ifdef I80386
-	paderrorline(1);
-#else
 	paderrorline(CODE_LIST_LENGTH - LINUM_LEN);
-#endif
 	writesn(FURTHER);
     }
 }

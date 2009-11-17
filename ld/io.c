@@ -43,9 +43,6 @@ PRIVATE int trelfd;		/* text relocation output file descriptor */
 #endif
 PRIVATE unsigned warncount;	/* count of warnings */
 
-#ifdef MSDOS
-#define off_t	long		/* NOT a typedef */
-#endif
 
 FORWARD void errexit P((char *message));
 FORWARD void flushout P((void));
@@ -129,10 +126,8 @@ PUBLIC void executable()
 {
     if (errcount)
         unlink(outputname);
-#ifndef MSDOS
     else
 	chmod(outputname, outputperms);
-#endif
 }
 
 PUBLIC void flusherr()
@@ -205,12 +200,10 @@ char *filename;
 #endif
 	outputerror("cannot open");
 
-#ifndef MSDOS
     /* Can't do this on MSDOS; it upsets share.exe */
     oldmask = umask(0); umask(oldmask);
     outputperms = ((CREAT_PERMS | EXEC_PERMS) & ~oldmask);
     chmod(filename, outputperms & ~EXEC_PERMS);
-#endif
 
 #ifdef REL_OUTPUT
     drelbufptr = drelbuf;

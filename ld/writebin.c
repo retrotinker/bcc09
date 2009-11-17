@@ -21,9 +21,6 @@
 #endif
 #endif
 
-#ifdef EDOS
-# define FILEHEADERLENGTH 0
-#endif
 #ifdef MINIX
 # ifdef BSD_A_OUT
 #  ifdef STANDARD_GNU_A_OUT
@@ -99,21 +96,13 @@ PRIVATE bool_t stripflag;	/* nonzero to strip symbols */
 PRIVATE bin_off_t spos;		/* position in current seg */
 PRIVATE bool_t uzp;		/* nonzero for unmapped zero page */
 
-#ifdef EDOS
-FORWARD unsigned binheaderlength P((char *commandname));
-FORWARD char *idconvert P((struct entrylist *elptr, char *commandname));
-#endif
 FORWARD void linkmod P((struct modstruct *modptr));
 FORWARD void padmod P((struct modstruct *modptr));
 FORWARD void setsym P((char *name, bin_off_t value));
 FORWARD void symres P((char *name));
 FORWARD void setseg P((fastin_pt newseg));
 FORWARD void skip P((unsigned countsize));
-#ifdef EDOS
-FORWARD void writeheader P((char *commandname));
-#else
 FORWARD void writeheader P((void));
-#endif
 FORWARD void writenulls P((bin_off_t count));
 
 /* write binary file */
@@ -129,9 +118,6 @@ bool_pt argstripflag;
 bool_pt arguzp;
 {
     char buf4[4];
-#ifdef EDOS
-    char *commandname;
-#endif
     char *cptr;
     struct nlist extsym;
     flags_t flags;
@@ -159,13 +145,6 @@ bool_pt arguzp;
 	if (bdataoffset == 0 && sepid)
 	    bdataoffset = page_size();
     }
-#ifdef EDOS
-    commandname = stralloc(outfilename);
-    if ((cptr = strchr(commandname, ':')) != NUL_PTR)
-	commandname = cptr + 1;
-    if ((cptr = strrchr(commandname, '.')) != NUL_PTR)
-	*cptr = 0;
-#endif
 
     /* reserve special symbols use curseg to pass parameter to symres() */
     for (curseg = 0; curseg < NSEG; ++curseg)
@@ -188,11 +167,7 @@ bool_pt arguzp;
         }
 #endif
     }
-#ifdef EDOS
-    curseg = 0;			/* data seg, s.b. variable */
-#else
     curseg = 3;
-#endif
     symres("__edata");
     symres("__end");
     curseg = 0;			/* text seg, s.b. variable */
@@ -249,13 +224,11 @@ bool_pt arguzp;
 	    {
 		segsz[seg] += cntooffset(cptr,
 			  sizecount = segsizecount((unsigned) seg, modptr));
-#ifndef EDOS
 
 		/* adjust sizes to even to get quad boundaries */
 		/* this should be specifiable dynamically */
 		segsz[seg] = ld_roundup(segsz[seg], 4, bin_off_t);
 		comsz[seg] = ld_roundup(comsz[seg], 4, bin_off_t);
-#endif
 		cptr += sizecount;
 	    }
 	}
@@ -269,10 +242,6 @@ bool_pt arguzp;
      * Assume seg 1..3 are data, Seg 0 is real text, seg 4+ are far text
 #endif
      */
-#ifdef EDOS
-    if (btextoffset == 0)
-	btextoffset = binheaderlength(commandname);
-#endif
     segpos[0] = segbase[0] = spos = btextoffset;
     combase[0] = segbase[0] + segsz[0];
     segadj[1] = segadj[0] = -btextoffset;
@@ -310,7 +279,6 @@ bool_pt arguzp;
 #endif
     {
 	segpos[seg] = segbase[seg] = combase[seg - 1] + comsz[seg - 1];
-#ifdef MC6809
 	if (seg == DPSEG)
 	{
 	    /* temporarily have fixed DP seg */
@@ -323,7 +291,6 @@ bool_pt arguzp;
 		segpos[seg] = segbase[seg] = (segbase[seg] + 0xFF)
 					     & ~(bin_off_t) 0xFF;
 	}
-#endif
 
 #ifdef QMAGIC
 	if(seg==3 && uzp && !stripflag) /* XXX Stripped last seek needed */
@@ -422,11 +389,7 @@ bool_pt arguzp;
 		 + (unsigned long) (etextpadoff - btextoffset)
 		 + (unsigned long) (edataoffset - bdataoffset));
 #endif
-#ifdef EDOS
-    writeheader(commandname);
-#else
     writeheader();
-#endif
     for (modptr = modfirst; modptr != NUL_PTR; modptr = modptr->modnext)
 	if (modptr->loadflag)
 	{
@@ -583,66 +546,6 @@ bool_pt arguzp;
 	executable();
 }
 
-#ifdef EDOS
-
-PRIVATE unsigned binheaderlength(commandname)
-char *commandname;
-{
-    unsigned count;
-    char *name;
-    struct entrylist *elptr;
-    struct symstruct *startptr;
-
-    count = 2 + 2 + 1;		/* len len nul */
-    startptr = findsym("start");
-    for (elptr = entryfirst; elptr != NUL_PTR; elptr = elptr->elnext)
-    {
-	name = idconvert(elptr, commandname);
-	count += strlen(name) + 1 + 2 + 1;	/* nul off flg */
-	ourfree(name);
-	if (startptr != NUL_PTR)
-	    count += 6;		/* LBSR $xxxx and LBRA $xxxx */
-    }
-    return count;
-}
-
-/* convert name of symbol (entry) list element to a Basic identifier */
-/* new name is built in storage obtained from stralloc() */
-/* the special name  _main  is converted to the command name first */
-/* copy upper case and numerals, convert lower case to upper, ignore rest */
-
-PRIVATE char *idconvert(elptr, commandname)
-struct entrylist *elptr;
-char *commandname;
-{
-    char *name;
-    char *newname;
-
-    if (strcmp(name = elptr->elsymptr->name, "_main") == 0)
-	name = commandname;
-    newname = stralloc(name);
-    {
-	register char *t;
-	register char *s;
-
-	t = newname;
-	s = name;
-	do
-	{
-	    if (*s >= '0' && *s <= '9' || *s >= 'A' && *s <= 'Z')
-		*t++ = *s;
-	    if (*s >= 'a' && *s <= 'z')
-		*t++ = *s + ('A' - 'a');
-	}
-	while (*s++);
-	*t = 0;
-    }
-    if (*newname < 'A')		/* numeral or null */
-	fatalerror("bad entry name");
-    return newname;
-}
-
-#endif /* EDOS */
 
 PRIVATE void linkmod(modptr)
 struct modstruct *modptr;
@@ -900,55 +803,6 @@ unsigned countsize;
     writenulls((bin_off_t) readsize(countsize));
 }
 
-#ifdef EDOS
-
-PRIVATE void writeheader(commandname)
-char *commandname;
-{
-    char buf[MAX_OFFSET_SIZE];
-    bin_off_t offset;
-    unsigned headlength;
-    char *name;
-    struct entrylist *elptr;
-    struct symstruct *startptr;
-
-    headlength = binheaderlength(commandname);
-    for (elptr = entryfirst; elptr != NUL_PTR; elptr = elptr->elnext)
-	headlength -= 6;
-    offset = headlength;
-    startptr = findsym("start");
-    offtocn(buf, edataoffset, 2);
-    writeout(buf, 2);
-    writechar(0xFF);		/* dummy data length 0xFFFF takes everything */
-    writechar(0xFF);
-    for (elptr = entryfirst; elptr != NUL_PTR; elptr = elptr->elnext)
-    {
-	name = idconvert(elptr, commandname);
-	writeout(name, (unsigned) strlen(name) + 1);
-	ourfree(name);
-	offtocn(buf, startptr == NUL_PTR ? elptr->elsymptr->value : offset, 2);
-	writeout(buf, 2);
-	writechar(0x82);	/* 8 = set flags from here, 2 = cmd line */
-	offset += 6;		/* LBSR $xxxx and LBRA $xxxx */
-    }
-    writechar(0);
-    if (startptr != NUL_PTR)
-    {
-	offset = headlength + 3;	/* over 1st LBSR */
-	for (elptr = entryfirst; elptr != NUL_PTR; elptr = elptr->elnext)
-	{
-	    writechar(0x17);	/* LBSR */
-	    offtocn(buf, startptr->value - offset, 2);
-	    writeout(buf, 2);
-	    writechar(0x16);	/* LBRA */
-	    offtocn(buf, elptr->elsymptr->value - offset - 3, 2);
-	    writeout(buf, 2);
-	    offset += 6;
-	}
-    }
-}
-
-#endif /* EDOS */
 
 #ifdef MINIX
 

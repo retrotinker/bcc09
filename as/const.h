@@ -1,20 +1,13 @@
 
 /* Speed and space hacks for BCC */
-#ifdef __AS386_16__
-#define LOW_BYTE	0	/* must be changed for big-endian */
-#else
 
 #define S_ALIGNMENT	sizeof(long)
-#endif
 
 /* const.h - constants for assembler */
 
 /* major switches */
 
 #define MC6809			/* generate 6809 code */
-#ifndef MC6809
-#define I80386			/* generate 80386 code */
-#endif
 #define MNSIZE			/* allow byte size in mnemonic, e.g. "movb" */
 #undef SOS_EDOS			/* source OS is EDOS */
 
@@ -26,19 +19,7 @@
 
 /* defaults modified by switches */
 
-#ifdef SOS_EDOS
-# undef INBUFSIZE
-# define INBUFSIZE	512
-# undef SOS_EOLSTR
-# define SOS_EOLSTR	"\015\012"
-# define STAKSIZ	256	/* table grows up to stack less this */
-#endif
 
-#ifdef __AS386_16__
-# undef INBUFSIZE
-# define INBUFSIZE	512
-# define STAKSIZ	512	/* table grows up to stack less this */
-#endif
 
 /* booleans */
 
@@ -67,72 +48,7 @@
 enum
 {
 /* Register codes (internal to assembler). */
-#ifdef I80386
 
-/* Index regs must be first. */
-    BPREG,
-    BXREG,
-    DIREG,
-    SIREG,
-#define MAX16BITINDREG	SIREG
-
-    EAXREG,
-    EBPREG,
-    EBXREG,
-    ECXREG,
-    EDIREG,
-    EDXREG,
-    ESIREG,
-    ESPREG,
-#define MAXINDREG	ESPREG
-
-    AXREG,
-    CXREG,
-    DXREG,
-    SPREG,
-
-    AHREG,
-    ALREG,
-    BHREG,
-    BLREG,
-    CHREG,
-    CLREG,
-    DHREG,
-    DLREG,
-
-    CSREG,
-    DSREG,
-    ESREG,
-    FSREG,
-    GSREG,
-    SSREG,
-
-    CR0REG,
-    CR2REG,
-    CR3REG,
-    DR0REG,
-    DR1REG,
-    DR2REG,
-    DR3REG,
-    DR6REG,
-    DR7REG,
-    TR3REG,
-    TR4REG,
-    TR5REG,
-    TR6REG,
-    TR7REG,
-
-    ST0REG,
-    ST1REG,
-    ST2REG,
-    ST3REG,
-    ST4REG,
-    ST5REG,
-    ST6REG,
-    ST7REG,
-#endif /* I80386 */
-
-#ifdef MC6809
 
 /* Index regs must be first, then PC. */
     SREG,
@@ -147,26 +63,10 @@ enum
     CCREG,
     DPREG,
     DREG,
-#endif /* MC6809 */
 
     NOREG
 };
 
-#ifdef I80386
-enum
-{
-/* Type and size keywords. */
-    BYTEOP,
-    DWORDOP,
-    FWORDOP,
-    FAROP,
-    PTROP,
-    PWORDOP,
-    QWORDOP,
-    TBYTEOP,
-    WORDOP
-};
-#endif /* I80386 */
 
 /* special chars */
 
@@ -302,9 +202,6 @@ oops - ENTBIT misplaced
 				/* size of macro param buffer */
 #define MAXMAC		8	/* max nesting level of macro stack */
 #define NLOC		16	/* number of location counters */
-#ifdef I80386
-#define NO_SIB		0340	/* illegal sib (3 with 4) to mean no sib */
-#endif
 
 /* special segments */
 

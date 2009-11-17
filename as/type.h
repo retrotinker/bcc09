@@ -24,16 +24,9 @@ typedef int bool_pt;
 typedef unsigned count_t;
 typedef int fd_t;
 typedef unsigned char indcount_t;
-#ifdef I80386
-typedef unsigned long offset_t;
-typedef long soffset_t;
-# define SIZEOF_OFFSET_T 4	/* non-portable */
-#endif
-#ifdef MC6809
 typedef unsigned offset_t;
 typedef int soffset_t;
 # define SIZEOF_OFFSET_T 2	/* but sizeof (offset_t) often breaks cpp */
-#endif
 typedef int opcode_pt;
 typedef unsigned char opcode_t;
 typedef int opsize_pt;
@@ -79,21 +72,6 @@ struct address_s
     struct sym_s *sym;
 };
 
-#ifdef I80386
-
-/* effective address */
-
-struct ea_s
-{
-    indcount_t indcount;
-    opsize_t size;
-    reg_pt base;
-    reg_pt index;
-    scale_t scale;
-    struct address_s displ;
-};
-
-#endif
 
 /* flags */
 

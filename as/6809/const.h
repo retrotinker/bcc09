@@ -18,13 +18,6 @@
 
 /* defaults modified by switches */
 
-#ifdef SOS_EDOS
-# undef INBUFSIZE
-# define INBUFSIZE 512
-# undef SOS_EOLSTR
-# define SOS_EOLSTR "\015\012"
-# define STAKSIZ 256		/* table grows up to stack less this */
-#endif
 
 /* booleans */
 
@@ -52,64 +45,7 @@
 
 /* register codes (internal to assembler) */
 
-#ifdef I80386
 
-/* index regs must be first */
-
-#define BPREG 0
-#define BXREG 1
-#define DIREG 2
-#define SIREG 3
-#define MAX16BITINDREG 3
-
-#define EAXREG 4
-#define EBPREG 5
-#define EBXREG 6
-#define ECXREG 7
-#define EDIREG 8
-#define EDXREG 9
-#define ESIREG 10
-#define ESPREG 11
-#define MAXINDREG 11
-
-#define AXREG 12
-#define CXREG 13
-#define DXREG 14
-#define SPREG 15
-
-#define AHREG 16
-#define ALREG 17
-#define BHREG 18
-#define BLREG 19
-#define CHREG 20
-#define CLREG 21
-#define DHREG 22
-#define DLREG 23
-
-#define CSREG 24
-#define DSREG 25
-#define ESREG 26
-#define FSREG 27
-#define GSREG 28
-#define SSREG 29
-
-#define CR0REG 30
-#define CR2REG 31
-#define CR3REG 32
-#define DR0REG 33
-#define DR1REG 34
-#define DR2REG 35
-#define DR3REG 36
-#define DR6REG 37
-#define DR7REG 38
-#define TR6REG 39
-#define TR7REG 40
-
-#define NOREG 41
-
-#endif				/* I80386 */
-
-#ifdef MC6809
 
 /* index regs must be first, then PC, then other regs */
 
@@ -126,22 +62,7 @@
 #define XREG  2
 #define YREG  3
 
-#endif
 
-#ifdef I80386
-
-/* type and size keywords */
-
-#define BYTEOP     0
-#define DWORDOP    1
-#define FWORDOP    2
-#define FAROP      3
-#define PTROP      4
-#define PWORDOP    5
-#define QWORDOP    6
-#define TBYTEOP    7
-#define WORDOP     8
-#endif
 
 /* special chars */
 
@@ -338,75 +259,7 @@
 #define SETDPOP    29
 #define _WARNOP    30
 
-#ifdef I80386
 
-/* further pseudo-ops */
-
-#define BSSOP      31
-#define COMMOP1    32
-#define DATAOP     33
-#define TEXTOP     34
-#define USE16OP    35
-#define USE32OP    36
-
-/* machine-op routine numbers */
-
-#define ARPL       37
-#define BCC        38
-#define BOUND      39
-#define CALL       40
-#define DIVMUL     41
-#define ENTER      42
-#define GROUP1     43
-#define GROUP2     44
-#define GROUP6     45
-#define GROUP7     46
-#define GROUP8     47
-#define GvEv       48
-#define IMUL       49
-#define IN         50
-#define INCDEC     51
-#define INHER      52
-#define INHER16    53
-#define INHER32    54
-#define INHER_A    55
-#define INT        56
-#define JCC        57
-#define JCXZ       58
-#define LEA        59
-#define LOAD_FULL_POINTER 60
-#define MOV        61
-#define MOVX       62
-#define NEGNOT     63
-#define OUT        64
-#define PUSHPOP    65
-#define RET        66
-#define RETF       67
-#define SEG        68
-#define SETCC      69
-#define SH_DOUBLE  70
-#define TEST       71
-#define XCHG       72
-
-/* further pseudo-ops */
-
-#define BLKWOP     73
-#define EVENOP     74
-#define FQBOP      75
-#define ALIGNOP    76
-
-/* further machine-ops */
-
-#define CALLI      77
-
-/* yet further pseudo-ops */
-
-#define LCOMMOP    78
-#define LCOMMOP1   79
-
-#endif				/* I80386 */
-
-#ifdef MC6809
 
 /* machine-op routine numbers */
 
@@ -425,7 +278,6 @@
 
 #define LCOMMOP    41
 
-#endif
 
 /* object code format (Introl) */
 
@@ -488,9 +340,6 @@ oops - ENTBIT misplaced
 				/* size of macro param buffer */
 #define MAXMAC 8		/* max nesting level of macro stack */
 #define NLOC 16			/* number of location counters */
-#ifdef I80386
-#define NO_SIB 0340		/* illegal sib (3 with 4) to mean no sib */
-#endif
 
 /* special segments */
 

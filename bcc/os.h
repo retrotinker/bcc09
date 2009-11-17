@@ -31,26 +31,7 @@
 
 /* special */
 
-#ifdef SOS_EDOS
-# undef DEFAULT_INCLUDE_DIR
-# define DEFAULT_INCLUDE_DIR "3"
-# undef DIRCHAR
-# define DIRCHAR ':'
-# undef DIRSTRING
-# define DIRSTRING ":"
-# define AS09
-# undef EOL
-# define EOL 13
-# undef isabspath
-# define isabspath(fnameptr, tempcptr) \
-	 ((*(tempcptr) = *(fnameptr)) >= '0' && *(tempcptr) <= '9' && \
-	  (fnameptr)[1] == DIRCHAR)
-#endif
 
-#ifdef TOS_EDOS
-# undef EOLTO
-# define EOLTO 13
-#endif
 
 /* don't let names dealt with here affect anything outside this file */
 

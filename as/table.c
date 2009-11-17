@@ -9,18 +9,10 @@
 
 #define hconv(ch) ((unsigned char) (ch) - 0x41)	/* better form for hashing */
 
-#ifdef I80386
-# ifdef MNSIZE
-EXTERN char bytesizeops[];
-# endif
-#endif
 EXTERN char ops[];
 EXTERN char page1ops[];
 EXTERN char page2ops[];
 EXTERN char regs[];
-#ifdef I80386
-EXTERN char typesizes[];
-#endif
 
 #ifdef DEBUG_HASH
 unsigned nhash;
@@ -35,17 +27,9 @@ FORWARD void install P((register char *keyptr, int data));
 PUBLIC void inst_keywords()
 {
     install(regs, REGBIT);
-#ifdef I80386
-    install(typesizes, SIZEBIT);
-#endif
     install(ops, 0);
     install(page1ops, PAGE1);
     install(page2ops, PAGE2);
-#ifdef I80386
-# ifdef MNSIZE
-    install(bytesizeops, PAGE1 | PAGE2);
-# endif
-#endif
 }
 
 PRIVATE void install(keyptr, data)

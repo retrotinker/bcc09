@@ -44,10 +44,6 @@ int defval;
 		return;
 	}
 	newcount = (int) lastexp.offset;
-#ifdef I80386			/* really sizeof (offset_t) != sizeof (int) */
-	if (newcount != lastexp.offset)
-	    datatoobig();
-#endif
 	newcount += flagptr->semaphore;
 	if ((int) lastexp.offset >= 0)
 	{
@@ -1022,50 +1018,6 @@ PUBLIC void pwarn()
     bumpsem(&as_warn, -1);
 }
 
-#ifdef I80386
-
-/* USE16 pseudo-op */
-
-PUBLIC void puse16()
-{
-    defsize = 2;
-#ifdef iscpu
-    if( sym != EOLSYM )
-    {
-	absexpres();
-	if (lastexp.data & UNDBIT)
-	    return;
-        if( lastexp.offset > 8000 )
-	   setcpu((int) lastexp.offset / 100 % 10);
-        else if( lastexp.offset > 15 )
-	   setcpu((int) lastexp.offset / 100);
-	else
-	   setcpu((int) lastexp.offset);
-    }
-#endif
-}
-
-/* USE16 pseudo-op */
-
-PUBLIC void puse32()
-{
-    defsize = 4;
-#ifdef iscpu
-    if(!iscpu(3)) setcpu(3);
-    if( sym != EOLSYM )
-    {
-	absexpres();
-	if (lastexp.data & UNDBIT)
-	    return;
-        if( lastexp.offset > 15 )
-	   setcpu((int) lastexp.offset / 100);
-	else
-	   setcpu((int) lastexp.offset);
-    }
-#endif
-}
-
-#endif
 
 /* show redefined label and error, and set REDBIT */
 

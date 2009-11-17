@@ -87,34 +87,12 @@ EXTERN int dirty_pass;		/* Set if this pass had a label movement */
 
 EXTERN int textseg;		/* Text segment id */
 
-#ifdef I80386
-
-EXTERN opcode_t aprefix;	/* address size prefix or 0 */
-EXTERN bool_t asld_compatible;	/* asld compatibility flag */
-EXTERN opsize_t defsize;	/* current default size */
-EXTERN opsize_t idefsize;	/* initial default size */
-EXTERN opcode_t oprefix;	/* operand size prefix or 0 */
-EXTERN opcode_t sprefix;	/* segment prefix or 0 */
-EXTERN opcode_t sib;		/* scale-index-base byte */
-
-EXTERN int cpuid;		/* Assembler instruction limit flag */
-EXTERN int origcpuid;		/* Assembler instruction limit flag */
-
-#endif
 
 /* miscellaneous */
 
 extern char hexdigit[];
 
 /* cpuid functions */
-#ifdef I80386
-#ifndef __AS386_16__
-#define iscpu(x) (cpuid>=(x))
-#define needcpu(x) do{ if(cpuid<(x)) {warning(CPUCLASH); cpuid|=0x10;} }while(0)
-#define setcpu(x) (cpuid=(x))
-#define cpuwarn() (cpuid&=0xF)
-#endif
-#endif
 
 #ifndef setcpu
 #define needcpu(x)

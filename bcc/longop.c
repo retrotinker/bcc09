@@ -61,16 +61,6 @@ struct symstruct *target;
 	if (source->offset.offv == 0)
 	    goto shiftdone;
     }
-#ifdef I8088
-    /* This is ugly! But it works. I should be able to stop it being used
-     * by removing the char demotion. */
-    if (source->type->scalar & CHAR && 
-	  !(source->storage & (BREG|DREG|DATREG1B))) {
-	load(source, DATREG1B);
-	outop2str("xor\tch,ch"); outnl();
-	source->storage = DATREG1;
-    }
-#endif
     load(source, OPWORKREG);
     switch ((op_t) op)
     {
@@ -120,11 +110,6 @@ shiftdone:
 	load(target, getindexreg());
     if (reglist)
     {
-#ifdef I8088
-	if (op == EQOP)
-	    changesp(spmark, FALSE);
-	else
-#endif
 	    modstk(spmark);
 	poplist(reglist);
     }
@@ -161,9 +146,7 @@ struct symstruct *target;
 
 PUBLIC void outlongendian()
 {
-#ifdef MC6809
     outbyte('_');
-#endif
 #if DYNAMIC_LONG_ORDER
     if (long_big_endian)
 #endif

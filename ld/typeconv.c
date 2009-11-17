@@ -47,13 +47,6 @@ PUBLIC void u2c2(buf, offset)
 char *buf;
 u2_pt offset;
 {
-#ifdef __AS386_16__
-   if( no_swap )
-   {
-      *((unsigned short*)buf) = offset;	/* UNALIGNED ACCESS! */
-      return;
-   }
-#endif
    buf[int_off[0]] = offset;
    buf[int_off[1]] = (offset>>8);
 }
@@ -63,13 +56,6 @@ char *buf;
 u4_t offset;
 {
    int i;
-#ifdef __AS386_16__
-   if( no_swap )
-   {
-      *((unsigned long*)buf) = offset;	/* UNALIGNED ACCESS! */
-      return;
-   }
-#endif
    for(i=0; i<4; i++)
    {
       buf[long_off[i]] = offset;
@@ -125,9 +111,6 @@ PUBLIC u2_pt c2u2(buf)
 char *buf;
 {
     u2_pt res;
-#ifdef __AS386_16__
-   if( no_swap ) return *((u2_pt *)buf);	/* UNALIGNED ACCESS! */
-#endif
 
     res  =   ((unsigned char *)buf) [int_off[0]]
          + ((((unsigned char *)buf) [int_off[1]]) << 8);
@@ -139,9 +122,6 @@ char *buf;
 {
     u4_t res;
     int i;
-#ifdef __AS386_16__
-   if( no_swap ) return *((u4_t *)buf);		/* UNALIGNED ACCESS! */
-#endif
     res = 0;
     for(i=3; i>=0; i--)
     {

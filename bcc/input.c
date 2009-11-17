@@ -494,9 +494,6 @@ char *argv[];
 #endif
     fd = 0;			/* standard input */
     memset(flag, 0, sizeof flag);
-#ifdef I80386
-    flag['3'] = sizeof (int) >= 4;
-#endif
     fname = "stdin";
 #ifdef BUILTIN_CPP
     (incptr = &incfirst)->incnext = &inclast;
@@ -516,12 +513,6 @@ char *argv[];
 	else
 	    switch (arg[1])
 	    {
-#ifdef I8088
-	    case '0':		/* generate 16-bit code */
-#endif
-#ifdef I80386
-	    case '3':		/* generate 32-bit code */
-#endif
 	    case 'c':		/* caller saves */
 #ifdef DBNODE
 	    case 'd':		/* print debugging information in asm output */
@@ -578,24 +569,7 @@ ts_s_includelist += sizeof *incnew;
 	    }
     }
 #ifdef BUILTIN_CPP
-#ifdef I8088
-#ifdef I80386
-    if (flag['3'])
-    {
-	i386_32 = TRUE;
-	definestring("__AS386_32__");
-	definestring("__i386__");
-    }
-    else
-#endif
-    {
-	definestring("__AS386_16__");
-	definestring("__8086__");
-    }
-#endif
-#ifdef MC6809
     definestring("__AS09__");
-#endif
     if (flag['c'])
     {
 	callersaves = TRUE;
@@ -608,12 +582,7 @@ ts_s_includelist += sizeof *incnew;
     if (flag['f'])
     {
 	arg1inreg = TRUE;
-#ifdef I8088
-	definestring("__FIRST_ARG_IN_AX__");
-#endif
-#ifdef MC6809
 	definestring("__FIRST_ARG_IN_X__");
-#endif
     }
     arg1op = arg1inreg ? ROOTLISTOP : LISTOP;
 #ifdef DYNAMIC_LONG_ORDER
@@ -642,9 +611,6 @@ ts_s_includelist += sizeof *incnew;
 
 #else /* !BUILTIN_CPP */
 
-#ifdef I80386
-    if (flag['3']) i386_32 = TRUE;
-#endif
     if (flag['c']) callersaves = TRUE;
 #ifdef DBNODE
     dbnodeon = flag['d'];
@@ -880,21 +846,9 @@ PRIVATE void usage()
 {
     fatalerror(
 #ifdef BUILTIN_CPP
-#  ifdef MC6809
 "usage: cc1 [-cdfptw[-]] [-Ddefine] [-Iincdir] [-Uundef] [-o outfile] [infile]"
-#  else 
-#    ifdef I80386
-"usage: cc1 [-03cdfltw[-]] [-Ddefine] [-Iincdir] [-Uundef] [-o outfile] [infile]"
-#    else 
-"usage: cc1 [-cdfltw[-]] [-Ddefine] [-Iincdir] [-Uundef] [-o outfile] [infile]"
-#    endif
-#  endif
 #else 
-#  ifdef I80386
-"usage: cc1 [-03cdfltw[-]] [-o outfile] [infile]"
-#  else 
 "usage: cc1 [-cdfltw[-]] [-o outfile] [infile]"
-#  endif
 #endif
    );
 }

@@ -12,14 +12,8 @@
 #include "sizes.h"
 #include "type.h"
 
-#ifdef I8088
-# define outlbranch() outop3str( "b")
-# define outsbranch() outop2str( "j")
-#endif
-#ifdef MC6809
 # define outlbranch() outop3str( "LB")
 # define outsbranch() outop2str( "B")
-#endif
 
 #define MAXVISLAB 32
 
@@ -31,29 +25,13 @@ struct labdatstruct
     ccode_t labcond;		/* condition code for branch */
 };
 
-#ifdef I8088
-PRIVATE char lcondnames[][2] =	/* names of long condition codes */
-{
-    { 'e', 'q', }, { 'n', 'e', }, { 'r', ' ', }, { 'r', 'n', },
-    { 'l', 't', }, { 'g', 'e', }, { 'l', 'e', }, { 'g', 't', },
-    { 'l', 'o', }, { 'h', 'i', }, { 'l', 'o', }, { 'h', 'i' },
-};
-PRIVATE char scondnames[][2] =	/* names of short condition codes */
-{
-    { 'e', ' ', }, { 'n', 'e', }, { 'm', 'p', }, { 'n', 0, },
-    { 'l', ' ', }, { 'g', 'e', }, { 'l', 'e', }, { 'g', ' ', },
-    { 'b', ' ', }, { 'a', 'e', }, { 'b', 'e', }, { 'a', ' ', }, 
-};
-#endif
 
-#ifdef MC6809
 PRIVATE char condnames[][2] =	/* names of condition codes */
 {
     { 'E', 'Q', }, { 'N', 'E', }, { 'R', 'A', }, { 'R', 'N', },
     { 'L', 'T', }, { 'G', 'E', }, { 'L', 'E', }, { 'G', 'T', },
     { 'L', 'O', }, { 'H', 'S', }, { 'L', 'S', }, { 'H', 'I', },
 };
-#endif
 
 PRIVATE label_no lasthighlab = 0xFFFF+1;	/* temp & temp init so labels fixed */
 				/* lint */
@@ -195,12 +173,6 @@ label_no label;
 		    if ((labpatch = labptr->labpatch) != NULL &&
 			isshortbranch(lc - labptr->lablc))
 		    {
-#ifdef I8088 /* patch "bcc(c) to j(c)(c)( ) */
-			*labpatch = 'j';
-			*(labpatch + 1) =
-			    *(cnameptr = scondnames[(int)labptr->labcond]);
-#endif
-#ifdef MC6809
 # ifdef NEW_MC6809 /* patch JMP\t> or LBCC\t to BCC \t */
 			*labpatch = 'B';
 			*(labpatch + 4) = '\t';	/* redundant unless JMP */
@@ -213,14 +185,11 @@ label_no label;
 			    *labpatch = '\t';
 			goto over;
 # endif
-#endif
 			*(labpatch + 2) = *(cnameptr + 1);
 			*(labpatch + 3) = ' ';
-#ifdef MC6809
 # ifndef NEW_MC6809 /* patch JMP\t> or LBCC\t to BCC \t */
 		over: ;		/* temp regression test kludge */
 # endif
-#endif
 			nlonger = jcclonger;
 			if (labptr->labcond == RA)
 			    nlonger = jmplonger;
@@ -285,10 +254,6 @@ PUBLIC void lbranch(cond, label)
 ccode_pt cond;
 label_no label;
 {
-#ifdef I8088
-    char *cnameptr;
-
-#endif
     struct labdatstruct *labptr;
     char *oldoutptr;
 
@@ -306,24 +271,8 @@ label_no label;
     else
     {
 	outlbranch();
-#ifdef I8088
-	outbyte(*(cnameptr = lcondnames[(int) cond]));
-	outbyte(*(cnameptr + 1));
-	if ((ccode_t) cond == LS || (ccode_t) cond == HS)
-	    outbyte('s');	/* "blos" or "bhis" */
-	else
-	    outbyte(' ');
-	outtab();
-	bumplc2();
-#ifdef I80386
-	if (i386_32)
-	    bumplc();
-#endif
-#endif
-#ifdef MC6809
 	outcond(cond);
 	bumplc();
-#endif
     }
     outlabel(label);
     outnl();
@@ -357,7 +306,6 @@ PUBLIC struct symstruct *namedlabel()
     return symptr;
 }
 
-#ifdef MC6809
 
 /* print condition code name */
 
@@ -371,7 +319,6 @@ ccode_pt cond;
     outtab();
 }
 
-#endif
 
 /* print label */
 
@@ -401,25 +348,10 @@ PUBLIC void sbranch(cond, label)
 ccode_pt cond;
 label_no label;
 {
-#ifdef I8088
-    char *cnameptr;
-
-    if ((ccode_t) cond != RN)
-    {
-	outsbranch();
-	outbyte(*(cnameptr = scondnames[(int) cond]));
-	outbyte(*(cnameptr + 1));
-	outtab();
-	outlabel(label);
-	outnl();
-    }
-#endif
-#ifdef MC6809
     outsbranch();
     outcond(cond);
     outlabel(label);
     outnl();
-#endif
 }
 
 /* reverse bump location counter */

@@ -23,15 +23,10 @@
  * RDB.
  */
 
-#ifndef __AS386_16__
 #ifndef BIGBUFFER
 #define BIGBUFFER	1	/* For most machines we have the memory */
 #endif
-#endif
 
-#ifdef MSDOS
-#define off_t		long	/* Not a typedef! */
-#endif
 
 #ifndef MINIBUF
 #define MINIBUF		1	/* Add in a reasonable buffer */
@@ -259,10 +254,6 @@ PUBLIC void pproceof()
 	initp1p2();		/* reset other varaiables */
 	if(pass==last_pass)
 	   binaryc = binaryg;
-#ifdef I80386
-	defsize = idefsize;
-	cpuid = origcpuid;
-#endif
 	if(pass==last_pass)
 	{
 	   list.current = list.global;

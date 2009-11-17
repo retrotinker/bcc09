@@ -693,35 +693,8 @@ PRIVATE void declfunc()
        if( main_flag > 2 )
           globl("environ");
     }
-#ifdef I8088
-    regfuse = 0;
-#endif
     lbrace();
     compound();
-#ifdef I8088
-    if (regfuse & (callee1mask | INDREG0)) {
-        outstr("! Register");
-        if (regfuse & INDREG0              ) outstr(" BX");
-        if (regfuse & INDREG1 & callee1mask) outstr(" SI");
-	if (regfuse & INDREG2 & callee1mask) outstr(" DI");
-	if (regfuse & LOCAL & callee1mask) outstr(" BP");
-	outstr(" used in function ");
-	outnstr(funcname);
-	if (optimise && !callersaves) {
-	    outstr(funcname);
-	    outnstr(".off = 0");
-	}
-    } else
-	if (optimise && !callersaves) {
-	    outstr(funcname);
-	    outstr(".off = ");
-#ifndef I80386
-	    outnhex(4);
-#else
-	    outnhex(i386_32?12:4);
-#endif
-	}
-#endif
     clearfunclabels();
 }
 
@@ -1128,10 +1101,8 @@ PRIVATE bool_pt regdecl()
     if (gvarsymptr->type->constructor != POINTER)
 	return FALSE;
 #endif
-#ifdef MC6809
     if (gvarsymptr->type->constructor != POINTER)
 	return FALSE;
-#endif
     if (!(regavail = regregs & ~reguse))
 	return FALSE;
     gvarsymptr->flags = REGVAR;

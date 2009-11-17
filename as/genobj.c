@@ -162,23 +162,6 @@ PUBLIC void genobj()
 	else
 	{
 	    remaining = mcount - 1;	/* count opcode immediately */
-#ifdef I80386
-	    if (aprefix != 0)
-	    {
-		putabs(aprefix);
-		--remaining;
-	    }
-	    if (oprefix != 0)
-	    {
-		putabs(oprefix);
-		--remaining;
-	    }
-	    if (sprefix != 0)
-	    {
-		putabs(sprefix);
-		--remaining;
-	    }
-#endif
 	    if (page != 0)
 	    {
 		putabs(page);
@@ -192,21 +175,10 @@ PUBLIC void genobj()
 		    putabs(postb);
 		    --remaining;
 		}
-#ifdef I80386
-		if (sib != NO_SIB)
-		{
-		    putabs(sib);
-		    --remaining;
-		}
-#endif
 		if (remaining != 0)
 		    genobjadr(&lastexp, remaining);
 	    }
 	}
-#ifdef I80386
-	if (immcount != 0)
-	    genobjadr(&immadr, immcount);
-#endif
     }
 }
 
@@ -312,16 +284,9 @@ PUBLIC void objheader()
 {
     static char module_header[] =
     {
-#ifdef I80386
-	0xA3, 0x86,
-	1, 0,
-	(char) (0xA3 + 0x86 + 1 + 0),
-#endif
-#ifdef MC6809
 	'S', '1',		/* 2 byte magic number */
 	0, 1,			/* 2 byte number of modules in file */
 	'S' + '1' + 0 + 1,	/* 1 byte checksum */
-#endif
     };
     static char seg_max_sizes[] =
     {

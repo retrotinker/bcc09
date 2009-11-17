@@ -18,9 +18,7 @@
 #include <stdio.h>
 #ifdef __STDC__
 #include <stdlib.h>
-#ifndef MSDOS
 #include <unistd.h>
-#endif
 #else
 #include <malloc.h>
 #endif
@@ -29,23 +27,10 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifndef MSDOS
 #include <sys/wait.h>
 #include <signal.h>
-#endif
 
-#ifdef MSDOS
-#define LOCALPREFIX     /linux86
-#define EXESUF		".exe"
-#define R_OK	4		/* Test for read permission.  */
-#define W_OK	2		/* Test for write permission.  */
-#define X_OK	1		/* Test for execute permission.	 */
-#define F_OK	0		/* Test for existence.	*/
-#define DEFARCH 0		/* Default to 8086 code */
-#include "version.h"
-#else
 #define EXESUF
-#endif
 
 #define AS	"as" EXESUF
 #define LD	"ld" EXESUF
@@ -121,11 +106,7 @@ int file_count = 0;
 int dyn_count = 0;
 int error_count = 0;
 char * progname = "C";
-#ifdef MSDOS
-char * tmpdir = "";
-#else
 char * tmpdir = "/tmp/";
-#endif
 
 int main P((int argc, char **argv));
 void getargs P((int argc, char **argv));
@@ -725,11 +706,7 @@ int use_o;
    else
    {
       char buf[16];
-#ifdef MSDOS
-      sprintf(buf, "$$%05d$", dyn_count++);
-#else
       sprintf(buf, "$$%04d%05d", dyn_count++, getpid());
-#endif
       file->file = catstr(tmpdir, buf);
    }
 
@@ -748,11 +725,7 @@ run_unlink()
    {
       char buf[16];
       char * p;
-#ifdef MSDOS
-      sprintf(buf, "$$%05d$", i);
-#else
       sprintf(buf, "$$%04d%05d", i, getpid());
-#endif
       p = catstr(tmpdir, buf);
       if (opt_v>1)
 	 fprintf(stderr, "rm %s\n", p);
@@ -988,14 +961,9 @@ char ** argv;
 
    add_prefix(getenv("BCC_EXEC_PREFIX"));
 
-#ifdef MC6809
    if (opt_M==0) opt_M = '9';
-#endif
 #ifdef CCC
    if (opt_M==0) opt_M = '8';
-#endif
-#ifdef MSDOS
-   if (opt_M==0) opt_M = 'd';
 #endif
 #ifdef __CYGWIN__
    if (opt_M==0) opt_M = 'd';
@@ -1239,13 +1207,8 @@ int size;
 void Usage()
 {
 #ifdef VERSION
-#ifdef __AS386_16__
-   if (opt_v)
-      fprintf(stderr, "%s: version %s (16bit)\n", progname, VERSION);
-#else
    if (opt_v)
       fprintf(stderr, "%s: version %s\n", progname, VERSION);
-#endif
 #endif
    fprintf(stderr,
 	 "Usage: %s [-ansi] [-options] [-o output] file [files].\n", progname);
@@ -1259,27 +1222,6 @@ char * str;
    exit(1);
 }
 
-#ifdef MSDOS
-void reset_prefix_path()
-{
-   char *ptr, *temp;
-
-   if (*localprefix && localprefix[1]) {
-      prefix_path = localprefix;
-      return;
-   }
-
-   temp = copystr(progname);
-   if( (ptr = strrchr(temp, '\\')) != 0
-         && temp<ptr-4 && strncmp(ptr-4, "\\BIN", 4) == 0 )
-   {
-      ptr[-4] = 0;
-      prefix_path = temp;
-   }
-   else
-      free(temp);
-}
-#else
 
 void reset_prefix_path()
 {
@@ -1347,7 +1289,6 @@ void reset_prefix_path()
    else
       free(temp);
 }
-#endif
 
 void
 run_command(file)
@@ -1361,9 +1302,7 @@ static char ** minienviron[] = {
 };
 #endif
    int i, status;
-#ifndef MSDOS
    void *oqsig, *oisig, *otsig, *ocsig;
-#endif
 
 
    if (opt_v)
@@ -1375,13 +1314,6 @@ static char ** minienviron[] = {
       if (opt_v>2) return;
    }
 
-#ifdef MSDOS
-   status = spawnv(0, command.fullpath, command.arglist);
-   if (status<0)
-   {
-      fprintf(stderr, "Unable to execute %s\n", command.fullpath);
-   }
-#else
    oqsig = signal(SIGQUIT, SIG_IGN);
    oisig = signal(SIGINT,  SIG_IGN);
    otsig = signal(SIGTERM,  SIG_IGN);
@@ -1420,7 +1352,6 @@ static char ** minienviron[] = {
    (void) signal(SIGINT,  oisig);
    (void) signal(SIGTERM, otsig);
    (void) signal(SIGCHLD, ocsig);
-#endif
    if (status)
    {
       if (file) file->filetype = '~';

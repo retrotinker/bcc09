@@ -15,17 +15,10 @@ PRIVATE char *asmbeg;		/* beginning of assembler code */
 
 /* Sneaky stuff, the start of a binary file can be _negative_ for the I80386
    assembler. The -ve addresses are ones over 2GB (or "org -32") */
-#ifdef I80386
-PRIVATE soffset_t binfbuf;	/* binary code buffer for file (counter) */
-PRIVATE soffset_t binmax;	/* maximum value of binmbuf for pass 1 */
-PRIVATE soffset_t binmin;	/* minimum value of binmbuf for pass 1 */
-#define PT soffset_t
-#else
 PRIVATE offset_t binfbuf;	/* binary code buffer for file (counter) */
 PRIVATE offset_t binmax;	/* maximum value of binmbuf for pass 1 */
 PRIVATE offset_t binmin;	/* minimum value of binmbuf for pass 1 */
 #define PT offset_t
-#endif
 
 FORWARD void putbinoffset P((offset_t offset, count_t size));
 
@@ -130,23 +123,6 @@ PUBLIC void genbin()
 	else
 	{
 	    remaining = mcount - 0x1;	/* count opcode immediately */
-#ifdef I80386
-	    if (aprefix != 0x0)
-	    {
-		putbin(aprefix);
-		--remaining;
-	    }
-	    if (oprefix != 0x0)
-	    {
-		putbin(oprefix);
-		--remaining;
-	    }
-	    if (sprefix != 0x0)
-	    {
-		putbin(sprefix);
-		--remaining;
-	    }
-#endif
 	    if (page != 0x0)
 	    {
 		putbin(page);
@@ -160,20 +136,9 @@ PUBLIC void genbin()
 		    putbin(postb);
 		    --remaining;
 		}
-#ifdef I80386
-		if (sib != NO_SIB)
-		{
-		    putbin(sib);
-		    --remaining;
-		}
-#endif
 		if (remaining != 0x0)
 		    putbinoffset(lastexp.offset, remaining);
 	    }
-#ifdef I80386
-	    if (immcount != 0x0)
-		putbinoffset(immadr.offset, immcount);
-#endif
 	}
 	/* else no code for this instruction, or already generated */
     }
@@ -183,11 +148,7 @@ PUBLIC void genbin()
 
 PUBLIC void initbin()
 {
-#ifdef I80386
-    binmin = ((offset_t)-1 >>1);	/* greater than anything */
-#else
     binmin = -1;		/* greater than anything */
-#endif
 }
 
 /* write char to binary file or directly to memory */
@@ -215,18 +176,7 @@ opcode_pt ch;
 	    else
 #endif
 	    {
-#ifdef MSDOS
-static PT zapptr = 0;
-#endif
 		outfd = binfil;
-#ifdef MSDOS
-		while (binfbuf < (PT)binmbuf && binfbuf >= zapptr+binmin)
-		{
-		    writec(0);
-		    ++binfbuf;
-		    ++zapptr;
-		}
-#endif
 		if( binfbuf != (PT)binmbuf)
 		    if( lseek(binfil, (long)((PT)binmbuf-binfbuf), 1) < 0 )
 			error(BWRAP);

@@ -98,9 +98,6 @@ PUBLIC void finishup()
 
 PRIVATE void initp1()
 {
-#ifdef I80386
-    idefsize = defsize = 2;	/* I think this is probably safer (RDB) */
-#endif
 #if 0
     idefsize = defsize = sizeof (char *) > 2 ? 4 : 2;
 #endif
@@ -162,9 +159,6 @@ char **argv;
     int opened_file = 0;
     int flag_state;
 
-#ifdef I80386
-    setcpu(0xF);
-#endif
     textseg = -1;
 
     if (argc <= 1)
@@ -198,19 +192,6 @@ char **argv;
 	       writesn("Unknown!");
 #endif
 	       exit(1);
-#ifdef I80386
-	    case '0': case '1': case '2':
-		idefsize = defsize = 0x2;
-		setcpu(arg[1]-'0');
-		break;
-	    case '3':
-		idefsize = defsize = 0x4;
-		setcpu(0xF);
-		break;
-	    case 'a':
-		asld_compatible = flag_state;
-		break;
-#endif
 	    case 'b':
 		if (!isnextarg || binfil != 0)
 		    usage();
@@ -222,15 +203,6 @@ char **argv;
 	    case 'g':
 		globals_only_in_obj = flag_state;
 		break;
-#ifdef I80386
-	    case 'j':
-		jumps_long = flag_state;
-		break;
-	    case 'O':
-		if( flag_state ) last_pass = 2;
-		else             last_pass = 1;
-		break;
-#endif
 	    case 'l':
 		list.global = TRUE;
 		goto get_any_list_file;
@@ -308,9 +280,6 @@ char **argv;
        infiln = infil0 = 1;
        infil = open_input(strcpy(filnamptr, "-"));
     }
-#ifdef I80386
-    origcpuid = cpuid;
-#endif
     inidata = (~binaryg & inidata) | (RELBIT | UNDBIT);
 }				/* IMPBIT from inidata unless binaryg */
 
@@ -337,9 +306,5 @@ unsigned num;
 PRIVATE void usage()
 {
     as_abort(
-#ifdef I80386
-"usage: as [-03agjuwO] [-b [bin]] [-lm [list]] [-n name] [-o obj] [-s sym] src");
-#else
     "usage: as [-guw] [-b [bin]] [-lm [list]] [-n name] [-o obj] [-s sym] src");
-#endif
 }

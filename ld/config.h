@@ -18,9 +18,6 @@
 #define HOST_8BIT		/* enable some 8-bit optimizations */
 
 /* Any machine can use long offsets but i386 needs them */
-#ifdef I80386
-#define LONG_OFFSETS
-#endif
 
 /* these must be defined to suit the source libraries */
 

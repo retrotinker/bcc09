@@ -350,13 +350,7 @@ PRIVATE void docont()
 	outshex(contloop->spmark);
 	outminus();
 	outswstacklab();
-#ifdef MC6809
 	outcregname(LOCAL);
-#endif
-#ifdef I80386
-	if (i386_32)
-	    bumplc2();
-#endif
 	outnl();
     }
     jump(contloop->contlab);
@@ -620,24 +614,14 @@ PRIVATE void jumptocases()
 	    lbranch(HI, zjtablelab = getlabel());
 	    if (charselector)
 		ctoi();
-#ifdef MC6809
 	    else
 		bumplc();	/* extra for CMPD */
-#endif
 	    slconst((value_t) (ptypesize / 2), DREG);
 					/* really log ptypesize */
 	    deflabel(jtablelab = casejump());
-#ifdef I8088
-	    jtablelab = jtablelab; 	/* not used, allocated for regress */
-#endif
 	    for (caseval = caseptr->casevalue; caseval <= case1ptr->casevalue;
 		 ++caseval)
 	    {
-#ifdef I8088
-		if (ptypesize > 2)
-		    defdword();
-		else
-#endif
 		    defword();
 		if (caseval != caseptr->casevalue)
 		    outlabel(dfaultlab);
@@ -646,18 +630,12 @@ PRIVATE void jumptocases()
 		    outlabel(caseptr->caselabel);
 		    ++caseptr;
 		}
-#ifdef MC6809
 		if (posindependent)
 		{
 		    outminus();
 		    outlabel(jtablelab);
 		}
-#endif
 		bumplc2();
-#ifdef I8088
-		if (ptypesize > 2)
-		    bumplc2();
-#endif
 		outnl();
 	    }
 	    deflabel(zjtablelab);
@@ -678,13 +656,6 @@ offset_T offset;
 #endif
     outplus();
     outswstacklab();
-#ifdef I8088
-    bumplc();
-#ifdef I80386
-    if (i386_32)
-	bumplc2();
-#endif
-#endif
 }
 
 PUBLIC void outswstacklab()

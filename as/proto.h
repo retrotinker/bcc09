@@ -59,66 +59,7 @@ void entermac P((struct sym_s *symptr));
 void pmacro P((void));
 
 /* mops.c */
-#ifdef I80386
-void mbcc P((void));
-void mbswap P((void));
-void mcall P((void));
-void mcalli P((void));
-void mdivmul P((void));
-void menter P((void));
-void mEwGw P((void));
-void mExGx P((void));
-void mf_inher P((void));
-void mf_m P((void));
-void mf_m2 P((void));
-void mf_m2_ax P((void));
-void mf_m2_m4 P((void));
-void mf_m2_m4_m8 P((void));
-void mf_m4_m8_optst P((void));
-void mf_m4_m8_st P((void));
-void mf_m4_m8_stst P((void));
-void mf_m4_m8_m10_st P((void));
-void mf_m10 P((void));
-void mf_optst P((void));
-void mf_st P((void));
-void mf_stst P((void));
-void mf_w_inher P((void));
-void mf_w_m P((void));
-void mf_w_m2 P((void));
-void mf_w_m2_ax P((void));
-void mgroup1 P((void));
-void mgroup2 P((void));
-void mgroup6 P((void));
-void mgroup7 P((void));
-void mgroup8 P((void));
-void mGvEv P((void));
-void mGvMa P((void));
-void mGvMp P((void));
-void mimul P((void));
-void min P((void));
-void mincdec P((void));
-void minher P((void));
-void minher16 P((void));
-void minher32 P((void));
-void minhera P((void));
-void mint P((void));
-void mjcc P((void));
-void mjcxz P((void));
-void mlea P((void));
-void mmov P((void));
-void mmovx P((void));
-void mnegnot P((void));
-void mout P((void));
-void mpushpop P((void));
-void mret P((void));
-void mseg P((void));
-void msetcc P((void));
-void mshdouble P((void));
-void mtest P((void));
-void mxchg P((void));
-#endif				/* I80386 */
 
-#ifdef MC6809
 void mall P((void));
 void malter P((void));
 void mimmed P((void));
@@ -128,7 +69,6 @@ void mlong P((void));
 void msstak P((void));
 void mswap P((void));
 void mustak P((void));
-#endif				/* MC6809 */
 
 void getcomma P((void));
 void mshort P((void));

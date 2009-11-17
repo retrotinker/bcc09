@@ -12,21 +12,6 @@
 #include <errno.h>
 #endif
 
-#ifdef MSDOS
-#undef POSIX_HEADERS_MISSING
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <io.h>
-
-#undef min
-#define R_OK	0
-#define mode_t		unsigned short
-#define SEEK_SET	0
-#define STDOUT_FILENO	1
-#define STDERR_FILENO	2
-#define VERSION 	"MSDOS Compile"
-#endif
 
 /******************************************************************************/
 

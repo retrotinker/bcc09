@@ -312,23 +312,7 @@ PUBLIC void factor()
 	    getsym();
 	    return;
 	}
-#ifndef MC6809
-    case LBRACKET:
-	if (!asld_compatible)
-	    break;		/* error, LPAREN is the grouping symbol */
-	getsym();
-	expres();
-	if (sym != RBRACKET)
-	    error(RBEXP);
-	else
-	    getsym();
-	return;
-#endif
     case LPAREN:
-#ifndef MC6809
-	if (asld_compatible)
-	    break;		/* error, LBRACKET is the grouping symbol */
-#endif
 	getsym();
 	expres();
 	if (sym != RPAREN)
