@@ -2790,6 +2790,7 @@ PUBLIC void mswap()
 		     & 0x88 && (postb & 0x88) != 0x88)
 		error(ILLREG);	/* registers not of same size */
 	}
+	getsym();
     }
 }
 
