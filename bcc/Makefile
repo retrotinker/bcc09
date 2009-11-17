@@ -5,7 +5,7 @@
 
 PREFIX=/usr
 
-CFLAGS	=-O
+CFLAGS	=-O -fno-builtin-exp2
 LDFLAGS	=-s
 BINDIR	=$(PREFIX)/bin
 LIBDIR	=$(PREFIX)/lib/bcc

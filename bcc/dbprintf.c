@@ -1,6 +1,7 @@
 
 #include <sys/types.h>
 #include <fcntl.h>
+#include <string.h>
 
 #if defined(__STDC__) && !defined(__FIRST_ARG_IN_AX__)
 #include <stdarg.h>

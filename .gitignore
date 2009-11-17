@@ -1,4 +1,5 @@
 *.o
+cscope.out
 ar/ar.h
 ar/ar09
 ar/rel_aout.h
