@@ -31,24 +31,24 @@ static char hash_sccsid[] = "@(#) hash.c 1.1 92/01/15 21:53:12";
 
 /* hash - hash a string; original author: P. J. Weinberger at Bell Labs. */
 
-int     hash(s, size)
+int hash(s, size)
 register char *s;
 unsigned size;
 {
-    register unsigned long h = 0;
-    register unsigned long g;
+	register unsigned long h = 0;
+	register unsigned long g;
 
-    /*
-     * For a performance comparison with the hash function presented in K&R,
-     * first edition, see the "Dragon" book by Aho, Sethi and Ullman.
-     */
+	/*
+	 * For a performance comparison with the hash function presented in K&R,
+	 * first edition, see the "Dragon" book by Aho, Sethi and Ullman.
+	 */
 
-    while (*s) {
-	h = (h << 4) + *s++;
-	if (g = (h & 0xf0000000)) {
-	    h ^= (g >> 24);
-	    h ^= g;
+	while (*s) {
+		h = (h << 4) + *s++;
+		if (g = (h & 0xf0000000)) {
+			h ^= (g >> 24);
+			h ^= g;
+		}
 	}
-    }
-    return (h % size);
+	return (h % size);
 }

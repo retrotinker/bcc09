@@ -36,11 +36,11 @@ extern char *malloc();
 #define	STR_TABSIZE	100
 
 struct string {
-    char   *strval;			/* unique string copy */
-    struct string *next;		/* next one in hash chain */
+	char *strval;		/* unique string copy */
+	struct string *next;	/* next one in hash chain */
 };
 
-static struct string *str_tab[STR_TABSIZE] = {0,};
+static struct string *str_tab[STR_TABSIZE] = { 0, };
 
 /* More string stuff. Maybe it should go to an #include file. */
 
@@ -48,24 +48,24 @@ static struct string *str_tab[STR_TABSIZE] = {0,};
 
 /* strsave - save unique copy of string */
 
-char   *strsave(str)
+char *strsave(str)
 register char *str;
 {
-    register struct string *s;
-    register int where = hash(str, STR_TABSIZE);
+	register struct string *s;
+	register int where = hash(str, STR_TABSIZE);
 
-    /* Look for existing entry. */
+	/* Look for existing entry. */
 
-    for (s = str_tab[where]; s; s = s->next)
-	if (STREQ(str, s->strval))
-	    return (s->strval);
+	for (s = str_tab[where]; s; s = s->next)
+		if (STREQ(str, s->strval))
+			return (s->strval);
 
-    /* Add new entry. */
+	/* Add new entry. */
 
-    if ((s = (struct string *) malloc(sizeof(*s))) == 0
-	|| (s->strval = malloc(strlen(str) + 1)) == 0)
-	fatal("out of memory");
-    s->next = str_tab[where];
-    str_tab[where] = s;
-    return (strcpy(s->strval, str));
+	if ((s = (struct string *)malloc(sizeof(*s))) == 0
+	    || (s->strval = malloc(strlen(str) + 1)) == 0)
+		fatal("out of memory");
+	s->next = str_tab[where];
+	str_tab[where] = s;
+	return (strcpy(s->strval, str));
 }

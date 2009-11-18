@@ -28,7 +28,7 @@ PRIVATE offset_t rmbcount;	/* accumulator for repeated RMB's */
 
 FORWARD void flushabs P((void));
 FORWARD void flushrmb P((void));
-FORWARD void genobjadr P((struct address_s *adrptr, int size));
+FORWARD void genobjadr P((struct address_s * adrptr, int size));
 FORWARD void putobj1 P((opcode_pt ch));
 FORWARD void putobj4 P((u32_T offset));
 FORWARD void putobjoffset P((offset_t offset, count_t size));
@@ -40,79 +40,69 @@ FORWARD void writeobj P((char *buf, unsigned count));
 PUBLIC void accumulate_rmb(offset)
 offset_t offset;
 {
-    if (objectc)
-    {
-	flushabs();
-	rmbcount += offset;
-    }
+	if (objectc) {
+		flushabs();
+		rmbcount += offset;
+	}
 }
 
 /* flush absolute object code buffer to object code buffer if necessary */
 
 PRIVATE void flushabs()
 {
-    if (absbufptr > absbuf)
-    {
-	putobj1((absbufptr - absbuf) | OBJ_ABS);
-	{
-	    register char *bufptr;
+	if (absbufptr > absbuf) {
+		putobj1((absbufptr - absbuf) | OBJ_ABS);
+		{
+			register char *bufptr;
 
-	    bufptr = absbuf;
-	    do
-		putobj1(*bufptr);
-	    while (++bufptr < absbufptr);
-	    absbufptr = absbuf;
+			bufptr = absbuf;
+			do
+				putobj1(*bufptr);
+			while (++bufptr < absbufptr);
+			absbufptr = absbuf;
+		}
 	}
-    }
 }
 
 /* flush object code buffer if necessary */
 
 PUBLIC void flushobj()
 {
-    int ntowrite;
+	int ntowrite;
 
-    if ((ntowrite = objbufptr - objbuf) > 0)
-    {
-	if (write(objfil, objbuf, (unsigned) ntowrite) != ntowrite)
-	{
-	    error(OBJOUT);
-	    listline();
-	    finishup();
+	if ((ntowrite = objbufptr - objbuf) > 0) {
+		if (write(objfil, objbuf, (unsigned)ntowrite) != ntowrite) {
+			error(OBJOUT);
+			listline();
+			finishup();
+		}
+		objbufptr = objbuf;
 	}
-	objbufptr = objbuf;
-    }
 }
 
 /* flush RMB count if necessary */
 
 PRIVATE void flushrmb()
 {
-    count_t size;
+	count_t size;
 
-    if (rmbcount != 0)
-    {
+	if (rmbcount != 0) {
 #if SIZEOF_OFFSET_T > 2
-	if (isge4byteoffset(rmbcount))
-	{
-	    putobj1(OBJ_SKIP_4);
-	    size = 4;
-	}
-	else
+		if (isge4byteoffset(rmbcount)) {
+			putobj1(OBJ_SKIP_4);
+			size = 4;
+		} else
 #endif
-	if (isge2byteoffset(rmbcount))
-	{
-	    putobj1(OBJ_SKIP_2);
-	    size = 2;
+		if (isge2byteoffset(rmbcount)) {
+			putobj1(OBJ_SKIP_2);
+			size = 2;
+		} else {
+			putobj1(OBJ_SKIP_1);
+			size = 1;
+		}
+		putobjoffset(rmbcount, size);
+		rmbcount = 0;
 	}
-	else
-	{
-	    putobj1(OBJ_SKIP_1);
-	    size = 1;
-	}
-	putobjoffset(rmbcount, size);
-	rmbcount = 0;
-    }
 }
 
 /* generate object code for current line */
@@ -124,62 +114,52 @@ PRIVATE void flushrmb()
 
 PUBLIC void genobj()
 {
-    struct address_s *adrptr;
-    char *bufptr;
-    unsigned char remaining;
+	struct address_s *adrptr;
+	char *bufptr;
+	unsigned char remaining;
 
-    if (objectc && mcount != 0)
-    {
-	if (popflags)
-	{
-	    if (fcflag)
-	    {
-		bufptr = databuf.fcbuf;
-		remaining = mcount;
-		do
-		    putabs(*bufptr++);
-		while (--remaining != 0);
-	    }
-	    if (fdflag)
-	    {
-		adrptr = databuf.fdbuf;
-		remaining = mcount;
-		do
-		    genobjadr(adrptr++, 2);
-		while ((remaining -= 2) != 0);
-	    }
+	if (objectc && mcount != 0) {
+		if (popflags) {
+			if (fcflag) {
+				bufptr = databuf.fcbuf;
+				remaining = mcount;
+				do
+					putabs(*bufptr++);
+				while (--remaining != 0);
+			}
+			if (fdflag) {
+				adrptr = databuf.fdbuf;
+				remaining = mcount;
+				do
+					genobjadr(adrptr++, 2);
+				while ((remaining -= 2) != 0);
+			}
 #if SIZEOF_OFFSET_T > 2
-	    if (fqflag)
-	    {
-		adrptr = databuf.fqbuf;
-		remaining = mcount;
-		do
-		    genobjadr(adrptr++, 4);
-		while ((remaining -= 4) != 0);
-	    }
+			if (fqflag) {
+				adrptr = databuf.fqbuf;
+				remaining = mcount;
+				do
+					genobjadr(adrptr++, 4);
+				while ((remaining -= 4) != 0);
+			}
 #endif
-	}
-	else
-	{
-	    remaining = mcount - 1;	/* count opcode immediately */
-	    if (page != 0)
-	    {
-		putabs(page);
-		--remaining;
-	    }
-	    putabs(opcode);
-	    if (remaining != 0)
-	    {
-		if (postb != 0)
-		{
-		    putabs(postb);
-		    --remaining;
+		} else {
+			remaining = mcount - 1;	/* count opcode immediately */
+			if (page != 0) {
+				putabs(page);
+				--remaining;
+			}
+			putabs(opcode);
+			if (remaining != 0) {
+				if (postb != 0) {
+					putabs(postb);
+					--remaining;
+				}
+				if (remaining != 0)
+					genobjadr(&lastexp, remaining);
+			}
 		}
-		if (remaining != 0)
-		    genobjadr(&lastexp, remaining);
-	    }
 	}
-    }
 }
 
 /* generate object code for current address */
@@ -188,91 +168,79 @@ PRIVATE void genobjadr(adrptr, size)
 struct address_s *adrptr;
 smallcount_t size;
 {
-    unsigned char byte;
-    unsigned symnum;
+	unsigned char byte;
+	unsigned symnum;
 
-    if (!(adrptr->data & RELBIT))
-    {
-	/* absolute address */
+	if (!(adrptr->data & RELBIT)) {
+		/* absolute address */
 
-	char buf[sizeof(offset_t)];
+		char buf[sizeof(offset_t)];
 
 #if SIZEOF_OFFSET_T > 2
-	u4cn(buf, adrptr->offset, size);
+		u4cn(buf, adrptr->offset, size);
 #else
-	u2cn(buf, adrptr->offset, size);
+		u2cn(buf, adrptr->offset, size);
 #endif
-	putabs(buf[0]);
-	if (size > 1)
-	    putabs(buf[1]);
-	if (size > 2)
-	{
-	    putabs(buf[2]);
-	    putabs(buf[3]);
-	}
-    }
-    else
-    {
-	/* relocatable address */
-	if (size != relsize)
-	    /* set reloc size index |00|0000xx| */
-	    putobj((relsize = size) == 4 ? 0x03 : relsize);
-	if (!(adrptr->data & IMPBIT))
-	{
-	    /* offset relocation (known offset) */
-	    putobj((adrptr->data & SEGM) | OBJ_OFFSET_REL | pcrflag);
-	    putobjoffset(adrptr->offset, size);
-	}
-	else
-	{
-	    /* symbol relocation (imported symbol + offset) */
-	    {
-		register struct sym_s **copyptr;
+		putabs(buf[0]);
+		if (size > 1)
+			putabs(buf[1]);
+		if (size > 2) {
+			putabs(buf[2]);
+			putabs(buf[3]);
+		}
+	} else {
+		/* relocatable address */
+		if (size != relsize)
+			/* set reloc size index |00|0000xx| */
+			putobj((relsize = size) == 4 ? 0x03 : relsize);
+		if (!(adrptr->data & IMPBIT)) {
+			/* offset relocation (known offset) */
+			putobj((adrptr->
+				data & SEGM) | OBJ_OFFSET_REL | pcrflag);
+			putobjoffset(adrptr->offset, size);
+		} else {
+			/* symbol relocation (imported symbol + offset) */
+			{
+				register struct sym_s **copyptr;
 
-		for (copyptr = arrext, symnum = 0;
-		     symnum < numext && *copyptr++ != adrptr->sym; ++symnum)
-		    ;
-	    }
-	    byte = OBJ_SYMBOL_REL;
-	    if (isge2byteoffset(symnum))
-		byte = OBJ_SYMBOL_REL | OBJ_S_MASK;
+				for (copyptr = arrext, symnum = 0;
+				     symnum < numext
+				     && *copyptr++ != adrptr->sym; ++symnum) ;
+			}
+			byte = OBJ_SYMBOL_REL;
+			if (isge2byteoffset(symnum))
+				byte = OBJ_SYMBOL_REL | OBJ_S_MASK;
 #if SIZEOF_OFFSET_T > 2
-	    if (isge4byteoffset(adrptr->offset))
-	    {
-		byte |= 0x03;	/* 4 byte offset */
-		size = 4;
-	    }
-	    else
+			if (isge4byteoffset(adrptr->offset)) {
+				byte |= 0x03;	/* 4 byte offset */
+				size = 4;
+			} else
 #endif
-	    if (isge2byteoffset(adrptr->offset))
-	    {
-		byte |= 0x02;	/* 2 byte offset */
-		size = 2;
-	    }
-	    else if (adrptr->offset != 0)
-	    {
-		byte |= 0x01;	/* 1 byte offset */
-		size = 1;
-	    }
-	    else
-		size = 0;
-	    putobj(byte | pcrflag);
-	    if (isge2byteoffset(symnum))
-		putobjword(symnum);
-	    else
-		putobj1((opcode_pt) symnum);
-	    if (adrptr->offset != 0)
-		putobjoffset(adrptr->offset, size);
+			if (isge2byteoffset(adrptr->offset)) {
+				byte |= 0x02;	/* 2 byte offset */
+				size = 2;
+			} else if (adrptr->offset != 0) {
+				byte |= 0x01;	/* 1 byte offset */
+				size = 1;
+			} else
+				size = 0;
+			putobj(byte | pcrflag);
+			if (isge2byteoffset(symnum))
+				putobjword(symnum);
+			else
+				putobj1((opcode_pt) symnum);
+			if (adrptr->offset != 0)
+				putobjoffset(adrptr->offset, size);
+		}
 	}
-    }
 }
 
 /* initialise private variables */
 
 PUBLIC void initobj()
 {
-    absbufend = (absbufptr = absbuf = hid_absbuf) + sizeof hid_absbuf;
-    objbufend = (objbufptr = objbuf = hid_objbuf) + sizeof hid_objbuf;
+	absbufend = (absbufptr = absbuf = hid_absbuf) + sizeof hid_absbuf;
+	objbufend = (objbufptr = objbuf = hid_objbuf) + sizeof hid_objbuf;
 }
 
 /*
@@ -282,115 +250,122 @@ PUBLIC void initobj()
 
 PUBLIC void objheader()
 {
-    static char module_header[] =
-    {
-	'S', '1',		/* 2 byte magic number */
-	0, 1,			/* 2 byte number of modules in file */
-	'S' + '1' + 0 + 1,	/* 1 byte checksum */
-    };
-    static char seg_max_sizes[] =
-    {
-	0x55,			/* all segments have maximum size 2^16 */
-	0x55,			/* this is encoded by 0b01 4 times per byte */
-	0x55,			/* other codes are 0b00 = max size 2^8 */
-	0x55,			/* 0b10 = max size 2^24, 0b11 = max 2^32 */
-    };
-    unsigned char byte;
-    register struct sym_s **copyptr;
-    struct sym_s **copytop;
-    struct sym_s **hashptr;
-    struct lc_s *lcp;
-    char module_name[FILNAMLEN + 1];
-    char *nameptr;
-    unsigned offset;
-    unsigned segsizebytes;
-    unsigned size;
-    unsigned char sizebits;
-    unsigned strsiz;		/* size of object string table */
-    unsigned symosiz;		/* size of object symbol table */
-    register struct sym_s *symptr;
-    u32_T textlength;
-    int symcount = 0;
+	static char module_header[] = {
+		'S', '1',	/* 2 byte magic number */
+		0, 1,		/* 2 byte number of modules in file */
+		'S' + '1' + 0 + 1,	/* 1 byte checksum */
+	};
+	static char seg_max_sizes[] = {
+		0x55,		/* all segments have maximum size 2^16 */
+		0x55,		/* this is encoded by 0b01 4 times per byte */
+		0x55,		/* other codes are 0b00 = max size 2^8 */
+		0x55,		/* 0b10 = max size 2^24, 0b11 = max 2^32 */
+	};
+	unsigned char byte;
+	register struct sym_s **copyptr;
+	struct sym_s **copytop;
+	struct sym_s **hashptr;
+	struct lc_s *lcp;
+	char module_name[FILNAMLEN + 1];
+	char *nameptr;
+	unsigned offset;
+	unsigned segsizebytes;
+	unsigned size;
+	unsigned char sizebits;
+	unsigned strsiz;	/* size of object string table */
+	unsigned symosiz;	/* size of object symbol table */
+	register struct sym_s *symptr;
+	u32_T textlength;
+	int symcount = 0;
 
-    if ((objectc = objectg) == 0)
-	return;
-    writeobj(module_header, sizeof module_header);
+	if ((objectc = objectg) == 0)
+		return;
+	writeobj(module_header, sizeof module_header);
 
-    /* calculate number of imported/exported symbols */
-    /* and lengths of symbol and string tables */
-    /* build array of imported/exported symbols */
+	/* calculate number of imported/exported symbols */
+	/* and lengths of symbol and string tables */
+	/* build array of imported/exported symbols */
 
-    symosiz = 0;
-    if (truefilename == NUL_PTR)
-	truefilename = filnamptr;
-    nameptr = strrchr(truefilename, DIRCHAR);
-    strcpy(module_name, nameptr != NUL_PTR ? nameptr + 1 : truefilename);
-    if ((nameptr = strrchr(module_name, '.')) != NUL_PTR)
-	*nameptr = 0;
-    strsiz = strlen(module_name) + 1;
-    
-    for (hashptr = spt; hashptr < spt_top;)
-	if ((symptr = *hashptr++) != NUL_PTR)
-	    do
-	    {
-		if ((symptr->type & EXPBIT || symptr->data & IMPBIT) ||
-		    (!globals_only_in_obj && symptr->name[0] != '.' &&
-		    !(symptr->type & (MNREGBIT | MACBIT | VARBIT))))
-		{
-		    symcount ++;
-		}
-	    }
-	    while ((symptr = symptr->next) != NUL_PTR);
-    arrext = copyptr = asalloc( sizeof(struct sym_s *) * symcount);
+	symosiz = 0;
+	if (truefilename == NUL_PTR)
+		truefilename = filnamptr;
+	nameptr = strrchr(truefilename, DIRCHAR);
+	strcpy(module_name, nameptr != NUL_PTR ? nameptr + 1 : truefilename);
+	if ((nameptr = strrchr(module_name, '.')) != NUL_PTR)
+		*nameptr = 0;
+	strsiz = strlen(module_name) + 1;
 
-    for (hashptr = spt; hashptr < spt_top;)
-	if ((symptr = *hashptr++) != NUL_PTR)
-	    do
-	    {
-		if ((symptr->type & EXPBIT || symptr->data & IMPBIT) ||
-		    (!globals_only_in_obj && symptr->name[0] != '.' &&
-		    !(symptr->type & (MNREGBIT | MACBIT | VARBIT))))
-		{
-		    *copyptr++ = symptr;
-		    strsiz += symptr->length + 1;
-		    if (textseg>=0 && (symptr->data & SEGM) == textseg)
-		       strsiz+=2;
+	for (hashptr = spt; hashptr < spt_top;)
+		if ((symptr = *hashptr++) != NUL_PTR)
+			do {
+				if ((symptr->type & EXPBIT
+				     || symptr->data & IMPBIT)
+				    || (!globals_only_in_obj
+					&& symptr->name[0] != '.'
+					&& !(symptr->
+					     type & (MNREGBIT | MACBIT |
+						     VARBIT)))) {
+					symcount++;
+				}
+			}
+			while ((symptr = symptr->next) != NUL_PTR);
+	arrext = copyptr = asalloc(sizeof(struct sym_s *) * symcount);
+
+	for (hashptr = spt; hashptr < spt_top;)
+		if ((symptr = *hashptr++) != NUL_PTR)
+			do {
+				if ((symptr->type & EXPBIT
+				     || symptr->data & IMPBIT)
+				    || (!globals_only_in_obj
+					&& symptr->name[0] != '.'
+					&& !(symptr->
+					     type & (MNREGBIT | MACBIT |
+						     VARBIT)))) {
+					*copyptr++ = symptr;
+					strsiz += symptr->length + 1;
+					if (textseg >= 0
+					    && (symptr->data & SEGM) == textseg)
+						strsiz += 2;
 #if SIZEOF_OFFSET_T > 2
-		    if (isge4byteoffset(symptr->value_reg_or_op.value))
-			size = 4 + 4;
-			/* 4 is size of offset into string table and flags */
-			/* 2nd 4 is for 4 byte offset */
-		    else
+					if (isge4byteoffset
+					    (symptr->value_reg_or_op.value))
+						size = 4 + 4;
+					/* 4 is size of offset into string table and flags */
+					/* 2nd 4 is for 4 byte offset */
+					else
 #endif
-		    if (isge2byteoffset(symptr->value_reg_or_op.value))
-			size = 4 + 2;
-		    else if (symptr->value_reg_or_op.value != 0)
-			size = 4 + 1;
-		    else
-			size = 4;
-		    symosiz += size;
-		    ++numext;
-		}
-	    }
-	    while ((symptr = symptr->next) != NUL_PTR);
-    copytop = copyptr;
+					if (isge2byteoffset
+						    (symptr->
+							     value_reg_or_op.
+							     value))
+						size = 4 + 2;
+					else if (symptr->value_reg_or_op.
+						 value != 0)
+						size = 4 + 1;
+					else
+						size = 4;
+					symosiz += size;
+					++numext;
+				}
+			}
+			while ((symptr = symptr->next) != NUL_PTR);
+	copytop = copyptr;
 
-    /* calculate length of text, and number of seg size bytes in header */
+	/* calculate length of text, and number of seg size bytes in header */
 
-    textlength = segsizebytes = 0;
-    lcp = lctab;
-    do
-	if (lcp->lc != 0)
-	{
-	    textlength += lcp->lc;	/* assuming text starts at 0 */
+	textlength = segsizebytes = 0;
+	lcp = lctab;
+	do
+		if (lcp->lc != 0) {
+			textlength += lcp->lc;	/* assuming text starts at 0 */
 #if SIZEOF_OFFSET_T > 2
-	    if (isge4byteoffset(lcp->lc))
-		segsizebytes += 4;
-	    else
+			if (isge4byteoffset(lcp->lc))
+				segsizebytes += 4;
+			else
 #endif
-		segsizebytes += 2;	/* use 2 byte size if possible */
-	}
-    while (++lcp < lctabtop);
+				segsizebytes += 2;	/* use 2 byte size if possible */
+		}
+	while (++lcp < lctabtop) ;
 
 /*
   offset to text = length of header since only 1 module
@@ -409,148 +384,133 @@ PUBLIC void objheader()
   strings			strsiz
 */
 
-    /* offset to start of text */
+	/* offset to start of text */
 
-    putobj4((u32_T) (sizeof module_header + 4 + 4 + 2 + 1 + 1 +
-		     sizeof seg_max_sizes + 4 + segsizebytes + 2 +
-		     symosiz) + strsiz);
+	putobj4((u32_T) (sizeof module_header + 4 + 4 + 2 + 1 + 1 +
+			 sizeof seg_max_sizes + 4 + segsizebytes + 2 +
+			 symosiz) + strsiz);
 
-    /* length of text */
+	/* length of text */
 
-    putobj4((u32_T) textlength);
+	putobj4((u32_T) textlength);
 
-    /* length of string area */
+	/* length of string area */
 
-    putobjword(strsiz);
+	putobjword(strsiz);
 
-    /* class and revision */
+	/* class and revision */
 
-    putobj1(0);
-    putobj1(0);
-
-    /* segment max sizes (constant) */
-
-    writeobj(seg_max_sizes, sizeof seg_max_sizes);
-
-    /* segment size descriptors */
-    /* produce only 0 and 2 byte sizes */
-
-    lcp = lctabtop;
-    byte = 0;
-    sizebits = OBJ_SEGSZ_TWO << 6;
-    do
-    {
-	--lcp;
-	if (lcp->lc != 0)
-	{
-	    byte |= sizebits;
-#if SIZEOF_OFFSET_T > 2
-	    if (isge4byteoffset(lcp->lc))
-		byte |= sizebits >> 1;	/* XXX - convert size 2 to size 4 */
-#endif
-	}
-	if ((sizebits >>= 2) == 0)
-	{
-	    putobj1(byte);
-	    byte = 0;
-	    sizebits = OBJ_SEGSZ_TWO << 6;
-	}
-    }
-    while (lcp > lctab);
-
-    /* segment sizes */
-
-    do				/* lcp starts at lctab */
-	if (lcp->lc != 0)
-	{
-#if SIZEOF_OFFSET_T > 2
-	    if (isge4byteoffset(lcp->lc))
-		putobj4(lcp->lc);
-	    else
-#endif
-		putobjword((unsigned) lcp->lc);
-	}
-    while (++lcp < lctabtop);
-
-    /* symbol count */
-
-    putobjword(numext);
-
-    /* symbol offsets and types */
-
-    offset = strlen(module_name) + 1;	/* 1st symbol begins after name */
-    for (copyptr = arrext; copyptr < copytop;)
-    {
-	putobjword(offset);
-	symptr = *copyptr++;
-	byte = symptr->type & OBJ_N_MASK;
-#if SIZEOF_OFFSET_T > 2
-	if (isge4byteoffset(symptr->value_reg_or_op.value))
-	{
-	    byte |= OBJ_SZ_FOUR;
-	    size = 4;
-	}
-	else
-#endif
-	if (isge2byteoffset(symptr->value_reg_or_op.value))
-	{
-	    byte |= OBJ_SZ_TWO;
-	    size = 2;
-	}
-	else if (symptr->value_reg_or_op.value != 0)
-	{
-	    byte |= OBJ_SZ_ONE;
-	    size = 1;
-	}
-	else
-	    size = 0;
-	if ((symptr->type & (COMMBIT | REDBIT)) == (COMMBIT | REDBIT))
-	{
-	    byte |= OBJ_SA_MASK;
-	    symptr->data &= ~OBJ_I_MASK;
-	}
-	putobjword((unsigned)
-		   (byte << 0x8) |
-		   (symptr->type & OBJ_E_MASK) |	/* |E|0000000| */
-	       ((symptr->data & (OBJ_I_MASK | OBJ_A_MASK | OBJ_SEGM_MASK)) ^
-	/* |0|I|0|A|SEGM| */
-		RELBIT));	/* RELBIT by negative logic */
-	if ((symptr->type & (COMMBIT | REDBIT)) == (COMMBIT | REDBIT))
-	    symptr->data |= OBJ_I_MASK;
-	if (size != 0)
-	    putobjoffset(symptr->value_reg_or_op.value, size);
-	offset += symptr->length + 1;
-	if (textseg>=0 && (symptr->data & SEGM) == textseg)
-	   offset+=2;
-    }
-
-    /* strings */
-
-    writeobj(module_name, strlen(module_name));
-    putobj1(0);
-    for (copyptr = arrext; copyptr < copytop;)
-    {
-	symptr = *copyptr++;
-	writeobj(symptr->name, symptr->length);
-	if (textseg>=0 && (symptr->data & SEGM) == textseg)
-	{
-	   putobj1('.');
-	   putobj1(hexdigit[textseg]);
-	}
 	putobj1(0);
-    }
-    putobj1(OBJ_SET_SEG | 0);	/* default segment 0, |0010|SEGM| */
+	putobj1(0);
+
+	/* segment max sizes (constant) */
+
+	writeobj(seg_max_sizes, sizeof seg_max_sizes);
+
+	/* segment size descriptors */
+	/* produce only 0 and 2 byte sizes */
+
+	lcp = lctabtop;
+	byte = 0;
+	sizebits = OBJ_SEGSZ_TWO << 6;
+	do {
+		--lcp;
+		if (lcp->lc != 0) {
+			byte |= sizebits;
+#if SIZEOF_OFFSET_T > 2
+			if (isge4byteoffset(lcp->lc))
+				byte |= sizebits >> 1;	/* XXX - convert size 2 to size 4 */
+#endif
+		}
+		if ((sizebits >>= 2) == 0) {
+			putobj1(byte);
+			byte = 0;
+			sizebits = OBJ_SEGSZ_TWO << 6;
+		}
+	}
+	while (lcp > lctab);
+
+	/* segment sizes */
+
+	do			/* lcp starts at lctab */
+		if (lcp->lc != 0) {
+#if SIZEOF_OFFSET_T > 2
+			if (isge4byteoffset(lcp->lc))
+				putobj4(lcp->lc);
+			else
+#endif
+				putobjword((unsigned)lcp->lc);
+		}
+	while (++lcp < lctabtop) ;
+
+	/* symbol count */
+
+	putobjword(numext);
+
+	/* symbol offsets and types */
+
+	offset = strlen(module_name) + 1;	/* 1st symbol begins after name */
+	for (copyptr = arrext; copyptr < copytop;) {
+		putobjword(offset);
+		symptr = *copyptr++;
+		byte = symptr->type & OBJ_N_MASK;
+#if SIZEOF_OFFSET_T > 2
+		if (isge4byteoffset(symptr->value_reg_or_op.value)) {
+			byte |= OBJ_SZ_FOUR;
+			size = 4;
+		} else
+#endif
+		if (isge2byteoffset(symptr->value_reg_or_op.value)) {
+			byte |= OBJ_SZ_TWO;
+			size = 2;
+		} else if (symptr->value_reg_or_op.value != 0) {
+			byte |= OBJ_SZ_ONE;
+			size = 1;
+		} else
+			size = 0;
+		if ((symptr->type & (COMMBIT | REDBIT)) == (COMMBIT | REDBIT)) {
+			byte |= OBJ_SA_MASK;
+			symptr->data &= ~OBJ_I_MASK;
+		}
+		putobjword((unsigned)
+			   (byte << 0x8) | (symptr->type & OBJ_E_MASK) |	/* |E|0000000| */
+			   ((symptr->
+			     data & (OBJ_I_MASK | OBJ_A_MASK | OBJ_SEGM_MASK)) ^
+			    /* |0|I|0|A|SEGM| */
+			    RELBIT));	/* RELBIT by negative logic */
+		if ((symptr->type & (COMMBIT | REDBIT)) == (COMMBIT | REDBIT))
+			symptr->data |= OBJ_I_MASK;
+		if (size != 0)
+			putobjoffset(symptr->value_reg_or_op.value, size);
+		offset += symptr->length + 1;
+		if (textseg >= 0 && (symptr->data & SEGM) == textseg)
+			offset += 2;
+	}
+
+	/* strings */
+
+	writeobj(module_name, strlen(module_name));
+	putobj1(0);
+	for (copyptr = arrext; copyptr < copytop;) {
+		symptr = *copyptr++;
+		writeobj(symptr->name, symptr->length);
+		if (textseg >= 0 && (symptr->data & SEGM) == textseg) {
+			putobj1('.');
+			putobj1(hexdigit[textseg]);
+		}
+		putobj1(0);
+	}
+	putobj1(OBJ_SET_SEG | 0);	/* default segment 0, |0010|SEGM| */
 }
 
 /* write trailer to object file */
 
 PUBLIC void objtrailer()
 {
-    if (objectc)
-    {
-	putobj(0);		/* end of object file */
-	flushobj();
-    }
+	if (objectc) {
+		putobj(0);	/* end of object file */
+		flushobj();
+	}
 }
 
 /* write char to absolute object code buffer, flush if necessary */
@@ -558,14 +518,13 @@ PUBLIC void objtrailer()
 PUBLIC void putabs(ch)
 opcode_pt ch;
 {
-    if (objectc)
-    {
-	if (rmbcount != 0)
-	    flushrmb();
-	if (absbufptr >= absbufend)
-	    flushabs();
-	*absbufptr++ = ch;
-    }
+	if (objectc) {
+		if (rmbcount != 0)
+			flushrmb();
+		if (absbufptr >= absbufend)
+			flushabs();
+		*absbufptr++ = ch;
+	}
 }
 
 /* write char to object code buffer, flush if necessary */
@@ -573,12 +532,11 @@ opcode_pt ch;
 PUBLIC void putobj(ch)
 opcode_pt ch;
 {
-    if (objectc)
-    {
-	flushabs();
-	flushrmb();
-	putobj1(ch);
-    }
+	if (objectc) {
+		flushabs();
+		flushrmb();
+		putobj1(ch);
+	}
 }
 
 /* write char to object code buffer assuming nothing in absolute & rmb bufs */
@@ -586,9 +544,9 @@ opcode_pt ch;
 PRIVATE void putobj1(ch)
 opcode_pt ch;
 {
-    if (objbufptr >= objbufend)
-	flushobj();
-    *objbufptr++ = ch;
+	if (objbufptr >= objbufend)
+		flushobj();
+	*objbufptr++ = ch;
 }
 
 /* write 32 bit offset to object code buffer assuming ... */
@@ -596,10 +554,10 @@ opcode_pt ch;
 PRIVATE void putobj4(offset)
 u32_T offset;
 {
-    char buf[sizeof offset];
+	char buf[sizeof offset];
 
-    u4c4(buf, offset);
-    writeobj(buf, 4);
+	u4c4(buf, offset);
+	writeobj(buf, 4);
 }
 
 /* write sized offset to object code buffer assuming ... */
@@ -608,21 +566,20 @@ PRIVATE void putobjoffset(offset, size)
 offset_t offset;
 count_t size;
 {
-    char buf[sizeof offset];
+	char buf[sizeof offset];
 
 #if SIZEOF_OFFSET_T > 2
-    u4cn(buf, offset, size);
+	u4cn(buf, offset, size);
 #else
-    u2cn(buf, offset, size);
+	u2cn(buf, offset, size);
 #endif
-    putobj1(buf[0]);
-    if (size > 1)
-	putobj1(buf[1]);
-    if (size > 2)
-    {
-	putobj1(buf[2]);
-	putobj1(buf[3]);
-    }
+	putobj1(buf[0]);
+	if (size > 1)
+		putobj1(buf[1]);
+	if (size > 2) {
+		putobj1(buf[2]);
+		putobj1(buf[3]);
+	}
 }
 
 /* write word to object code buffer assuming ... */
@@ -630,11 +587,11 @@ count_t size;
 PRIVATE void putobjword(word)
 unsigned word;
 {
-    char buf[sizeof word];
+	char buf[sizeof word];
 
-    u2c2(buf, word);
-    putobj1(buf[0]);
-    putobj1(buf[1]);
+	u2c2(buf, word);
+	putobj1(buf[0]);
+	putobj1(buf[1]);
 }
 
 /* write several bytes to object code buffer assuming ... */
@@ -643,7 +600,7 @@ PRIVATE void writeobj(buf, count)
 char *buf;
 unsigned count;
 {
-    do
-	putobj1(*buf++);
-    while (--count);
+	do
+		putobj1(*buf++);
+	while (--count);
 }

@@ -8,20 +8,20 @@ PUBLIC int main(argc, argv)
 int argc;
 char **argv;
 {
-    debug(1, "Start");
-    growheap(0);		/* init order is important */
-    syminit();
-    etreeinit();
+	debug(1, "Start");
+	growheap(0);		/* init order is important */
+	syminit();
+	etreeinit();
 #ifdef BUILTIN_CPP
-    ifinit();
-    predefine();
+	ifinit();
+	predefine();
 #endif
-    openio(argc, argv);
-    codeinit();
-    typeinit();
-    program();
-    finishup();
+	openio(argc, argv);
+	codeinit();
+	typeinit();
+	program();
+	finishup();
 
-    /* NOTREACHED */
-    return 0;
+	/* NOTREACHED */
+	return 0;
 }

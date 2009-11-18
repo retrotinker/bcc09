@@ -90,13 +90,13 @@
 #define USE_DBPRINTF
 
 #ifndef DEBUG
-static char ident[] = 
-   "$Id: debug.c: (c) 1995-2004 Robert de Bath. Debugging disabled. $";
+static char ident[] =
+    "$Id: debug.c: (c) 1995-2004 Robert de Bath. Debugging disabled. $";
 #else
-static char ident[] = 
-   "$Id: debug.c: (c) 1995-2004 Robert de Bath. Debugging enabled. $";
+static char ident[] =
+    "$Id: debug.c: (c) 1995-2004 Robert de Bath. Debugging enabled. $";
 
-static char * db_file = 0;
+static char *db_file = 0;
 static int db_lineno = 0;
 static int disp_state = 0;
 static int disp_pos(void);
@@ -105,92 +105,94 @@ static void debug_envvar(void);
 
 int debug_level = -1;
 
-void debug_do_setlevel(char * fname, int lineno, int level) 
+void debug_do_setlevel(char *fname, int lineno, int level)
 {
-   if(level || !debug_level) 
-      debug_level = level;
-   debug_pos(fname, lineno);
-   debug_msg(1, "Debug level now %d", level);
-   debug_level = level;
+	if (level || !debug_level)
+		debug_level = level;
+	debug_pos(fname, lineno);
+	debug_msg(1, "Debug level now %d", level);
+	debug_level = level;
 }
 
-int debug_pos(char * file, int lineno)
+int debug_pos(char *file, int lineno)
 {
-   db_file = file;
-   db_lineno = lineno;
-   disp_state |= 1;
-   return disp_pos();
+	db_file = file;
+	db_lineno = lineno;
+	disp_state |= 1;
+	return disp_pos();
 }
 
-int debug_msg(int level, char * fmt, ...)
+int debug_msg(int level, char *fmt, ...)
 {
-   va_list ap;
-   int rv = 0;
-   int disp = 0;
+	va_list ap;
+	int rv = 0;
+	int disp = 0;
 
-   if (debug_level == -1) debug_envvar();
+	if (debug_level == -1)
+		debug_envvar();
 
-   if (level == -1) {
-      level = 0;
-      disp_state |= 1;
-      db_lineno = -1;
-   }
+	if (level == -1) {
+		level = 0;
+		disp_state |= 1;
+		db_lineno = -1;
+	}
 
-   disp_state |= 2;
+	disp_state |= 2;
 
-   if (level>9 || debug_level>9) {
-      disp = (level%10 <= debug_level%10);
-      if (disp && level>9 && debug_level>9 && level/10 != debug_level/10)
-	 disp = 0;
-   } else disp = (level <= debug_level);
+	if (level > 9 || debug_level > 9) {
+		disp = (level % 10 <= debug_level % 10);
+		if (disp && level > 9 && debug_level > 9
+		    && level / 10 != debug_level / 10)
+			disp = 0;
+	} else
+		disp = (level <= debug_level);
 
-   if (disp)
-   {
-      disp_state |= 4;
+	if (disp) {
+		disp_state |= 4;
 
-      va_start(ap, fmt);
+		va_start(ap, fmt);
 #ifdef USE_DBPRINTF
-      rv = vdbprintf(fmt, ap);
+		rv = vdbprintf(fmt, ap);
 #else
-      rv = vfprintf(stderr, fmt, ap);
+		rv = vfprintf(stderr, fmt, ap);
 #endif
-      va_end(ap);
-   }
-   return rv + disp_pos();
+		va_end(ap);
+	}
+	return rv + disp_pos();
 }
 
-int
-disp_pos()
+int disp_pos()
 {
-   int rv = 0;
-   if (disp_state == 7 && db_lineno != -1)
+	int rv = 0;
+	if (disp_state == 7 && db_lineno != -1)
 #ifdef USE_DBPRINTF
-      rv = dbprintf(" at %s:%d\n", db_file, db_lineno);
+		rv = dbprintf(" at %s:%d\n", db_file, db_lineno);
 #else
-      rv = fprintf(stderr, " at %s:%d\n", db_file, db_lineno);
+		rv = fprintf(stderr, " at %s:%d\n", db_file, db_lineno);
 #endif
 
-   if ((disp_state&3) == 3) {
-      db_file = 0;
-      db_lineno = disp_state = 0;
-   }
-   return rv;
+	if ((disp_state & 3) == 3) {
+		db_file = 0;
+		db_lineno = disp_state = 0;
+	}
+	return rv;
 }
 
 /* If setlevel isn't called check the environment */
 
 static void debug_envvar(void)
 {
-   char * p = getenv("DEBUG");
-   if (!p || !*p)
-      debug_level = 0;
-   else 
-      debug_level = atoi(p);
-   if (debug_level)
+	char *p = getenv("DEBUG");
+	if (!p || !*p)
+		debug_level = 0;
+	else
+		debug_level = atoi(p);
+	if (debug_level)
 #ifdef USE_DBPRINTF
-      dbprintf("Debug level now %d from environment.\n", debug_level);
+		dbprintf("Debug level now %d from environment.\n", debug_level);
 #else
-      fprintf(stderr, "Debug level now %d from environment.\n", debug_level);
+		fprintf(stderr, "Debug level now %d from environment.\n",
+			debug_level);
 #endif
 }
 
@@ -205,12 +207,12 @@ static void debug_envvar(void)
  *
  * We know GNU-C is ok, but it complains.
  */
-int debug_never(int level, char * name, ...)
+int debug_never(int level, char *name, ...)
 {
 #ifndef __GNUC__
-   1?0:debug_never(0, "$Warning: Debugging strings exist in non-debug binary $");
+	1 ? 0 : debug_never(0,
+			    "$Warning: Debugging strings exist in non-debug binary $");
 #endif
-   return 0;
+	return 0;
 }
 #endif
-

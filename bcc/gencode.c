@@ -29,7 +29,6 @@
 			    (t)->type->constructor & FUNCTION))
 #endif
 
-
 PUBLIC store_pt allregs = BREG | DREG | INDREG0 | INDREG1 | INDREG2;
 PUBLIC store_pt allindregs = INDREG0 | INDREG1 | INDREG2;
 PUBLIC uoffset_T alignmask = ~(uoffset_T) 0x0000;
@@ -64,540 +63,505 @@ PUBLIC uoffset_T opregsize = 2;
 PUBLIC uoffset_T pshregsize = 2;
 PUBLIC uoffset_T returnadrsize = 2;
 
-
 PRIVATE store_pt callermask;
 PRIVATE offset_T lastargsp;
 
-PRIVATE smalin_t opdata[] =
-{
+PRIVATE smalin_t opdata[] = {
 /*	GTOP, LTOP, ADDOP, DIVOP, */
-    GT, LT, 0, 0,
+	GT, LT, 0, 0,
 /*	MODOP, LOGNOTOP, NOTOP, STRUCELTOP, */
-    0, 0, 0, 0,
+	0, 0, 0, 0,
 /*	STRUCPTROP, ASSIGNOP, ADDABOP, ANDABOP, */
-    0, 0, 0, ANDOP,
+	0, 0, 0, ANDOP,
 /*	DIVABOP, EORABOP, MODABOP, MULABOP, */
-    DIVOP, EOROP, MODOP, MULOP,
+	DIVOP, EOROP, MODOP, MULOP,
 /*	ORABOP, SLABOP, SRABOP, SUBABOP, */
-    OROP, SLOP, SROP, 0,
+	OROP, SLOP, SROP, 0,
 /*	COMMAOP, COLONOP, LOGOROP, LOGANDOP, */
-    0, 0, 0, 0,
+	0, 0, 0, 0,
 /*	EQOP, NEOP, GEOP, LEOP, */
-    EQ, NE, GE, LE,
+	EQ, NE, GE, LE,
 };
 
-FORWARD void abop P((op_pt op, struct symstruct *source,
-		      struct symstruct *target));
-FORWARD void smakeleaf P((struct nodestruct *exp));
-FORWARD void tcheck P((struct nodestruct *exp));
+FORWARD void abop P((op_pt op, struct symstruct * source,
+		     struct symstruct * target));
+FORWARD void smakeleaf P((struct nodestruct * exp));
+FORWARD void tcheck P((struct nodestruct * exp));
 
 PRIVATE void abop(op, source, target)
 op_pt op;
 struct symstruct *source;
 struct symstruct *target;
 {
-    store_pt regmark;
-    store_pt regpushed;
-    store_pt regtemp;
-    struct symstruct temptarg;
+	store_pt regmark;
+	store_pt regpushed;
+	store_pt regtemp;
+	struct symstruct temptarg;
 
-    regpushed = preslval(source, target);
-    temptarg = *target;
-    if ((source->type->scalar ^ target->type->scalar) & (DLONG | RSCALAR)
-	&& op != SLABOP && op != SRABOP)	/* XXX - perhaps not float */
-    {
-	pres2(target, source);
-	cast(source->type, &temptarg);
-    }
-    switch (op)
-    {
-    case ADDABOP:
-	add(source, &temptarg);
-	break;
-    case ANDABOP:
-    case EORABOP:
-    case ORABOP:
-	op1((opdata - FIRSTOPDATA)[op], source, &temptarg);
-	break;
-    case DIVABOP:
-    case MODABOP:
-    case MULABOP:
-    case SLABOP:
-    case SRABOP:
-	softop((opdata - FIRSTOPDATA)[op], source, &temptarg);
-	break;
-    case PTRADDABOP:
-	regtemp = 0;
-	if ((reguse & allindregs) == allindregs)
-	{
-	    /* free a temporary index not used for source or target */
+	regpushed = preslval(source, target);
+	temptarg = *target;
+	if ((source->type->scalar ^ target->type->scalar) & (DLONG | RSCALAR)
+	    && op != SLABOP && op != SRABOP) {	/* XXX - perhaps not float */
+		pres2(target, source);
+		cast(source->type, &temptarg);
+	}
+	switch (op) {
+	case ADDABOP:
+		add(source, &temptarg);
+		break;
+	case ANDABOP:
+	case EORABOP:
+	case ORABOP:
+		op1((opdata - FIRSTOPDATA)[op], source, &temptarg);
+		break;
+	case DIVABOP:
+	case MODABOP:
+	case MULABOP:
+	case SLABOP:
+	case SRABOP:
+		softop((opdata - FIRSTOPDATA)[op], source, &temptarg);
+		break;
+	case PTRADDABOP:
+		regtemp = 0;
+		if ((reguse & allindregs) == allindregs) {
+			/* free a temporary index not used for source or target */
 
-	    regmark = reguse;
-	    reguse = source->storage | temptarg.storage;
-	    pushreg(regtemp = getindexreg());
-	    reguse = regmark & ~regtemp;
+			regmark = reguse;
+			reguse = source->storage | temptarg.storage;
+			pushreg(regtemp = getindexreg());
+			reguse = regmark & ~regtemp;
+		}
+		indexadr(source, &temptarg);
+		if (regtemp) {
+			load(&temptarg, DREG);
+			recovlist(regtemp);
+		}
+		break;
+	case SUBABOP:
+		sub(source, &temptarg);
+		break;
 	}
-	indexadr(source, &temptarg);
-	if (regtemp)
-	{
-	    load(&temptarg, DREG);
-	    recovlist(regtemp);
-	}
-	break;
-    case SUBABOP:
-	sub(source, &temptarg);
-	break;
-    }
-    assign(&temptarg, target);
-    recovlist(regpushed);
+	assign(&temptarg, target);
+	recovlist(regpushed);
 }
 
 PUBLIC void bileaf(exp)
 struct nodestruct *exp;
 {
-    bool_t commutop;
-    bool_t tookaddress;
-    store_t regmark;
-    struct nodestruct *indchase;
-    struct nodestruct *left;
-    struct nodestruct *right;
-    struct symstruct *source;
-    struct symstruct *target;
+	bool_t commutop;
+	bool_t tookaddress;
+	store_t regmark;
+	struct nodestruct *indchase;
+	struct nodestruct *left;
+	struct nodestruct *right;
+	struct symstruct *source;
+	struct symstruct *target;
 
-    left = exp->left.nodeptr;
-    if ((right = exp->right) == NULL)
-    {
-	makeleaf(left);
+	left = exp->left.nodeptr;
+	if ((right = exp->right) == NULL) {
+		makeleaf(left);
+#ifdef DBNODE
+		dbnode(exp);
+#endif
+		return;
+	}
+	switch (exp->tag) {
+	case ADDOP:
+	case ANDOP:
+	case EOROP:
+	case OROP:
+	case EQOP:
+	case NEOP:
+	case MULOP:
+		commutop = TRUE;
+		break;
+	case FUNCOP:
+		makeleaf(left);
+		if ((target = left->left.symptr)->storage & allregs
+		    && right->tag != LEAF && target->flags != REGVAR) {
+			if (target->indcount == 0)
+				push(target);
+			else {
+				--target->indcount;
+				push(target);
+				++target->indcount;
+			}
+		}
+	default:
+		commutop = FALSE;
+		break;
+	}
+	regmark = reguse;
+	if (right->tag != LEAF) {
+		if (left->tag != LEAF && commutop
+		    && left->weight > right->weight) {
+			exp->left.nodeptr = right;
+			right = exp->right = left;
+			left = exp->left.nodeptr;
+#ifdef DBNODE
+			dbnodeswap();
+#endif
+		}
+		makeleaf(right);
+	} else if (left->tag != LEAF)
+		makeleaf(left);
+	source = right->left.symptr;
+	if (left->tag != LEAF) {
+		for (indchase = left;
+		     indchase->tag == INDIRECTOP || indchase->tag == STRUCELTOP;
+		     indchase = indchase->left.nodeptr) ;
+		tookaddress = FALSE;
+		if (source->storage & allindregs || indchase->tag != LEAF) {
+			if (exp->nodetype->constructor & STRUCTU
+			    && exp->tag == ASSIGNOP) {
+				address(source);
+				tookaddress = TRUE;
+			}
+			if (source->storage & allindregs
+			    && source->indcount == 0
+			    && (source->type->scalar & (DLONG | RSCALAR)
+				|| (left->tag == FUNCOP
+				    && source->flags != REGVAR)))
+				push(source);	/* XXX - perhaps not float */
+			else
+				preserve(source);
+		}
+		makeleaf(left);
+		if (tookaddress)
+			indirec(source);
+	}
+	target = left->left.symptr;
+	if (istooindirect(source)) {
+		/* want to makelessindirect(source) */
+		/* this uses source->storage if that is a free index */
+		/* otherwise, must preserve target if that is an index */
+
+		tookaddress = FALSE;
+		if (!(source->storage & ~reguse & allindregs) &&
+		    target->storage & allindregs) {
+			/* want to pres2(source, target) */
+			/* this requires target to be < MAXINDIRECT indirect */
+			/* it is safe to makelessindirect(target) */
+			/* since source is not a free index */
+
+			if (islvalop(exp->tag) && target->indcount != 0) {
+				address(target);
+				tookaddress = TRUE;
+			}
+			if (istooindirect(target))
+				makelessindirect(target);
+			pres2(source, target);
+		}
+		makelessindirect(source);
+		if (tookaddress)
+			indirec(target);
+	}
+	if (istooindirect(target)) {
+		tookaddress = FALSE;
+		if (!(target->storage & ~reguse & allindregs) &&
+		    source->storage & allindregs) {
+			if (exp->nodetype->constructor & STRUCTU
+			    && exp->tag == ASSIGNOP) {
+				address(source);
+				tookaddress = TRUE;
+			}
+			pres2(target, source);
+		}
+		makelessindirect(target);
+		if (tookaddress)
+			indirec(source);
+	}
+	reguse = regmark;
 #ifdef DBNODE
 	dbnode(exp);
 #endif
-	return;
-    }
-    switch (exp->tag)
-    {
-    case ADDOP:
-    case ANDOP:
-    case EOROP:
-    case OROP:
-    case EQOP:
-    case NEOP:
-    case MULOP:
-	commutop = TRUE;
-	break;
-    case FUNCOP:
-	makeleaf(left);
-	if ((target = left->left.symptr)->storage & allregs
-	    && right->tag != LEAF && target->flags != REGVAR)
-	{
-	    if (target->indcount == 0)
-		push(target);
-	    else
-	    {
-		--target->indcount;
-		push(target);
-		++target->indcount;
-	    }
-	}
-    default:
-	commutop = FALSE;
-	break;
-    }
-    regmark = reguse;
-    if (right->tag != LEAF)
-    {
-	if (left->tag != LEAF && commutop && left->weight > right->weight)
-	{
-	    exp->left.nodeptr = right;
-	    right = exp->right = left;
-	    left = exp->left.nodeptr;
+	if (commutop
+	    && ((target->storage == CONSTANT
+		 && !(target->type->scalar & (DLONG | RSCALAR)))
+		|| source->storage & ALLDATREGS
+		|| (source->type->scalar & (DLONG | RSCALAR)
+		    && source->indcount == 0 && target->indcount != 0))) {
+		exp->left.nodeptr = right;
+		exp->right = left;
 #ifdef DBNODE
-	    dbnodeswap();
+		dbnodeswap();
 #endif
 	}
-	makeleaf(right);
-    }
-    else if (left->tag != LEAF)
-	makeleaf(left);
-    source = right->left.symptr;
-    if (left->tag != LEAF)
-    {
-	for (indchase = left;
-	     indchase->tag == INDIRECTOP || indchase->tag == STRUCELTOP;
-	     indchase = indchase->left.nodeptr)
-	    ;
-	tookaddress = FALSE;
-	if (source->storage & allindregs || indchase->tag != LEAF)
-	{
-	    if (exp->nodetype->constructor & STRUCTU && exp->tag == ASSIGNOP)
-	    {
-		address(source);
-		tookaddress = TRUE;
-	    }
-	    if (source->storage & allindregs && source->indcount == 0 &&
-		(source->type->scalar & (DLONG | RSCALAR) ||
-		 (left->tag == FUNCOP && source->flags != REGVAR)))
-		push(source);	/* XXX - perhaps not float */
-	    else
-		preserve(source);
-	}
-	makeleaf(left);
-	if (tookaddress)
-	    indirec(source);
-    }
-    target = left->left.symptr;
-    if (istooindirect(source))
-    {
-	/* want to makelessindirect(source) */
-	/* this uses source->storage if that is a free index */
-	/* otherwise, must preserve target if that is an index */
-
-	tookaddress = FALSE;
-	if (!(source->storage & ~reguse & allindregs) &&
-	    target->storage & allindregs)
-	{
-	    /* want to pres2(source, target) */
-	    /* this requires target to be < MAXINDIRECT indirect */
-	    /* it is safe to makelessindirect(target) */
-	    /* since source is not a free index */
-
-	    if (islvalop(exp->tag) && target->indcount != 0)
-	    {
-		address(target);
-		tookaddress = TRUE;
-	    }
-	    if (istooindirect(target))
-		makelessindirect(target);
-	    pres2(source, target);
-	}
-	makelessindirect(source);
-	if (tookaddress)
-	    indirec(target);
-    }
-    if (istooindirect(target))
-    {
-	tookaddress = FALSE;
-	if (!(target->storage & ~reguse & allindregs) &&
-	    source->storage & allindregs)
-	{
-	    if (exp->nodetype->constructor & STRUCTU && exp->tag == ASSIGNOP)
-	    {
-		address(source);
-		tookaddress = TRUE;
-	    }
-	    pres2(target, source);
-	}
-	makelessindirect(target);
-	if (tookaddress)
-	    indirec(source);
-    }
-    reguse = regmark;
-#ifdef DBNODE
-    dbnode(exp);
-#endif
-    if (commutop
-	&& ((target->storage == CONSTANT
-	    && !(target->type->scalar & (DLONG | RSCALAR)))
-	    || source->storage & ALLDATREGS
-	    || (source->type->scalar & (DLONG | RSCALAR)
-	       && source->indcount == 0 && target->indcount != 0)))
-    {
-	exp->left.nodeptr = right;
-	exp->right = left;
-#ifdef DBNODE
-	dbnodeswap();
-#endif
-    }
 }
 
 PUBLIC fastin_pt bitcount(number)
 register uvalue_t number;
 {
-    register fastin_pt count;
+	register fastin_pt count;
 
-    for (count = 0; number != 0; number >>= 1)
-	if (number & 1)
-	    ++count;
-    return count;
+	for (count = 0; number != 0; number >>= 1)
+		if (number & 1)
+			++count;
+	return count;
 }
 
 PUBLIC void codeinit()
 {
 #ifdef POSINDEPENDENT
-    if (posindependent)
-    {
-	callstring = "LBSR\t";
-	jumpstring = "LBRA\t";
-    }
+	if (posindependent) {
+		callstring = "LBSR\t";
+		jumpstring = "LBRA\t";
+	}
 #endif
-    if (callersaves)
-	calleemask = 0;
-    callermask = ~calleemask;
+	if (callersaves)
+		calleemask = 0;
+	callermask = ~calleemask;
 #ifdef FRAMEPOINTER
-    funcsaveregsize = bitcount((uvalue_t) calleemask) * maxregsize
-		      + frameregsize;
-    funcdsaveregsize = bitcount((uvalue_t) calleemask & ~doubleregs)
-		       * maxregsize + frameregsize;
-    framelist = FRAMEREG | calleemask;
+	funcsaveregsize = bitcount((uvalue_t) calleemask) * maxregsize
+	    + frameregsize;
+	funcdsaveregsize = bitcount((uvalue_t) calleemask & ~doubleregs)
+	    * maxregsize + frameregsize;
+	framelist = FRAMEREG | calleemask;
 #else
-    funcsaveregsize = bitcount((uvalue_t) calleemask) * maxregsize;
-    funcdsaveregsize = bitcount((uvalue_t) calleemask & ~doubleregs)
-		       * maxregsize;
+	funcsaveregsize = bitcount((uvalue_t) calleemask) * maxregsize;
+	funcdsaveregsize = bitcount((uvalue_t) calleemask & ~doubleregs)
+	    * maxregsize;
 #endif
 }
 
 PUBLIC fastin_pt highbit(number)
 register uvalue_t number;
 {
-    register fastin_pt bit;
+	register fastin_pt bit;
 
-    for (bit = -1; number != 0; number >>= 1)
-	++bit;
-    return bit;
+	for (bit = -1; number != 0; number >>= 1)
+		++bit;
+	return bit;
 }
 
 PUBLIC void makeleaf(exp)
 struct nodestruct *exp;
 {
-    ccode_t condtrue;
-    op_pt op;
-    store_t regmark;
-    offset_T saveargsp = 0; /* for -Wall */
-    store_t savelist = 0; /* for -Wall */
-    offset_T saveoffset = 0; /* for -Wall */
-    struct symstruct *source;
-    offset_T spmark;
-    struct symstruct *structarg = 0; /* for -Wall */
-    struct symstruct *target;
+	ccode_t condtrue;
+	op_pt op;
+	store_t regmark;
+	offset_T saveargsp = 0;	/* for -Wall */
+	store_t savelist = 0;	/* for -Wall */
+	offset_T saveoffset = 0;	/* for -Wall */
+	struct symstruct *source;
+	offset_T spmark;
+	struct symstruct *structarg = 0;	/* for -Wall */
+	struct symstruct *target;
 
-    if ((op_t) (op = exp->tag) == LEAF)
-    {
-	target = exp->left.symptr;
-	if (istooindirect(target))
-	    makelessindirect(target);
+	if ((op_t) (op = exp->tag) == LEAF) {
+		target = exp->left.symptr;
+		if (istooindirect(target))
+			makelessindirect(target);
 #ifdef SELFTYPECHECK
-	tcheck(exp);
+		tcheck(exp);
 #endif
-	return;
-    }
-    if ((op_t) op == INDIRECTOP || (op_t) op == STRUCELTOP)
-    {
-	smakeleaf(exp);
-	target = exp->left.symptr;
-	if (istooindirect(target))
-	    makelessindirect(target);
+		return;
+	}
+	if ((op_t) op == INDIRECTOP || (op_t) op == STRUCELTOP) {
+		smakeleaf(exp);
+		target = exp->left.symptr;
+		if (istooindirect(target))
+			makelessindirect(target);
 #ifdef SELFTYPECHECK
-	tcheck(exp);
+		tcheck(exp);
 #endif
-	return;
-    }
-    if ((op_t) op == COMMAOP)
-    {
+		return;
+	}
+	if ((op_t) op == COMMAOP) {
+		spmark = sp;
+		makeleaf(exp->left.nodeptr);
+		modstk(spmark);
+		makeleaf(exp->right);
+		exp->tag = LEAF;
+		exp->left.symptr = exp->right->left.symptr;
+#ifdef SELFTYPECHECK
+		tcheck(exp);
+#endif
+		return;
+	}
+	if ((op_t) op == CONDOP) {
+		condop(exp);
+#ifdef SELFTYPECHECK
+		tcheck(exp);
+#endif
+		return;
+	}
+	if ((op_t) op == LOGANDOP || (op_t) op == LOGNOTOP
+	    || (op_t) op == LOGOROP) {
+		logop(exp);
+#ifdef SELFTYPECHECK
+		tcheck(exp);
+#endif
+		return;
+	}
+	regmark = reguse;
+	if ((op_t) op == FUNCOP) {
+		saveargsp = lastargsp;
+		lastargsp = savelist = 0;
+		if (exp->nodetype->constructor & STRUCTU) {
+			modstk(sp - (offset_T) exp->nodetype->typesize);
+			onstack(structarg = constsym((value_t) 0));
+		} else {
+			if (exp->nodetype->scalar & DOUBLE) {
+				if (regmark & doublreturnregs)
+					savelist = doublreturnregs;
+			} else if (regmark & RETURNREG)	/* XXX size long == float ? */
+				savelist = exp->nodetype->scalar & DLONG
+				    ? LONGRETURNREGS : RETURNREG;
+			if (savelist != 0)
+				modstk(saveoffset =
+				       sp - exp->nodetype->typesize);
+		}
+		pushlist(regmark & callermask);
+	}
 	spmark = sp;
-	makeleaf(exp->left.nodeptr);
-	modstk(spmark);
-	makeleaf(exp->right);
-	exp->tag = LEAF;
-	exp->left.symptr = exp->right->left.symptr;
-#ifdef SELFTYPECHECK
-	tcheck(exp);
-#endif
-	return;
-    }
-    if ((op_t) op == CONDOP)
-    {
-	condop(exp);
-#ifdef SELFTYPECHECK
-	tcheck(exp);
-#endif
-	return;
-    }
-    if ((op_t) op == LOGANDOP || (op_t) op == LOGNOTOP
-	|| (op_t) op == LOGOROP)
-    {
-	logop(exp);
-#ifdef SELFTYPECHECK
-	tcheck(exp);
-#endif
-	return;
-    }
-    regmark = reguse;
-    if ((op_t) op == FUNCOP)
-    {
-	saveargsp = lastargsp;
-	lastargsp = savelist = 0;
-	if (exp->nodetype->constructor & STRUCTU)
-	{
-	    modstk(sp - (offset_T) exp->nodetype->typesize);
-	    onstack(structarg = constsym((value_t) 0));
-	}
+	bileaf(exp);
+	if (exp->right != NULL)
+		source = exp->right->left.symptr;
 	else
-	{
-	    if (exp->nodetype->scalar & DOUBLE)
-	    {
-		if (regmark & doublreturnregs)
-		    savelist = doublreturnregs;
-	    }
-	    else if (regmark & RETURNREG)	/* XXX size long == float ? */
-		savelist = exp->nodetype->scalar & DLONG
-			   ? LONGRETURNREGS : RETURNREG;
-	    if (savelist != 0)
-		modstk(saveoffset = sp - exp->nodetype->typesize);
+		source = NULL;
+	target = exp->left.nodeptr->left.symptr;
+	switch ((op_t) op) {
+	case ADDABOP:
+	case ANDABOP:
+	case DIVABOP:
+	case EORABOP:
+	case SUBABOP:
+	case MODABOP:
+	case MULABOP:
+	case ORABOP:
+	case PTRADDABOP:
+	case SLABOP:
+	case SRABOP:
+		abop(op, source, target);
+		break;
+	case ADDOP:
+		add(source, target);
+		break;
+	case ADDRESSOP:
+		address(target);
+		break;
+	case ANDOP:
+	case EOROP:
+	case OROP:
+		op1(op, source, target);
+		break;
+	case ASSIGNOP:
+		assign(source, target);
+		break;
+	case CASTOP:
+		cast(source->type, target);
+		break;
+	case DIVOP:
+	case MODOP:
+	case MULOP:
+	case SLOP:
+	case SROP:
+		softop(op, source, target);
+		break;
+	case EQOP:
+	case GEOP:
+	case GTOP:
+	case LEOP:
+	case LTOP:
+	case NEOP:
+		condtrue = (opdata - FIRSTOPDATA)[op];
+		cmp(source, target, &condtrue);
+		break;
+	case FUNCOP:
+		/* kludge update pushed regs */
+		/* may only work for si, di */
+		/* -2 skips for ax and bx */
+		/* need dirtymask to mostly avoid this */
+		savereturn(regmark & callermask & regregs,
+			   spmark - 2 * (offset_T) pshregsize);
+		if (exp->nodetype->constructor & STRUCTU) {
+			address(structarg);
+			push(structarg);
+		}
+		function(target);
+		break;
+	case INDIRECTOP:
+		indirec(target);
+		break;
+	case LISTOP:
+		listo(target, lastargsp);
+		lastargsp = sp;
+		break;
+	case NEGOP:
+		neg(target);
+		break;
+	case NOTOP:
+		not(target);
+		break;
+	case POSTDECOP:
+	case POSTINCOP:
+	case PREDECOP:
+	case PREINCOP:
+		incdec(op, target);
+		break;
+	case PTRADDOP:
+		indexadr(source, target);
+		break;
+	case PTRSUBOP:
+		ptrsub(source, target);
+		break;
+	case ROOTLISTOP:
+		listroot(target);
+		lastargsp = sp;
+		break;
+	case STRUCELTOP:
+		struc(source, target);
+		break;
+	case SUBOP:
+		sub(source, target);
+		break;
 	}
-	pushlist(regmark & callermask);
-    }
-    spmark = sp;
-    bileaf(exp);
-    if (exp->right != NULL)
-	source = exp->right->left.symptr;
-    else
-	source = NULL;
-    target = exp->left.nodeptr->left.symptr;
-    switch ((op_t) op)
-    {
-    case ADDABOP:
-    case ANDABOP:
-    case DIVABOP:
-    case EORABOP:
-    case SUBABOP:
-    case MODABOP:
-    case MULABOP:
-    case ORABOP:
-    case PTRADDABOP:
-    case SLABOP:
-    case SRABOP:
-	abop(op, source, target);
-	break;
-    case ADDOP:
-	add(source, target);
-	break;
-    case ADDRESSOP:
-	address(target);
-	break;
-    case ANDOP:
-    case EOROP:
-    case OROP:
-	op1(op, source, target);
-	break;
-    case ASSIGNOP:
-	assign(source, target);
-	break;
-    case CASTOP:
-	cast(source->type, target);
-	break;
-    case DIVOP:
-    case MODOP:
-    case MULOP:
-    case SLOP:
-    case SROP:
-	softop(op, source, target);
-	break;
-    case EQOP:
-    case GEOP:
-    case GTOP:
-    case LEOP:
-    case LTOP:
-    case NEOP:
-	condtrue = (opdata - FIRSTOPDATA)[op];
-	cmp(source, target, &condtrue);
-	break;
-    case FUNCOP:
-	/* kludge update pushed regs */
-	/* may only work for si, di */
-	/* -2 skips for ax and bx */
-	/* need dirtymask to mostly avoid this */
-	savereturn(regmark & callermask & regregs,
-		   spmark - 2 * (offset_T) pshregsize);
-	if (exp->nodetype->constructor & STRUCTU)
-	{
-	    address(structarg);
-	    push(structarg);
-	}
-	function(target);
-	break;
-    case INDIRECTOP:
-	indirec(target);
-	break;
-    case LISTOP:
-	listo(target, lastargsp);
-	lastargsp = sp;
-	break;
-    case NEGOP:
-	neg(target);
-	break;
-    case NOTOP:
-	not(target);
-	break;
-    case POSTDECOP:
-    case POSTINCOP:
-    case PREDECOP:
-    case PREINCOP:
-	incdec(op, target);
-	break;
-    case PTRADDOP:
-	indexadr(source, target);
-	break;
-    case PTRSUBOP:
-	ptrsub(source, target);
-	break;
-    case ROOTLISTOP:
-	listroot(target);
-	lastargsp = sp;
-	break;
-    case STRUCELTOP:
-	struc(source, target);
-	break;
-    case SUBOP:
-	sub(source, target);
-	break;
-    }
-    if (target->storage == LOCAL && target->offset.offi < spmark &&
-	target->flags == TEMP)
-	spmark = target->offset.offi;
-#if 1 /* XXX - why does sp get changed without this? */
-    if ((op_t) op != ROOTLISTOP)
+	if (target->storage == LOCAL && target->offset.offi < spmark &&
+	    target->flags == TEMP)
+		spmark = target->offset.offi;
+#if 1				/* XXX - why does sp get changed without this? */
+	if ((op_t) op != ROOTLISTOP)
 #endif
-	modstk(spmark);
-    if ((op_t) op == FUNCOP)
-    {
-	lastargsp = saveargsp;
-	if (savelist != 0)
-	{
-	    savereturn(savelist, saveoffset);
-	    onstack(target);
-	    target->offset.offi = saveoffset;
+		modstk(spmark);
+	if ((op_t) op == FUNCOP) {
+		lastargsp = saveargsp;
+		if (savelist != 0) {
+			savereturn(savelist, saveoffset);
+			onstack(target);
+			target->offset.offi = saveoffset;
+		}
+		recovlist(regmark & callermask);
 	}
-	recovlist(regmark & callermask);
-    }
-    reguse = regmark;
-    exp->tag = LEAF;
-    exp->left.symptr = target;
-    if (istooindirect(target))
-	makelessindirect(target);
+	reguse = regmark;
+	exp->tag = LEAF;
+	exp->left.symptr = target;
+	if (istooindirect(target))
+		makelessindirect(target);
 #ifdef SELFTYPECHECK
-    tcheck(exp);
+	tcheck(exp);
 #endif
 }
 
 PRIVATE void smakeleaf(exp)
 struct nodestruct *exp;
 {
-    struct nodestruct *left;
+	struct nodestruct *left;
 
-    left = exp->left.nodeptr;
-    if (left->tag == INDIRECTOP || left->tag == STRUCELTOP)
-	smakeleaf(left);
-    else if (left->tag != LEAF)
-	makeleaf(left);
-    if (exp->tag == INDIRECTOP)
-	indirec(left->left.symptr);
-    else
-    {
-	if (left->left.symptr->indcount > MAXINDIRECT + 1)
-	    makelessindirect(left->left.symptr);
-	struc(exp->right->left.symptr, left->left.symptr);
-    }
-    exp->tag = LEAF;
-    exp->left.symptr = left->left.symptr;
+	left = exp->left.nodeptr;
+	if (left->tag == INDIRECTOP || left->tag == STRUCELTOP)
+		smakeleaf(left);
+	else if (left->tag != LEAF)
+		makeleaf(left);
+	if (exp->tag == INDIRECTOP)
+		indirec(left->left.symptr);
+	else {
+		if (left->left.symptr->indcount > MAXINDIRECT + 1)
+			makelessindirect(left->left.symptr);
+		struc(exp->right->left.symptr, left->left.symptr);
+	}
+	exp->tag = LEAF;
+	exp->left.symptr = left->left.symptr;
 }
 
 #ifdef SELFTYPECHECK
@@ -605,22 +569,21 @@ struct nodestruct *exp;
 PRIVATE void tcheck(exp)
 register struct nodestruct *exp;
 {
-    register struct symstruct *target;
+	register struct symstruct *target;
 
-    if (exp->nodetype != (target = exp->left.symptr)->type)
-    {
-	{
-	    bugerror("botched nodetype calculation");
+	if (exp->nodetype != (target = exp->left.symptr)->type) {
+		{
+			bugerror("botched nodetype calculation");
 #ifdef DBNODE
-	    comment();
-	    outstr("runtime type is ");
-	    dbtype(target->type);
-	    outstr(", calculated type is ");
-	    dbtype(exp->nodetype);
-	    outnl();
+			comment();
+			outstr("runtime type is ");
+			dbtype(target->type);
+			outstr(", calculated type is ");
+			dbtype(exp->nodetype);
+			outnl();
 #endif
+		}
 	}
-    }
 }
 
 #endif /* SELFTYPECHECK */

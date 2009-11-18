@@ -15,73 +15,67 @@ PRIVATE char *heapptr;		/* next free space in symbol list */
 PRIVATE char tempbuf[2048];
 #endif
 
-void
-init_heap()
+void init_heap()
 {
 #ifdef USE_FIXED_HEAP
 #ifndef USERMEM
 #define USERMEM 0xAC00U
 #endif
 
-    heapptr = malloc(USERMEM);
-    heapend = heapptr + USERMEM;
-    if (heapptr == 0)
-	as_abort(NOMEMEORY);
+	heapptr = malloc(USERMEM);
+	heapend = heapptr + USERMEM;
+	if (heapptr == 0)
+		as_abort(NOMEMEORY);
 #endif
 }
 
-void * temp_buf()
+void *temp_buf()
 {
 #ifdef USE_FIXED_HEAP
-    return heapptr;
+	return heapptr;
 #else
-    return tempbuf;
+	return tempbuf;
 #endif
 }
 
-void * 
-asalloc(size)
+void *asalloc(size)
 unsigned int size;
 {
-    void * rv;
+	void *rv;
 #ifdef USE_FIXED_HEAP
-    align(heapptr);
-    if (heapptr+size < heapend)
-    {
-        rv = heapptr;
-        heapptr += size;
-    }
-    else
-       rv = 0;
+	align(heapptr);
+	if (heapptr + size < heapend) {
+		rv = heapptr;
+		heapptr += size;
+	} else
+		rv = 0;
 #else
-    rv = malloc(size);
+	rv = malloc(size);
 #endif
-    if (rv == 0 && size) as_abort(NOMEMEORY);
-    return rv;
+	if (rv == 0 && size)
+		as_abort(NOMEMEORY);
+	return rv;
 }
 
-
-void * 
-asrealloc(oldptr, size)
-void * oldptr;
+void *asrealloc(oldptr, size)
+void *oldptr;
 unsigned int size;
 {
-    void * rv;
+	void *rv;
 #ifdef USE_FIXED_HEAP
-    if (oldptr == 0) return asalloc(size);
+	if (oldptr == 0)
+		return asalloc(size);
 
-    if ((char*)oldptr+size < heapend)
-    {
-        heapptr = (char*)oldptr + size;
-        rv = oldptr;
-    }
-    else
-        rv = 0;
+	if ((char *)oldptr + size < heapend) {
+		heapptr = (char *)oldptr + size;
+		rv = oldptr;
+	} else
+		rv = 0;
 #else
-    rv = realloc(oldptr, size);
+	rv = realloc(oldptr, size);
 #endif
 
-    if (rv == 0) as_abort(NOMEMEORY);
-    return rv;
+	if (rv == 0)
+		as_abort(NOMEMEORY);
+	return rv;
 }
-

@@ -77,46 +77,45 @@ extern char *realloc();
 /* vs_alloc - initial string allocation */
 
 struct vstring *vs_alloc(len)
-int     len;
+int len;
 {
-    register struct vstring *vp;
+	register struct vstring *vp;
 
-    if (len < 1 
-	|| (vp = (struct vstring *) malloc(sizeof(struct vstring))) == 0
-	|| (vp->str = malloc(len)) == 0)
-	return (0);
-    vp->last = vp->str + len - 1;
-    return (vp);
+	if (len < 1
+	    || (vp = (struct vstring *)malloc(sizeof(struct vstring))) == 0
+	    || (vp->str = malloc(len)) == 0)
+		return (0);
+	vp->last = vp->str + len - 1;
+	return (vp);
 }
 
 /* vs_realloc - extend string, update write pointer */
 
-char   *vs_realloc(vp, cp)
+char *vs_realloc(vp, cp)
 register struct vstring *vp;
-char   *cp;
+char *cp;
 {
-    int     where = cp - vp->str;
-    int     len = vp->last - vp->str + 1;
+	int where = cp - vp->str;
+	int len = vp->last - vp->str + 1;
 
-    if ((vp->str = realloc(vp->str, len *= 2)) == 0)
-	return (0);
-    vp->last = vp->str + len - 1;
-    return (vp->str + where);
+	if ((vp->str = realloc(vp->str, len *= 2)) == 0)
+		return (0);
+	vp->last = vp->str + len - 1;
+	return (vp->str + where);
 }
 
 /* vs_strcpy - copy string */
 
-char   *vs_strcpy(vp, dst, src)
+char *vs_strcpy(vp, dst, src)
 register struct vstring *vp;
 register char *dst;
 register char *src;
 {
-    while (*src) {
-	if (VS_ADDCH(vp, dst, *src) == 0)
-	    return (0);
-	src++;
-    }
-    *dst = '\0';
-    return (dst);
+	while (*src) {
+		if (VS_ADDCH(vp, dst, *src) == 0)
+			return (0);
+		src++;
+	}
+	*dst = '\0';
+	return (dst);
 }
-

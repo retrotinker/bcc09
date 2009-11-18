@@ -8,7 +8,7 @@
 #include "scan.h"
 #include "source.h"
 
-FORWARD void experror P((char * err_str));
+FORWARD void experror P((char *err_str));
 FORWARD void expundefined P((void));
 FORWARD void simple2 P((void));
 FORWARD void simple P((void));
@@ -17,63 +17,62 @@ FORWARD void factor2 P((void));
 
 PUBLIC void absexpres()
 {
-    expres();
-    chkabs();
+	expres();
+	chkabs();
 }
 
 /* check lastexp.data is abs */
 
 PUBLIC void chkabs()
 {
-    if (lastexp.data & RELBIT)
-    {
-	if (pass == last_pass)
-	    error(ABSREQ);
-	expundefined();
-    }
+	if (lastexp.data & RELBIT) {
+		if (pass == last_pass)
+			error(ABSREQ);
+		expundefined();
+	}
 }
 
 PRIVATE void experror(err_str)
-char * err_str;
+char *err_str;
 {
-    error(err_str);
-    expundefined();
+	error(err_str);
+	expundefined();
 }
 
 PRIVATE void expundefined()
 {
-    if( last_pass == 1 )
-       lastexp.data = FORBIT | UNDBIT;
-    else
-       lastexp.data = UNDBIT;
+	if (last_pass == 1)
+		lastexp.data = FORBIT | UNDBIT;
+	else
+		lastexp.data = UNDBIT;
 }
 
 PUBLIC void nonimpexpres()
 {
-    expres();
-    if (lastexp.data & IMPBIT)
-	experror(NONIMPREQ);
+	expres();
+	if (lastexp.data & IMPBIT)
+		experror(NONIMPREQ);
 }
 
 /* generate relocation error if pass 2, make lastexp.data forward&undefined */
 
 PUBLIC void showrelbad()
 {
-    if (pass == last_pass)
-	error(RELBAD);
-    expundefined();
+	if (pass == last_pass)
+		error(RELBAD);
+	expundefined();
 }
 
 PUBLIC void symabsexpres()
 {
-    getsym();
-    absexpres();
+	getsym();
+	absexpres();
 }
 
 PUBLIC void symexpres()
 {
-    getsym();
-    expres();
+	getsym();
+	expres();
 }
 
 /*
@@ -85,52 +84,47 @@ PUBLIC void symexpres()
 
 PUBLIC void expres()
 {
-    offset_t leftoffset;
+	offset_t leftoffset;
 
-    simple();
-    leftoffset = lastexp.offset;
-    if (sym == EQOP)
-    {
-	simple2();
-	if (leftoffset == lastexp.offset)
-	    lastexp.offset = -1;
-	else
-	    lastexp.offset = 0;
-    }
-    else if (sym == LESSTHAN)
-    {
-	/* context-sensitive, LESSTHAN really means less than here */
-	simple2();
-	if (leftoffset < lastexp.offset)
-	    lastexp.offset = -1;
-	else
-	    lastexp.offset = 0;
-    }
-    else if (sym == GREATERTHAN)
-    {
-	/* context-sensitive, GREATERTHAN really means greater than here */
-	simple2();
-	if (leftoffset > lastexp.offset)
-	    lastexp.offset = -1;
-	else
-	    lastexp.offset = 0;
-    }
+	simple();
+	leftoffset = lastexp.offset;
+	if (sym == EQOP) {
+		simple2();
+		if (leftoffset == lastexp.offset)
+			lastexp.offset = -1;
+		else
+			lastexp.offset = 0;
+	} else if (sym == LESSTHAN) {
+		/* context-sensitive, LESSTHAN really means less than here */
+		simple2();
+		if (leftoffset < lastexp.offset)
+			lastexp.offset = -1;
+		else
+			lastexp.offset = 0;
+	} else if (sym == GREATERTHAN) {
+		/* context-sensitive, GREATERTHAN really means greater than here */
+		simple2();
+		if (leftoffset > lastexp.offset)
+			lastexp.offset = -1;
+		else
+			lastexp.offset = 0;
+	}
 }
 
 /* get symbol and 2nd simple expression, check both rel or both abs */
 
 PRIVATE void simple2()
 {
-    unsigned char leftdata;
+	unsigned char leftdata;
 
-    leftdata = lastexp.data;
-    getsym();
-    simple();
-    if ((leftdata | lastexp.data) & IMPBIT ||
-	(leftdata ^ lastexp.data) & (RELBIT | SEGM))
-	showrelbad();
-    else
-	lastexp.data = (leftdata & lastexp.data) & ~(RELBIT | SEGM);
+	leftdata = lastexp.data;
+	getsym();
+	simple();
+	if ((leftdata | lastexp.data) & IMPBIT ||
+	    (leftdata ^ lastexp.data) & (RELBIT | SEGM))
+		showrelbad();
+	else
+		lastexp.data = (leftdata & lastexp.data) & ~(RELBIT | SEGM);
 }
 
 /*
@@ -140,108 +134,93 @@ PRIVATE void simple2()
 
 PRIVATE void simple()
 {
-    offset_t leftoffset;
-    unsigned char leftdata;
+	offset_t leftoffset;
+	unsigned char leftdata;
 
-    if (sym == ADDOP || sym == SUBOP)
-	lastexp.data = lastexp.offset = 0;
-    else
-	term();
-    while (TRUE)
-    {
-	leftoffset = lastexp.offset;
-	leftdata = lastexp.data;
-	if (sym == ADDOP)
-	{
-	    getsym();
-	    term();
-	    if (leftdata & lastexp.data & RELBIT)
-		showrelbad();	/* rel + rel no good */
-	    else
-		lastexp.data |= leftdata;
-	    lastexp.offset += leftoffset;
-	}
-	else if (sym == SUBOP)
-	{
-	    getsym();
-	    term();
-	    /* check not abs - rel or rel - rel with mismatch */
-	    if (lastexp.data & RELBIT &&
-		(!(leftdata & RELBIT) ||
-		 (leftdata | lastexp.data) & IMPBIT ||
-		 (leftdata ^ lastexp.data) & (RELBIT | SEGM)))
-		showrelbad();
-	    else
-		lastexp.data = ((leftdata | lastexp.data) & ~(RELBIT | SEGM))
-			     | ((leftdata ^ lastexp.data) &  (RELBIT | SEGM));
-	    lastexp.offset = leftoffset - lastexp.offset;
-	}
-	else if (sym == OROP)
-	{
-	    getsym();
-	    term();
-	    lastexp.data |= leftdata;
-	    chkabs();		/* both must be absolute */
-	    lastexp.offset |= leftoffset;
-	}
+	if (sym == ADDOP || sym == SUBOP)
+		lastexp.data = lastexp.offset = 0;
 	else
-	    return;
-    }
+		term();
+	while (TRUE) {
+		leftoffset = lastexp.offset;
+		leftdata = lastexp.data;
+		if (sym == ADDOP) {
+			getsym();
+			term();
+			if (leftdata & lastexp.data & RELBIT)
+				showrelbad();	/* rel + rel no good */
+			else
+				lastexp.data |= leftdata;
+			lastexp.offset += leftoffset;
+		} else if (sym == SUBOP) {
+			getsym();
+			term();
+			/* check not abs - rel or rel - rel with mismatch */
+			if (lastexp.data & RELBIT &&
+			    (!(leftdata & RELBIT) ||
+			     (leftdata | lastexp.data) & IMPBIT ||
+			     (leftdata ^ lastexp.data) & (RELBIT | SEGM)))
+				showrelbad();
+			else
+				lastexp.data =
+				    ((leftdata | lastexp.
+				      data) & ~(RELBIT | SEGM))
+				    | ((leftdata ^ lastexp.data) &
+				       (RELBIT | SEGM));
+			lastexp.offset = leftoffset - lastexp.offset;
+		} else if (sym == OROP) {
+			getsym();
+			term();
+			lastexp.data |= leftdata;
+			chkabs();	/* both must be absolute */
+			lastexp.offset |= leftoffset;
+		} else
+			return;
+	}
 }
 
 /* term() parses term = factor {op factor}, where op is *, /, &, <<, or >>. */
 
 PRIVATE void term()
 {
-    offset_t leftoffset;
+	offset_t leftoffset;
 
-    factor();
-    while (TRUE)
-    {
-	leftoffset = lastexp.offset;
-	if (sym == STAR)
-	{
-	    /* context-sensitive, STAR means multiplication here */
-	    factor2();
-	    lastexp.offset *= leftoffset;
+	factor();
+	while (TRUE) {
+		leftoffset = lastexp.offset;
+		if (sym == STAR) {
+			/* context-sensitive, STAR means multiplication here */
+			factor2();
+			lastexp.offset *= leftoffset;
+		} else if (sym == SLASH) {
+			/* context-sensitive, SLASH means division here */
+			factor2();
+			lastexp.offset = leftoffset / lastexp.offset;
+		} else if (sym == ANDOP) {
+			factor2();
+			lastexp.offset &= leftoffset;
+		} else if (sym == SLOP) {
+			factor2();
+			lastexp.offset = leftoffset << lastexp.offset;
+		} else if (sym == SROP) {
+			factor2();
+			lastexp.offset = leftoffset >> lastexp.offset;
+		} else
+			return;
 	}
-	else if (sym == SLASH)
-	{
-	    /* context-sensitive, SLASH means division here */
-	    factor2();
-	    lastexp.offset = leftoffset / lastexp.offset;
-	}
-	else if (sym == ANDOP)
-	{
-	    factor2();
-	    lastexp.offset &= leftoffset;
-	}
-	else if (sym == SLOP)
-	{
-	    factor2();
-	    lastexp.offset = leftoffset << lastexp.offset;
-	}
-	else if (sym == SROP)
-	{
-	    factor2();
-	    lastexp.offset = leftoffset >> lastexp.offset;
-	}
-	else
-	    return;
-    }
 }
 
 /* get symbol and 2nd or later factor, check both abs */
 
 PRIVATE void factor2()
 {
-    unsigned char leftdata;
+	unsigned char leftdata;
 
-    leftdata = lastexp.data;
-    getsym();
-    factor();
-    lastexp.data |= leftdata;
-    chkabs();
+	leftdata = lastexp.data;
+	getsym();
+	factor();
+	lastexp.data |= leftdata;
+	chkabs();
 }
 
 /*
@@ -259,92 +238,91 @@ PRIVATE void factor2()
 
 PUBLIC void factor()
 {
-    switch (sym)
-    {
-    case SLASH:
-	/* context-sensitive, SLASH means a hex number here */
-	context_hexconst();
-    case INTCONST:
-	lastexp.data = 0;	/* absolute & not forward or undefined */
-	lastexp.offset = number;
-	getsym();
-	return;
-    case IDENT:
-	{
-	    register struct sym_s *symptr;
+	switch (sym) {
+	case SLASH:
+		/* context-sensitive, SLASH means a hex number here */
+		context_hexconst();
+	case INTCONST:
+		lastexp.data = 0;	/* absolute & not forward or undefined */
+		lastexp.offset = number;
+		getsym();
+		return;
+	case IDENT:
+		{
+			register struct sym_s *symptr;
 
-	    symptr = gsymptr;
-	    if (symptr->type & (MNREGBIT | MACBIT))
-		experror(symptr->type & MACBIT ? MACUID :
-			 symptr->data & REGBIT ? REGUID : MNUID);
-	    else
-	    {
-		if (!(symptr->type & (LABIT | VARBIT)))
-		{
-                    if( last_pass == 1 )
-		        symptr->data |= FORBIT;
-		    lastexp.sym = symptr;
+			symptr = gsymptr;
+			if (symptr->type & (MNREGBIT | MACBIT))
+				experror(symptr->type & MACBIT ? MACUID :
+					 symptr->
+					 data & REGBIT ? REGUID : MNUID);
+			else {
+				if (!(symptr->type & (LABIT | VARBIT))) {
+					if (last_pass == 1)
+						symptr->data |= FORBIT;
+					lastexp.sym = symptr;
+				}
+				if (pass != last_pass) {
+					if (last_pass == 1)
+						lastexp.data = symptr->data &
+						    (FORBIT | RELBIT | UNDBIT |
+						     SEGM);
+					else
+						lastexp.data = symptr->data &
+						    (RELBIT | UNDBIT | SEGM);
+					/* possible flags for pass 1 */
+					lastexp.offset =
+					    symptr->value_reg_or_op.value;
+				} else {
+					if ((lastexp.data =
+					     symptr->data) & IMPBIT)
+						lastexp.offset = 0;	/* value != 0 for commons */
+					/* OK even if UNDBIT */
+					else {
+						lastexp.offset =
+						    symptr->value_reg_or_op.
+						    value;
+						if (lastexp.data & UNDBIT)
+							experror(UNBLAB);
+					}
+				}
+			}
+			getsym();
+			return;
 		}
-		if (pass != last_pass)
-		{
-                    if( last_pass == 1 )
-		        lastexp.data = symptr->data &
-			    (FORBIT | RELBIT | UNDBIT | SEGM);
-		    else
-		        lastexp.data = symptr->data &
-			    (RELBIT | UNDBIT | SEGM);
-				/* possible flags for pass 1 */
-		    lastexp.offset = symptr->value_reg_or_op.value;
-		}
+	case LPAREN:
+		getsym();
+		expres();
+		if (sym != RPAREN)
+			error(RPEXP);
 		else
-		{
-		    if ((lastexp.data = symptr->data) & IMPBIT)
-			lastexp.offset = 0;	/* value != 0 for commons */
-						/* OK even if UNDBIT */
-		    else
-		    {
-			lastexp.offset = symptr->value_reg_or_op.value;
-			if (lastexp.data & UNDBIT)
-			    experror(UNBLAB);
-		    }
-		}
-	    }
-	    getsym();
-	    return;
+			getsym();
+		return;
+	case NOTOP:
+		getsym();
+		factor();
+		chkabs();
+		lastexp.offset = ~lastexp.offset;
+		return;
+	case ADDOP:
+		getsym();
+		factor();
+		return;
+	case SUBOP:
+		getsym();
+		factor();
+		chkabs();
+		lastexp.offset = -lastexp.offset;
+		return;
+	case STAR:
+		/* context-sensitive, STAR means location counter here */
+		lastexp.offset = lc;
+		if ((lastexp.data = lcdata) & UNDBIT && pass == last_pass)
+			experror(UNBLAB);
+		getsym();
+		return;
 	}
-    case LPAREN:
-	getsym();
-	expres();
-	if (sym != RPAREN)
-	    error(RPEXP);
-	else
-	    getsym();
-	return;
-    case NOTOP:
-	getsym();
-	factor();
-	chkabs();
-	lastexp.offset = ~lastexp.offset;
-	return;
-    case ADDOP:
-	getsym();
-	factor();
-	return;
-    case SUBOP:
-	getsym();
-	factor();
-	chkabs();
-	lastexp.offset = -lastexp.offset;
-	return;
-    case STAR:
-	/* context-sensitive, STAR means location counter here */
-	lastexp.offset = lc;
-	if ((lastexp.data = lcdata) & UNDBIT && pass == last_pass)
-	    experror(UNBLAB);
-	getsym();
-	return;
-    }
-    experror(FACEXP);
+	experror(FACEXP);
 }
 
 /*
@@ -355,41 +333,35 @@ PUBLIC void factor()
 
 PUBLIC void scompare()
 {
-    /* prepare flags for OK, lastexp.offset for error */
-    lastexp.data = lastexp.offset = 0;
-    if (sym != LPAREN)
-	experror(LPEXP);
-    else
-    {
-	register char *string1;
-	register char *string2;
+	/* prepare flags for OK, lastexp.offset for error */
+	lastexp.data = lastexp.offset = 0;
+	if (sym != LPAREN)
+		experror(LPEXP);
+	else {
+		register char *string1;
+		register char *string2;
 
-	for (string2 = string1 = lineptr; *string2 != ','; ++string2)
-	    if (*string2 == 0 || *string2 == ')')
-	    {
-		symname = string2;
-		experror(COMEXP);
-		return;
-	    }
-	string2++;
-	while (*string1++ == *string2++)
-	    ;
-	if (string2[-1] == ')')
-	{
-	    if (string1[-1] == ',')
-		lastexp.offset = TRUE;	/* else leave FALSE */
-	    lineptr = string2;
-	}
-	else			/* FALSE, keep reading to verify syntax */
-	{
-	    for (; *string2 != ')'; ++string2)
-		if (*string2 == 0 || *string2 == ',')
-		{
-		    symname = string2;
-		    experror(RPEXP);
+		for (string2 = string1 = lineptr; *string2 != ','; ++string2)
+			if (*string2 == 0 || *string2 == ')') {
+				symname = string2;
+				experror(COMEXP);
+				return;
+			}
+		string2++;
+		while (*string1++ == *string2++) ;
+		if (string2[-1] == ')') {
+			if (string1[-1] == ',')
+				lastexp.offset = TRUE;	/* else leave FALSE */
+			lineptr = string2;
+		} else {	/* FALSE, keep reading to verify syntax */
+
+			for (; *string2 != ')'; ++string2)
+				if (*string2 == 0 || *string2 == ',') {
+					symname = string2;
+					experror(RPEXP);
+				}
+			lineptr = ++string2;
 		}
-	    lineptr = ++string2;
+		getsym();
 	}
-	getsym();
-    }
 }

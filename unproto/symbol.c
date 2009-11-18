@@ -53,7 +53,7 @@ extern char *malloc();
 
 #define	SYM_TABSIZE	20
 
-static struct symbol *sym_tab[SYM_TABSIZE] = {0,};
+static struct symbol *sym_tab[SYM_TABSIZE] = { 0, };
 
 /* More string stuff. Maybe it should go to an #include file. */
 
@@ -61,22 +61,22 @@ static struct symbol *sym_tab[SYM_TABSIZE] = {0,};
 
 /* sym_enter - enter symbol into table */
 
-void    sym_enter(name, type)
-char   *name;
-int     type;
+void sym_enter(name, type)
+char *name;
+int type;
 {
-    struct symbol *s;
-    int     where;
+	struct symbol *s;
+	int where;
 
-    if ((s = (struct symbol *) malloc(sizeof(*s))) == 0
-	|| (s->name = malloc(strlen(name) + 1)) == 0)
-	fatal("out of memory");
-    (void) strcpy(s->name, name);
-    s->type = type;
+	if ((s = (struct symbol *)malloc(sizeof(*s))) == 0
+	    || (s->name = malloc(strlen(name) + 1)) == 0)
+		fatal("out of memory");
+	(void)strcpy(s->name, name);
+	s->type = type;
 
-    where = hash(name, SYM_TABSIZE);
-    s->next = sym_tab[where];
-    sym_tab[where] = s;
+	where = hash(name, SYM_TABSIZE);
+	s->next = sym_tab[where];
+	sym_tab[where] = s;
 }
 
 /* sym_find - locate symbol definition */
@@ -84,17 +84,17 @@ int     type;
 struct symbol *sym_find(name)
 register char *name;
 {
-    register struct symbol *s;
+	register struct symbol *s;
 
-    /*
-     * This function is called for almost every "word" token, so it better be
-     * fast.
-     */
+	/*
+	 * This function is called for almost every "word" token, so it better be
+	 * fast.
+	 */
 
-    for (s = sym_tab[hash(name, SYM_TABSIZE)]; s; s = s->next)
-	if (STREQ(name, s->name))
-	    return (s);
-    return (0);
+	for (s = sym_tab[hash(name, SYM_TABSIZE)]; s; s = s->next)
+		if (STREQ(name, s->name))
+			return (s);
+	return (0);
 }
 
  /*
@@ -104,41 +104,40 @@ register char *name;
   */
 
 struct sym {
-    char   *name;
-    int     tokno;
+	char *name;
+	int tokno;
 };
 
 static struct sym syms[] = {
-    "if", TOK_CONTROL,
-    "else", TOK_CONTROL,
-    "for", TOK_CONTROL,
-    "while", TOK_CONTROL,
-    "do", TOK_CONTROL,
-    "switch", TOK_CONTROL,
-    "case", TOK_CONTROL,
-    "default", TOK_CONTROL,
-    "return", TOK_CONTROL,
-    "continue", TOK_CONTROL,
-    "break", TOK_CONTROL,
-    "goto", TOK_CONTROL,
-    "struct", TOK_COMPOSITE,
-    "union", TOK_COMPOSITE,
-    "__DATE__", TOK_DATE,
-    "__TIME__", TOK_TIME,
+	"if", TOK_CONTROL,
+	"else", TOK_CONTROL,
+	"for", TOK_CONTROL,
+	"while", TOK_CONTROL,
+	"do", TOK_CONTROL,
+	"switch", TOK_CONTROL,
+	"case", TOK_CONTROL,
+	"default", TOK_CONTROL,
+	"return", TOK_CONTROL,
+	"continue", TOK_CONTROL,
+	"break", TOK_CONTROL,
+	"goto", TOK_CONTROL,
+	"struct", TOK_COMPOSITE,
+	"union", TOK_COMPOSITE,
+	"__DATE__", TOK_DATE,
+	"__TIME__", TOK_TIME,
 #if defined(MAP_VOID_STAR) || defined(MAP_VOID)
-    "void", TOK_VOID,
+	"void", TOK_VOID,
 #endif
-    "asm", TOK_OTHER,
-    0,
+	"asm", TOK_OTHER,
+	0,
 };
 
 /* sym_init - enter known keywords into symbol table */
 
-void    sym_init()
+void sym_init()
 {
-    register struct sym *p;
+	register struct sym *p;
 
-    for (p = syms; p->name; p++)
-	sym_enter(p->name, p->tokno);
+	for (p = syms; p->name; p++)
+		sym_enter(p->name, p->tokno);
 }
-

@@ -70,7 +70,7 @@ static void tok_date();
 static void tok_space_append();
 
 #if defined(MAP_VOID_STAR) || defined(MAP_VOID)
-static void tok_void();			/* rewrite void keyword */
+static void tok_void();		/* rewrite void keyword */
 #endif
 
 static struct token *tok_buf = 0;	/* token push-back storage */
@@ -86,89 +86,89 @@ register struct token *list;
 register struct token *t;
 {
 
-    /*
-     * The head/tail fields of a token do triple duty. They are used to keep
-     * track of the members that make up a (list); to keep track of the
-     * non-blank tokens that make up one list member; and, finally, to tack
-     * whitespace and comment tokens onto the non-blank tokens that make up
-     * one list member.
-     * 
-     * Within a (list), white space and comment tokens are always tacked onto
-     * the non-blank tokens to avoid parsing complications later on. For this
-     * reason, blanks and comments at the beginning of a list member are
-     * discarded because there is no token to tack them onto. (Well, we could
-     * start each list member with a dummy token, but that would mess up the
-     * whole unprototyper).
-     * 
-     * Blanks or comments that follow a (list) are discarded, because the
-     * head/tail fields of a (list) are already being used for other
-     * purposes.
-     * 
-     * Newlines within a (list) are discarded because they can mess up the
-     * output when we rewrite function headers. The output routines will
-     * regenerate discarded newlines, anyway.
-     */
+	/*
+	 * The head/tail fields of a token do triple duty. They are used to keep
+	 * track of the members that make up a (list); to keep track of the
+	 * non-blank tokens that make up one list member; and, finally, to tack
+	 * whitespace and comment tokens onto the non-blank tokens that make up
+	 * one list member.
+	 * 
+	 * Within a (list), white space and comment tokens are always tacked onto
+	 * the non-blank tokens to avoid parsing complications later on. For this
+	 * reason, blanks and comments at the beginning of a list member are
+	 * discarded because there is no token to tack them onto. (Well, we could
+	 * start each list member with a dummy token, but that would mess up the
+	 * whole unprototyper).
+	 * 
+	 * Blanks or comments that follow a (list) are discarded, because the
+	 * head/tail fields of a (list) are already being used for other
+	 * purposes.
+	 * 
+	 * Newlines within a (list) are discarded because they can mess up the
+	 * output when we rewrite function headers. The output routines will
+	 * regenerate discarded newlines, anyway.
+	 */
 
-    if (list == 0 || list->tokno == TOK_LIST) {
-	tok_free(t);
-    } else {
-	tok_list_append(list, t);
-    }
+	if (list == 0 || list->tokno == TOK_LIST) {
+		tok_free(t);
+	} else {
+		tok_list_append(list, t);
+	}
 }
 
 /* tok_class - discriminate single tokens, keywords, and composite tokens */
 
 struct token *tok_class()
 {
-    register struct token *t;
-    register struct symbol *s;
+	register struct token *t;
+	register struct symbol *s;
 
-    /*
-     * Use push-back token, if available. Push-back tokens are already
-     * canonical and can be passed on to the caller without further
-     * inspection.
-     */
+	/*
+	 * Use push-back token, if available. Push-back tokens are already
+	 * canonical and can be passed on to the caller without further
+	 * inspection.
+	 */
 
-    if (t = tok_buf) {
-	tok_buf = t->next;
-	t->next = 0;
-	return (t);
-    }
-    /* Read a new token and canonicalize it. */
-
-    if (t = tok_get()) {
-	switch (t->tokno) {
-	case '(':				/* beginning of list */
-	    t = tok_list(t);
-	    break;
-	case TOK_WORD:				/* look up keyword */
-	    if ((s = sym_find(t->vstr->str))) {
-		switch (s->type) {
-		case TOK_TIME:			/* map __TIME__ to string */
-		    tok_time(t);
-		    tok_strcat(t);		/* look for more strings */
-		    break;
-		case TOK_DATE:			/* map __DATE__ to string */
-		    tok_date(t);
-		    tok_strcat(t);		/* look for more strings */
-		    break;
-#if defined(MAP_VOID_STAR) || defined(MAP_VOID)
-		case TOK_VOID:			/* optionally map void types */
-		    tok_void(t);
-		    break;
-#endif
-		default:			/* other keyword */
-		    t->tokno = s->type;
-		    break;
-		}
-	    }
-	    break;
-	case '"':				/* string, look for more */
-	    tok_strcat(t);
-	    break;
+	if (t = tok_buf) {
+		tok_buf = t->next;
+		t->next = 0;
+		return (t);
 	}
-    }
-    return (t);
+	/* Read a new token and canonicalize it. */
+
+	if (t = tok_get()) {
+		switch (t->tokno) {
+		case '(':	/* beginning of list */
+			t = tok_list(t);
+			break;
+		case TOK_WORD:	/* look up keyword */
+			if ((s = sym_find(t->vstr->str))) {
+				switch (s->type) {
+				case TOK_TIME:	/* map __TIME__ to string */
+					tok_time(t);
+					tok_strcat(t);	/* look for more strings */
+					break;
+				case TOK_DATE:	/* map __DATE__ to string */
+					tok_date(t);
+					tok_strcat(t);	/* look for more strings */
+					break;
+#if defined(MAP_VOID_STAR) || defined(MAP_VOID)
+				case TOK_VOID:	/* optionally map void types */
+					tok_void(t);
+					break;
+#endif
+				default:	/* other keyword */
+					t->tokno = s->type;
+					break;
+				}
+			}
+			break;
+		case '"':	/* string, look for more */
+			tok_strcat(t);
+			break;
+		}
+	}
+	return (t);
 }
 
 /* tok_list - collect ()-delimited, comma-separated list of tokens */
@@ -176,56 +176,56 @@ struct token *tok_class()
 static struct token *tok_list(t)
 struct token *t;
 {
-    register struct token *list = tok_alloc();
-    char   *filename;
-    int     lineno;
+	register struct token *list = tok_alloc();
+	char *filename;
+	int lineno;
 
-    /* Save context of '(' for diagnostics. */
+	/* Save context of '(' for diagnostics. */
 
-    filename = t->path;
-    lineno = t->line;
+	filename = t->path;
+	lineno = t->line;
 
-    list->tokno = TOK_LIST;
-    list->head = list->tail = t;
-    list->path = t->path;
-    list->line = t->line;
+	list->tokno = TOK_LIST;
+	list->head = list->tail = t;
+	list->path = t->path;
+	list->line = t->line;
 #ifdef DEBUG
-    strcpy(list->vstr->str, "LIST");
+	strcpy(list->vstr->str, "LIST");
 #endif
 
-    /*
-     * Read until the matching ')' is found, accounting for structured stuff
-     * (enclosed by '{' and '}' tokens). Break the list up at each ',' token,
-     * and try to preserve as much whitespace as possible. Newlines are
-     * discarded so that they will not mess up the layout when we rewrite
-     * argument lists. The output routines will regenerate discarded
-     * newlines.
-     */
+	/*
+	 * Read until the matching ')' is found, accounting for structured stuff
+	 * (enclosed by '{' and '}' tokens). Break the list up at each ',' token,
+	 * and try to preserve as much whitespace as possible. Newlines are
+	 * discarded so that they will not mess up the layout when we rewrite
+	 * argument lists. The output routines will regenerate discarded
+	 * newlines.
+	 */
 
-    while (t = tok_class()) {			/* skip blanks */
-	switch (t->tokno) {
-	case ')':				/* end of list */
-	    tok_list_append(list, t);
-	    return (list);
-	case '{':				/* struct/union type */
-	    tok_list_struct(list->tail, t);
-	    break;
-	case TOK_WSPACE:			/* preserve trailing blanks */
-	    tok_space_append(list->tail->tail, t);	/* except after list */
-	    break;
-	case '\n':				/* fix newlines later */
-	    tok_free(t);
-	    break;
-	case ',':				/* list separator */
-	    tok_list_append(list, t);
-	    break;
-	default:				/* other */
-	    tok_list_append(list->tail, t);
-	    break;
+	while (t = tok_class()) {	/* skip blanks */
+		switch (t->tokno) {
+		case ')':	/* end of list */
+			tok_list_append(list, t);
+			return (list);
+		case '{':	/* struct/union type */
+			tok_list_struct(list->tail, t);
+			break;
+		case TOK_WSPACE:	/* preserve trailing blanks */
+			tok_space_append(list->tail->tail, t);	/* except after list */
+			break;
+		case '\n':	/* fix newlines later */
+			tok_free(t);
+			break;
+		case ',':	/* list separator */
+			tok_list_append(list, t);
+			break;
+		default:	/* other */
+			tok_list_append(list->tail, t);
+			break;
+		}
 	}
-    }
-    error_where(filename, lineno, "unmatched '('");
-    return (list);				/* do not waste any data */
+	error_where(filename, lineno, "unmatched '('");
+	return (list);		/* do not waste any data */
 }
 
 /* tok_list_struct - collect structured type info within list */
@@ -234,47 +234,47 @@ static void tok_list_struct(list, t)
 register struct token *list;
 register struct token *t;
 {
-    char   *filename;
-    int     lineno;
+	char *filename;
+	int lineno;
 
-    /*
-     * Save context of '{' for diagnostics. This routine is called by the one
-     * that collects list members. If the '}' is not found, the list
-     * collector will not see the closing ')' either.
-     */
+	/*
+	 * Save context of '{' for diagnostics. This routine is called by the one
+	 * that collects list members. If the '}' is not found, the list
+	 * collector will not see the closing ')' either.
+	 */
 
-    filename = t->path;
-    lineno = t->line;
+	filename = t->path;
+	lineno = t->line;
 
-    tok_list_append(list, t);
+	tok_list_append(list, t);
 
-    /*
-     * Collect tokens until the matching '}' is found. Try to preserve as
-     * much whitespace as possible. Newlines are discarded so that they do
-     * not interfere when rewriting argument lists. The output routines will
-     * regenerate discarded newlines.
-     */
+	/*
+	 * Collect tokens until the matching '}' is found. Try to preserve as
+	 * much whitespace as possible. Newlines are discarded so that they do
+	 * not interfere when rewriting argument lists. The output routines will
+	 * regenerate discarded newlines.
+	 */
 
-    while (t = tok_class()) {
-	switch (t->tokno) {
-	case TOK_WSPACE:			/* preserve trailing blanks */
-	    tok_space_append(list->tail, t);	/* except after list */
-	    break;
-	case '\n':				/* fix newlines later */
-	    tok_free(t);
-	    break;
-	case '{':				/* recurse */
-	    tok_list_struct(list, t);
-	    break;
-	case '}':				/* done */
-	    tok_list_append(list, t);
-	    return;
-	default:				/* other */
-	    tok_list_append(list, t);
-	    break;
+	while (t = tok_class()) {
+		switch (t->tokno) {
+		case TOK_WSPACE:	/* preserve trailing blanks */
+			tok_space_append(list->tail, t);	/* except after list */
+			break;
+		case '\n':	/* fix newlines later */
+			tok_free(t);
+			break;
+		case '{':	/* recurse */
+			tok_list_struct(list, t);
+			break;
+		case '}':	/* done */
+			tok_list_append(list, t);
+			return;
+		default:	/* other */
+			tok_list_append(list, t);
+			break;
+		}
 	}
-    }
-    error_where(filename, lineno, "unmatched '{'");
+	error_where(filename, lineno, "unmatched '{'");
 }
 
 /* tok_strcat - concatenate multiple string constants */
@@ -282,37 +282,37 @@ register struct token *t;
 static void tok_strcat(t1)
 register struct token *t1;
 {
-    register struct token *t2;
-    register struct token *lookahead = 0;
+	register struct token *t2;
+	register struct token *lookahead = 0;
 
-    /*
-     * Read ahead past whitespace, comments and newlines. If we find a string
-     * token, concatenate it with the previous one and push back the
-     * intervening tokens (thus preserving as much information as possible).
-     * If we find something else, push back all lookahead tokens.
-     */
+	/*
+	 * Read ahead past whitespace, comments and newlines. If we find a string
+	 * token, concatenate it with the previous one and push back the
+	 * intervening tokens (thus preserving as much information as possible).
+	 * If we find something else, push back all lookahead tokens.
+	 */
 
 #define PUSHBACK_AND_RETURN { if (lookahead) tok_unget(lookahead); return; }
 
-    while (t2 = tok_class()) {
-	switch (t2->tokno) {
-	case TOK_WSPACE:			/* read past comments/blanks */
-	case '\n':				/* read past newlines */
-	    TOK_PREPEND(lookahead, t2);
-	    break;
-	case '"':				/* concatenate string tokens */
-	    if (vs_strcpy(t1->vstr,
-			  t1->vstr->str + strlen(t1->vstr->str) - 1,
-			  t2->vstr->str + 1) == 0)
-		fatal("out of memory");
-	    tok_free(t2);
-	    PUSHBACK_AND_RETURN;
-	default:				/* something else, push back */
-	    tok_unget(t2);
-	    PUSHBACK_AND_RETURN;
+	while (t2 = tok_class()) {
+		switch (t2->tokno) {
+		case TOK_WSPACE:	/* read past comments/blanks */
+		case '\n':	/* read past newlines */
+			TOK_PREPEND(lookahead, t2);
+			break;
+		case '"':	/* concatenate string tokens */
+			if (vs_strcpy(t1->vstr,
+				      t1->vstr->str + strlen(t1->vstr->str) - 1,
+				      t2->vstr->str + 1) == 0)
+				fatal("out of memory");
+			tok_free(t2);
+			PUSHBACK_AND_RETURN;
+		default:	/* something else, push back */
+			tok_unget(t2);
+			PUSHBACK_AND_RETURN;
+		}
 	}
-    }
-    PUSHBACK_AND_RETURN;			/* hit EOF */
+	PUSHBACK_AND_RETURN;	/* hit EOF */
 }
 
 #if defined(MAP_VOID_STAR) || defined(MAP_VOID)
@@ -322,40 +322,40 @@ register struct token *t1;
 static void tok_void(t)
 register struct token *t;
 {
-    register struct token *t2;
-    register struct token *lookahead = 0;
+	register struct token *t2;
+	register struct token *lookahead = 0;
 
-    /*
-     * Look ahead beyond whitespace, comments and newlines until we see a '*'
-     * token. If one is found, replace "void" by "char". If we find something
-     * else, and if "void" should always be mapped, replace "void" by "int".
-     * Always push back the lookahead tokens.
-     * 
-     * XXX The code also replaces the (void) argument list; this must be
-     * accounted for later on. The alternative would be to add (in unproto.c)
-     * TOK_VOID cases all over the place and that would be too error-prone.
-     */
+	/*
+	 * Look ahead beyond whitespace, comments and newlines until we see a '*'
+	 * token. If one is found, replace "void" by "char". If we find something
+	 * else, and if "void" should always be mapped, replace "void" by "int".
+	 * Always push back the lookahead tokens.
+	 * 
+	 * XXX The code also replaces the (void) argument list; this must be
+	 * accounted for later on. The alternative would be to add (in unproto.c)
+	 * TOK_VOID cases all over the place and that would be too error-prone.
+	 */
 
 #define PUSHBACK_AND_RETURN { if (lookahead) tok_unget(lookahead); return; }
 
-    while (t2 = tok_class()) {
-	switch (TOK_PREPEND(lookahead, t2)->tokno) {
-	case TOK_WSPACE:			/* read past comments/blanks */
-	case '\n':				/* read past newline */
-	    break;
-	case '*':				/* "void *" -> "char *" */
-	    if (vs_strcpy(t->vstr, t->vstr->str, "char") == 0)
-		fatal("out of memory");
-	    PUSHBACK_AND_RETURN;
-	default:
-#ifdef MAP_VOID					/* plain "void" -> "int" */
-	    if (vs_strcpy(t->vstr, t->vstr->str, "int") == 0)
-		fatal("out of memory");
+	while (t2 = tok_class()) {
+		switch (TOK_PREPEND(lookahead, t2)->tokno) {
+		case TOK_WSPACE:	/* read past comments/blanks */
+		case '\n':	/* read past newline */
+			break;
+		case '*':	/* "void *" -> "char *" */
+			if (vs_strcpy(t->vstr, t->vstr->str, "char") == 0)
+				fatal("out of memory");
+			PUSHBACK_AND_RETURN;
+		default:
+#ifdef MAP_VOID			/* plain "void" -> "int" */
+			if (vs_strcpy(t->vstr, t->vstr->str, "int") == 0)
+				fatal("out of memory");
 #endif
-	    PUSHBACK_AND_RETURN;
+			PUSHBACK_AND_RETURN;
+		}
 	}
-    }
-    PUSHBACK_AND_RETURN;			/* hit EOF */
+	PUSHBACK_AND_RETURN;	/* hit EOF */
 }
 
 #endif
@@ -365,21 +365,21 @@ register struct token *t;
 static void tok_time(t)
 struct token *t;
 {
-    long    now;
-    char   *cp;
-    char    buf[BUFSIZ];
+	long now;
+	char *cp;
+	char buf[BUFSIZ];
 
-    /*
-     * Using sprintf() to select parts of a string is gross, but this should
-     * be fast enough.
-     */
+	/*
+	 * Using sprintf() to select parts of a string is gross, but this should
+	 * be fast enough.
+	 */
 
-    (void) time(&now);
-    cp = ctime(&now);
-    sprintf(buf, "\"%.8s\"", cp + 11);
-    if (vs_strcpy(t->vstr, t->vstr->str, buf) == 0)
-	fatal("out of memory");
-    t->tokno = buf[0];
+	(void)time(&now);
+	cp = ctime(&now);
+	sprintf(buf, "\"%.8s\"", cp + 11);
+	if (vs_strcpy(t->vstr, t->vstr->str, buf) == 0)
+		fatal("out of memory");
+	t->tokno = buf[0];
 }
 
 /* tok_date - rewrite __DATE__ to "Mmm dd yyyy" string constant */
@@ -387,34 +387,34 @@ struct token *t;
 static void tok_date(t)
 struct token *t;
 {
-    long    now;
-    char   *cp;
-    char    buf[BUFSIZ];
+	long now;
+	char *cp;
+	char buf[BUFSIZ];
 
-    /*
-     * Using sprintf() to select parts of a string is gross, but this should
-     * be fast enough.
-     */
+	/*
+	 * Using sprintf() to select parts of a string is gross, but this should
+	 * be fast enough.
+	 */
 
-    (void) time(&now);
-    cp = ctime(&now);
-    sprintf(buf, "\"%.3s %.2s %.4s\"", cp + 4, cp + 8, cp + 20);
-    if (vs_strcpy(t->vstr, t->vstr->str, buf) == 0)
-	fatal("out of memory");
-    t->tokno = buf[0];
+	(void)time(&now);
+	cp = ctime(&now);
+	sprintf(buf, "\"%.3s %.2s %.4s\"", cp + 4, cp + 8, cp + 20);
+	if (vs_strcpy(t->vstr, t->vstr->str, buf) == 0)
+		fatal("out of memory");
+	t->tokno = buf[0];
 }
 
 /* tok_unget - push back one or more possibly composite tokens */
 
-void    tok_unget(t)
+void tok_unget(t)
 register struct token *t;
 {
-    register struct token *next;
+	register struct token *next;
 
-    do {
-	next = t->next;
-	TOK_PREPEND(tok_buf, t);
-    } while (t = next);
+	do {
+		next = t->next;
+		TOK_PREPEND(tok_buf, t);
+	} while (t = next);
 }
 
 /* tok_list_append - append data to list */
@@ -423,10 +423,10 @@ static void tok_list_append(h, t)
 struct token *h;
 struct token *t;
 {
-    if (h->head == 0) {
-	h->head = h->tail = t;
-    } else {
-	h->tail->next = t;
-	h->tail = t;
-    }
+	if (h->head == 0) {
+		h->head = h->tail = t;
+	} else {
+		h->tail->next = t;
+		h->tail = t;
+	}
 }

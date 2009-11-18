@@ -60,38 +60,38 @@ extern void exit();
 #include "token.h"
 #include "error.h"
 
-int     errcount = 0;			/* error counter */
+int errcount = 0;		/* error counter */
 
 /* error - report problem (implicit context) */
 
-void    error(text)
-char   *text;
+void error(text)
+char *text;
 {
-    error_where(in_path, in_line, text);
+	error_where(in_path, in_line, text);
 }
 
 /* error_where - report problem (explicit context) */
 
-void    error_where(path, line, text)
-char   *path;
-int     line;
-char   *text;
+void error_where(path, line, text)
+char *path;
+int line;
+char *text;
 {
-    errcount++;
+	errcount++;
 
-    /* Suppress context info if there is none. */
+	/* Suppress context info if there is none. */
 
-    if (line && path[0])
-	fprintf(stderr, "%s, line %d: ", path, line);
+	if (line && path[0])
+		fprintf(stderr, "%s, line %d: ", path, line);
 
-    fprintf(stderr, "%s\n", text);
+	fprintf(stderr, "%s\n", text);
 }
 
 /* fatal - report problem and terminate unsuccessfully */
 
-void    fatal(text)
-char   *text;
+void fatal(text)
+char *text;
 {
-    error(text);
-    exit(1);
+	error(text);
+	exit(1);
 }

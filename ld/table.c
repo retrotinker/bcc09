@@ -16,7 +16,7 @@ PRIVATE struct symstruct *hashtab[HASHTABSIZE];	/* hash table */
 PRIVATE char *tableptr;		/* next free spot in catchall table */
 PRIVATE char *tableend;		/* ptr to spot after last in table */
 
-PUBLIC  int maxused = 0;	/* Stats */
+PUBLIC int maxused = 0;		/* Stats */
 PRIVATE int mainavail, usedtop;	/* Stats */
 
 FORWARD struct symstruct **gethashptr P((char *name));
@@ -26,20 +26,20 @@ FORWARD void check_used P((void));
 
 PUBLIC void syminit()
 {
-    unsigned i;
+	unsigned i;
 
-    for (i = sizeof(int) <= 2 ? 0xE000 : (unsigned) 0x38000;
-	 i != 0; i -= 512)
-	if ((tableptr = malloc(i)) != NUL_PTR)
-	    break;
-    if (tableptr == NUL_PTR)
-	outofmemory();
-    tableend = tableptr + i;
-    for (i = 0; i < HASHTABSIZE; i++)
-	hashtab[i] = NUL_PTR;
+	for (i = sizeof(int) <= 2 ? 0xE000 : (unsigned)0x38000;
+	     i != 0; i -= 512)
+		if ((tableptr = malloc(i)) != NUL_PTR)
+			break;
+	if (tableptr == NUL_PTR)
+		outofmemory();
+	tableend = tableptr + i;
+	for (i = 0; i < HASHTABSIZE; i++)
+		hashtab[i] = NUL_PTR;
 
-    mainavail = tableend - tableptr;
-    usedtop = 0;
+	mainavail = tableend - tableptr;
+	usedtop = 0;
 }
 
 /* add named symbol to end of table - initialise only name and next fields */
@@ -48,30 +48,29 @@ PUBLIC void syminit()
 PUBLIC struct symstruct *addsym(name)
 char *name;
 {
-    struct symstruct **hashptr;
-    struct symstruct *oldsymptr = 0;
-    struct symstruct *symptr;
+	struct symstruct **hashptr;
+	struct symstruct *oldsymptr = 0;
+	struct symstruct *symptr;
 
-    hashptr = gethashptr(name);
-    symptr = *hashptr;
-    while (symptr != NUL_PTR)
-    {
-	oldsymptr = symptr;
-	symptr = symptr->next;
-    }
-    align(tableptr);
-    symptr = (struct symstruct *) tableptr;
-    if ((tableptr = symptr->name + (strlen(name) + 1)) > tableend)
-	outofmemory();
-    symptr->modptr = NUL_PTR;
-    symptr->next = NUL_PTR;
-    if (name != symptr->name)
-	strcpy(symptr->name, name);	/* should't happen */
-    if (*hashptr == NUL_PTR)
-	*hashptr = symptr;
-    else
-	oldsymptr->next = symptr;
-    return symptr;
+	hashptr = gethashptr(name);
+	symptr = *hashptr;
+	while (symptr != NUL_PTR) {
+		oldsymptr = symptr;
+		symptr = symptr->next;
+	}
+	align(tableptr);
+	symptr = (struct symstruct *)tableptr;
+	if ((tableptr = symptr->name + (strlen(name) + 1)) > tableend)
+		outofmemory();
+	symptr->modptr = NUL_PTR;
+	symptr->next = NUL_PTR;
+	if (name != symptr->name)
+		strcpy(symptr->name, name);	/* should't happen */
+	if (*hashptr == NUL_PTR)
+		*hashptr = symptr;
+	else
+		oldsymptr->next = symptr;
+	return symptr;
 }
 
 /* lookup named symbol */
@@ -79,13 +78,13 @@ char *name;
 PUBLIC struct symstruct *findsym(name)
 char *name;
 {
-    struct symstruct *symptr;
+	struct symstruct *symptr;
 
-    symptr = *gethashptr(name);
-    while (symptr != NUL_PTR && (!(symptr->flags & (E_MASK | I_MASK)) ||
-			      strcmp(symptr->name, name) != 0))
-	symptr = symptr->next;
-    return symptr;
+	symptr = *gethashptr(name);
+	while (symptr != NUL_PTR && (!(symptr->flags & (E_MASK | I_MASK)) ||
+				     strcmp(symptr->name, name) != 0))
+		symptr = symptr->next;
+	return symptr;
 }
 
 /* convert name to a hash table ptr */
@@ -93,12 +92,12 @@ char *name;
 PRIVATE struct symstruct **gethashptr(name)
 register char *name;
 {
-    register unsigned hashval;
+	register unsigned hashval;
 
-    hashval = 0;
-    while (*name)
-	hashval = hashval * 2 + *name++;
-    return hashtab + ((hashval * GOLDEN) & (HASHTABSIZE - 1));
+	hashval = 0;
+	while (*name)
+		hashval = hashval * 2 + *name++;
+	return hashtab + ((hashval * GOLDEN) & (HASHTABSIZE - 1));
 
 /*
 
@@ -134,18 +133,18 @@ HASHVAL.EXIT
 PUBLIC char *moveup(nbytes)
 unsigned nbytes;
 {
-    register char *source;
-    register char *target;
+	register char *source;
+	register char *target;
 
-    usedtop   += nbytes;
-    mainavail -= nbytes;
+	usedtop += nbytes;
+	mainavail -= nbytes;
 
-    source = tableptr;
-    target = tableend;
-    while (nbytes--)
-	*--target = *--source;
-    tableptr = source;
-    return tableend = target;
+	source = tableptr;
+	target = tableend;
+	while (nbytes--)
+		*--target = *--source;
+	tableptr = source;
+	return tableend = target;
 }
 
 /* our version of malloc */
@@ -153,13 +152,13 @@ unsigned nbytes;
 PUBLIC char *ourmalloc(nbytes)
 unsigned nbytes;
 {
-    char *allocptr;
+	char *allocptr;
 
-    align(tableptr);
-    allocptr = tableptr;
-    if ((tableptr += nbytes) > tableend)
-	outofmemory();
-    return allocptr;
+	align(tableptr);
+	allocptr = tableptr;
+	if ((tableptr += nbytes) > tableend)
+		outofmemory();
+	return allocptr;
 }
 
 /* our version of free (release from bottom of table) */
@@ -167,32 +166,31 @@ unsigned nbytes;
 PUBLIC void ourfree(cptr)
 char *cptr;
 {
-    check_used();
-    tableptr = cptr;
-    check_used();
+	check_used();
+	tableptr = cptr;
+	check_used();
 }
 
 /* read string from file into table at offset suitable for next symbol */
 
 PUBLIC char *readstring()
 {
-    int c;
-    char *s;
-    char *start;
+	int c;
+	char *s;
+	char *start;
 
-    align(tableptr);
-    start = s = ((struct symstruct *) tableptr)->name;
-    while (TRUE)
-    {
-        /* Stats: need a checkused against 's', maybe. */
-	if (s >= tableend)
-	    outofmemory();
-	if ((c = readchar()) < 0)
-	    prematureeof();
-	if ((*s++ = c) == 0)
-	    return start;
-    }
-    /* NOTREACHED */
+	align(tableptr);
+	start = s = ((struct symstruct *)tableptr)->name;
+	while (TRUE) {
+		/* Stats: need a checkused against 's', maybe. */
+		if (s >= tableend)
+			outofmemory();
+		if ((c = readchar()) < 0)
+			prematureeof();
+		if ((*s++ = c) == 0)
+			return start;
+	}
+	/* NOTREACHED */
 }
 
 /* release from top of table */
@@ -200,25 +198,26 @@ PUBLIC char *readstring()
 PUBLIC void release(cptr)
 char *cptr;
 {
-    check_used();
-    mainavail += cptr - tableend;
-    usedtop -= cptr - tableend;
+	check_used();
+	mainavail += cptr - tableend;
+	usedtop -= cptr - tableend;
 
-    tableend = cptr;
+	tableend = cptr;
 }
 
 PRIVATE void check_used()
 {
-   int used;
+	int used;
 
-   used = usedtop + mainavail - (tableend - tableptr);
-   if (used > maxused) maxused = used;
+	used = usedtop + mainavail - (tableend - tableptr);
+	if (used > maxused)
+		maxused = used;
 }
 
 PUBLIC int memory_used()
 {
-   check_used();
-   return maxused;
+	check_used();
+	return maxused;
 }
 
 /* allocate space for string */
@@ -226,5 +225,5 @@ PUBLIC int memory_used()
 PUBLIC char *stralloc(s)
 char *s;
 {
-    return strcpy(ourmalloc((unsigned) strlen(s) + 1), s);
+	return strcpy(ourmalloc((unsigned)strlen(s) + 1), s);
 }
