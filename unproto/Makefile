@@ -12,7 +12,7 @@
 # be installed as "/whatever/cpp". This script should then be specified
 # to the C compiler as a non-default preprocessor.
 #
-PROG	= unproto09
+PROG	= unproto
 PIPE	=
 
 # The overhead and problems of shell script interpretation can be
@@ -118,8 +118,8 @@ clean realclean:
 	rm -f *.o core cpp unproto mon.out varargs.o varargs example.tmp
 
 install: $(PROG)
-	install -d $(LIBDIR)
-	install -m 755 $(PROG) $(LIBDIR)/$(PROG)
+	install -d $(LIBEXECDIR)
+	install -m 755 $(PROG) $(LIBEXECDIR)/$(PROG)
 
 error.o : error.c token.h error.h Makefile
 hash.o : hash.c Makefile

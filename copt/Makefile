@@ -1,11 +1,11 @@
 
-copt09: copt.c
+copt: copt.c
 	$(CC) $(ANSI) $(CFLAGS) $(LDFLAGS) -o $@ copt.c
 
-install: copt09
-	install -d $(LIBDIR)
-	install -m 755 copt09 $(LIBDIR)/copt09
+install: copt
+	install -d $(LIBEXECDIR)
+	install -m 755 copt $(LIBEXECDIR)/copt
 
 realclean clean:
-	rm -f *.o copt09
+	rm -f *.o copt
 

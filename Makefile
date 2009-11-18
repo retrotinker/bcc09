@@ -20,5 +20,5 @@ clean: ar as bcc cpp ld unproto
 install: ar as bcc cpp ld unproto
 	for i in $^ ;\
 	do \
-		make PREFIX=$(PREFIX) LIBDIR=$(PREFIX)/bin -C $$i install ;\
+		make PREFIX=$(PREFIX) LIBEXECDIR=$(PREFIX)/libexec/bcc09 -C $$i install ;\
 	done

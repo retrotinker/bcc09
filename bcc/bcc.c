@@ -43,14 +43,14 @@
 #define AS09	"as09" EXESUF
 #define LD09	"ld09" EXESUF
 
-#define CPPBCC	"bcc09-cpp" EXESUF
-#define CC1BCC	"bcc09-cc1" EXESUF
+#define CPPBCC	"cpp" EXESUF
+#define CC1BCC	"cc1" EXESUF
 #define AS86	"as86" EXESUF
 #define LD86	"ld86" EXESUF
 
 #define GCC	"gcc"
-#define UNPROTO "unproto09" EXESUF
-#define OPTIM	"copt09" EXESUF
+#define UNPROTO "unproto" EXESUF
+#define OPTIM	"copt" EXESUF
 
 #if __STDC__ == 1
 #define P(x)	x
@@ -155,6 +155,7 @@ char *default_libdir = QUOT(LIBDIR);
 #else
 char *default_libdir = "/lib";
 #endif
+char *default_libexecdir = "/libexec";
 char *libdir_suffix = "";
 
 char devnull[] = "/dev/null";
@@ -183,9 +184,9 @@ char **argv;
 	if (!*localprefix || !localprefix[1]) {
 
 		if (*localprefix == '/') {
-			/* Paths for full NATIVE install "-M/" */
-			build_prefix(default_libdir, libdir_suffix, "");
-			build_prefix(default_libdir, "", "");
+			/* Paths for full NATIVE install */
+			build_prefix(default_libexecdir, libdir_suffix, "");
+			build_prefix(default_libexecdir, "", "");
 
 			default_include =
 			    build_libpath("-I", "/usr/include", "");
@@ -193,14 +194,10 @@ char **argv;
 			    build_libpath("-L", default_libdir, libdir_suffix);
 			optim_rules =
 			    build_libpath("-d", optim_rules, libdir_suffix);
-#if 0
-		} else if (*localprefix == '+') {
-			/* Paths for a special */
-#endif
 		} else {
-			/* Relative paths to a build dir "-M-" */
-			build_prefix("/lib", libdir_suffix, "");
-			build_prefix("/lib", "", "");
+			/* Relative paths to a build dir */
+			build_prefix("/libexec", libdir_suffix, "");
+			build_prefix("/libexec", "", "");
 
 			default_include = build_libpath("-I", "/include", "");
 			default_libdir =
@@ -211,12 +208,12 @@ char **argv;
 
 	} else {
 		/* Relative paths to normal PREFIX directory */
-		default_include = build_libpath("-I", "/lib/bcc/include", "");
-		default_libdir = build_libpath("-L", "/lib/bcc", libdir_suffix);
-		optim_rules = build_libpath("-d", "/lib/bcc", libdir_suffix);
+		default_include = build_libpath("-I", "/lib/bcc09/include", "");
+		default_libdir = build_libpath("-L", "/lib/bcc09", libdir_suffix);
+		optim_rules = build_libpath("-d", "/lib/bcc09", libdir_suffix);
 
-		build_prefix("/lib/bcc", libdir_suffix, "");
-		build_prefix("/lib/bcc", "", "");
+		build_prefix("/libexec/bcc09", libdir_suffix, "");
+		build_prefix("/libexec/bcc09", "", "");
 	}
 
 	build_prefix("/bin", "", "");
@@ -1126,11 +1123,6 @@ char **argv;
 		} else
 			append_option("-D__HAS_NO_FLOATS__", 'p');
 	}
-
-	if (opt_arch == 1)
-		libdir_suffix = "/i386";
-	if (opt_arch == 4)
-		libdir_suffix = "/m09";
 
 #ifdef VERSION
 	{

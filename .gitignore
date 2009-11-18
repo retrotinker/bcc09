@@ -5,9 +5,9 @@ ar/ar09
 ar/rel_aout.h
 as/as09
 bcc/bcc09
-bcc/bcc09-cc1
-copt/copt09
-cpp/bcc09-cpp
+bcc/cc1
+copt/copt
+cpp/cpp
 cpp/token1.h
 cpp/token2.h
 ld/ar.h
@@ -15,4 +15,4 @@ ld/catimage
 ld/ld09
 ld/objchop
 ld/objdump09
-unproto/unproto09
+unproto/unproto

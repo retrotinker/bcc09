@@ -1,19 +1,22 @@
+PREFIX	=/usr
+LIBEXECDIR	=$(PREFIX)/libexec/bcc09
+
 CFLAGS=-Wall -Wstrict-prototypes
 
-all: bcc09-cpp
+all: cpp
 
-bcc09-cpp: main.o cpp.o hash.o token1.o token2.o
-	$(CC) $(CFLAGS) -o bcc09-cpp main.o cpp.o hash.o token1.o token2.o
+cpp: main.o cpp.o hash.o token1.o token2.o
+	$(CC) $(CFLAGS) -o cpp main.o cpp.o hash.o token1.o token2.o
 
 clean realclean:
-	rm -f bcc09-cpp main.o cpp.o hash.o token1.o token2.o tmp.h
+	rm -f cpp main.o cpp.o hash.o token1.o token2.o tmp.h
 
 maintclean: realclean
 	rm -f token1.h token2.h
 
-install: bcc09-cpp
-	install -d $(LIBDIR)
-	install -m 755 bcc09-cpp $(LIBDIR)/bcc09-cpp
+install: cpp
+	install -d $(LIBEXECDIR)
+	install -m 755 cpp $(LIBEXECDIR)/cpp
 
 main.o: cc.h
 cpp.o: cc.h
