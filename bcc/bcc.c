@@ -95,7 +95,7 @@ int opt_arch = sizeof(char *) >= 4;
 #endif
 
 int do_preproc = 1;		/* c -> i */
-int do_unproto = 0;		/* i -> i */
+int do_unproto = 1;		/* i -> i */
 int do_compile = 1;		/* i -> s */
 int do_optim = 0;		/* s -> s */
 int do_as = 1;			/* s -> o */
@@ -832,17 +832,15 @@ char **argv;
 			if (!pflag)
 				switch (argv[ar][1]) {
 				case 'a':
-					if (strcmp(argv[ar], "-ansi") == 0) {
-						do_unproto = 1;
-#if 0
-						/* NOTE I'm setting this to zero, this isn't a _real_ Ansi cpp. */
-						prepend_option("-D__STDC__=0",
-							       'p');
-#else
-						prepend_option("-D__STDC__",
-							       'p');
-#endif
-					} else
+					/* Accept -ansi, but ignore it since
+ 					   it is now the default */
+					if (strcmp(argv[ar], "-ansi") != 0)
+						Usage();
+					break;
+				case 'k':
+					if (strcmp(argv[ar], "-kr") == 0)
+						do_unproto = 0;
+					else
 						Usage();
 					break;
 
@@ -1014,6 +1012,8 @@ char **argv;
 				fatal("Last option requires an argument");
 		}
 
+	if (do_unproto)
+		prepend_option("-D__STDC__", 'p');
 	if (control_count > 1)
 		fatal("only one option from -E -P -S -c allowed");
 	if (exe_count > 1)
@@ -1271,7 +1271,7 @@ void Usage()
 		fprintf(stderr, "%s: version %s\n", progname, VERSION);
 #endif
 	fprintf(stderr,
-		"Usage: %s [-ansi] [-options] [-o output] file [files].\n",
+		"Usage: %s [-kr] [-options] [-o output] file [files].\n",
 		progname);
 	exit(1);
 }
