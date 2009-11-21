@@ -156,7 +156,7 @@ char *default_libdir = QUOT(LIBDIR);
 char *default_libdir = "/lib";
 #endif
 char *default_libexecdir = "/libexec";
-char *libdir_suffix = "";
+char *libdir_suffix = "/bcc09";
 
 char devnull[] = "/dev/null";
 char *exec_prefixs[16] = {
@@ -208,12 +208,13 @@ char **argv;
 
 	} else {
 		/* Relative paths to normal PREFIX directory */
-		default_include = build_libpath("-I", "/lib/bcc09/include", "");
-		default_libdir = build_libpath("-L", "/lib/bcc09", libdir_suffix);
-		optim_rules = build_libpath("-d", "/lib/bcc09", libdir_suffix);
+		temp = catstr(libdir_suffix, "/include");
+		default_include = build_libpath("-I", "/lib", temp);
+		default_libdir = build_libpath("-L", "/lib", libdir_suffix);
+		optim_rules = build_libpath("-d", "/lib", libdir_suffix);
 
-		build_prefix("/libexec/bcc09", libdir_suffix, "");
-		build_prefix("/libexec/bcc09", "", "");
+		build_prefix("/libexec", libdir_suffix, "");
+		build_prefix("/libexec", "", "");
 	}
 
 	build_prefix("/bin", "", "");
