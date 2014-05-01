@@ -24,7 +24,7 @@ typedef int bool_pt;
 typedef unsigned count_t;
 typedef int fd_t;
 typedef unsigned char indcount_t;
-typedef unsigned offset_t;
+typedef size_t offset_t;
 typedef int soffset_t;
 # define SIZEOF_OFFSET_T 2	/* but sizeof (offset_t) often breaks cpp */
 typedef int opcode_pt;
