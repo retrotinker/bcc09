@@ -117,6 +117,7 @@ PRIVATE void doaltind()
 		do1altind();
 		if (sym != RBRACKET)
 			error(RBEXP);
+		getsym();
 	} else
 		do1altind();
 }
