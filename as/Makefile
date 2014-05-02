@@ -1,8 +1,8 @@
 
 CFLAGS=-O
 LDFLAGS=-s
-LIBDIR=/usr/bin
-BINDIR=/usr/bin
+LIBDIR=$(PREFIX)/bin
+BINDIR=$(PREFIX)/bin
 
 OBJS		=as.o assemble.o errors.o express.o \
 		 genbin.o genlist.o genobj.o gensym.o \

@@ -2,7 +2,7 @@
 # This file is part of the Linux-8086 Development environment and is
 # distributed under the GNU General Public License.
 
-LIBDIR	=/usr/bin
+LIBDIR	=$(PREFIX)/bin
 CFLAGS	=-O
 LDFLAGS	=
 DEFS	=

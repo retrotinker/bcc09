@@ -1,5 +1,5 @@
 
-LIBDIR	=/usr/bin
+LIBDIR	=$(PREFIX)/bin
 CFLAGS	=-O
 LDFLAGS	=
 
