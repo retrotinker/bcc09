@@ -18,7 +18,7 @@
 # define HEXSTARTCHAR '$'
 #endif
 #define OUTBUFSIZE 2048
-#define opcodeleadin()		/* outtab() for fussy assemblers */
+#define opcodeleadin()		outtab() /* for fussy assemblers */
 
 PRIVATE unsigned errcount;	/* # errors in compilation */
 				/* depends on zero init */

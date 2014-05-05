@@ -179,7 +179,7 @@ label_no label;
 # else
 						if (labptr->labcond == RA)
 							strncpy(labpatch,
-								"BRA\t\t", 5);
+								"\tBRA\t", 5);
 						else
 							*labpatch = '\t';
 						goto over;
