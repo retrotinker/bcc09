@@ -158,15 +158,7 @@ void u2cn P((char *buf, u2_pt offset, unsigned count));
 void u4cn P((char *buf, u4_t offset, unsigned count));
 bool_pt typeconv_init P((bool_pt big_endian, bool_pt long_big_endian));
 
-/* writebin.c */
-void writebin P((char *outfilename, bool_pt argsepid, bool_pt argbits32,
-		 bool_pt argstripflag, bool_pt arguzp));
-
-void write_dosemu P((char *outfilename, bool_pt argsepid, bool_pt argbits32,
-		 bool_pt argstripflag, bool_pt arguzp));
-
-/* write_elks.c */
-void write_elks P((char *outfilename, bool_pt argsepid, bool_pt argbits32,
+void write_elks P((char *outfilename, bool_pt argsepid,
 		 bool_pt argstripflag, bool_pt arguzp, bool_pt nsym));
 
 /* linksym.c */

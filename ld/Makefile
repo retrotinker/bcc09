@@ -18,7 +18,7 @@ DEFS	=-DREL_OUTPUT
 # NATIVE=-DA_OUT_INCL='"a_out_local.h"' 
 
 OBJS= dumps.o io.o ld.o readobj.o table.o typeconv.o linksyms.o mkar.o \
-      writex86.o writebin.o writeemu.o
+      writex86.o
 
 all: ld09 objchop catimage objdump09
 

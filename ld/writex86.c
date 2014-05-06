@@ -4,7 +4,6 @@
 
 #include "syshead.h"
 #include "x86_aout.h"
-#include "x86_cpm86.h"
 #include "const.h"
 #include "obj.h"
 #include "type.h"
@@ -18,7 +17,7 @@
 #define ELF_SYMS 0
 #endif
 
-#  define FILEHEADERLENGTH (headerless?0:(cpm86?CPM86_HEADERLEN:A_MINHDR))
+#  define FILEHEADERLENGTH (headerless?0:A_MINHDR)
 				/* part of header not counted in offsets */
 #define DPSEG 2
 
@@ -46,7 +45,6 @@
 #define offsetof(struc, mem) ((size_t) &((struc *) 0)->mem)
 #define memsizeof(struc, mem) sizeof(((struc *) 0)->mem)
 
-PRIVATE bool_t bits32;		/* nonzero for 32-bit executable */
 PRIVATE bin_off_t combase[NSEG];	/* bases of common parts of segments */
 PRIVATE bin_off_t comsz[NSEG];	/* sizes of common parts of segments */
 PRIVATE fastin_t curseg;	/* current segment, 0 to $F */
@@ -77,18 +75,16 @@ FORWARD void symres P((char *name));
 FORWARD void setseg P((fastin_pt newseg));
 FORWARD void skip P((unsigned countsize));
 FORWARD void writeheader P((void));
-FORWARD void cpm86header P((void));
 FORWARD void writenulls P((bin_off_t count));
 
 EXTERN bool_t reloc_output;
 
 /* write binary file */
 
-PUBLIC void write_elks(outfilename, argsepid, argbits32, argstripflag, arguzp,
+PUBLIC void write_elks(outfilename, argsepid, argstripflag, arguzp,
 		       argxsym)
 char *outfilename;
 bool_pt argsepid;
-bool_pt argbits32;
 bool_pt argstripflag;
 bool_pt arguzp;
 bool_pt argxsym;
@@ -107,7 +103,6 @@ bool_pt argxsym;
 		    ("Output binformat not configured relocatable, use -N");
 
 	sepid = argsepid;
-	bits32 = argbits32;
 	stripflag = argstripflag;
 	uzp = arguzp;
 	xsym = argxsym;
@@ -311,24 +306,19 @@ bool_pt argxsym;
 	setsym("__end", endoffset = combase[3] + comsz[3]);
 #endif
 	setsym("__segoff", (bin_off_t) (segadj[1] - segadj[0]) / 0x10);
-	if (!bits32) {
-		if (etextoffset > 65536L)
-			fatalerror("text segment too large for 16bit");
-		if (endoffset > 65536L)
-			fatalerror("data segment too large for 16bit");
-	}
+	if (etextoffset > 65536L)
+		fatalerror("text segment too large");
+	if (endoffset > 65536L)
+		fatalerror("data segment too large");
 
 	if (heap_top_value < 0x100 || endoffset > heap_top_value - 0x100)
 		heap_top_value = endoffset + 0x8000;
-	if (heap_top_value > 0x10000 && !bits32)
+	if (heap_top_value > 0x10000)
 		heap_top_value = 0x10000;
 	setsym("__heap_top", (bin_off_t) heap_top_value);
 
 	openout(outfilename);
-	if (cpm86)
-		cpm86header();
-	else
-		writeheader();
+	writeheader();
 	for (modptr = modfirst; modptr != NUL_PTR; modptr = modptr->modnext)
 		if (modptr->loadflag) {
 			linkmod(modptr);
@@ -653,28 +643,6 @@ unsigned countsize;
 	writenulls((bin_off_t) readsize(countsize));
 }
 
-PRIVATE void cpm86header()
-{
-	struct cpm86_exec header;
-	memset(&header, 0, sizeof header);
-
-	if (sepid) {
-		header.ce_group[0].cg_type = CG_CODE;
-		u2c2(header.ce_group[0].cg_len, (15 + etextpadoff) / 16);
-		u2c2(header.ce_group[0].cg_min, (15 + etextpadoff) / 16);
-		header.ce_group[1].cg_type = CG_DATA;
-		u2c2(header.ce_group[1].cg_len, (15 + edataoffset) / 16);
-		u2c2(header.ce_group[1].cg_min, (15 + endoffset) / 16);
-		u2c2(header.ce_group[1].cg_max, 0x1000);
-	} else {
-		header.ce_group[0].cg_type = CG_CODE;
-		u2c2(header.ce_group[0].cg_len, (15 + edataoffset) / 16);
-		u2c2(header.ce_group[0].cg_min, (15 + endoffset) / 16);
-	}
-	if (FILEHEADERLENGTH)
-		writeout((char *)&header, FILEHEADERLENGTH);
-}
-
 PRIVATE void writeheader()
 {
 	struct exec header;
@@ -685,7 +653,7 @@ PRIVATE void writeheader()
 	header.a_flags = sepid ? A_SEP : A_EXEC;
 	if (uzp)
 		header.a_flags |= A_UZP;
-	header.a_cpu = bits32 ? A_I80386 : A_I8086;
+	header.a_cpu = A_I8086;
 	header.a_hdrlen = FILEHEADERLENGTH;
 	offtocn((char *)&header.a_text, etextpadoff - btextoffset,
 		sizeof header.a_text);

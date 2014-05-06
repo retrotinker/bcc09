@@ -15,7 +15,6 @@ PUBLIC bin_off_t text_base_value = 0;	/* XXX */
 PUBLIC bin_off_t data_base_value = 0;	/* XXX */
 PUBLIC bin_off_t heap_top_value = 0;	/* XXX */
 PUBLIC int headerless = 0;
-PUBLIC int cpm86 = 0;
 PUBLIC char hexdigit[] = "0123456789abcdef";
 
 PRIVATE bool_t flag[128];
@@ -96,19 +95,12 @@ char **argv;
 			case 't':	/* trace modules linked */
 				if (icount > 0)
 					usage();
-#ifdef REL_OUTPUT
-			case 'B':	/* Broken -r for dosemu. */
-#endif
-			case '0':	/* use 16-bit libraries */
-			case '3':	/* use 32-bit libraries */
 			case 'M':	/* print symbols linked */
 			case 'i':	/* separate I & D output */
 			case 'm':	/* print modules linked */
 			case 's':	/* strip symbols */
 			case 'z':	/* unmapped zero page */
-			case 'N':	/* Native format a.out */
 			case 'd':	/* Make a headerless outfile */
-			case 'c':	/* Write header in CP/M-86 format */
 			case 'y':	/* Use a newer symbol table */
 				if (arg[2] == 0)
 					flag[(int)arg[1]] = TRUE;
@@ -116,8 +108,6 @@ char **argv;
 					flag[(int)arg[1]] = FALSE;
 				else
 					usage();
-				if (arg[1] == '0')	/* flag 0 is negative logic flag 3 */
-					flag['3'] = !flag['0'];
 				break;
 			case 'C':	/* startfile name */
 				tfn = buildname(crtprefix, arg + 2, crtsuffix);
@@ -201,14 +191,13 @@ char **argv;
 		usage();
 
 #ifdef BUGCOMPAT
-	if (icount == 1 && (flag['r'] && !flag['N'])) {
+	if (icount == 1 && flag['r']) {
 		flag['r'] = 0;
-		flag['B'] = 1;
 	}
 #endif
 
 #ifdef REL_OUTPUT
-	if (flag['r'] && !flag['N']) {
+	if (flag['r']) {
 		/* Do a relocatable link -- actually fake it with 'ar.c' */
 		ld86r(argc, argv);
 	}
@@ -219,23 +208,10 @@ char **argv;
 	if (headerless)
 		flag['s'] = 1;
 
-	/* CP/M-86 executables can't use symbols. */
-	cpm86 = flag['c'];
-	if (cpm86)
-		flag['s'] = 1;
-
-	linksyms(flag['r'] | flag['B']);
+	linksyms(flag['r']);
 	if (outfilename == NUL_PTR)
 		outfilename = "a.out";
-	if (flag['N'])
-		writebin(outfilename, flag['i'], flag['3'], flag['s'],
-			 flag['z'] & flag['3']);
-	else if (flag['B'])
-		write_dosemu(outfilename, flag['i'], flag['3'], flag['s'],
-			     flag['z'] & flag['3']);
-	else
-		write_elks(outfilename, flag['i'], flag['3'], flag['s'],
-			   flag['z'], flag['y']);
+	write_elks(outfilename, flag['i'], flag['s'], flag['z'], flag['y']);
 	if (flag['m'])
 		dumpmods();
 	if (flag['M'])
