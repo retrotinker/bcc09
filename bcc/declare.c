@@ -658,11 +658,6 @@ PRIVATE void declfunc()
 		if (arg1inreg && symptr == &locsyms[0])
 			argsp = returnadrsize;	/* skip return adr after 1st arg */
 	}
-	if (main_flag > 0) {
-		globl("__mkargv");
-		if (main_flag > 2)
-			globl("environ");
-	}
 	lbrace();
 	compound();
 	clearfunclabels();
