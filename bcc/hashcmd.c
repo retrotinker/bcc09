@@ -98,7 +98,7 @@ PRIVATE void asmcontrol()
 	if (expect_statement)
 		return;
 
-	outnstr("!BCC_ASM");
+	outnstr(";BCC_ASM");
 	dumplocs();
 #ifndef ASM_BARE
 	cppscan(1);
@@ -143,7 +143,7 @@ PRIVATE void asmcontrol()
 		}
 	}
 #endif
-	outnstr("!BCC_ENDASM");
+	outnstr(";BCC_ENDASM");
 }
 
 /* warningcntl() - process #warning */

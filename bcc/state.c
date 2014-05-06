@@ -229,7 +229,7 @@ PUBLIC void doasm()
 	if (sym != STRINGCONST)
 		error("string const expected");
 	else {
-		outnstr("!BCC_ASM");
+		outnstr(";BCC_ASM");
 		for (;;) {
 			constant.value.s[charptr - constant.value.s] = '\0';
 			outbyte('\t');
@@ -245,7 +245,7 @@ PUBLIC void doasm()
 			if (sym != STRINGCONST)
 				break;
 		}
-		outnstr("!BCC_ENDASM");
+		outnstr(";BCC_ENDASM");
 		if (sym == RPAREN)
 			nextsym();
 		semicolon();
@@ -725,7 +725,7 @@ more:
 		semicolon();
 		break;
 	case SEMICOLON:
-		outnstr("!BCC_EOS");
+		outnstr(";BCC_EOS");
 		nextsym();
 		return;
 	case ASMSYM:

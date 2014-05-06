@@ -154,7 +154,7 @@ struct nodestruct *exp;
 {
 	if (!dbnodeon)
 		return;
-	outstr("! Debug: ");
+	outstr("; Debug: ");
 	if (exp->tag < FIRSTOP && exp->tag > LASTOP)
 		outstr("unknown op");
 	else
@@ -178,7 +178,7 @@ struct nodestruct *exp;
 PUBLIC void dbnodeswap()
 {
 	if (dbnodeon)
-		outnstr("! Debug: expression subtree swapping");
+		outnstr("; Debug: expression subtree swapping");
 }
 
 PRIVATE void outindchars(byte, count)

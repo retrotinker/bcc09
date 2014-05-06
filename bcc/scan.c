@@ -432,10 +432,10 @@ PUBLIC void nextsym()
 	register char *reglineptr;
 
 	if (expect_statement && asmmode) {
-		outnstr("!BCC_ASM");
+		outnstr(";BCC_ASM");
 		dumplocs();
 		cppscan(1);
-		outnstr("!BCC_ENDASM");
+		outnstr(";BCC_ENDASM");
 	} else
 		while (TRUE) {	/* exit with short, fast returns */
 			reglineptr = lineptr;

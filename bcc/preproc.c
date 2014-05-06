@@ -86,7 +86,7 @@ PRIVATE void asmcontrol()
 	if (orig_cppmode)
 		outnstr("#asm");
 	else {
-		outnstr("!BCC_ASM");
+		outnstr(";BCC_ASM");
 		dumplocs();
 	}
 #ifndef ASM_BARE
@@ -135,7 +135,7 @@ PRIVATE void asmcontrol()
 	if (orig_cppmode)
 		outnstr("#endasm");
 	else
-		outnstr("!BCC_ENDASM");
+		outnstr(";BCC_ENDASM");
 }
 
 PUBLIC void checknotinif()

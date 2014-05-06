@@ -91,7 +91,7 @@ PUBLIC void clrBreg()
 
 PUBLIC void comment()
 {
-	outstr("| ");
+	outstr("; ");
 }
 
 PUBLIC void defbyte()

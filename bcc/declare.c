@@ -1065,7 +1065,7 @@ PUBLIC void rparen()
 
 PUBLIC void semicolon()
 {
-	outnstr("!BCC_EOS");
+	outnstr(";BCC_EOS");
 	if (sym != SEMICOLON)
 		need(';');
 	else
