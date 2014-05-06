@@ -28,9 +28,12 @@ ld09: $(OBJS)
 objdump09: objdump86.c
 	$(CC) $(LDFLAGS) $< -o $@
 
-install: ld09
+install: ld09 objdump09
 	install -d $(LIBDIR)
 	install -m 755 ld09 $(LIBDIR)
+	install -m 755 objdump09 $(LIBDIR)
+	ln -f $(LIBDIR)/objdump09 $(LIBDIR)/nm09
+	ln -f $(LIBDIR)/objdump09 $(LIBDIR)/size09
 
 clean realclean clobber:
 	rm -f *.o ld09 objchop catimage objdump09

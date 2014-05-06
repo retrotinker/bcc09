@@ -714,13 +714,13 @@ void fetch_aout_hdr()
 void dump_aout()
 {
 	static char *cpu[] =
-	    { "unknown", "8086", "m68k", "ns16k", "i386", "sparc" };
+	    { "unknown", "8086", "m68k", "ns16k", "i386", "sparc", "m6809" };
 	static char *byteord[] =
 	    { "LITTLE_ENDIAN", "(2143)", "(3412)", "BIG_ENDIAN" };
 	int i;
 	long l;
 
-	if (h_cpu > 0x17)
+	if (h_cpu > 0x1B)
 		h_cpu &= 3;
 
 	printf("HLEN %d\n", h_len);

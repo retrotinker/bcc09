@@ -653,7 +653,7 @@ PRIVATE void writeheader()
 	header.a_flags = sepid ? A_SEP : A_EXEC;
 	if (uzp)
 		header.a_flags |= A_UZP;
-	header.a_cpu = A_I8086;
+	header.a_cpu = A_M6809;
 	header.a_hdrlen = FILEHEADERLENGTH;
 	offtocn((char *)&header.a_text, etextpadoff - btextoffset,
 		sizeof header.a_text);
