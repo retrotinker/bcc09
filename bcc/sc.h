@@ -2,7 +2,9 @@
 
 /* Copyright (C) 1992 Bruce Evans */
 
+#define DIRECTPAGE_BROKEN	/* DP usage needs work... */
 #define DIRECTPAGE  0x01	/* modifier on global to show in dpseg */
+
 #define EXTERNAL    0x02	/* external */
 #define STATIC      0x04
 
