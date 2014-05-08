@@ -204,11 +204,11 @@ bool_pt argxsym;
 	 */
 	segpos[0] = segbase[0] = spos = btextoffset;
 	combase[0] = segbase[0] + segsz[0];
-	segadj[1] = segadj[0] = -btextoffset;
+	segadj[1] = segadj[0] = btextoffset;
 	etextpadoff = etextoffset = combase[0] + comsz[0];
 	if (sepid) {
 		etextpadoff = ld_roundup(etextoffset, 0x10, bin_off_t);
-		segadj[1] += etextpadoff - bdataoffset;
+		segadj[1] -= etextpadoff - bdataoffset;
 	} else if (bdataoffset == 0)
 		bdataoffset = etextpadoff;
 	segpos[1] = segbase[1] = edataoffset = bdataoffset;
@@ -221,7 +221,7 @@ bool_pt argxsym;
 
 		etextpadoff +=
 		    ld_roundup(segsz[seg] + comsz[seg], 0x10, bin_off_t);
-		segadj[1] +=
+		segadj[1] -=
 		    ld_roundup(segsz[seg] + comsz[seg], 0x10, bin_off_t);
 	}
 	for (seg = 2; seg < 4; ++seg)
@@ -633,7 +633,7 @@ fastin_pt newseg;
 		segpos[curseg] = spos;
 		spos = segpos[curseg = newseg];
 		seekout(FILEHEADERLENGTH + (unsigned long)spos
-			+ (unsigned long)segadj[curseg]);
+			- (unsigned long)segadj[curseg]);
 	}
 }
 
@@ -682,7 +682,7 @@ bin_off_t count;
 	 */
 
 	seekout(FILEHEADERLENGTH + (unsigned long)spos
-		+ (unsigned long)segadj[curseg]);
+		- (unsigned long)segadj[curseg]);
 	return;
 
 #endif
