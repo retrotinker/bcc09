@@ -142,6 +142,7 @@ enum scan_states
     TYPEDEFNAME,
     UNIONDECL,
     UNSIGNDECL,
+    DIRECTDECL,
 
     AUTODECL,
     EXTERNDECL,

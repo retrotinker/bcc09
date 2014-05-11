@@ -30,7 +30,7 @@
 #define MAXEXPR 500
 #endif
 #define MAXLOCAL 100
-#define NKEYWORDS 39
+#define NKEYWORDS 40
 #ifdef NOFLOAT
 #define NSCALTYPES 10
 #else
@@ -92,6 +92,7 @@ PRIVATE struct keywordstruct keywords[NKEYWORDS] = {
 	{"extern", EXTERNDECL,},
 	{"register", REGDECL,},
 	{"static", STATICDECL,},
+	{"direct", DIRECTDECL,},
 
 	{"typedef", TYPEDEFDECL,},
 

@@ -429,6 +429,11 @@ PRIVATE bool_pt declspec()
 			gvarsc = sym;
 			nextsym();
 			break;
+		case DIRECTDECL:
+			++nsc;
+			gvarsc = sym;
+			nextsym();
+			break;
 		case STRUCTDECL:
 		case UNIONDECL:
 			++ntype;
@@ -730,13 +735,13 @@ PRIVATE void idecllist()
 				gvarsymptr->flags &= ~EXTERNAL;
 		} else if (level == GLBLEVEL
 			   || gvartype->constructor == FUNCTION
-			   || gvarsc == EXTERNDECL) {
+			   || gvarsc == EXTERNDECL
+			   || gvarsc == DIRECTDECL) {
 			gvarsymptr = addglb(gvarname, gvartype);
-#if !defined(DIRECTPAGE_BROKEN)	/* FIXME: This does not seem right for most potential uses... */
 #ifdef DIRECTPAGE		/* make all global scalar and pointer variables DIRECTPAGE */
-			if (!(gvartype->constructor & ~POINTER))
-				gvarsymptr->flags = DIRECTPAGE;
-#endif
+			if (gvarsc == DIRECTDECL)
+				if (!(gvartype->constructor & ~POINTER))
+					gvarsymptr->flags = DIRECTPAGE;
 #endif
 			if (gvarsc == EXTERNDECL)
 				gvarsymptr->flags |= EXTERNAL;
