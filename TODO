@@ -1,9 +1,8 @@
-- Add README (and maybe FAQ)
-- Remove unused compiler options and correct documentation
-- Ditto for assembler and linker
-- Remove x86isms
-- Get some simple startup code
-- Fix objdump09 and fix Makefile to install it (and nm09 and size09)
+- Expand README (and maybe add FAQ)
+- Audit bcc/bcc.doc for accuracy and completeness
+- Continue removing unused options and correcting documentation
+- Ditto for any remaining x86isms
+- Add some simple startup code and other fundamental support libraries
 - Change default PREFIX to /usr/local (when things actually work)
 - Implement at least some basic copt rules
 - Evaluate/improve "-pic" option (for use w/ OS-9)
