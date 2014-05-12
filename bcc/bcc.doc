@@ -1,25 +1,17 @@
-WARNING: This document bis out of date; it's kept mainly for the 6809 notes.
-
 bcc options
 -----------
 
-bcc [-03EGOPSVcegv] [-Aas_option] [-Bexecutable_prefix] [-Ccc1_option]
-    [-Ddefine] [-Iinclude_dir] [-Lld_option] [-Qc386_option] [-Ttmpdir]
-    [-Uundef] [-o outfile] [-fpt error] [ld_options] [infiles]
-
-The 6809 version does not support -0, -3 or -G.
-Only the c386 version supports -Q.
+bcc09 [-EOPSVcegv] [-Aas_option] [-Bexecutable_prefix] [-Ccc1_option]
+      [-Ddefine] [-Iinclude_dir] [-Lld_option] [-Ttmpdir]
+      [-Uundef] [-o outfile] [-fpt error] [ld_options] [infiles]
 
 defaults (off or none except for these):
--03		native
 outfile		stdout for preprocessor output
 		somewhere/file.[ci] -> file.s for compiler output
 		somewhere/file.[cis] -> file.o for assembler output
 		a.out for ld output
 
 -kr Do not pass the source through 'unproto' first
--0  8086 target (works even on 80386 host)
--3  80386 target (works even on 8086 host)
 -A  pass remainder of option to assembler (e.g. -A-l -Alistfile for a listing)
 -B  prefix for executable search path (as usual; the search order is all paths
     specified using -B, in order, then the path given in the environment
@@ -28,7 +20,6 @@ outfile		stdout for preprocessor output
 -C  pass remainder of option to cc1 (e.g. -C-c for caller-saves)
 -D  define (as usual)
 -E  produce preprocessor output (as usual)
--G  produce gnu-Minix objects (link with gnu ld)
 -Ix include search path (as usual)
 -I  don't add default include to search list
 -Lx add dir name x to the head of the list of library dirs searched
@@ -36,7 +27,6 @@ outfile		stdout for preprocessor output
 -X  pass remainder of option to linker
 -O  optimize (does nothing)
 -P  produce preprocessor output with no line numbers (as usual)
--Q  pass full option to c386
 -S  produce assembler file (as usual)
 -T  temporary directory (overrides previous value and default; default is
     from the environment variable TMPDIR if that is set, otherwise /tmp)
@@ -57,25 +47,20 @@ outfile		stdout for preprocessor output
 Other options are passed to the linker, in particular -i-, -lx, -M, -m, -s.
 The -i option is always passed to the linker but can be cancelled using -i-.
 
-This is supposed to match the V7 manual except for -0, -3, -A, -C, -G, -L,
--T, -V, -e, -v and where not supported.
+This is supposed to match the V7 manual except for -3, -A, -C, -L, -T, -V,
+-e, -v and where not supported.
 
 cc1 options
 ----------
 
-cc1 [-03EPcdfltw[-]] [-Ddefine] [-Iinclude_dir] [-Uundef] [-o outfile] [infile]
-
-The 6809 version does not support -0 or -3 but it supports -p.
+cc1 [-EPcdflptw[-]] [-Ddefine] [-Iinclude_dir] [-Uundef] [-o outfile] [infile]
 
 defaults (off or none except for these):
--03		native
--c		on for 6809
--f		on for 6809
+-c		on
+-f		on
 outfile		stdout
 infile		stdin
 
--0  8086 target (works even on 80386 host)
--3  80386 target (works even on 8086 host)
 -D  define (as usual)
 -E  produce preprocessor output (as usual)
 -I  include search path (as usual)
@@ -99,37 +84,27 @@ __BCC__			1
 
 The following may be defined after option processing:
 
-__AS09__		1 if 6809 version
-__AS386_16__		1 if -0 option on 80*86
-__AS386_32__		1 if -3 option on 80*86
+__AS09__		1
 __CALLER_SAVES__	1 if -c option
-__FIRST_ARG_IN_AX__	1 if -f option on 80*86
-__FIRST_ARG_IN_X__	1 if -f option on 6809
+__FIRST_ARG_IN_X__	1 if -f option
 __LONG_BIG_ENDIAN__	1 if -l option
-__POS_INDEPENDENT__	1 if -p option on 6809
+__POS_INDEPENDENT__	1 if -p option
 
 The following are standard builtins:
 
 __FILE__		stringized name of current input file
 __LINE__		current line number
 
-as options
+as09 options
 ----------
 
-as [-03agjuw] [-b [bin]] [-lm [list]] [-n name] [-o obj] [-s sym] src
-
-The 6809 version does not support -0, -3, -a or -j.
+as09 [-guw] [-b [bin]] [-lm [list]] [-n name] [-o obj] [-s sym] src
 
 defaults (off or none except for these; no output is produced without a flag):
--03		native
 list		stdout (beware of clobbering next arg)
 name		basename of the source name
 
--0  start with 16-bit code segment
--3  start with 32-bit code segment
--a  enable partial compatibility with asld
 -g  only put global symbols in object file
--j  force all jumps to be long
 -l  produce list file, filename may follow
 -m  print macro expansions in listing
 -n  name of module follows (goes in object instead of source name)
@@ -149,29 +124,23 @@ The -b flag now produces a 'raw' binary file with no header, if there's no
 table, if a binary file doesn't start at location zero the first two items
 are the start and end addresses of the binary file.
 
-ld options
+ld09 options
 ----------
 
-ld [-03Mimrstz[-]] [-llib_extension] [-o outfile] [-Ccrtfile]
+ld09 [-Mmrstz[-]] [-llib_extension] [-o outfile] [-Ccrtfile]
        [-Llibdir] [-Olibfile] [-T textaddr] infile...
 
-The version that produces old Minix a.out format does not support -r.
-
-The 6809 version does not support -i or -r.
+The current version supports -r by invoking ar.
 
 defaults (off or none except for these):
--03		native
 -L/usr/local/lib/m/	(m is machine-dependent)
 outfile		a.out
 
--0  produce header with 16-bit magic and use library subdir i86 for -lx
--3  produce header with 32-bit magic and use library subdir i386 for -lx
 -Cx add file libdir-from-search/crtx.o to list of files linked
 -Lx add dir name x to the head of the list of library dirs searched
 -M  print symbols linked on stdout
 -Ox add library libdir-from-search/x to list of files linked
 -T  text base address follows (in format suitable for strtoul)
--i  separate I&D output
 -lx add library libdir-from-search/libx.a to list of files linked
 -m  print modules linked on stdout
 -o  output file name follows
