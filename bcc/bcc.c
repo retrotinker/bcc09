@@ -149,7 +149,7 @@ char *localprefix = "/";
 
 /* These paths are NATIVE install paths, change others below */
 char *default_include = "/usr/include";
-char *optim_rules = "/lib";
+char *optim_rules = "/libexec";
 #ifdef LIBDIR
 char *default_libdir = QUOT(LIBDIR);
 #else
@@ -203,7 +203,7 @@ char **argv;
 			default_libdir =
 			    build_libpath("-L", "/lib", libdir_suffix);
 			optim_rules =
-			    build_libpath("-d", "/lib", libdir_suffix);
+			    build_libpath("-d", "/libexec", libdir_suffix);
 		}
 
 	} else {
@@ -211,7 +211,7 @@ char **argv;
 		temp = catstr(libdir_suffix, "/include");
 		default_include = build_libpath("-I", "/lib", temp);
 		default_libdir = build_libpath("-L", "/lib", libdir_suffix);
-		optim_rules = build_libpath("-d", "/lib", libdir_suffix);
+		optim_rules = build_libpath("-d", "/libexec", libdir_suffix);
 
 		build_prefix("/libexec", libdir_suffix, "");
 		build_prefix("/libexec", "", "");
@@ -402,41 +402,12 @@ struct file_list *file;
 		command.cmd = OPT;
 	command_reset();
 	newfilename(file, !do_as, 's', 1);
-	command_opt("-c!");
-	if (opt_O && opt_arch == 0) {
-		sprintf(buf, "-huse16 %c86", opt_O);
-		command_opt(buf);
-	}
+	command_opt("-c;");
 	command_opt(optim_rules);
 
-	command_opt("rules.start");
 	command_opts('o');
 
-	if (opt_O) {
-		if (opt_arch == 0)
-			sprintf(buf, "rules.%c86", opt_O);
-		else
-			sprintf(buf, "rules.lv_%c", opt_O);
-		command_opt(buf);
-	}
-
-	switch (opt_arch) {
-	case 0:
-		command_opt("rules.86");
-		break;
-	case 1:
-	case 2:
-		command_opt("rules.i386");
-		break;
-	case 4:
-		command_opt("rules.6809");
-		break;
-	default:
-		command_opt("rules.mid");
-		break;
-	}
-
-	command_opt("rules.end");
+	command_opt("rules.6809");
 
 	run_command(file);
 }

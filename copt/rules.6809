@@ -1,0 +1,13 @@
+## Redundant STx ... ; LDx ...
+
+# Exclude indexed with pre/post inc/decrement
+ST%1	%2,%[X|Y|U|S]3
+LD%1	%2,%[X|Y|U|S]3
+=
+ST%1	%2,%3
+
+# Exclude indexed and immediate completely
+ST%1	%![,|#]%2
+LD%1	%![,|#]%2
+=
+ST%1	%2

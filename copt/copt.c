@@ -765,7 +765,7 @@ static void optimize(int backup)
 	while (cur != NULL) {
 		if (cur->comment_flg || in_asm) {
 			lp = cur->next;
-			if (memcmp(cur->text, "!BCC_", 5) == 0)
+			if (memcmp(cur->text, ";BCC_", 5) == 0)
 				in_asm = (memcmp(cur->text + 5, "ASM", 3) == 0);
 		} else if ((lp = optline(cur)) != NULL && lp != cur->next) {
 			for (i = 0; i < backup && lp != NULL; i++)

@@ -4,7 +4,7 @@
 - Ditto for any remaining x86isms
 - Add some simple startup code and other fundamental support libraries
 - Change default PREFIX to /usr/local (when things actually work)
-- Implement at least some basic copt rules
+- Implement more/better copt rules
 - Evaluate/improve "-pic" option (for use w/ OS-9)
 - Add code generation option for 6309
 - Consolidate ld/rel_aout.h and ld/x86_aout.h (as bcc_aout.h?)
