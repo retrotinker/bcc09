@@ -732,11 +732,15 @@ PRIVATE void idecllist()
 			   || gvartype->constructor == FUNCTION
 			   || gvarsc == EXTERNDECL) {
 			gvarsymptr = addglb(gvarname, gvartype);
-#if !defined(DIRECTPAGE_BROKEN)	/* FIXME: This does not seem right for most potential uses... */
-#ifdef DIRECTPAGE		/* make all global scalar and pointer variables DIRECTPAGE */
-			if (!(gvartype->constructor & ~POINTER))
+#ifdef DIRECTPAGE
+			/*
+			 * make all global scalar and pointer variables
+			 * DIRECTPAGE only iff generating position
+			 * independent code
+			 */
+			if (posindependent &&
+			    !(gvartype->constructor & ~POINTER))
 				gvarsymptr->flags = DIRECTPAGE;
-#endif
 #endif
 			if (gvarsc == EXTERNDECL)
 				gvarsymptr->flags |= EXTERNAL;

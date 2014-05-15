@@ -584,13 +584,13 @@ struct symstruct *adr;
 			} else if (indflag) {
 				outextended();
 				bumplc2();
-			} else if (adr->flags & DIRECTPAGE)
-				outdirectpage();
-			else {
+			} else if (!(adr->flags & DIRECTPAGE)) {
 				outextended();
 				bumplc();
 			}
 		}
+		if (adr->flags & DIRECTPAGE)
+			outdirectpage();
 		if (adr->flags & LABELLED)
 			outlabel(adr->name.label);
 		else if (*adr->name.namep == 0) {	/* constant address */
@@ -603,7 +603,7 @@ struct symstruct *adr;
 				outplus();
 			outshex(adr->offset.offi);
 		}
-		if (posindependent) {
+		if (posindependent && !(adr->flags & DIRECTPAGE)) {
 			outcregname(GLOBAL);
 			bumplc2();
 		}
