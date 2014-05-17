@@ -11,3 +11,13 @@ ST%1	%![,|#]%2
 LD%1	%![,|#]%2
 =
 ST%1	%2
+
+## LDx followed by STx doesn't change the flags,
+## so no nead for a TSTx instruction to follow...
+
+LD%[A|B]1	%2
+ST%[A|B]1	%3
+TST%[A|B]1
+=
+LD%1	%2
+ST%1	%3
