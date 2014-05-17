@@ -20,9 +20,9 @@ typedef int fastin_pt;
 typedef unsigned flags_t;	/* unsigned makes shifts logical */
 
 #ifdef LONG_OFFSETS
-typedef unsigned long bin_off_t;
+typedef signed long bin_off_t;
 #else
-typedef unsigned bin_off_t;
+typedef signed bin_off_t;
 #endif
 
 #ifdef OBJ_H			/* obj.h is included */
