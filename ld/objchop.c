@@ -34,6 +34,8 @@ char **argv;
 	if (BADMAG(header))
 		fatal("Input file has bad magic number");
 
+	exec_header_adjust(&header);
+
 	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
 		fatal("Cannot seek to start of text");
 

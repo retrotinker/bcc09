@@ -8,6 +8,8 @@
 #ifndef __AOUT_H
 #define __AOUT_H
 
+#include <endian.h>
+
 /* If the host isn't an x86 all bets are off, use chars. */
 #if defined(i386) || defined(__BCC__) || defined(MSDOS)
 typedef long Long;
@@ -37,6 +39,21 @@ struct	exec {			/* a.out header */
   Long		a_tbase;	/* text relocation base */
   Long		a_dbase;	/* data relocation base */
 };
+
+static inline
+void exec_header_adjust(struct exec *header)
+{
+	header->a_text = be32toh(header->a_text);
+	header->a_data = be32toh(header->a_data);
+	header->a_bss = be32toh(header->a_bss);
+	header->a_entry = be32toh(header->a_entry);
+	header->a_total = be32toh(header->a_total);
+	header->a_syms = be32toh(header->a_syms);
+	header->a_trsize = be32toh(header->a_trsize);
+	header->a_drsize = be32toh(header->a_drsize);
+	header->a_tbase = be32toh(header->a_tbase);
+	header->a_dbase = be32toh(header->a_dbase);
+}
 
 #define A_MAGIC0      (unsigned char) 0x01
 #define A_MAGIC1      (unsigned char) 0x03

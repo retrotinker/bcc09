@@ -114,6 +114,8 @@ char *fname;
 
 	if (BADMAG(header))
 		fatal("Input file has bad magic number");
+
+	exec_header_adjust(&header);
 }
 
 copy_segment(out_offset, in_offset, length)
