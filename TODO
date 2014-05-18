@@ -10,4 +10,8 @@
 - Consolidate ld/rel_aout.h and ld/x86_aout.h (as bcc_aout.h?)
 - Genericize os9copy as objcopy; include decb, srec, ihex, etc...
 - Clean-up and remove/minimize opt_arch usage in bcc.c
+- Remove DATASEGS definition from linker (x86-ism?)
+- Clarify heap_top_value meaning in linker
+- Need runtime init of statically initialized pointer data (ctors/dtors?)
+  for PIC code (and corresponding support in startup code)
 - Plenty more...
