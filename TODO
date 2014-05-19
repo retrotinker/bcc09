@@ -14,4 +14,12 @@
 - Clarify heap_top_value meaning in linker
 - Need runtime init of statically initialized pointer data (ctors/dtors?)
   for PIC code (and corresponding support in startup code)
+- In PIC mode, global (bss?) pointers and arrays are using PC-relative
+  addressing rather than direct addressing
+- Pointers to direct page objects don't work
+  (LEAX <_foo -> LDD #_foo ; TFR DP,A ; TFR D,X)
+  (           -> LEAS -1,S ; CLR 0,S ; PSHS DP ; PULS X ; LEAX _foo,X)
+  (           -> TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X)
+  (           -> TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X)
+- Create a BUGS file for items like the last two?
 - Plenty more...
