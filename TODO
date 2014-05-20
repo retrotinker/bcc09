@@ -23,4 +23,5 @@
   (           -> TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X)
   (           -> TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X)
 - Create a BUGS file for items like the last two?
+- Add support for Color TRSDOS (i.e. Disk EDTASM) environment?
 - Plenty more...
