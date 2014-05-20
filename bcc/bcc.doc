@@ -2,8 +2,8 @@ bcc options
 -----------
 
 bcc09 [-EOPSVcegv] [-Aas_option] [-Bexecutable_prefix] [-Ccc1_option]
-      [-Ddefine] [-Iinclude_dir] [-Lld_option] [-Ttmpdir]
-      [-Uundef] [-o outfile] [-fpt error] [ld_options] [infiles]
+      [-Ddefine] [-Iinclude_dir] [-Lld_option] [-Ttmpdir] [-Uundef]
+      [-o outfile] [ld_options] [infiles]
 
 defaults (off or none except for these):
 outfile		stdout for preprocessor output
@@ -35,19 +35,16 @@ outfile		stdout for preprocessor output
 -c  produce object file (as usual)
 -e  run the preprocess pass separately.  This takes less memory, and may help
     or harm by giving more traditional semantics like token pasting with /**/.
--f  error (float emulation not supported)
 -g  produce debugging info (does nothing)
 -o  output file name follows (assembler, object or executable) (as usual)
 -p  error (profiling not supported)
--t  error (substitution of some cc passes not supported)
 -v  print names and args of subprocesses being run.  Two or more -v's:
     print names of files being unlinked.  Three or more -v's:
     print names of paths being searched.
 
-Other options are passed to the linker, in particular -i-, -lx, -M, -m, -s.
-The -i option is always passed to the linker but can be cancelled using -i-.
+Other options are passed to the linker, in particular -lx, -M, -m, -s.
 
-This is supposed to match the V7 manual except for -3, -A, -C, -L, -T, -V,
+This is supposed to match the V7 manual except for -A, -C, -L, -T, -V,
 -e, -v and where not supported.
 
 cc1 options

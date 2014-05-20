@@ -7,13 +7,7 @@
  *
  *       Personality flags are:
  *
- *	-Mn	Normal ELKS
- *	-Md	MSDOS
- *	-Ms	PC Standalone.
- *	-Ml	i386 Linux
- *	-M8	CvW's c386
  *	-M9	MC6809 with bcc
- *	-M0	A framework for the -B option.
  */
 #include <stdio.h>
 #ifdef __STDC__
@@ -32,23 +26,12 @@
 
 #define EXESUF
 
-#define AS	"as" EXESUF
-#define LD	"ld" EXESUF
-#define CPP	"cpp" EXESUF
-#define CC1	"cc1" EXESUF
-#define OPT	"opt" EXESUF
-
-#define CC1C386 "c386" EXESUF
-
 #define AS09	"as09" EXESUF
 #define LD09	"ld09" EXESUF
 
 #define CPPBCC	"cpp" EXESUF
 #define CC1BCC	"cc1" EXESUF
-#define AS86	"as86" EXESUF
-#define LD86	"ld86" EXESUF
 
-#define GCC	"gcc"
 #define UNPROTO "unproto" EXESUF
 #define OPTIM	"copt" EXESUF
 
@@ -86,13 +69,7 @@ struct opt_list {
 	int opttype;		/* Where the option should go */
 } *options;
 
-int opt_v, opt_V, opt_e, opt_x, opt_I, opt_L, opt_W, opt_i, opt_O, opt_M, opt_f;
-
-#ifdef DEFARCH
-int opt_arch = (DEFARCH != 0);
-#else
-int opt_arch = sizeof(char *) >= 4;
-#endif
+int opt_v, opt_V, opt_e, opt_x, opt_I, opt_L, opt_W, opt_O, opt_M;
 
 int do_preproc = 1;		/* c -> i */
 int do_unproto = 1;		/* i -> i */
@@ -121,7 +98,6 @@ void run_as P((struct file_list * file));
 void run_link P((void));
 void command_reset P((void));
 void command_opt P((char *option));
-void command_arch P((void));
 void command_opts P((int opykey));
 void newfilename
 P((struct file_list * file, int last_stage, int new_extn, int use_o));
@@ -281,26 +257,21 @@ struct file_list *file;
 {
 	static char cc1bcc[] = CC1BCC;
 
-	if (opt_arch < 5) {
-		if (opt_e)
-			command.cmd = cc1bcc;
-		else {
-			command.cmd = CPPBCC;
-			command.altcmd = cc1bcc;
-		}
-	} else
-		command.cmd = CPP;
+	if (opt_e)
+		command.cmd = cc1bcc;
+	else {
+		command.cmd = CPPBCC;
+		command.altcmd = cc1bcc;
+	}
 	command_reset();
-	newfilename(file, (!do_as && !do_optim), (do_compile ? 's' : 'i'),
-		    (opt_arch < 5));
-	if (opt_arch < 5 && command.cmd == cc1bcc)
+	newfilename(file, (!do_as && !do_optim), (do_compile ? 's' : 'i'), 1);
+	if (command.cmd == cc1bcc)
 		command_opt("-E");
-	else if (opt_arch < 5 && do_unproto)
+	else if (do_unproto)
 		command_opt("-A");
 	command_opts('p');
 	command_opt("-D__ASSEMBLER__");
 
-	command_arch();
 	run_command(file);
 }
 
@@ -311,19 +282,15 @@ struct file_list *file;
 	int combined_cpp;
 	static char cc1bcc[] = CC1BCC;
 
-	if (opt_arch < 5) {
-		if (opt_e)
-			command.cmd = cc1bcc;
-		else {
-			command.cmd = CPPBCC;
-			command.altcmd = cc1bcc;
-		}
-	} else
-		command.cmd = CPP;
+	if (opt_e)
+		command.cmd = cc1bcc;
+	else {
+		command.cmd = CPPBCC;
+		command.altcmd = cc1bcc;
+	}
 	command_reset();
 
 	combined_cpp = (command.cmd == cc1bcc &&
-			opt_arch != 3 &&
 			opt_e < 2 && !do_unproto && do_compile);
 
 	if (combined_cpp && !do_optim && !do_as)
@@ -331,10 +298,9 @@ struct file_list *file;
 	if (!combined_cpp && !do_compile)
 		last_stage = 1;
 
-	newfilename(file, last_stage, (combined_cpp ? 's' : 'i'),
-		    (opt_arch < 5));
+	newfilename(file, last_stage, (combined_cpp ? 's' : 'i'), 1);
 
-	if (!combined_cpp && opt_arch < 5) {
+	if (!combined_cpp) {
 		if (command.cmd == cc1bcc)
 			command_opt("-E");
 		else if (do_unproto)
@@ -344,15 +310,13 @@ struct file_list *file;
 	command_opts('p');
 	command_opts('C');
 	if (combined_cpp) {
-		if (opt_arch < 5 && !do_as)
+		if (!do_as)
 			command_opt("-t");
 		command_opts('c');
 	}
 
 	if (!opt_I)
 		command_opt(default_include);
-
-	command_arch();
 
 	run_command(file);
 }
@@ -371,23 +335,15 @@ struct file_list *file;
 void run_compile(file)
 struct file_list *file;
 {
-	if (opt_arch == 3)
-		command.cmd = CC1C386;
-	else if (opt_arch < 5)
-		command.cmd = CC1BCC;
-	else
-		command.cmd = CC1;
+	command.cmd = CC1BCC;
 	command_reset();
-	newfilename(file, !(do_optim || do_as), 's',
-		    (opt_arch != 3 && opt_arch < 5));
+	newfilename(file, !(do_optim || do_as), 's', 1);
 
-	if (opt_arch < 5 && !do_as)
+	if (!do_as)
 		command_opt("-t");
 
 	command_opts('c');
 	command_opts('C');
-
-	command_arch();
 
 	run_command(file);
 }
@@ -396,10 +352,7 @@ void run_optim(file)
 struct file_list *file;
 {
 	char buf[32];
-	if (opt_arch < 5)
-		command.cmd = OPTIM;
-	else
-		command.cmd = OPT;
+	command.cmd = OPTIM;
 	command_reset();
 	newfilename(file, !do_as, 's', 1);
 	command_opt("-c;");
@@ -416,97 +369,46 @@ void run_as(file)
 struct file_list *file;
 {
 	char *buf;
-	switch (opt_arch) {
-	case 0:
-	case 1:
-	case 2:
-		command.cmd = AS86;
-		break;
-	case 4:
-		command.cmd = AS09;
-		break;
-	default:
-		command.cmd = AS;
-		break;
-	}
+
+	command.cmd = AS09;
 	command_reset();
-	newfilename(file, (!do_link && opt_arch != 2), 'o', 1);
-	if (opt_arch == 3)
-		command_opt("-j");
-	if (opt_arch < 5)
-		command_opt("-u");
+	newfilename(file, !do_link, 'o', 1);
+	command_opt("-u");
 	command_opts('a');
 	if (opt_W)
 		command_opt("-w-");
 	else
 		command_opt("-w");
-	command_arch();
 	command_opt("-n");
 	buf = catstr(file->name, ".s");
 	command_opt(buf);
 	free(buf);
 
 	run_command(file);
-
-	if (opt_arch == 2) {
-		command.cmd = LD86;
-		command_reset();
-		command_opt("-r");
-		command_opt("-N");
-		newfilename(file, !do_link, 'o', 1);
-		run_command(file);
-	}
 }
 
 void run_link()
 {
 	struct file_list *next_file;
 
-	switch (opt_arch) {
-	case 0:
-	case 1:
-		command.cmd = LD86;
-		break;
-	case 2:
-		command.cmd = GCC;
-		break;
-	case 4:
-		command.cmd = LD09;
-		break;
-	default:
-		command.cmd = LD;
-		break;
-	}
+	command.cmd = LD09;
 	command_reset();
 	if (executable_name) {
 		command_opt("-o");
 		command_opt(executable_name);
 	}
 
-	if (opt_arch < 2)
-		command_opt("-y");
-
 	command_opts('l');
-	if (opt_arch != 2) {
-		if (opt_arch == 0 && !opt_i)
-			command_opt("-i");
+	if (!opt_L)
+		command_opt(default_libdir);
 
-		if (!opt_L)
-			command_opt(default_libdir);
-		command_arch();
-
-		if (!opt_x)
-			command_opt("-C0");
-	}
-	/* Current Debian compilers only work in with this: */
-	else
-		command_opt("--static");
+	if (!opt_x)
+		command_opt("-C0");
 
 	for (next_file = files; next_file; next_file = next_file->next)
 		command_opt(next_file->file);
 
-	if (opt_arch != 2)
-		command_opt(libc);
+	command_opt(libc);
 	run_command(0);
 }
 
@@ -520,17 +422,13 @@ void validate_link_opt(char *option)
 	default:
 		err = 1;
 		break;
-	case '0':		/* use 16-bit libraries */
-	case '3':		/* use 32-bit libraries */
 	case 'M':		/* print symbols linked */
 	case 'i':		/* separate I & D output */
 	case 'm':		/* print modules linked */
 	case 's':		/* strip symbols */
 	case 't':		/* trace modules linked */
 	case 'z':		/* unmapped zero page */
-	case 'N':		/* Native format a.out */
 	case 'd':		/* Make a headerless outfile */
-	case 'c':		/* Write header in CP/M-86 format */
 	case 'y':		/* Use a newer symbol table */
 		if (option[2] != 0 && option[2] != '-')
 			err = 1;
@@ -561,8 +459,6 @@ void validate_link_opts()
 {
 	struct opt_list *ol;
 	struct file_list *next_file;
-	if (opt_arch > 1)
-		return;		/* Only check ld86 options */
 
 	for (ol = options; ol; ol = ol->next)
 		if (ol->opttype == 'l')
@@ -572,8 +468,6 @@ void validate_link_opts()
 		validate_link_opt(next_file->file);
 
 	if (!do_link) {
-		if (opt_i)
-			fprintf(stderr, "warning: linker option -i unused.\n");
 		if (opt_x)
 			fprintf(stderr, "warning: linker option -x unused.\n");
 		if (opt_L)
@@ -666,16 +560,6 @@ char *option;
 	command.arglist[command.numargs++] = copystr(option);
 }
 
-void command_arch()
-{
-	if (opt_arch == 0)
-		command_opt("-0");
-	if (opt_arch == 1)
-		command_opt("-3");
-	if (opt_arch == 2)
-		command_opt("-3");
-}
-
 void command_opts(optkey)
 int optkey;
 {
@@ -754,20 +638,6 @@ char **argv;
 
 	for (ar = 1; ar < argc;)
 		if (argv[ar][0] != '-') {
-#ifdef __CYGWIN__
-			if (executable_name == 0) {
-				char *p = strrchr(argv[ar], '.');
-				if (p && p == argv[ar] + strlen(argv[ar]) - 2) {
-					/* This will actually create a COM file, but windows doesn't
-					 * care and cygwin will only do PATH searches for EXE files.
-					 */
-					*p = 0;
-					executable_name =
-					    catstr(argv[ar], ".exe");
-					*p = '.';
-				}
-			}
-#endif
 			append_file(argv[ar++], 0);
 			file_count++;
 		} else {
@@ -941,22 +811,9 @@ char **argv;
 				case 'L':
 					opt_L++;
 					break;
-				case 'i':
-					opt_i++;
-					break;
-				case 'f':
-					opt_f++;
-					break;
 
 				case 'W':
 					opt_W++;
-					break;
-
-				case '0':
-					opt_arch = 0;
-					break;
-				case '3':
-					opt_arch = 1;
 					break;
 
 				case 'w':
@@ -1001,99 +858,18 @@ char **argv;
 
 	if (opt_M == 0)
 		opt_M = '9';
-#ifdef CCC
-	if (opt_M == 0)
-		opt_M = '8';
-#endif
-#ifdef __CYGWIN__
-	if (opt_M == 0)
-		opt_M = 'd';
-#endif
-	if (opt_M == 0)
-		opt_M = (opt_arch == 1 ? 'l' : 'n');
 	switch (opt_M) {
-	case 'n':		/* Normal Elks */
-		prepend_option("-D__unix__", 'p');
-		prepend_option("-D__ELKS__", 'p');
-		libc = "-lc";
-		break;
-	case 'f':		/* Fast Call Elks */
-		prepend_option("-D__unix__", 'p');
-		prepend_option("-D__ELKS__", 'p');
-		append_option("-c", 'C');
-		append_option("-f", 'C');
-		libc = "-lc_f";
-		break;
-	case 'c':		/* Caller saves Elks */
-		prepend_option("-D__unix__", 'p');
-		prepend_option("-D__ELKS__", 'p');
-		append_option("-c", 'C');
-		libc = "-lc";
-		break;
-	case 's':		/* Standalone 8086 */
-		prepend_option("-D__STANDALONE__", 'p');
-		libc = "-lc_s";
-		break;
-	case 'd':		/* DOS COM file */
-		prepend_option("-D__MSDOS__", 'p');
-		if (do_link) {
-			libc = "-ldos";
-			append_option("-d", 'l');
-			append_option("-T100", 'l');
-		}
-		break;
-	case 'l':		/* 386 Linux a.out */
-		opt_arch = 1;
-		prepend_option("-D__unix__", 'p');
-		prepend_option("-D__linux__", 'p');
-		if (do_link) {
-			libc = "-lc";
-			append_option("-N", 'l');
-		}
-		break;
-	case 'g':		/* 386 Linux object using gcc as linker */
-		opt_arch = 2;
-		prepend_option("-D__unix__", 'p');
-		prepend_option("-D__linux__", 'p');
-
-		/* This is a more traditional libc, it also gives a 20k executable
-		 * for hello world vs. 400k with glibc2 and --static. 
-		 * NB: DLL libc no longer seems to work.
-		 */
-		add_prefix("/usr/bin/i386-uclibc-");
-		break;
-	case '8':		/* Use 'c386' program as compiler */
-		opt_arch = 3;
-		prepend_option("-D__unix__", 'p');
-		prepend_option("-D__c386__", 'p');
-		break;
 	case '9':		/* 6809 compiler */
-		opt_arch = 4;
 		prepend_option("-D__6809__", 'p');
-		break;
-	case '0':		/* Plain old Unix V7 style */
-		opt_arch = 5;
-		opt_I = 1;
-		opt_L = 1;
-		opt_x = 1;
-		append_option("/lib/crt0.o", 'l');
 		break;
 	default:
 		fatal
-		    ("Unknown model specifier for -M valid are: n,f,c,s,d,l,g,8,9,0");
+		    ("Unknown model specifier for -M valid are: 9");
 	}
 
 	if (do_optim) {
 		append_option("-O", 'C');
 		append_option("-O", 'a');
-	}
-
-	if (opt_arch == 0) {
-		if (opt_f) {
-			/* append_option("--enable-floats", 'c'); */
-			libc = catstr(libc, "+f");
-		} else
-			append_option("-D__HAS_NO_FLOATS__", 'p');
 	}
 
 #ifdef VERSION

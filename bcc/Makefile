@@ -9,7 +9,7 @@ CFLAGS	=-O -fno-builtin-exp2
 LDFLAGS	=-s
 BINDIR	=$(PREFIX)/bin
 LIBEXECDIR	=$(PREFIX)/libexec/bcc09
-BCCDEFS	=-DLOCALPREFIX=$(PREFIX) -DBINDIR=$(BINDIR) -DDEFARCH=0
+BCCDEFS	=-DLOCALPREFIX=$(PREFIX) -DBINDIR=$(BINDIR)
 
 BCFLAGS=$(ANSI) $(CFLAGS) $(LDFLAGS)
 
@@ -26,17 +26,8 @@ install: all
 	install -d $(LIBEXECDIR)
 	install -m 755 cc1 $(LIBEXECDIR)/cc1
 
-bcc: bcc.c
-	$(CC) $(BCFLAGS) $(BCCDEFS) bcc.c -o $@
-
-ncc: bcc.c
-	$(CC) $(BCFLAGS) -DLOCALPREFIX= -DDEFARCH=0 bcc.c -o $@
-
 bcc09: bcc.c
-	$(CC) $(BCFLAGS) -DMC6809 $(BCCDEFS) bcc.c -o $@
-
-ccc: bcc.c
-	$(CC) $(BCFLAGS) -DCCC $(BCCDEFS) bcc.c -o $@
+	$(CC) $(BCFLAGS) $(BCCDEFS) bcc.c -o $@
 
 cc1: $(OBJS)
 	$(CC) $(BCCARCH) $(LDFLAGS) $(OBJS) -o cc1
@@ -48,7 +39,7 @@ dbprintf.o: dbprintf.c
 	$(CC) $(ANSI) $(BCCARCH) $(CFLAGS) -c dbprintf.c
 
 clean realclean:
-	rm -f bcc cc1 ncc bcc09 ccc bcc.o $(OBJS)
+	rm -f bcc09 cc1 bcc.o $(OBJS)
 
 
 $(OBJS):  bcc.h align.h const.h types.h \
