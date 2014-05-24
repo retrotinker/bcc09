@@ -730,7 +730,7 @@ void dump_aout()
 	if (h_flgs & 0x01)
 		printf(" FLG-01");
 	if (h_flgs & 0x02)
-		printf(" A_PAL");
+		printf(" FLG-02");
 	if (h_flgs & 0x04)
 		printf(" A_NSYM");
 	if (h_flgs & 0x08)
