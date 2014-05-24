@@ -7,7 +7,14 @@
  *
  *       Personality flags are:
  *
- *	-M9	MC6809 with bcc
+ *	-Ms	standalone MC6809
+ *	-Me	Microsoft Color BASIC (EXEC)
+ *	-Mu	Microsoft Color BASIC (USR)
+ *	-Mr	Microsoft Color BASIC (ROM)
+ *	-Mb	Microsoft Color BASIC (DOS)
+ *	-Mo	Microware OS-9
+ *	-Mf	TSC Flex
+ *	-Mv	GCE Vectrex
  */
 #include <stdio.h>
 #ifdef __STDC__
@@ -68,6 +75,18 @@ struct opt_list {
 	char *opt;
 	int opttype;		/* Where the option should go */
 } *options;
+
+/* This list might be optimistic, but it is good to have goals... */
+enum supported_arches {
+	MC6809_STANDALONE,
+	MC6809_CB_EXEC,
+	MC6809_CB_USR,
+	MC6809_CB_ROM,
+	MC6809_CB_DOS,
+	MC6809_OS9,
+	MC6809_FLEX,
+	MC6809_VECTREX,
+} opt_arch;
 
 int opt_v, opt_V, opt_e, opt_x, opt_I, opt_L, opt_W, opt_O, opt_M;
 
@@ -789,10 +808,6 @@ char **argv;
 					do_optim = 1;
 					break;
 
-				case 'G':
-					opt_M = 'g';
-					break;
-
 				case 'v':
 					opt_v++;
 					break;
@@ -856,15 +871,48 @@ char **argv;
 
 	add_prefix(getenv("BCC_EXEC_PREFIX"));
 
+	prepend_option("-D__6809__", 'p');
+
 	if (opt_M == 0)
-		opt_M = '9';
+		opt_M = 's';
 	switch (opt_M) {
-	case '9':		/* 6809 compiler */
-		prepend_option("-D__6809__", 'p');
+	case 's':
+		prepend_option("-D__STANDALONE_", 'p');
+		opt_arch = MC6809_STANDALONE;
+		break;
+	case 'e':
+		prepend_option("-D__CB__", 'p');
+		opt_arch = MC6809_CB_EXEC;
+		break;
+	case 'u':
+		prepend_option("-D__CB__", 'p');
+		opt_arch = MC6809_CB_USR;
+		break;
+	case 'r':
+		prepend_option("-D__CB__", 'p');
+		opt_arch = MC6809_CB_ROM;
+		break;
+	case 'b':
+		prepend_option("-D__CB__", 'p');
+		opt_arch = MC6809_CB_DOS;
+		break;
+	case 'o':
+		prepend_option("-D__OS9__", 'p');
+		append_option("-p", 'c'); /* equivalent to '-C-p' */
+		opt_arch = MC6809_OS9;
+		break;
+	case 'f':
+		prepend_option("-D__FLEX__", 'p');
+		prepend_option("-D__FLEX9__", 'p');
+		opt_arch = MC6809_FLEX;
+		break;
+	case 'v':
+		prepend_option("-D__VECTREX__", 'p');
+		opt_arch = MC6809_VECTREX;
 		break;
 	default:
-		fatal
-		    ("Unknown model specifier for -M valid are: 9");
+		fatal("Unknown model specifier for -M valid are: "
+		      "s,e,u,r,b,o,f,v");
 	}
 
 	if (do_optim) {
