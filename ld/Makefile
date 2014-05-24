@@ -37,7 +37,7 @@ install: ld09 objdump09
 	install -m 755 os9copy $(LIBDIR)
 
 clean realclean clobber:
-	rm -f *.o ld09 objchop catimage objdump09
+	rm -f *.o ld09 objchop catimage objdump09 os9copy
 
 $(OBJS): align.h bindef.h byteord.h config.h const.h globvar.h obj.h \
 	 syshead.h type.h x86_aout.h
