@@ -144,7 +144,6 @@ outfile		a.out
 -r  produce output suitable for further relocation
 -s  strip symbols
 -t  trace modules being looked at on stdout
--z  produce "unmapped zero page" executables
 
 All the options not taking an argument may be turned off by following the
 option letter by a '-', as for cc1.

@@ -39,7 +39,6 @@ struct	exec {			/* a.out header */
 #define A_WLR(cputype)	((cputype&0x02)!=0) /* TRUE if words left-to-right */
 
 /* Flags. */
-#define A_UZP	0x01	/* unmapped zero page (pages) */
 #define A_EXEC	0x10	/* executable */
 #define A_SEP	0x20	/* separate I/D */
 #define A_PURE	0x40	/* pure text */		/* not used */

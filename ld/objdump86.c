@@ -728,7 +728,7 @@ void dump_aout()
 
 	printf("FLAGS:");
 	if (h_flgs & 0x01)
-		printf(" A_UZP");
+		printf(" FLG-01");
 	if (h_flgs & 0x02)
 		printf(" A_PAL");
 	if (h_flgs & 0x04)

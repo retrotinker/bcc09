@@ -158,8 +158,8 @@ void u2cn P((char *buf, u2_pt offset, unsigned count));
 void u4cn P((char *buf, u4_t offset, unsigned count));
 bool_pt typeconv_init P((bool_pt big_endian, bool_pt long_big_endian));
 
-void write_elks P((char *outfilename, bool_pt argsepid,
-		 bool_pt argstripflag, bool_pt arguzp, bool_pt nsym));
+void write_elks P((char *outfilename, bool_pt argsepid, bool_pt argstripflag,
+		   bool_pt nsym));
 
 /* linksym.c */
 void linksyms P((bool_pt argreloc_output));

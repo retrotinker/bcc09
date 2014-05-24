@@ -72,7 +72,6 @@ void exec_header_adjust(struct exec *header)
 #define A_WLR(cputype)	((cputype&0x02)!=0) /* TRUE if words left-to-right */
 
 /* Flags. */
-#define A_UZP	0x01	/* unmapped zero page (pages) */
 #define A_PAL	0x02	/* page aligned executable */
 #define A_NSYM	0x04	/* new style symbol table */
 #define A_EXEC	0x10	/* executable */

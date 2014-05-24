@@ -65,7 +65,6 @@ PRIVATE bin_off_t segsz[NSEG];	/* sizes of data parts of segments */
 PRIVATE bool_t sepid;		/* nonzero for separate I & D */
 PRIVATE bool_t stripflag;	/* nonzero to strip symbols */
 PRIVATE bin_off_t spos;		/* position in current seg */
-PRIVATE bool_t uzp;		/* nonzero for unmapped zero page */
 PRIVATE bool_t xsym;		/* extended symbol table */
 
 FORWARD void linkmod P((struct modstruct * modptr));
@@ -81,12 +80,10 @@ EXTERN bool_t reloc_output;
 
 /* write binary file */
 
-PUBLIC void write_elks(outfilename, argsepid, argstripflag, arguzp,
-		       argxsym)
+PUBLIC void write_elks(outfilename, argsepid, argstripflag, argxsym)
 char *outfilename;
 bool_pt argsepid;
 bool_pt argstripflag;
-bool_pt arguzp;
 bool_pt argxsym;
 {
 	char buf4[4];
@@ -104,14 +101,7 @@ bool_pt argxsym;
 
 	sepid = argsepid;
 	stripflag = argstripflag;
-	uzp = arguzp;
 	xsym = argxsym;
-	if (uzp) {
-		if (btextoffset == 0)
-			btextoffset = page_size();
-		if (bdataoffset == 0 && sepid)
-			bdataoffset = page_size();
-	}
 
 	/* reserve special symbols use curseg to pass parameter to symres() */
 	for (curseg = 0; curseg < NSEG; ++curseg) {
@@ -651,8 +641,6 @@ PRIVATE void writeheader()
 	header.a_magic[0] = A_MAGIC0;
 	header.a_magic[1] = A_MAGIC1;
 	header.a_flags = sepid ? A_SEP : A_EXEC;
-	if (uzp)
-		header.a_flags |= A_UZP;
 	header.a_cpu = A_M6809;
 	header.a_hdrlen = FILEHEADERLENGTH;
 	offtocn((char *)&header.a_text, etextpadoff - btextoffset,
@@ -661,9 +649,6 @@ PRIVATE void writeheader()
 		sizeof header.a_data);
 	offtocn((char *)&header.a_bss, endoffset - edataoffset,
 		sizeof header.a_bss);
-	if (uzp)
-		offtocn((char *)&header.a_entry, page_size(),
-			sizeof header.a_entry);
 
 	offtocn((char *)&header.a_total, (bin_off_t) heap_top_value,
 		sizeof header.a_total);

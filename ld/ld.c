@@ -99,7 +99,6 @@ char **argv;
 			case 'i':	/* separate I & D output */
 			case 'm':	/* print modules linked */
 			case 's':	/* strip symbols */
-			case 'z':	/* unmapped zero page */
 			case 'd':	/* Make a headerless outfile */
 			case 'y':	/* Use a newer symbol table */
 				if (arg[2] == 0)
@@ -211,7 +210,7 @@ char **argv;
 	linksyms(flag['r']);
 	if (outfilename == NUL_PTR)
 		outfilename = "a.out";
-	write_elks(outfilename, flag['i'], flag['s'], flag['z'], flag['y']);
+	write_elks(outfilename, flag['i'], flag['s'], flag['y']);
 	if (flag['m'])
 		dumpmods();
 	if (flag['M'])
