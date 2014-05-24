@@ -649,6 +649,8 @@ PRIVATE void writeheader()
 		sizeof header.a_data);
 	offtocn((char *)&header.a_bss, endoffset - edataoffset,
 		sizeof header.a_bss);
+	offtocn((char *)&header.a_entry, entryfirst->elsymptr->value,
+		sizeof header.a_entry);
 
 	offtocn((char *)&header.a_total, (bin_off_t) heap_top_value,
 		sizeof header.a_total);
