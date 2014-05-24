@@ -9,7 +9,8 @@
 - Add code generation option for 6309
 - Consolidate ld/rel_aout.h and ld/x86_aout.h (as bcc_aout.h?)
 - Parameterize os9copy for version, reentrancy, data size, etc...
-- Genericize os9copy as objcopy; include decb, srec, ihex, etc...
+- Add data address parameter for decbcopy (or read from a.out header)
+- Genericize os9/decbcopy as objcopy; include os9, decb, srec, ihex, etc...
 - Clean-up and remove/minimize opt_arch usage in bcc.c
 - Remove DATASEGS definition from linker (x86-ism?)
 - Clarify heap_top_value meaning in linker

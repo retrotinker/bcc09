@@ -20,7 +20,7 @@ DEFS	=-DREL_OUTPUT
 OBJS= dumps.o io.o ld.o readobj.o table.o typeconv.o linksyms.o mkar.o \
       writex86.o
 
-all: ld09 objchop catimage objdump09 os9copy
+all: ld09 objchop catimage objdump09 os9copy decbcopy
 
 ld09: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
@@ -35,9 +35,10 @@ install: ld09 objdump09
 	ln -f $(LIBDIR)/objdump09 $(LIBDIR)/nm09
 	ln -f $(LIBDIR)/objdump09 $(LIBDIR)/size09
 	install -m 755 os9copy $(LIBDIR)
+	install -m 755 decbcopy $(LIBDIR)
 
 clean realclean clobber:
-	rm -f *.o ld09 objchop catimage objdump09 os9copy
+	rm -f *.o ld09 objchop catimage objdump09 os9copy decbcopy
 
 $(OBJS): align.h bindef.h byteord.h config.h const.h globvar.h obj.h \
 	 syshead.h type.h x86_aout.h

@@ -16,4 +16,5 @@ ld/ld09
 ld/objchop
 ld/objdump09
 ld/os9copy
+ld/decbcopy
 unproto/unproto
