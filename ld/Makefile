@@ -1,6 +1,6 @@
 
 LIBDIR	=$(PREFIX)/bin
-CFLAGS	=-O
+CFLAGS	=-O -DDATASEGS
 LDFLAGS	=
 
 # Will need some of these if you want native executables on non-Linux/i386
