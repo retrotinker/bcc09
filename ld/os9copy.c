@@ -78,6 +78,25 @@ void write_file(FILE *ofd, long bsize)
 	}
 }
 
+void write_zeroes(FILE *ofd, long bsize)
+{
+	char buffer[1024];
+	int ssize;
+
+	memset(buffer, 0, sizeof(buffer));
+	while (bsize > 0) {
+		if (bsize > sizeof(buffer))
+			ssize = sizeof(buffer);
+		else
+			ssize = bsize;
+
+		crc_adjust(buffer, ssize);
+		if (fwrite(buffer, 1, ssize, ofd) != ssize)
+			fatal("Error writing zeroes to output file");
+		bsize -= ssize;
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	FILE *ofd;
@@ -87,10 +106,10 @@ int main(int argc, char *argv[])
 	unsigned short modsize;
 	int i, namelen;
 	unsigned char hdrchk = 0;
-	unsigned short datasize = 400;
+	unsigned short datasize = 512;
 
-	if (argc != 4)
-		fatal("Usage: os9copy a.out outfile modname");
+	if ((argc < 4) || argc > 5)
+		fatal("Usage: os9copy a.out outfile modname <datasize>");
 
 	ifd = fopen(argv[1], "r");
 	if (ifd == 0)
@@ -110,14 +129,17 @@ int main(int argc, char *argv[])
 
 	namelen = strlen(argv[3]);
 
-	modsize = header.a_text + header.a_data +
+	if (argc == 5)
+		datasize = strtoul(argv[4], NULL, 0);
+
+	modsize = header.a_text + 2 * header.a_data + header.a_bss +
 			sizeof(os9hdr) + namelen + sizeof(crc);
 
 	*((unsigned short *)&os9hdr[2]) = htobe16(modsize);
 	*((unsigned short *)&os9hdr[4]) = htobe16(sizeof(os9hdr));
 
 	os9hdr[6] = 0x11; /* 6809 executable */
-	os9hdr[7] = 0x81; /* re-entrant, version 1 */
+	os9hdr[7] = 0x00; /* _NOT_ re-entrant, version 0 */
 
 	for (i = 0; i < 8; i++)
 		hdrchk ^= os9hdr[i];
@@ -125,7 +147,7 @@ int main(int argc, char *argv[])
 
 	/* For now, presume execution starts right after the module name... */
 	*((unsigned short *)&os9hdr[9]) =
-		htobe16(sizeof(os9hdr) + namelen);
+		htobe16(sizeof(os9hdr) + namelen + header.a_entry);
 
 	/* Request 400 bytes of storage (~200 stack + ~200 parameter) */
 	*((unsigned short *)&os9hdr[11]) = htobe16(datasize);
@@ -145,6 +167,8 @@ int main(int argc, char *argv[])
 		fatal("Cannot seek to start of text");
 
 	write_file(ofd, header.a_text);
+
+	write_zeroes(ofd, header.a_data + header.a_bss);
 
 	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
 		fatal("Cannot seek to start of data");
