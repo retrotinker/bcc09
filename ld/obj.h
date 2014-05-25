@@ -5,9 +5,7 @@
 #define OBJ_H
 
 #ifndef OMAGIC
-
-
-#  define OMAGIC 0x5331
+#define OMAGIC 0x5331
 #endif
 
 #ifdef LONG_OFFSETS
@@ -18,7 +16,7 @@
 # define offtocn u2cn
 #endif
 
-# define ld_roundup( num, boundary, type ) \
+#define ld_roundup( num, boundary, type ) \
 	(((num) + ((boundary) - 1)) & (type) ~((boundary) - 1))
 
 #define MAX_OFFSET_SIZE 4
