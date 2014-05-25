@@ -18,7 +18,8 @@
 # define offtocn u2cn
 #endif
 
-# define ld_roundup( num, boundary, type ) (num)
+# define ld_roundup( num, boundary, type ) \
+	(((num) + ((boundary) - 1)) & (type) ~((boundary) - 1))
 
 #define MAX_OFFSET_SIZE 4
 #define NSEG 16
