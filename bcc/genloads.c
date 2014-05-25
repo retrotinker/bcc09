@@ -69,7 +69,10 @@ struct symstruct *source;
 #endif
 	push(length);
 	push(source);
-	pushreg(DREG);
+	if (arg1inreg)
+		regtransfer(DREG, XREG);
+	else
+		pushreg(DREG);
 	call("_memcpy");
 	outnl();
 	modstk(spmark);

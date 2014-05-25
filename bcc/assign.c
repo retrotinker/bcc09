@@ -179,7 +179,10 @@ uoffset_T size;
 	length->type = uitype;
 	push(length);
 	push(source);
-	push(target);
+	if (arg1inreg)
+		loadreg(target, XREG);
+	else
+		push(target);
 	call(funcname);
 	outnl();
 	if (regpushed) {
