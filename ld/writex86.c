@@ -123,10 +123,12 @@ bool_pt argxsym;
 #endif
 	}
 	curseg = 3;
+	symres("__bdata");
 	symres("__edata");
 	symres("__end");
 	symres("__heap_top");
 	curseg = 0;		/* text seg, s.b. variable */
+	symres("__btext");
 	symres("__etext");
 	symres("__segoff");
 
@@ -288,7 +290,9 @@ bool_pt argxsym;
 		}
 #endif
 	}
+	setsym("__btext", btextoffset);
 	setsym("__etext", etextoffset);
+	setsym("__bdata", bdataoffset);
 	setsym("__edata", edataoffset);
 #ifdef DATASEGS
 	setsym("__end", endoffset = combase[NSEG - 1] + comsz[NSEG - 1]);
