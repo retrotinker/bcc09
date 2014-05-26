@@ -31,7 +31,9 @@
 #endif
 #define MAXLOCAL 100
 #define NKEYWORDS 39
-#ifdef NOFLOAT
+#if defined(NOFLOAT) && defined(NOLONG)
+#define NSCALTYPES 8
+#elif defined(NOFLOAT) || defined(NOLONG)
 #define NSCALTYPES 10
 #else
 #define NSCALTYPES 12
@@ -137,8 +139,10 @@ PRIVATE struct typedatastruct scaltypes[NSCALTYPES] = {
 	{"short", FALSE, UNSIGNED | SHORT, 2, &ustype,},
 	{"int", TRUE, INT, 2, &itype,},
 	{"int", FALSE, UNSIGNED | INT, 2, &uitype,},
+#ifndef NOLONG
 	{"long", TRUE, LONG | DLONG, 4, &ltype,},
 	{"long", FALSE, UNSIGNED | LONG | DLONG, 4, &ultype,},
+#endif
 #ifndef NOFLOAT
 	{"float", TRUE, FLOAT, 4, &fltype,},
 	{"double", TRUE, DOUBLE, 8, &dtype,},

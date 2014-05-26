@@ -5,7 +5,7 @@
 
 PREFIX=/usr
 
-CFLAGS	=-O -fno-builtin-exp2
+CFLAGS	=-O -fno-builtin-exp2 -DNOFLOAT -DNOLONG
 LDFLAGS	=-s
 BINDIR	=$(PREFIX)/bin
 LIBEXECDIR	=$(PREFIX)/libexec/bcc09

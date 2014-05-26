@@ -577,6 +577,9 @@ char *argv[];
 		optimise = TRUE;
 		definestring("__OPTIMISED__");
 	}
+#ifdef NOLONG
+	definestring("__HAS_NO_LONGS__");
+#endif
 #ifdef NOFLOAT
 	definestring("__HAS_NO_FLOATS__");
 #endif

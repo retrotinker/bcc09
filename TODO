@@ -11,6 +11,8 @@
 - Remove DATASEGS definition from linker (x86-ism?)
 - Remove etextpadoff from linker (x86-ism?)
 - Add 'os9' pseudo-op to assembler
+- Reenable long and float types in compiler and add required functions
+  to compiler runtime library
 - Need runtime init of statically initialized pointer data (ctors/dtors?)
   for PIC code (and corresponding support in startup code)
 - Improve "-C-p" option for data position independence (for use w/ OS-9)

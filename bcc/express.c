@@ -347,12 +347,14 @@ cpp_ident:
 	case INTCONST:		/* this includes enumeration-constants */
 		symptr = constsym(constant.value.v);
 		symptr->type = constant.type;
+#ifndef NOLONG
 		if (!(ltype->scalar & LONG)) {
 			if (symptr->type == ltype)
 				symptr->type = itype;
 			else if (symptr->type == ultype)
 				symptr->type = uitype;
 		}
+#endif
 		nextsym();
 		return leafnode(symptr);
 	case DEFINEDSYM:
