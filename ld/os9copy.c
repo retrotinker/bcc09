@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 		0x87, 0xcd,
 	};
 	unsigned short modsize;
-	int i, namelen;
+	int i, namelen, nameoffset;
 	unsigned char hdrchk = 0;
 	unsigned short datasize = 512;
 
@@ -132,11 +132,12 @@ int main(int argc, char *argv[])
 	if (argc == 5)
 		datasize = strtoul(argv[4], NULL, 0);
 
-	modsize = header.a_text + 2 * header.a_data + header.a_bss +
-			sizeof(os9hdr) + namelen + sizeof(crc);
+	nameoffset = sizeof(os9hdr) + header.a_text +
+			header.a_data + header.a_bss;
+	modsize = nameoffset + namelen + sizeof(crc);
 
 	*((unsigned short *)&os9hdr[2]) = htobe16(modsize);
-	*((unsigned short *)&os9hdr[4]) = htobe16(sizeof(os9hdr));
+	*((unsigned short *)&os9hdr[4]) = htobe16(nameoffset);
 
 	os9hdr[6] = 0x11; /* 6809 executable */
 	os9hdr[7] = 0x00; /* _NOT_ re-entrant, version 0 */
@@ -145,16 +146,27 @@ int main(int argc, char *argv[])
 		hdrchk ^= os9hdr[i];
 	os9hdr[8] = hdrchk ^ 0xff;
 
-	/* For now, presume execution starts right after the module name... */
 	*((unsigned short *)&os9hdr[9]) =
-		htobe16(sizeof(os9hdr) + namelen + header.a_entry);
+		htobe16(sizeof(os9hdr) + header.a_entry);
 
-	/* Request 400 bytes of storage (~200 stack + ~200 parameter) */
+	/* Request stack + parameter storage */
 	*((unsigned short *)&os9hdr[11]) = htobe16(datasize);
 
 	crc_adjust(os9hdr, sizeof(os9hdr));
 	if (fwrite(os9hdr, 1, sizeof(os9hdr), ofd) != sizeof(os9hdr))
 		fatal("Error writing OS-9 module header to outfile");
+
+	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
+		fatal("Cannot seek to start of text");
+
+	write_file(ofd, header.a_text);
+
+	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
+		fatal("Cannot seek to start of data");
+
+	write_file(ofd, header.a_data);
+
+	write_zeroes(ofd, header.a_bss);
 
 	/* End of string needs MSB set... */
 	argv[3][namelen - 1] |= 0x80;
@@ -162,18 +174,6 @@ int main(int argc, char *argv[])
 	crc_adjust(argv[3], namelen);
 	if (fwrite(argv[3], 1, namelen, ofd) != namelen)
 		fatal("Error writing OS-9 module name to outfile");
-
-	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
-		fatal("Cannot seek to start of text");
-
-	write_file(ofd, header.a_text);
-
-	write_zeroes(ofd, header.a_data + header.a_bss);
-
-	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
-		fatal("Cannot seek to start of data");
-
-	write_file(ofd, header.a_data);
 
 	crc[0] ^= 0xff;
 	crc[1] ^= 0xff;
