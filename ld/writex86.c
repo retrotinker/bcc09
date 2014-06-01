@@ -122,8 +122,9 @@ bool_pt argxsym;
 		}
 #endif
 	}
-	curseg = 3;
+	curseg = 2;
 	symres("__bdata");
+	curseg = 3;
 	symres("__edata");
 	symres("__end");
 	symres("__heap_top");
