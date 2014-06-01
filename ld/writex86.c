@@ -306,11 +306,8 @@ bool_pt argxsym;
 	if (endoffset > 65536L)
 		fatalerror("data segment too large");
 
-	if (heap_top_value < 0x100 || endoffset > heap_top_value - 0x100)
-		heap_top_value = endoffset + 0x8000;
-	if (heap_top_value > 0x10000)
-		heap_top_value = 0x10000;
-	setsym("__heap_top", (bin_off_t) heap_top_value);
+	heap_top_value += endoffset;
+	setsym("__heap_top", heap_top_value);
 
 	openout(outfilename);
 	writeheader();
@@ -657,7 +654,8 @@ PRIVATE void writeheader()
 	offtocn((char *)&header.a_entry, entryfirst->elsymptr->value,
 		sizeof header.a_entry);
 
-	offtocn((char *)&header.a_total, (bin_off_t) heap_top_value,
+	offtocn((char *)&header.a_total,
+		heap_top_value - bdataoffset + etextpadoff - btextoffset,
 		sizeof header.a_total);
 	if (FILEHEADERLENGTH)
 		writeout((char *)&header, FILEHEADERLENGTH);

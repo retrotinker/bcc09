@@ -166,7 +166,7 @@ char **argv;
 					heap_top_value =
 					    strtoul(arg + 2, (char **)0, 16);
 				if (errno != 0)
-					use_error("invalid heap top");
+					use_error("invalid heap size");
 				break;
 			case 'l':	/* library name */
 				tfn = buildname(libprefix, arg + 2, libsuffix);
