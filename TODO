@@ -29,6 +29,5 @@
 - Ditto for "-C-c-" and "caller saves"...
 - Change os9copy to use a_total to set data allocation size
 - Change os9copy to default to reentrant if zero-length data+bss
-  (may require linker changes to move segment 1 to text)
 - Include heap start (i.e. U reg) in environment for OS-9 (e.g. "HEAPSTART=0x6E00")
 - Plenty more...

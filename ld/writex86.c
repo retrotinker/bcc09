@@ -198,14 +198,9 @@ bool_pt argxsym;
 	segpos[0] = segbase[0] = spos = btextoffset;
 	combase[0] = segbase[0] + segsz[0];
 	segadj[1] = segadj[0] = -btextoffset;
-	etextpadoff = etextoffset = combase[0] + comsz[0];
-	if (sepid) {
-		etextpadoff = ld_roundup(etextoffset, 0x10, bin_off_t);
-		segadj[1] += etextpadoff - bdataoffset;
-	} else if (bdataoffset == 0)
-		bdataoffset = etextpadoff;
-	segpos[1] = segbase[1] = edataoffset = bdataoffset;
+	segpos[1] = segbase[1] = combase[0] + comsz[0];
 	combase[1] = segbase[1] + segsz[1];
+	etextpadoff = etextoffset = combase[1] + comsz[1];
 #ifndef DATASEGS
 	for (seg = 4; seg < NSEG; ++seg) {
 		segpos[seg] = segbase[seg] = 0;
@@ -217,24 +212,33 @@ bool_pt argxsym;
 		segadj[1] +=
 		    ld_roundup(segsz[seg] + comsz[seg], 0x10, bin_off_t);
 	}
-	for (seg = 2; seg < 4; ++seg)
+#endif
+	if (sepid) {
+		etextpadoff = ld_roundup(etextoffset, 0x10, bin_off_t);
+		segadj[DPSEG] = segadj[DPSEG - 1] + etextpadoff - bdataoffset;
+	} else {
+		if (bdataoffset == 0)
+			bdataoffset = etextpadoff;
+		segadj[DPSEG] = segadj[DPSEG - 1];
+	}
+	segpos[DPSEG] = segbase[DPSEG] = edataoffset = bdataoffset;
+	/* temporarily have fixed DP seg */
+	/* adjust if nec so it only spans 1 page */
+	tempoffset = segsz[DPSEG] + comsz[DPSEG];
+	if (tempoffset > 0x100)
+		fatalerror("direct page segment too large");
+	if ((((segbase[DPSEG] + tempoffset) ^ segbase[DPSEG])
+	     & ~(bin_off_t) 0xFF) != 0)
+		segpos[DPSEG] = segbase[DPSEG] =
+		    (segbase[DPSEG] + 0xFF) & ~(bin_off_t) 0xFF;
+	combase[DPSEG] = segbase[DPSEG] + segsz[DPSEG];
+#ifndef DATASEGS
+	for (seg = 3; seg < 4; ++seg)
 #else
-	for (seg = 2; seg < NSEG; ++seg)
+	for (seg = 3; seg < NSEG; ++seg)
 #endif
 	{
 		segpos[seg] = segbase[seg] = combase[seg - 1] + comsz[seg - 1];
-		if (seg == DPSEG) {
-			/* temporarily have fixed DP seg */
-			/* adjust if nec so it only spans 1 page */
-			tempoffset = segsz[seg] + comsz[seg];
-			if (tempoffset > 0x100)
-				fatalerror("direct page segment too large");
-			if ((((segbase[seg] + tempoffset) ^ segbase[seg])
-			     & ~(bin_off_t) 0xFF) != 0)
-				segpos[seg] = segbase[seg] =
-				    (segbase[seg] + 0xFF)
-				    & ~(bin_off_t) 0xFF;
-		}
 		combase[seg] = segbase[seg] + segsz[seg];
 		segadj[seg] = segadj[seg - 1];
 	}
@@ -263,10 +267,10 @@ bool_pt argxsym;
 	/* adjust special symbols */
 	for (seg = 0; seg < NSEG; ++seg) {
 #ifdef DATASEGS
-		if (segsz[seg] != 0)
+		if (segsz[seg] != 0 && seg > 1)
 			/* only count data of nonzero length */
 #else
-		if (segsz[seg] != 0 && seg < 4)
+		if (segsz[seg] != 0 && seg > 1 && seg < 4)
 #endif
 			edataoffset = segbase[seg] + segsz[seg];
 		segboundary[5] = hexdigit[seg];	/* to __segX?H */
