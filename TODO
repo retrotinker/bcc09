@@ -9,6 +9,7 @@
 - Add data address parameter for decbcopy (or read from a.out header)
 - Genericize os9/decbcopy as objcopy; include os9, decb, srec, ihex, etc...
 - Remove DATASEGS definition from linker (x86-ism?)
+- Remove etextpadoff from linker (x86-ism?)
 - Add 'os9' pseudo-op to assembler
 - Need runtime init of statically initialized pointer data (ctors/dtors?)
   for PIC code (and corresponding support in startup code)
