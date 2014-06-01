@@ -109,8 +109,8 @@ int main(int argc, char *argv[])
 		0x87, 0xcd,
 	};
 	unsigned short modsize, heapsize;
-	int i, namelen, nameoffset;
-	unsigned char hdrchk = 0;
+	int i, namelen, nameoffset, reentrant;
+	unsigned char hdrchk = 0, version = 0;
 	unsigned short datasize = 0;
 
 	if ((argc < 4) || argc > 5)
@@ -143,6 +143,9 @@ int main(int argc, char *argv[])
 	if (!datasize)
 		warn("datasize is zero");
 
+	/* only claim reentrant if no r/w static allocations */
+	reentrant = !(header.a_data + header.a_bss);
+
 	nameoffset = sizeof(os9hdr) + header.a_text +
 			header.a_data + header.a_bss;
 	modsize = nameoffset + namelen + sizeof(crc);
@@ -151,7 +154,9 @@ int main(int argc, char *argv[])
 	*((unsigned short *)&os9hdr[4]) = htobe16(nameoffset);
 
 	os9hdr[6] = 0x11; /* 6809 executable */
-	os9hdr[7] = 0x00; /* _NOT_ re-entrant, version 0 */
+	os9hdr[7] = version;
+	if (reentrant)
+		os9hdr[7] |= 0x80;
 
 	for (i = 0; i < 8; i++)
 		hdrchk ^= os9hdr[i];
