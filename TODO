@@ -10,6 +10,7 @@
 - Genericize os9/decbcopy as objcopy; include os9, decb, srec, ihex, etc...
 - Clarify heap_top_value meaning in linker
 - Remove DATASEGS definition from linker (x86-ism?)
+- Add 'os9' pseudo-op to assembler
 - Need runtime init of statically initialized pointer data (ctors/dtors?)
   for PIC code (and corresponding support in startup code)
 - Improve "-C-p" option for data position independence (for use w/ OS-9)
