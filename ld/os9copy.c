@@ -58,6 +58,11 @@ void fatal(char *str)
 	exit(2);
 }
 
+void warn(char *str)
+{
+	fprintf(stderr, "os9copy: WARNING: %s\n", str);
+}
+
 void write_file(FILE *ofd, long bsize)
 {
 	char buffer[1024];
@@ -103,10 +108,10 @@ int main(int argc, char *argv[])
 	uint8_t os9hdr[13] = {
 		0x87, 0xcd,
 	};
-	unsigned short modsize;
+	unsigned short modsize, heapsize;
 	int i, namelen, nameoffset;
 	unsigned char hdrchk = 0;
-	unsigned short datasize = 512;
+	unsigned short datasize = 0;
 
 	if ((argc < 4) || argc > 5)
 		fatal("Usage: os9copy a.out outfile modname <datasize>");
@@ -129,8 +134,14 @@ int main(int argc, char *argv[])
 
 	namelen = strlen(argv[3]);
 
+	heapsize = header.a_total - header.a_text -
+			header.a_data - header.a_bss;
 	if (argc == 5)
 		datasize = strtoul(argv[4], NULL, 0);
+	if (datasize < heapsize)
+		datasize = heapsize;
+	if (!datasize)
+		warn("datasize is zero");
 
 	nameoffset = sizeof(os9hdr) + header.a_text +
 			header.a_data + header.a_bss;
