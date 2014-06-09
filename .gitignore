@@ -1,4 +1,5 @@
 *.o
+.*.swp
 cscope.out
 ar/ar.h
 ar/ar09
