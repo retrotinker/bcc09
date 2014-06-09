@@ -26,6 +26,8 @@ enum output_formats {
 
 unsigned int loadaddr;
 unsigned int datasize;
+unsigned int modversion;
+unsigned int reentrant;
 char *os9name;
 
 uint8_t os9crc[3] = { 0xff, 0xff, 0xff };
@@ -49,7 +51,7 @@ void usage(void)
 {
 	fprintf(stderr,
 		"Usage: %s [-O <output type>] [-l <load address>]\n"
-		"\t\t[-d datasize] [-n modulename]\n"
+		"\t\t[-d <data size>] [-n <module name>] [-v <module version>] [-r]\n"
 		"\t\tinfile outfile\n", progname);
 	exit(EXIT_FAILURE);
 }
@@ -220,8 +222,8 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 		0x87, 0xcd,
 	};
 	unsigned short modsize, heapsize;
-	unsigned int i, namelen, nameoffset, reentrant;
-	unsigned char hdrchk = 0, version = 0;
+	unsigned int i, namelen, nameoffset;
+	unsigned char hdrchk = 0;
 
 	namelen = strlen(os9name);
 
@@ -232,8 +234,9 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 	if (!datasize)
 		fatal("OS-9 module data size is zero");
 
-	/* only claim reentrant if no r/w static allocations */
-	reentrant = !(header.a_data + header.a_bss);
+	/* can claim reentrant if no r/w static data allocations */
+	if (!reentrant)
+		reentrant = !(header.a_data + header.a_bss);
 
 	nameoffset = sizeof(os9hdr) + header.a_text +
 			header.a_data + header.a_bss;
@@ -243,7 +246,10 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 	*((unsigned short *)&os9hdr[4]) = htobe16(nameoffset);
 
 	os9hdr[6] = 0x11; /* 6809 executable */
-	os9hdr[7] = version;
+
+	if (modversion > 0x7f)
+		fatal("OS-9 module version is too large");
+	os9hdr[7] = modversion;
 	if (reentrant)
 		os9hdr[7] |= 0x80;
 
@@ -296,7 +302,7 @@ int main(int argc, char *argv[])
 	enum output_formats outform = BINARY;
 
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "O:d:l:n:")) != -1) {
+	while ((opt = getopt(argc, argv, "O:d:l:n:v:r")) != -1) {
 		switch(opt) {
 		case 'O':
 			if (!strncmp(optarg, "binary", 3))
@@ -322,6 +328,15 @@ int main(int argc, char *argv[])
 			break;
 		case 'n':
 			os9name = optarg;
+			break;
+		case 'v':
+			errno = 0;
+			modversion = strtol(optarg, NULL, 0);
+			if (errno)
+				fatal("Bad version value");
+			break;
+		case 'r':
+			reentrant = 1;
 			break;
 		default:
 			usage();
