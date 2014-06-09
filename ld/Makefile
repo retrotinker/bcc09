@@ -45,10 +45,5 @@ clean realclean clobber:
 $(OBJS): align.h bindef.h byteord.h config.h const.h globvar.h obj.h \
 	 syshead.h type.h x86_aout.h
 
-writebin.o: writebin.c
-	$(CC) $(CFLAGS) $(DEFS) $(NATIVE) -c $<
-
-writerel.o: writebin.c
-
 .c.o:
 	$(CC) $(CFLAGS) $(DEFS) -c $< -o $@
