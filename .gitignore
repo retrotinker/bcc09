@@ -15,6 +15,5 @@ ld/catimage
 ld/ld09
 ld/objchop
 ld/objdump09
-ld/os9copy
-ld/decbcopy
+ld/objcopy09
 unproto/unproto
