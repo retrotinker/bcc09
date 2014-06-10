@@ -24,7 +24,8 @@ enum output_formats {
 	OS9_MODULE,
 };
 
-unsigned int loadaddr;
+unsigned int textaddr;
+unsigned int dataaddr;
 unsigned int datasize;
 unsigned int modversion;
 unsigned int reentrant;
@@ -32,7 +33,9 @@ char *os9name;
 
 uint8_t os9crc[3] = { 0xff, 0xff, 0xff };
 
-uint32_t textaddr;
+uint32_t textstart;
+uint32_t textend;
+uint32_t datastart;
 
 struct {
 	char *n_name;
@@ -40,7 +43,15 @@ struct {
 } searchsyms[] = {
 	{
 		.n_name = "__btext",
-		.val = &textaddr,
+		.val = &textstart,
+	},
+	{
+		.n_name = "__etext",
+		.val = &textend,
+	},
+	{
+		.n_name = "__bdata",
+		.val = &datastart,
 	},
 };
 #define NUM_SEARCH_SYMS	(sizeof(searchsyms) / sizeof(searchsyms[0]))
@@ -50,7 +61,7 @@ static char *progname;
 void usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-O <output type>] [-l <load address>]\n"
+		"Usage: %s [-O <output type>] [-T <text address>] [-D <data address>]\n"
 		"\t\t[-d <data size>] [-n <module name>] [-v <module version>] [-r]\n"
 		"\t\tinfile outfile\n", progname);
 	exit(EXIT_FAILURE);
@@ -181,18 +192,21 @@ void decb_output(FILE *ifd, FILE *ofd, struct exec header)
 	uint8_t binhead[5], binfoot[5];
 	int binsize;
 
-	if (!loadaddr)
-		loadaddr = textaddr;
-	if (!loadaddr)
+	if (!textaddr)
+		textaddr = textstart;
+	if (!textaddr)
 		warning("BIN load address is zero");
 
-	binsize = header.a_text + header.a_data;
+	binsize = header.a_text;
+	if (!(header.a_flags & A_SEP) ||
+	    (!dataaddr && datastart == textend))
+		binsize += header.a_data;
 
 	binhead[0] = 0;
 	binhead[1] = (binsize & 0xff00) >> 8;
 	binhead[2] =  binsize & 0x00ff;
-	binhead[3] = (loadaddr & 0xff00) >> 8;
-	binhead[4] =  loadaddr & 0x00ff;
+	binhead[3] = (textaddr & 0xff00) >> 8;
+	binhead[4] =  textaddr & 0x00ff;
 
 	if (fwrite(binhead, 1, sizeof(binhead), ofd) != sizeof(binhead))
 		fatal("Error writing DECB BIN header to outfile");
@@ -201,6 +215,25 @@ void decb_output(FILE *ifd, FILE *ofd, struct exec header)
 		fatal("Cannot seek to start of text");
 
 	write_file(ifd, ofd, header.a_text);
+
+	if ((header.a_flags & A_SEP) &&
+	    (dataaddr || datastart != textend)) {
+		if (!dataaddr)
+			dataaddr = datastart;
+		if (!dataaddr)
+			warning("BIN data load address is zero");
+
+		binsize = header.a_data;
+
+		binhead[0] = 0;
+		binhead[1] = (binsize & 0xff00) >> 8;
+		binhead[2] =  binsize & 0x00ff;
+		binhead[3] = (dataaddr & 0xff00) >> 8;
+		binhead[4] =  dataaddr & 0x00ff;
+
+		if (fwrite(binhead, 1, sizeof(binhead), ofd) != sizeof(binhead))
+			fatal("Error writing DECB BIN data header to outfile");
+	}
 
 	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
 		fatal("Cannot seek to start of data");
@@ -302,7 +335,7 @@ int main(int argc, char *argv[])
 	enum output_formats outform = BINARY;
 
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "O:d:l:n:v:r")) != -1) {
+	while ((opt = getopt(argc, argv, "O:T:D:d:n:v:r")) != -1) {
 		switch(opt) {
 		case 'O':
 			if (!strncmp(optarg, "binary", 3))
@@ -314,11 +347,17 @@ int main(int argc, char *argv[])
 			else
 				fatal("Unknown output format!\n");
 			break;
-		case 'l':
+		case 'T':
 			errno = 0;
-			loadaddr = strtol(optarg, NULL, 0);
+			textaddr = strtol(optarg, NULL, 0);
 			if (errno)
-				fatal("Bad load address value");
+				fatal("Bad text address value");
+			break;
+		case 'D':
+			errno = 0;
+			dataaddr = strtol(optarg, NULL, 0);
+			if (errno)
+				fatal("Bad data address value");
 			break;
 		case 'd':
 			errno = 0;

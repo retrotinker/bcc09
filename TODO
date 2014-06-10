@@ -5,7 +5,6 @@
 - Consolidate ld/rel_aout.h and ld/x86_aout.h (as bcc_aout.h?)
 - Add some simple startup code and other fundamental support libraries
 - Change default PREFIX to /usr/local (when things actually work)
-- Add data address parameter (for DECB, etc) in objcopy (or read from a.out header)
 - Add DragonDOS BIN output to objcopy (http://dragon32.info/info/binformt.html)
 - Add objcopy output options for srec, ihex, cas (and wav?)
 - Remove DATASEGS definition from linker (x86-ism?)
