@@ -19,9 +19,10 @@
 #include "x86_aout.h"
 
 enum output_formats {
-	BINARY,
-	DECB_BIN,
-	OS9_MODULE,
+	BINARY,		/* raw binary (no header) */
+	DECB_BIN,	/* Disk Extend Color BASIC BIN file */
+	DDOS_BIN,	/* Dragon DOS BIN file */
+	OS9_MODULE,	/* OS-9/6809 program module file */
 };
 
 unsigned int textaddr;
@@ -249,6 +250,46 @@ void decb_output(FILE *ifd, FILE *ofd, struct exec header)
 		fatal("Error writing DECB BIN footer to outfile");
 }
 
+void ddos_output(FILE *ifd, FILE *ofd, struct exec header)
+{
+	uint8_t binhead[9];
+	int binsize;
+
+	if (!textaddr)
+		textaddr = textstart;
+	if (!textaddr)
+		warning("BIN load address is zero");
+
+	if ((header.a_flags & A_SEP) &&
+	    (dataaddr || datastart != textend))
+		fatal("Dragon DOS does not support split text/data");
+
+	binsize = header.a_text + header.a_data;
+
+	binhead[0] = 0x55;
+	binhead[1] = 0x02;
+	binhead[2] = (textaddr & 0xff00) >> 8;
+	binhead[3] =  textaddr & 0x00ff;
+	binhead[4] = (binsize & 0xff00) >> 8;
+	binhead[5] =  binsize & 0x00ff;
+	binhead[6] = (header.a_entry & 0xff00) >> 8;
+	binhead[7] =  header.a_entry & 0x00ff;
+	binhead[8] = 0xAA;
+
+	if (fwrite(binhead, 1, sizeof(binhead), ofd) != sizeof(binhead))
+		fatal("Error writing Dragon DOS BIN header to outfile");
+
+	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
+		fatal("Cannot seek to start of text");
+
+	write_file(ifd, ofd, header.a_text);
+
+	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
+		fatal("Cannot seek to start of data");
+
+	write_file(ifd, ofd, header.a_data);
+}
+
 void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 {
 	uint8_t os9hdr[13] = {
@@ -342,6 +383,8 @@ int main(int argc, char *argv[])
 				outform = BINARY;
 			else if(!strncmp(optarg, "decb", 4))
 				outform = DECB_BIN;
+			else if(!strncmp(optarg, "ddos", 4))
+				outform = DDOS_BIN;
 			else if (!strncmp(optarg, "os9", 3))
 				outform = OS9_MODULE;
 			else
@@ -412,6 +455,9 @@ int main(int argc, char *argv[])
 		break;
 	case DECB_BIN:
 		decb_output(ifd, ofd, header);
+		break;
+	case DDOS_BIN:
+		ddos_output(ifd, ofd, header);
 		break;
 	case OS9_MODULE:
 		if (!os9name) {
