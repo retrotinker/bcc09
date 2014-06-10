@@ -6,6 +6,7 @@
 - Add some simple startup code and other fundamental support libraries
 - Change default PREFIX to /usr/local (when things actually work)
 - Add objcopy output options for srec, ihex, cas (and wav?)
+  (http://archive.worldofdragon.org/index.php?title=Tape\Disk_Preservation#CAS_File_Format)
 - Remove DATASEGS definition from linker (x86-ism?)
 - Remove etextpadoff from linker (x86-ism?)
 - Add 'os9' pseudo-op to assembler
