@@ -207,6 +207,9 @@ char **argv;
 	if (headerless)
 		flag['s'] = 1;
 
+	if (data_base_value && !flag['d'])
+		flag['i'] = TRUE;
+
 	linksyms(flag['r']);
 	if (outfilename == NUL_PTR)
 		outfilename = "a.out";
