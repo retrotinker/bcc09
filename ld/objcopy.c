@@ -20,6 +20,8 @@
 
 #define SREC_LINESIZE	16
 #define IHEX_LINESIZE	16
+#define CAS_BLOCKSIZE	255
+#define CAS_LEADERSIZE	128
 
 enum output_formats {
 	BINARY,		/* raw binary (no header) */
@@ -28,6 +30,7 @@ enum output_formats {
 	OS9_MODULE,	/* OS-9/6809 program module file */
 	SREC,		/* Motorola S-record file */
 	IHEX,		/* Intel Hex file */
+	CAS,		/* Color BASIC CAS file (same for both CoCo and Dragon) */
 };
 
 unsigned int textaddr;
@@ -262,6 +265,45 @@ unsigned int write_ihex(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 		bsize -= ssize;
 	}
 	return lines + (extra ? 1 : 0);
+}
+
+void write_cas(FILE *ifd, FILE *ofd, unsigned bsize)
+{
+	unsigned char buffer[1020];
+	unsigned int i, j, ssize, blocks, extra;
+	unsigned char *bufptr, csum, blsize;
+
+	while (bsize > 0) {
+		if (bsize > sizeof(buffer))
+			ssize = sizeof(buffer);
+		else
+			ssize = bsize;
+
+		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
+			fatal("Error reading segment from executable");
+		bufptr = buffer;
+
+		blocks = ssize / CAS_BLOCKSIZE;
+		extra = ssize % CAS_BLOCKSIZE;
+		for (i = 0; i <= blocks; i++) {
+			if (i == blocks && extra)
+				blsize = extra;
+			else if (i != blocks)
+				blsize = CAS_BLOCKSIZE;
+			else
+				break;
+
+			fprintf(ofd, "%c%c%c%c", 0x55, 0x3c, 0x01, blsize);
+			if (fwrite(bufptr, 1, blsize, ofd) != blsize)
+				fatal("Error writing Color BASIC cassette data block to outfile");
+			csum = 1 + blsize;
+			for (j = 0; j < blsize; j++) {
+				csum += *bufptr++;
+			}
+			fprintf(ofd, "%c%c", csum, 0x55);
+		}
+		bsize -= ssize;
+	}
 }
 
 void raw_output(FILE *ifd, FILE *ofd, struct exec header)
@@ -529,6 +571,74 @@ void ihex_output(FILE *ifd, FILE *ofd, struct exec header)
 	fprintf(ofd, "%02X\n", csum);
 }
 
+void cas_output(FILE *ifd, FILE *ofd, struct exec header)
+{
+	int i, namelen;
+	uint8_t csum, blockdata[21];
+
+	if (!textaddr)
+		textaddr = textstart;
+	if (!textaddr)
+		warning("Color BASIC executable load address is zero");
+
+	if ((header.a_flags & A_SEP) &&
+	    (dataaddr || datastart != textend))
+		fatal("Color BASIC executable does not support split text/data");
+
+	blockdata[0] = 0x55;
+
+	for (i = 0; i < CAS_LEADERSIZE; i++)
+		fwrite(blockdata, 1, 1, ofd);
+
+	blockdata[1] = 0x3c;
+	blockdata[2] = 0;
+	blockdata[3] = sizeof(blockdata) - 6;
+
+	namelen = strlen(objname);
+	memcpy(&blockdata[4], objname, namelen <= 8 ? namelen : 8);
+	if (namelen < 8)
+		memset(&blockdata[4+namelen], ' ', 8 - namelen);
+
+	blockdata[12] = 2;
+	blockdata[13] = 0;
+	blockdata[14] = 0;
+	blockdata[15] = (header.a_entry & 0xff00) >> 8;
+	blockdata[16] =  header.a_entry & 0x00ff;
+	blockdata[17] = (textaddr & 0xff00) >> 8;
+	blockdata[18] =  textaddr & 0x00ff;
+
+	csum = 0;
+	for (i = 3 ; i < 19; i++)
+		csum += blockdata[i];
+
+	blockdata[19] = csum;
+	blockdata[20] = 0x55;
+
+	if (fwrite(blockdata, 1, sizeof(blockdata), ofd) != sizeof(blockdata))
+		fatal("Error writing Color BASIC name block to outfile");
+
+	for (i = 0; i < CAS_LEADERSIZE; i++)
+		fwrite(blockdata, 1, 1, ofd);
+
+	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
+		fatal("Cannot seek to start of text");
+
+	write_cas(ifd, ofd, header.a_text);
+
+	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
+		fatal("Cannot seek to start of data");
+
+	write_cas(ifd, ofd, header.a_data);
+
+	blockdata[2] = 0xff;
+	blockdata[3] = 0;
+	blockdata[4] = 0xff;
+	blockdata[5] = 0x55;
+
+	if (fwrite(blockdata, 1, 6, ofd) != 6)
+		fatal("Error writing Color BASIC EOF block to outfile");
+}
+
 int main(int argc, char *argv[])
 {
 	FILE *ifd, *ofd;
@@ -552,6 +662,8 @@ int main(int argc, char *argv[])
 				outform = SREC;
 			else if (!strncmp(optarg, "ihex", 3))
 				outform = IHEX;
+			else if (!strncmp(optarg, "cas", 3))
+				outform = CAS;
 			else
 				fatal("Unknown output format!\n");
 			break;
@@ -638,6 +750,9 @@ int main(int argc, char *argv[])
 		break;
 	case IHEX:
 		ihex_output(ifd, ofd, header);
+		break;
+	case CAS:
+		cas_output(ifd, ofd, header);
 		break;
 	default:
 		fatal("Unknown output format");

@@ -5,8 +5,7 @@
 - Consolidate ld/rel_aout.h and ld/x86_aout.h (as bcc_aout.h?)
 - Add some simple startup code and other fundamental support libraries
 - Change default PREFIX to /usr/local (when things actually work)
-- Add objcopy output option(s) for cas (and wav?)
-  (http://archive.worldofdragon.org/index.php?title=Tape\Disk_Preservation#CAS_File_Format)
+- Add objcopy output option for wav (based on cas)
 - Remove DATASEGS definition from linker (x86-ism?)
 - Remove etextpadoff from linker (x86-ism?)
 - Add 'os9' pseudo-op to assembler
