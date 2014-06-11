@@ -31,7 +31,7 @@ enum output_formats {
 	OS9_MODULE,	/* OS-9/6809 program module file */
 	SREC,		/* Motorola S-record file */
 	IHEX,		/* Intel Hex file */
-	CAS,		/* Color BASIC CAS file (same for both CoCo and Dragon) */
+	CAS,		/* Color BASIC CAS file (for both CoCo and Dragon) */
 	WAV,		/* Color BASIC cassete WAV file */
 };
 
@@ -72,8 +72,9 @@ static char *progname;
 void usage(void)
 {
 	fprintf(stderr,
-		"Usage: %s [-O <output type>] [-T <text address>] [-D <data address>]\n"
-		"\t\t[-n <object name>] [-v <object version>] [-d <data size>] [-r]\n"
+		"Usage: %s [-O <output type>] [-n <object name>]\n"
+		"\t\t[-T <text address>] [-D <data address>]\n"
+		"\t\t[-v <object version>] [-d <data size>] [-r]\n"
 		"\t\tinfile outfile\n", progname);
 	exit(EXIT_FAILURE);
 }
@@ -380,9 +381,9 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 
 unsigned int write_s1(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 {
-	unsigned char buffer[1024];
-	unsigned int i, j, ssize, lsize, lines, extra;
-	unsigned char *bufptr, csum;
+	unsigned char buffer[SREC_LINESIZE];
+	unsigned int i, ssize, lines = 0;
+	unsigned char csum;
 
 	while (bsize > 0) {
 		if (bsize > sizeof(buffer))
@@ -392,32 +393,22 @@ unsigned int write_s1(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 
 		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
 			fatal("Error reading segment from executable");
-		bufptr = buffer;
 
-		lines = ssize / SREC_LINESIZE;
-		extra = ssize % SREC_LINESIZE;
-		for (i = 0; i <= lines; i++) {
-			if (i == lines && extra)
-				lsize = extra;
-			else if (i != lines)
-				lsize = SREC_LINESIZE;
-			else
-				break;
-
-			fprintf(ofd, "S1%02X%04X", lsize + 3, address);
-			csum = lsize + 3 +
-			       ((address & 0xff00) >> 8) + (address & 0x00ff);
-			address += lsize;
-			for (j = 0; j < lsize; j++) {
-				csum += *bufptr;
-				fprintf(ofd, "%02X", *bufptr++);
-			}
-			csum ^= 0xff;
-			fprintf(ofd, "%02X\n", csum);
+		fprintf(ofd, "S1%02X%04X", ssize + 3, address);
+		csum = ssize + 3 +
+		       ((address & 0xff00) >> 8) + (address & 0x00ff);
+		address += ssize;
+		for (i = 0; i < ssize; i++) {
+			csum += buffer[i];
+			fprintf(ofd, "%02X", buffer[i]);
 		}
+		csum ^= 0xff;
+		fprintf(ofd, "%02X\n", csum);
+
 		bsize -= ssize;
+		lines++;
 	}
-	return lines + (extra ? 1 : 0);
+	return lines;
 }
 
 void srec_output(FILE *ifd, FILE *ofd, struct exec header)
@@ -463,11 +454,11 @@ void srec_output(FILE *ifd, FILE *ofd, struct exec header)
 	fprintf(ofd, "%02X\n", csum);
 }
 
-unsigned int write_ihex(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
+void write_ihex(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 {
-	unsigned char buffer[1024];
-	unsigned int i, j, ssize, lsize, lines, extra;
-	unsigned char *bufptr, csum;
+	unsigned char buffer[IHEX_LINESIZE];
+	unsigned int i, ssize;
+	unsigned char csum;
 
 	while (bsize > 0) {
 		if (bsize > sizeof(buffer))
@@ -477,32 +468,20 @@ unsigned int write_ihex(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 
 		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
 			fatal("Error reading segment from executable");
-		bufptr = buffer;
 
-		lines = ssize / IHEX_LINESIZE;
-		extra = ssize % IHEX_LINESIZE;
-		for (i = 0; i <= lines; i++) {
-			if (i == lines && extra)
-				lsize = extra;
-			else if (i != lines)
-				lsize = IHEX_LINESIZE;
-			else
-				break;
-
-			fprintf(ofd, ":%02X%04X00", lsize, address);
-			csum = lsize +
-			       ((address & 0xff00) >> 8) + (address & 0x00ff);
-			address += lsize;
-			for (j = 0; j < lsize; j++) {
-				csum += *bufptr;
-				fprintf(ofd, "%02X", *bufptr++);
-			}
-			csum = (csum ^ 0xff) + 1;
-			fprintf(ofd, "%02X\r\n", csum);
+		fprintf(ofd, ":%02X%04X00", ssize, address);
+		csum = ssize +
+		       ((address & 0xff00) >> 8) + (address & 0x00ff);
+		address += ssize;
+		for (i = 0; i < ssize; i++) {
+			csum += buffer[i];
+			fprintf(ofd, "%02X", buffer[i]);
 		}
+		csum = (csum ^ 0xff) + 1;
+		fprintf(ofd, "%02X\r\n", csum);
+
 		bsize -= ssize;
 	}
-	return lines + (extra ? 1 : 0);
 }
 
 void ihex_output(FILE *ifd, FILE *ofd, struct exec header)
@@ -536,9 +515,9 @@ void ihex_output(FILE *ifd, FILE *ofd, struct exec header)
 
 void write_cas(FILE *ifd, FILE *ofd, unsigned bsize)
 {
-	unsigned char buffer[1020];
-	unsigned int i, j, ssize, blocks, extra;
-	unsigned char *bufptr, csum, blsize;
+	unsigned char buffer[CAS_BLOCKSIZE];
+	unsigned int i;
+	unsigned char csum, ssize;
 
 	while (bsize > 0) {
 		if (bsize > sizeof(buffer))
@@ -548,27 +527,16 @@ void write_cas(FILE *ifd, FILE *ofd, unsigned bsize)
 
 		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
 			fatal("Error reading segment from executable");
-		bufptr = buffer;
 
-		blocks = ssize / CAS_BLOCKSIZE;
-		extra = ssize % CAS_BLOCKSIZE;
-		for (i = 0; i <= blocks; i++) {
-			if (i == blocks && extra)
-				blsize = extra;
-			else if (i != blocks)
-				blsize = CAS_BLOCKSIZE;
-			else
-				break;
-
-			fprintf(ofd, "%c%c%c%c", 0x55, 0x3c, 0x01, blsize);
-			if (fwrite(bufptr, 1, blsize, ofd) != blsize)
-				fatal("Error writing Color BASIC cassette data block to outfile");
-			csum = 1 + blsize;
-			for (j = 0; j < blsize; j++) {
-				csum += *bufptr++;
-			}
-			fprintf(ofd, "%c%c", csum, 0x55);
+		fprintf(ofd, "%c%c%c%c", 0x55, 0x3c, 0x01, ssize);
+		if (fwrite(buffer, 1, ssize, ofd) != ssize)
+			fatal("Error writing cassette data block to outfile");
+		csum = 1 + ssize;
+		for (i = 0; i < ssize; i++) {
+			csum += buffer[i];
 		}
+		fprintf(ofd, "%c%c", csum, 0x55);
+
 		bsize -= ssize;
 	}
 }
@@ -585,7 +553,7 @@ void cas_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	if ((header.a_flags & A_SEP) &&
 	    (dataaddr || datastart != textend))
-		fatal("Color BASIC executable does not support split text/data");
+		fatal("Color BASIC does not support split text/data");
 
 	blockdata[0] = 0x55;
 
@@ -672,7 +640,7 @@ void write_wavdat(FILE *ofd, uint8_t val)
 
 		for (j = 0; j < sizeof(wavdat); j += steps)
 			if (fwrite(&wavdat[j], 1, 1, ofd) != 1)
-				fatal("Error writing Color BASIC cassette WAV data to outfile");
+				fatal("Error writing WAV data to outfile");
 
 		wav_samples += sizeof(wavdat) / steps;
 	}
@@ -680,9 +648,9 @@ void write_wavdat(FILE *ofd, uint8_t val)
 
 void write_wav(FILE *ifd, FILE *ofd, unsigned bsize)
 {
-	unsigned char buffer[1020];
-	unsigned int i, j, ssize, blocks, extra;
-	unsigned char *bufptr, csum, blsize;
+	unsigned char buffer[CAS_BLOCKSIZE];
+	unsigned int i;
+	unsigned char csum, ssize;
 
 	while (bsize > 0) {
 		if (bsize > sizeof(buffer))
@@ -692,31 +660,19 @@ void write_wav(FILE *ifd, FILE *ofd, unsigned bsize)
 
 		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
 			fatal("Error reading segment from executable");
-		bufptr = buffer;
 
-		blocks = ssize / CAS_BLOCKSIZE;
-		extra = ssize % CAS_BLOCKSIZE;
-		for (i = 0; i <= blocks; i++) {
-			if (i == blocks && extra)
-				blsize = extra;
-			else if (i != blocks)
-				blsize = CAS_BLOCKSIZE;
-			else
-				break;
-
-			write_wavdat(ofd, 0x55);
-			write_wavdat(ofd, 0x3c);
-			write_wavdat(ofd, 0x01);
-			write_wavdat(ofd, blsize);
-			for (j = 0; j < blsize; j++)
-				write_wavdat(ofd, *(bufptr + j));
-			csum = 1 + blsize;
-			for (j = 0; j < blsize; j++) {
-				csum += *bufptr++;
-			}
-			write_wavdat(ofd, csum);
-			write_wavdat(ofd, 0x55);
+		write_wavdat(ofd, 0x55);
+		write_wavdat(ofd, 0x3c);
+		write_wavdat(ofd, 0x01);
+		write_wavdat(ofd, ssize);
+		csum = 1 + ssize;
+		for (i = 0; i < ssize; i++) {
+			write_wavdat(ofd, buffer[i]);
+			csum += buffer[i];
 		}
+		write_wavdat(ofd, csum);
+		write_wavdat(ofd, 0x55);
+
 		bsize -= ssize;
 	}
 }
@@ -728,7 +684,7 @@ void write_wavgap(FILE *ofd)
 
         for (i = 0; i < WAV_HZ / 2; i++)
                 if (fwrite(&c, 1, 1, ofd) != 1)
-                        fatal("Error writing Color BASIC cassette WAV data (silence) to outfile");
+                        fatal("Error writing WAV data (silence) to outfile");
 
         wav_samples += WAV_HZ / 2;
 }
@@ -745,7 +701,7 @@ void wav_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	if ((header.a_flags & A_SEP) &&
 	    (dataaddr || datastart != textend))
-		fatal("Color BASIC executable does not support split text/data");
+		fatal("Color BASIC does not support split text/data");
 
 	if (fwrite(wavhdr, 1, sizeof(wavhdr), ofd) != sizeof(wavhdr))
 		fatal("Error writing WAV header to outfile");
