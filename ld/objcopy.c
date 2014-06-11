@@ -19,6 +19,7 @@
 #include "x86_aout.h"
 
 #define SREC_LINESIZE	16
+#define IHEX_LINESIZE	16
 
 enum output_formats {
 	BINARY,		/* raw binary (no header) */
@@ -26,6 +27,7 @@ enum output_formats {
 	DDOS_BIN,	/* Dragon DOS BIN file */
 	OS9_MODULE,	/* OS-9/6809 program module file */
 	SREC,		/* Motorola S-record file */
+	IHEX,		/* Intel Hex file */
 };
 
 unsigned int textaddr;
@@ -214,6 +216,48 @@ unsigned int write_s1(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 			}
 			csum ^= 0xff;
 			fprintf(ofd, "%02X\n", csum);
+		}
+		bsize -= ssize;
+	}
+	return lines + (extra ? 1 : 0);
+}
+
+unsigned int write_ihex(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
+{
+	unsigned char buffer[1024];
+	unsigned int i, j, ssize, lsize, lines, extra;
+	unsigned char *bufptr, csum;
+
+	while (bsize > 0) {
+		if (bsize > sizeof(buffer))
+			ssize = sizeof(buffer);
+		else
+			ssize = bsize;
+
+		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
+			fatal("Error reading segment from executable");
+		bufptr = buffer;
+
+		lines = ssize / IHEX_LINESIZE;
+		extra = ssize % IHEX_LINESIZE;
+		for (i = 0; i <= lines; i++) {
+			if (i == lines && extra)
+				lsize = extra;
+			else if (i != lines)
+				lsize = IHEX_LINESIZE;
+			else
+				break;
+
+			fprintf(ofd, ":%02X%04X00", lsize, address);
+			csum = lsize +
+			       ((address & 0xff00) >> 8) + (address & 0x00ff);
+			address += lsize;
+			for (j = 0; j < lsize; j++) {
+				csum += *bufptr;
+				fprintf(ofd, "%02X", *bufptr++);
+			}
+			csum = (csum ^ 0xff) + 1;
+			fprintf(ofd, "%02X\r\n", csum);
 		}
 		bsize -= ssize;
 	}
@@ -456,6 +500,35 @@ void srec_output(FILE *ifd, FILE *ofd, struct exec header)
 	fprintf(ofd, "%02X\n", csum);
 }
 
+void ihex_output(FILE *ifd, FILE *ofd, struct exec header)
+{
+	unsigned char csum;
+
+	if (!textaddr)
+		textaddr = textstart;
+	if (!textaddr)
+		warning("IHEX load address is zero");
+	if (!dataaddr)
+		dataaddr = datastart;
+	if (!dataaddr)
+		warning("IHEX data load address is zero");
+
+	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
+		fatal("Cannot seek to start of text");
+
+	write_ihex(ifd, ofd, header.a_text, textaddr);
+
+	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
+		fatal("Cannot seek to start of data");
+
+	write_ihex(ifd, ofd, header.a_data, dataaddr);
+
+	fprintf(ofd, ":00%04X01", header.a_entry);
+	csum = 1 + ((header.a_entry & 0xff00) >> 8) + (header.a_entry & 0x00ff);
+	csum = (csum ^ 0xff) + 1;
+	fprintf(ofd, "%02X\n", csum);
+}
+
 int main(int argc, char *argv[])
 {
 	FILE *ifd, *ofd;
@@ -477,6 +550,8 @@ int main(int argc, char *argv[])
 				outform = OS9_MODULE;
 			else if (!strncmp(optarg, "srec", 3))
 				outform = SREC;
+			else if (!strncmp(optarg, "ihex", 3))
+				outform = IHEX;
 			else
 				fatal("Unknown output format!\n");
 			break;
@@ -560,6 +635,9 @@ int main(int argc, char *argv[])
 		break;
 	case SREC:
 		srec_output(ifd, ofd, header);
+		break;
+	case IHEX:
+		ihex_output(ifd, ofd, header);
 		break;
 	default:
 		fatal("Unknown output format");
