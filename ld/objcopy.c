@@ -21,7 +21,8 @@
 #define SREC_LINESIZE	16
 #define IHEX_LINESIZE	16
 #define CAS_BLOCKSIZE	255
-#define CAS_LEADERSIZE	128
+#define CAS_LEADERSIZE	192
+#define WAV_HZ		48000
 
 enum output_formats {
 	BINARY,		/* raw binary (no header) */
@@ -31,6 +32,7 @@ enum output_formats {
 	SREC,		/* Motorola S-record file */
 	IHEX,		/* Intel Hex file */
 	CAS,		/* Color BASIC CAS file (same for both CoCo and Dragon) */
+	WAV,		/* Color BASIC cassete WAV file */
 };
 
 unsigned int textaddr;
@@ -301,6 +303,98 @@ void write_cas(FILE *ifd, FILE *ofd, unsigned bsize)
 				csum += *bufptr++;
 			}
 			fprintf(ofd, "%c%c", csum, 0x55);
+		}
+		bsize -= ssize;
+	}
+}
+
+unsigned int wav_samples = 0;
+
+uint8_t wavhdr[] = {
+	0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00,
+	0x57, 0x41, 0x56, 0x45, 0x66, 0x6d, 0x74, 0x20,
+	0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
+	0x80, 0xbb, 0x00, 0x00, 0x80, 0xbb, 0x00, 0x00,
+	0x01, 0x00, 0x08, 0x00, 0x64, 0x61, 0x74, 0x61,
+	0x00, 0x00, 0x00, 0x00
+};
+
+uint8_t wavdat[40] = {
+	0x80, 0x93, 0xa7, 0xb9, 0xca, 0xd9, 0xe6, 0xf1,
+	0xf8, 0xfd, 0xff, 0xfd, 0xf8, 0xf1, 0xe6, 0xd9,
+	0xca, 0xb9, 0xa7, 0x93, 0x80, 0x6d, 0x59, 0x47,
+	0x36, 0x27, 0x1a, 0x0f, 0x08, 0x03, 0x01, 0x03,
+	0x08, 0x0f, 0x1a, 0x27, 0x36, 0x47, 0x59, 0x6d,
+};
+
+void write_wavdat(FILE *ofd, uint8_t val)
+{
+	int i, j, steps;
+
+	for (i = 0; i < 8; val >>= 1, i++) {
+		if (val & 1)
+			steps = 2;
+		else
+			steps = 1;
+
+		for (j = 0; j < sizeof(wavdat); j += steps)
+			if (fwrite(&wavdat[j], 1, 1, ofd) != 1)
+				fatal("Error writing Color BASIC cassette WAV data to outfile");
+
+		wav_samples += sizeof(wavdat) / steps;
+	}
+}
+
+void write_wavgap(FILE *ofd)
+{
+        int i;
+        unsigned char c = 0x80;
+
+        for (i = 0; i < WAV_HZ / 2; i++)
+                if (fwrite(&c, 1, 1, ofd) != 1)
+                        fatal("Error writing Color BASIC cassette WAV data (silence) to outfile");
+
+        wav_samples += WAV_HZ / 2;
+}
+
+void write_wav(FILE *ifd, FILE *ofd, unsigned bsize)
+{
+	unsigned char buffer[1020];
+	unsigned int i, j, ssize, blocks, extra;
+	unsigned char *bufptr, csum, blsize;
+
+	while (bsize > 0) {
+		if (bsize > sizeof(buffer))
+			ssize = sizeof(buffer);
+		else
+			ssize = bsize;
+
+		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
+			fatal("Error reading segment from executable");
+		bufptr = buffer;
+
+		blocks = ssize / CAS_BLOCKSIZE;
+		extra = ssize % CAS_BLOCKSIZE;
+		for (i = 0; i <= blocks; i++) {
+			if (i == blocks && extra)
+				blsize = extra;
+			else if (i != blocks)
+				blsize = CAS_BLOCKSIZE;
+			else
+				break;
+
+			write_wavdat(ofd, 0x55);
+			write_wavdat(ofd, 0x3c);
+			write_wavdat(ofd, 0x01);
+			write_wavdat(ofd, blsize);
+			for (j = 0; j < blsize; j++)
+				write_wavdat(ofd, *(bufptr + j));
+			csum = 1 + blsize;
+			for (j = 0; j < blsize; j++) {
+				csum += *bufptr++;
+			}
+			write_wavdat(ofd, csum);
+			write_wavdat(ofd, 0x55);
 		}
 		bsize -= ssize;
 	}
@@ -639,6 +733,102 @@ void cas_output(FILE *ifd, FILE *ofd, struct exec header)
 		fatal("Error writing Color BASIC EOF block to outfile");
 }
 
+void wav_output(FILE *ifd, FILE *ofd, struct exec header)
+{
+	int i, namelen;
+	uint8_t csum, blockdata[21];
+
+	if (!textaddr)
+		textaddr = textstart;
+	if (!textaddr)
+		warning("Color BASIC executable load address is zero");
+
+	if ((header.a_flags & A_SEP) &&
+	    (dataaddr || datastart != textend))
+		fatal("Color BASIC executable does not support split text/data");
+
+	if (fwrite(wavhdr, 1, sizeof(wavhdr), ofd) != sizeof(wavhdr))
+		fatal("Error writing WAV header to outfile");
+
+	for (i = 0; i < CAS_LEADERSIZE; i++)
+		write_wavdat(ofd, 0x55);
+
+	blockdata[0] = 0x55;
+	blockdata[1] = 0x3c;
+	blockdata[2] = 0;
+	blockdata[3] = sizeof(blockdata) - 6;
+
+	namelen = strlen(objname);
+	memcpy(&blockdata[4], objname, namelen <= 8 ? namelen : 8);
+	if (namelen < 8)
+		memset(&blockdata[4+namelen], ' ', 8 - namelen);
+
+	blockdata[12] = 2;
+	blockdata[13] = 0;
+	blockdata[14] = 0;
+	blockdata[15] = (header.a_entry & 0xff00) >> 8;
+	blockdata[16] =  header.a_entry & 0x00ff;
+	blockdata[17] = (textaddr & 0xff00) >> 8;
+	blockdata[18] =  textaddr & 0x00ff;
+
+	csum = 0;
+	for (i = 3 ; i < 19; i++)
+		csum += blockdata[i];
+
+	blockdata[19] = csum;
+	blockdata[20] = 0x55;
+
+	for (i = 0; i < sizeof(blockdata); i++)
+		write_wavdat(ofd, blockdata[i]);
+
+	write_wavgap(ofd);
+
+	for (i = 0; i < CAS_LEADERSIZE; i++)
+		write_wavdat(ofd, 0x55);
+
+	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
+		fatal("Cannot seek to start of text");
+
+	write_wav(ifd, ofd, header.a_text);
+
+	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
+		fatal("Cannot seek to start of data");
+
+	write_wav(ifd, ofd, header.a_data);
+
+	blockdata[2] = 0xff;
+	blockdata[3] = 0;
+	blockdata[4] = 0xff;
+	blockdata[5] = 0x55;
+
+	for (i = 0; i < 6; i++)
+		write_wavdat(ofd, blockdata[i]);
+
+	if (fseek(ofd, 40, 0) < 0)
+		fatal("Cannot seek to start of WAV data in outfile");
+
+	blockdata[0] =  (wav_samples        & 0xff);
+	blockdata[1] = ((wav_samples >> 8)  & 0xff);
+	blockdata[2] = ((wav_samples >> 16) & 0xff);
+	blockdata[3] = ((wav_samples >> 24) & 0xff);
+
+	if (fwrite(blockdata, 1, 4, ofd) != 4)
+		fatal("Error writing size info to WAV header in outfile");
+
+	wav_samples += 36;
+
+	if (fseek(ofd, 4, 0) < 0)
+		fatal("Cannot seek to start of WAV data in outfile");
+
+	blockdata[0] =  (wav_samples        & 0xff);
+	blockdata[1] = ((wav_samples >> 8)  & 0xff);
+	blockdata[2] = ((wav_samples >> 16) & 0xff);
+	blockdata[3] = ((wav_samples >> 24) & 0xff);
+
+	if (fwrite(blockdata, 1, 4, ofd) != 4)
+		fatal("Error writing size info to WAV header in outfile");
+}
+
 int main(int argc, char *argv[])
 {
 	FILE *ifd, *ofd;
@@ -664,6 +854,8 @@ int main(int argc, char *argv[])
 				outform = IHEX;
 			else if (!strncmp(optarg, "cas", 3))
 				outform = CAS;
+			else if (!strncmp(optarg, "wav", 3))
+				outform = WAV;
 			else
 				fatal("Unknown output format!\n");
 			break;
@@ -753,6 +945,9 @@ int main(int argc, char *argv[])
 		break;
 	case CAS:
 		cas_output(ifd, ofd, header);
+		break;
+	case WAV:
+		wav_output(ifd, ofd, header);
 		break;
 	default:
 		fatal("Unknown output format");
