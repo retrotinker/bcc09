@@ -18,19 +18,22 @@
 
 #include "x86_aout.h"
 
+#define SREC_LINESIZE	16
+
 enum output_formats {
 	BINARY,		/* raw binary (no header) */
 	DECB_BIN,	/* Disk Extend Color BASIC BIN file */
 	DDOS_BIN,	/* Dragon DOS BIN file */
 	OS9_MODULE,	/* OS-9/6809 program module file */
+	SREC,		/* Motorola S-record file */
 };
 
 unsigned int textaddr;
 unsigned int dataaddr;
 unsigned int datasize;
-unsigned int modversion;
+unsigned int objversion;
 unsigned int reentrant;
-char *os9name;
+char *objname;
 
 uint8_t os9crc[3] = { 0xff, 0xff, 0xff };
 
@@ -63,7 +66,7 @@ void usage(void)
 {
 	fprintf(stderr,
 		"Usage: %s [-O <output type>] [-T <text address>] [-D <data address>]\n"
-		"\t\t[-d <data size>] [-n <module name>] [-v <module version>] [-r]\n"
+		"\t\t[-n <object name>] [-v <object version>] [-d <data size>] [-r]\n"
 		"\t\tinfile outfile\n", progname);
 	exit(EXIT_FAILURE);
 }
@@ -173,6 +176,48 @@ void write_zeroes(FILE *ofd, unsigned int bsize)
 			fatal("Error writing zeroes to output file");
 		bsize -= ssize;
 	}
+}
+
+unsigned int write_s1(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
+{
+	unsigned char buffer[1024];
+	unsigned int i, j, ssize, lsize, lines, extra;
+	unsigned char *bufptr, csum;
+
+	while (bsize > 0) {
+		if (bsize > sizeof(buffer))
+			ssize = sizeof(buffer);
+		else
+			ssize = bsize;
+
+		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
+			fatal("Error reading segment from executable");
+		bufptr = buffer;
+
+		lines = ssize / SREC_LINESIZE;
+		extra = ssize % SREC_LINESIZE;
+		for (i = 0; i <= lines; i++) {
+			if (i == lines && extra)
+				lsize = extra;
+			else if (i != lines)
+				lsize = SREC_LINESIZE;
+			else
+				break;
+
+			fprintf(ofd, "S1%02X%04X", lsize + 3, address);
+			csum = lsize + 3 +
+			       ((address & 0xff00) >> 8) + (address & 0x00ff);
+			address += lsize;
+			for (j = 0; j < lsize; j++) {
+				csum += *bufptr;
+				fprintf(ofd, "%02X", *bufptr++);
+			}
+			csum ^= 0xff;
+			fprintf(ofd, "%02X\n", csum);
+		}
+		bsize -= ssize;
+	}
+	return lines + (extra ? 1 : 0);
 }
 
 void raw_output(FILE *ifd, FILE *ofd, struct exec header)
@@ -299,7 +344,7 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 	unsigned int i, namelen, nameoffset;
 	unsigned char hdrchk = 0;
 
-	namelen = strlen(os9name);
+	namelen = strlen(objname);
 
 	heapsize = header.a_total - header.a_text -
 			header.a_data - header.a_bss;
@@ -321,9 +366,9 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	os9hdr[6] = 0x11; /* 6809 executable */
 
-	if (modversion > 0x7f)
+	if (objversion > 0x7f)
 		fatal("OS-9 module version is too large");
-	os9hdr[7] = modversion;
+	os9hdr[7] = objversion;
 	if (reentrant)
 		os9hdr[7] |= 0x80;
 
@@ -354,10 +399,10 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 	write_zeroes(ofd, header.a_bss);
 
 	/* End of string needs MSB set... */
-	os9name[namelen - 1] |= 0x80;
+	objname[namelen - 1] |= 0x80;
 
-	os9_crc_adjust((uint8_t *)os9name, namelen);
-	if (fwrite(os9name, 1, namelen, ofd) != namelen)
+	os9_crc_adjust((uint8_t *)objname, namelen);
+	if (fwrite(objname, 1, namelen, ofd) != namelen)
 		fatal("Error writing OS-9 module name to outfile");
 
 	os9crc[0] ^= 0xff;
@@ -366,6 +411,49 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	if (fwrite(os9crc, 1, sizeof(os9crc), ofd) != sizeof(os9crc))
 		fatal("Error writing OS-9 module CRC to outfile");
+}
+
+void srec_output(FILE *ifd, FILE *ofd, struct exec header)
+{
+	unsigned int i, len, s1count;
+	unsigned char csum;
+
+	if (!textaddr)
+		textaddr = textstart;
+	if (!textaddr)
+		warning("SREC load address is zero");
+	if (!dataaddr)
+		dataaddr = datastart;
+	if (!dataaddr)
+		warning("SREC data load address is zero");
+
+	csum = len = strlen(objname);
+	fprintf(ofd, "S0%02X0000", len+3);
+	for (i = 0; i < len; i++) {
+		fprintf(ofd, "%02X", objname[i]);
+	}
+	csum ^= 0xff;
+	fprintf(ofd, "%02X\n", csum);
+
+	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
+		fatal("Cannot seek to start of text");
+
+	s1count = write_s1(ifd, ofd, header.a_text, textaddr);
+
+	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
+		fatal("Cannot seek to start of data");
+
+	s1count += write_s1(ifd, ofd, header.a_data, dataaddr);
+
+	fprintf(ofd, "S503%04X", s1count);
+	csum  = 3 + ((s1count & 0xff00) >> 8) + (s1count & 0x00ff);
+	csum ^= 0xff;
+	fprintf(ofd, "%02X\n", csum);
+
+	fprintf(ofd, "S903%04X", header.a_entry);
+	csum  = 3 + ((header.a_entry & 0xff00) >> 8) + (header.a_entry & 0x00ff);
+	csum ^= 0xff;
+	fprintf(ofd, "%02X\n", csum);
 }
 
 int main(int argc, char *argv[])
@@ -387,6 +475,8 @@ int main(int argc, char *argv[])
 				outform = DDOS_BIN;
 			else if (!strncmp(optarg, "os9", 3))
 				outform = OS9_MODULE;
+			else if (!strncmp(optarg, "srec", 3))
+				outform = SREC;
 			else
 				fatal("Unknown output format!\n");
 			break;
@@ -409,11 +499,11 @@ int main(int argc, char *argv[])
 				fatal("Bad data size value");
 			break;
 		case 'n':
-			os9name = optarg;
+			objname = optarg;
 			break;
 		case 'v':
 			errno = 0;
-			modversion = strtol(optarg, NULL, 0);
+			objversion = strtol(optarg, NULL, 0);
 			if (errno)
 				fatal("Bad version value");
 			break;
@@ -449,6 +539,12 @@ int main(int argc, char *argv[])
 	if (ofd == 0)
 		fatal("Cannot open output file");
 
+	if (!objname) {
+		objname = argv[optind + 1];
+		for (i = 0; i < strlen(objname); i++)
+			objname[i] = toupper(objname[i]);
+	}
+
 	switch(outform) {
 	case BINARY:
 		raw_output(ifd, ofd, header);
@@ -460,13 +556,13 @@ int main(int argc, char *argv[])
 		ddos_output(ifd, ofd, header);
 		break;
 	case OS9_MODULE:
-		if (!os9name) {
-			os9name = argv[optind + 1];
-			for (i = 0; i < strlen(os9name); i++)
-				os9name[i] = toupper(os9name[i]);
-		}
 		os9_output(ifd, ofd, header);
 		break;
+	case SREC:
+		srec_output(ifd, ofd, header);
+		break;
+	default:
+		fatal("Unknown output format");
 	};
 
 	fclose(ifd);
