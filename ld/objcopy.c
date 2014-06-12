@@ -40,6 +40,7 @@ unsigned int dataaddr;
 unsigned int datasize;
 unsigned int objversion;
 unsigned int reentrant;
+unsigned int padoutput;
 char *objname;
 
 uint8_t os9crc[3] = { 0xff, 0xff, 0xff };
@@ -74,7 +75,7 @@ void usage(void)
 	fprintf(stderr,
 		"Usage: %s [-O <output type>] [-n <object name>]\n"
 		"\t\t[-T <text address>] [-D <data address>]\n"
-		"\t\t[-v <object version>] [-d <data size>] [-r]\n"
+		"\t\t[-v <object version>] [-d <data size>] [-rp]\n"
 		"\t\tinfile outfile\n", progname);
 	exit(EXIT_FAILURE);
 }
@@ -188,6 +189,16 @@ void write_zeroes(FILE *ofd, unsigned int bsize)
 
 void raw_output(FILE *ifd, FILE *ofd, struct exec header)
 {
+	if (!textaddr)
+		textaddr = textstart;
+	if (!textend)
+		textend = textstart + header.a_text;
+	if (!dataaddr)
+		if (header.a_flags & A_SEP)
+			dataaddr = datastart;
+		else
+			dataaddr = textend;
+
 	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
 		fatal("Cannot seek to start of text");
 
@@ -195,6 +206,9 @@ void raw_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
 		fatal("Cannot seek to start of data");
+
+	if (padoutput && fseek(ofd, dataaddr - textaddr, 0) < 0)
+		fatal("Cannot seek to start of data in outfile");
 
 	write_file(ifd, ofd, header.a_data);
 }
@@ -793,7 +807,7 @@ int main(int argc, char *argv[])
 	enum output_formats outform = BINARY;
 
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "O:T:D:d:n:v:r")) != -1) {
+	while ((opt = getopt(argc, argv, "O:T:D:d:n:v:rp")) != -1) {
 		switch(opt) {
 		case 'O':
 			if (!strncmp(optarg, "binary", 3))
@@ -844,6 +858,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'r':
 			reentrant = 1;
+			break;
+		case 'p':
+			padoutput = 1;
 			break;
 		default:
 			usage();
