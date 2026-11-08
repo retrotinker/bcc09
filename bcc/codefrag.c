@@ -736,9 +736,18 @@ value_t shift;
 store_pt reg;
 {
 	if ((uvalue_t) shift >= INT16BITSTO) {
-		slconst(shift - INT16BITSTO, lowregisDreg()? DREG : reg);
-		regexchange(reg, DREG);
-		clr(lowregisDreg()? DREG : reg);
+		/* the low half becomes the high half, shifted; only D can
+		   be shifted, so if the low half is in the index register,
+		   move it to D first */
+		if (lowregisDreg()) {
+			slconst(shift - INT16BITSTO, DREG);
+			regexchange(reg, DREG);
+			clr(DREG);
+		} else {
+			regexchange(reg, DREG);
+			slconst(shift - INT16BITSTO, DREG);
+			clr(reg);
+		}
 		return 0;
 	}
 	return (int)shift;
