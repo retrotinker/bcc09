@@ -1,6 +1,6 @@
 
 LIBDIR	=$(PREFIX)/bin
-CFLAGS	=-O -DDATASEGS
+CFLAGS	=-O -std=gnu89 -DDATASEGS
 LDFLAGS	=
 
 # Will need some of these if you want native executables on non-Linux/i386
@@ -26,7 +26,7 @@ ld09: $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
 
 objdump09: objdump86.c
-	$(CC) $(LDFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $< -o $@
 
 objcopy09: objcopy.c srec.c srec.h
 	$(CC) $(CFLAGS) $(LDFLAGS) objcopy.c srec.c -o $@

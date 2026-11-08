@@ -1,5 +1,5 @@
 
-CFLAGS=-O
+CFLAGS=-O -std=gnu89
 LDFLAGS=-s
 LIBDIR=$(PREFIX)/bin
 BINDIR=$(PREFIX)/bin

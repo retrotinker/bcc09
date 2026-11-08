@@ -1,7 +1,7 @@
 PREFIX	=/usr
 LIBEXECDIR	=$(PREFIX)/libexec/bcc09
 
-CFLAGS=-Wall -Wstrict-prototypes
+CFLAGS=-std=gnu89 -Wall -Wstrict-prototypes
 
 all: cpp
 

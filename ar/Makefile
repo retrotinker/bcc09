@@ -3,7 +3,7 @@
 # distributed under the GNU General Public License.
 
 LIBDIR	=$(PREFIX)/bin
-CFLAGS	=-O
+CFLAGS	=-O -std=gnu89
 LDFLAGS	=
 DEFS	=
 OBJS= ar.o alloca.o

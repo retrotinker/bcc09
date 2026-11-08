@@ -5,7 +5,7 @@
 
 PREFIX=/usr
 
-CFLAGS	=-O -fno-builtin-exp2
+CFLAGS	=-O -std=gnu89 -fno-builtin-exp2
 LDFLAGS	=-s
 BINDIR	=$(PREFIX)/bin
 LIBEXECDIR	=$(PREFIX)/libexec/bcc09
