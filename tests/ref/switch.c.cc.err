@@ -1,7 +1,0 @@
-00039 0037   8E   0000> 	LDX	#.B:
-*****                                      ^junk after operands
-00039 0037   8E   003C> 	LDX	#.B:
-*****                                      ^junk after operands
-
-00001 errors
-00000 warnings

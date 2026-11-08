@@ -52,7 +52,7 @@ CMPD	#5
 LBHI	.A
 LSLB
 ROLA
-LDX	#.B:
+LDX	#.B
 JMP	[D,X]
 .B:
 FDB	.4

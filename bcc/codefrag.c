@@ -385,7 +385,8 @@ PUBLIC label_no casejump()
 		outpijswitch();
 	} else {
 		outlswitch();
-		outnlabel(jtablelab = getlabel());
+		outlabel(jtablelab = getlabel());
+		outnl();
 		outjswitch();
 	}
 	return jtablelab;
