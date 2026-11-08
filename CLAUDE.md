@@ -26,5 +26,6 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 
 ## Known issues
 
-- With GCC 15 and later (C23 default), the K&R code in `bcc/`, `cpp/`, `ld/` and `unproto/`
-  fails to build. `make CC="gcc -std=gnu89"` works around it. `cpp/` also needs `gperf`.
+- The code is K&R C, so every Makefile builds with `-std=gnu89`. Without it, GCC 15 and
+  later (C23 by default) can't build `bcc/`, `cpp/`, `ld/` or `unproto/`.
+- `cpp/` needs `gperf` to generate `token1.h` and `token2.h`.
