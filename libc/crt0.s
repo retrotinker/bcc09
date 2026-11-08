@@ -5,6 +5,9 @@
 ; clears the BSS, saves S and calls main.  When main returns, or the
 ; program calls exit(), the status goes in D, S is put back as it was,
 ; and an RTS returns to the loader.
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.data			; the linker defines these in the data segment,
 	import	__edata		; so they must be imported there

@@ -5,6 +5,9 @@
 ; ...), lcmpu_b for unsigned ones (LO, HS, ...), and ltst_b compares
 ; D:X with 0, signed.  D holds the high word and X the low one.  Change
 ; only CC.
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.text
 	export	lcmp_b

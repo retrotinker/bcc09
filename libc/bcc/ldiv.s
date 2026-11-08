@@ -9,6 +9,9 @@
 ; and a quotient of all ones (unsigned), or signed -1 for a dividend of
 ; 0 or more and 1 for a negative one; and LONG_MIN / -1 gives LONG_MIN.
 ; Changes D, X and CC.
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.text
 	export	ldiv_b

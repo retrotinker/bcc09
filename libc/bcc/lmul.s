@@ -5,6 +5,9 @@
 ; signed and unsigned operands.  With a = ah:al and b = bh:bl in 16-bit
 ; words, the product is al * bl + ((ah * bl + al * bh) << 16), and the
 ; 8-bit MUL builds each part.  Changes D, X and CC.
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.text
 	export	lmul_b

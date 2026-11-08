@@ -3,6 +3,9 @@
 ;
 ; X points at the long, high word first.  The compiler keeps the old
 ; value in D and U, so change only the long and CC.
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.text
 	export	linc_b

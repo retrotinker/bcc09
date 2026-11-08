@@ -2,6 +2,9 @@
 ;
 ; bcc09 also calls it to copy structures.  dst arrives in X (the first
 ; argument), src and n on the stack.  Changes D and CC.
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.text
 	export	_memcpy

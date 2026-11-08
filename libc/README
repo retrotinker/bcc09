@@ -14,6 +14,10 @@ look for them (bcc09 links with -C0, which is crt0.o, and -lc).  Each routine th
 own is in its own module, since ld09 only loads the members of a
 library that something refers to.
 
+All of libc is under the GNU Library General Public License, version 2
+(see COPYING.LIB), rather than the GPL that covers the rest of bcc09,
+since it is linked into the programs bcc09 builds.
+
 Start-up code
 -------------
 

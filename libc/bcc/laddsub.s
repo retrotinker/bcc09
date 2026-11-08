@@ -3,6 +3,9 @@
 ; D:X = D:X + [Y] or D:X - [Y]: D holds the high word and X the low one,
 ; and Y points at the other operand, high word first.  Signed and
 ; unsigned are the same.  Changes D, X and CC.
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.text
 	export	ladd_b

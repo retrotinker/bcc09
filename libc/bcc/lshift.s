@@ -6,6 +6,9 @@
 ; 32 or more, taken as unsigned (so negative counts too), gives 0, or
 ; for lsr_b all copies of the sign bit, as shifting one bit at a time
 ; that many times would.  Changes D, X, Y and CC.
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.text
 	export	lsl_b

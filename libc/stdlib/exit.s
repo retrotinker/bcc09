@@ -4,6 +4,9 @@
 ; return to the loader, with the status in D, as when main returns.
 ; (exit() will flush stdio and call atexit() functions once libc has
 ; them.)
+;
+; Written for bcc09.  Like the rest of libc, it is distributed under the
+; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.bss			; crt0 defines it there, so import it there
 	import	__savesp

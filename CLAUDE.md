@@ -39,6 +39,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   returns to the loader (such as Color BASIC's `EXEC`) with the status in D. Next: the
   rest of the dev86 libc, then floating point, and start-up code for other `-M` targets.
 
+- Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
+  linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
+  notice saying so; new libc files should too, and code with no stated license (such
+  as dev86's old `strcspn.c`) shouldn't be copied in.
+
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
