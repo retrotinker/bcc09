@@ -1,140 +1,402 @@
 00001                   ; run on sim6809: each run-time helper in libc must leave alone the
 00002                   ; registers the compiler keeps values in across the call: Y and U for
-00003                   ; the 16-bit helpers, U for the 32-bit ones, and all but CC for linc_b
-00004                   ; and ldec_b; exits with the number of helpers that changed one of them
-00005                   
-00006 0000              	.text
-00007                   	entry	start
-00008                   	import	imul
-00009                   	import	imulu
-00010                   	import	idiv
-00011                   	import	imod
-00012                   	import	idivu
-00013                   	import	imodu
-00014                   	import	isl
-00015                   	import	islu
-00016                   	import	isr
-00017                   	import	isru
-00018                   	import	ladd_b
-00019                   	import	laddu_b
-00020                   	import	lsub_b
-00021                   	import	lsubu_b
-00022                   	import	land_b
-00023                   	import	landu_b
-00024                   	import	lor_b
-00025                   	import	loru_b
-00026                   	import	leor_b
-00027                   	import	leoru_b
-00028                   	import	lmul_b
-00029                   	import	lmulu_b
-00030                   	import	ldiv_b
-00031                   	import	ldivu_b
-00032                   	import	lmod_b
-00033                   	import	lmodu_b
-00034                   	import	lcmp_b
-00035                   	import	lcmpu_b
-00036                   	import	ltst_b
-00037                   	import	lneg_b
-00038                   	import	lcom_b
-00039                   	import	lsl_b
-00040                   	import	lslu_b
-00041                   	import	lsr_b
-00042                   	import	lsru_b
-00043                   	import	linc_b
-00044                   	import	ldec_b
-00045                   
-00046 0000 10CE   7F00  start:	lds	#$7f00
-00047 0004   7F   0006> 	clr	fails
-00048                   
-00049                   ; 16-bit helpers: D and X are the operands; keep Y and U
-00050 0007 108E   00A8> 	ldy	#itable
-00051 000B   AE     A1  inext:	ldx	,y++		; the next helper, or 0 at the end
-00052 000D   27     29  	beq	idone
-00053 000F   34     20  	pshs	y
-00054 0011   BF   0004> 	stx	helper
-00055 0014 108E   A55A  	ldy	#$a55a		; values to look for afterwards
-00056 0018   CE   5AA5  	ldu	#$5aa5
-00057 001B   CC   FC18  	ldd	#-1000		; operands that make each helper loop
-00058 001E   8E   0007  	ldx	#7
-00059 0021   AD9F 0004> 	jsr	[helper]
-00060 0025 108C   A55A  	cmpy	#$a55a
-00061 0029   26     06  	bne	ibad
-00062 002B 1183   5AA5  	cmpu	#$5aa5
-00063 002F   27     03  	beq	igood
-00064 0031   7C   0006> ibad:	inc	fails
-00065 0034   35     20  igood:	puls	y
-00066 0036   20     D3  	bra	inext
-00067                   
-00068                   ; 32-bit helpers: D:X and the long at Y are the operands (Y is the
-00069                   ; count for shifts); keep U
-00070 0038 108E   00BE> idone:	ldy	#ltable
-00071 003C   AE     A1  lnext:	ldx	,y++
-00072 003E   27     24  	beq	ldone
-00073 0040   34     20  	pshs	y
-00074 0042   BF   0004> 	stx	helper
-00075 0045 10AE     A4  	ldy	,y		; the long, or the count
-00076 0048   CE   5AA5  	ldu	#$5aa5
-00077 004B   CC   FFFE  	ldd	#$fffe		; -100000
-00078 004E   8E   7960  	ldx	#$7960
-00079 0051   AD9F 0004> 	jsr	[helper]
-00080 0055 1183   5AA5  	cmpu	#$5aa5
-00081 0059   27     03  	beq	lgood
-00082 005B   7C   0006> 	inc	fails
-00083 005E   35     20  lgood:	puls	y
-00084 0060   31     22  	leay	2,y
-00085 0062   20     D8  	bra	lnext
-00086                   
-00087                   ; linc_b and ldec_b: X points at the long; keep D, X, Y and U
-00088 0064 108E   0124> ldone:	ldy	#ctable
-00089 0068   AE     A1  cnext:	ldx	,y++
-00090 006A   27     34  	beq	done
-00091 006C   34     20  	pshs	y
-00092 006E   BF   0004> 	stx	helper
-00093 0071   CC   1234  	ldd	#$1234
-00094 0074   8E   0000> 	ldx	#along
-00095 0077 108E   A55A  	ldy	#$a55a
-00096 007B   CE   5AA5  	ldu	#$5aa5
-00097 007E   AD9F 0004> 	jsr	[helper]
-00098 0082 1083   1234  	cmpd	#$1234
-00099 0086   26     11  	bne	cbad
-00100 0088   8C   0000> 	cmpx	#along
-00101 008B   26     0C  	bne	cbad
-00102 008D 108C   A55A  	cmpy	#$a55a
-00103 0091   26     06  	bne	cbad
-00104 0093 1183   5AA5  	cmpu	#$5aa5
-00105 0097   27     03  	beq	cgood
-00106 0099   7C   0006> cbad:	inc	fails
-00107 009C   35     20  cgood:	puls	y
-00108 009E   20     C8  	bra	cnext
-00109                   
-00110 00A0   F6   0006> done:	ldb	fails
-00111 00A3   F7   FF02  	stb	$ff02		; exit with that number
-00112 00A6   20     FE  stop:	bra	stop
-00113                   
-00114 00A8        0000> itable:	fdb	imul,imulu,idiv,imod,idivu,imodu,isl,islu,isr,isru,0
-00115                   ; each 32-bit helper, and its Y
-00116 00BE        0000> ltable:	fdb	ladd_b,along,laddu_b,along,lsub_b,along,lsubu_b,along
-00117 00CE        0000> 	fdb	land_b,along,landu_b,along,lor_b,along,loru_b,along
-00118 00DE        0000> 	fdb	leor_b,along,leoru_b,along,lmul_b,along,lmulu_b,along
-00119 00EE        0000> 	fdb	ldiv_b,along,ldivu_b,along,lmod_b,along,lmodu_b,along
-00120 00FE        0000> 	fdb	lcmp_b,along,lcmpu_b,along,ltst_b,along,lneg_b,along
-00121 010E        0000> 	fdb	lcom_b,along
-00122 0112        0000> 	fdb	lsl_b,5,lslu_b,5,lsr_b,5,lsru_b,5
-00123 0122        0000  	fdb	0
-00124 0124        0000> ctable:	fdb	linc_b,ldec_b,0
-00125                   
-00126 0000              	.data
-00127 0000        0001  along:	fdb	$0001,$86a0	; 100000
-00128                   
-00129 0004              	.bss
-00130 0004        0002  helper:	.blkb	2
-00131 0006        0001  fails:	.blkb	1
+00003                   ; the 16-bit helpers, U for the 32-bit ones, all but CC for linc_b
+00004                   ; and ldec_b, and Y and U for the floating point ones, which must also
+00005                   ; pop and push what the compiler expects; exits with the number of
+00006                   ; helpers that didn't
+00007                   
+00008 0000              	.text
+00009                   	entry	start
+00010                   	import	imul
+00011                   	import	imulu
+00012                   	import	idiv
+00013                   	import	imod
+00014                   	import	idivu
+00015                   	import	imodu
+00016                   	import	isl
+00017                   	import	islu
+00018                   	import	isr
+00019                   	import	isru
+00020                   	import	ladd_b
+00021                   	import	laddu_b
+00022                   	import	lsub_b
+00023                   	import	lsubu_b
+00024                   	import	land_b
+00025                   	import	landu_b
+00026                   	import	lor_b
+00027                   	import	loru_b
+00028                   	import	leor_b
+00029                   	import	leoru_b
+00030                   	import	lmul_b
+00031                   	import	lmulu_b
+00032                   	import	ldiv_b
+00033                   	import	ldivu_b
+00034                   	import	lmod_b
+00035                   	import	lmodu_b
+00036                   	import	lcmp_b
+00037                   	import	lcmpu_b
+00038                   	import	ltst_b
+00039                   	import	lneg_b
+00040                   	import	lcom_b
+00041                   	import	lsl_b
+00042                   	import	lslu_b
+00043                   	import	lsr_b
+00044                   	import	lsru_b
+00045                   	import	linc_b
+00046                   	import	ldec_b
+00047                   	import	Fadd
+00048                   	import	Fsub
+00049                   	import	Fmul
+00050                   	import	Fdiv
+00051                   	import	Faddd
+00052                   	import	Fsubd
+00053                   	import	Fmuld
+00054                   	import	Fdivd
+00055                   	import	Faddf
+00056                   	import	Fsubf
+00057                   	import	Fmulf
+00058                   	import	Fdivf
+00059                   	import	Fcomp
+00060                   	import	Fcompd
+00061                   	import	Fcompf
+00062                   	import	Ftstd
+00063                   	import	Ftstf
+00064                   	import	Fpushd
+00065                   	import	Fnegd
+00066                   	import	Fneg
+00067                   	import	Fpulld
+00068                   	import	Fpushf
+00069                   	import	Fnegf
+00070                   	import	Fpullf
+00071                   	import	dtof
+00072                   	import	Fpushc
+00073                   	import	Fpushuc
+00074                   	import	Fpushs
+00075                   	import	Fpushus
+00076                   	import	Fpushi
+00077                   	import	Fpushui
+00078                   	import	Fpushl
+00079                   	import	Fpushul
+00080                   	import	dtoc
+00081                   	import	dtouc
+00082                   	import	dtos
+00083                   	import	dtous
+00084                   	import	dtoi
+00085                   	import	dtoui
+00086                   	import	dtol
+00087                   	import	dtoul
+00088                   	import	ftoc
+00089                   	import	ftouc
+00090                   	import	ftos
+00091                   	import	ftous
+00092                   	import	ftoi
+00093                   	import	ftoui
+00094                   	import	ftol
+00095                   	import	ftoul
+00096                   	import	Fpreincd
+00097                   	import	Fpredecd
+00098                   	import	Fpostincd
+00099                   	import	Fpostdecd
+00100                   	import	Fpreincf
+00101                   	import	Fpredecf
+00102                   	import	Fpostincf
+00103                   	import	Fpostdecf
+00104                   
+00105 0000 10CE   7F00  start:	lds	#$7f00
+00106 0004   7F   001E> 	clr	fails
+00107                   
+00108                   ; 16-bit helpers: D and X are the operands; keep Y and U
+00109 0007 108E   0113> 	ldy	#itable
+00110 000B   AE     A1  inext:	ldx	,y++		; the next helper, or 0 at the end
+00111 000D   27     29  	beq	idone
+00112 000F   34     20  	pshs	y
+00113 0011   BF   001C> 	stx	helper
+00114 0014 108E   A55A  	ldy	#$a55a		; values to look for afterwards
+00115 0018   CE   5AA5  	ldu	#$5aa5
+00116 001B   CC   FC18  	ldd	#-1000		; operands that make each helper loop
+00117 001E   8E   0007  	ldx	#7
+00118 0021   AD9F 001C> 	jsr	[helper]
+00119 0025 108C   A55A  	cmpy	#$a55a
+00120 0029   26     06  	bne	ibad
+00121 002B 1183   5AA5  	cmpu	#$5aa5
+00122 002F   27     03  	beq	igood
+00123 0031   7C   001E> ibad:	inc	fails
+00124 0034   35     20  igood:	puls	y
+00125 0036   20     D3  	bra	inext
+00126                   
+00127                   ; 32-bit helpers: D:X and the long at Y are the operands (Y is the
+00128                   ; count for shifts); keep U
+00129 0038 108E   0129> idone:	ldy	#ltable
+00130 003C   AE     A1  lnext:	ldx	,y++
+00131 003E   27     24  	beq	ldone
+00132 0040   34     20  	pshs	y
+00133 0042   BF   001C> 	stx	helper
+00134 0045 10AE     A4  	ldy	,y		; the long, or the count
+00135 0048   CE   5AA5  	ldu	#$5aa5
+00136 004B   CC   FFFE  	ldd	#$fffe		; -100000
+00137 004E   8E   7960  	ldx	#$7960
+00138 0051   AD9F 001C> 	jsr	[helper]
+00139 0055 1183   5AA5  	cmpu	#$5aa5
+00140 0059   27     03  	beq	lgood
+00141 005B   7C   001E> 	inc	fails
+00142 005E   35     20  lgood:	puls	y
+00143 0060   31     22  	leay	2,y
+00144 0062   20     D8  	bra	lnext
+00145                   
+00146                   ; linc_b and ldec_b: X points at the long; keep D, X, Y and U
+00147 0064 108E   018F> ldone:	ldy	#ctable
+00148 0068   AE     A1  cnext:	ldx	,y++
+00149 006A   27     34  	beq	done
+00150 006C   34     20  	pshs	y
+00151 006E   BF   001C> 	stx	helper
+00152 0071   CC   1234  	ldd	#$1234
+00153 0074   8E   0000> 	ldx	#along
+00154 0077 108E   A55A  	ldy	#$a55a
+00155 007B   CE   5AA5  	ldu	#$5aa5
+00156 007E   AD9F 001C> 	jsr	[helper]
+00157 0082 1083   1234  	cmpd	#$1234
+00158 0086   26     11  	bne	cbad
+00159 0088   8C   0000> 	cmpx	#along
+00160 008B   26     0C  	bne	cbad
+00161 008D 108C   A55A  	cmpy	#$a55a
+00162 0091   26     06  	bne	cbad
+00163 0093 1183   5AA5  	cmpu	#$5aa5
+00164 0097   27     03  	beq	cgood
+00165 0099   7C   001E> cbad:	inc	fails
+00166 009C   35     20  cgood:	puls	y
+00167 009E   20     C8  	bra	cnext
+00168                   
+00169                   ; floating point helpers: X points at an operand, and on the stack are
+00170                   ; doubles (1.5); keep Y and U, and leave the stack with the number of
+00171                   ; bytes the table says
+00172 00A0 108E   0195> done:	ldy	#ftable
+00173 00A4   AE     A4  fnext:	ldx	,y
+00174 00A6   27     63  	beq	fdone
+00175 00A8   BF   001C> 	stx	helper
+00176 00AB 10BF   001F> 	sty	fptr
+00177 00AF 10FF   0021> 	sts	fsave
+00178 00B3   E6     24  	ldb	4,y		; push the doubles
+00179 00B5   5D         fpush:	tstb
+00180 00B6   27     12  	beq	fcall
+00181 00B8   8E   0000  	ldx	#0
+00182 00BB   34     10  	pshs	x
+00183 00BD   34     10  	pshs	x
+00184 00BF   34     10  	pshs	x
+00185 00C1   8E   3FF8  	ldx	#$3ff8
+00186 00C4   34     10  	pshs	x
+00187 00C6   C0     08  	subb	#8
+00188 00C8   20     EB  	bra	fpush
+00189 00CA   AE     22  fcall:	ldx	2,y
+00190 00CC 108E   A55A  	ldy	#$a55a
+00191 00D0   CE   5AA5  	ldu	#$5aa5
+00192 00D3   CC   0003  	ldd	#3		; (the integer for Fpushi ...)
+00193 00D6   AD9F 001C> 	jsr	[helper]
+00194 00DA 108C   A55A  	cmpy	#$a55a
+00195 00DE   26     1C  	bne	fbad
+00196 00E0 1183   5AA5  	cmpu	#$5aa5
+00197 00E4   26     16  	bne	fbad
+00198 00E6 10BE   001F> 	ldy	fptr		; S must be what it was, less what was left
+00199 00EA   E6     25  	ldb	5,y
+00200 00EC   4F         	clra
+00201 00ED   34     06  	pshs	d		; (2 more)
+00202 00EF   1F     40  	tfr	s,d
+00203 00F1   E3     E1  	addd	,s++
+00204 00F3   C3   0002  	addd	#2
+00205 00F6 10B3   0021> 	cmpd	fsave
+00206 00FA   27     03  	beq	fgood
+00207 00FC   7C   001E> fbad:	inc	fails
+00208 00FF 10FE   0021> fgood:	lds	fsave
+00209 0103 10BE   001F> 	ldy	fptr
+00210 0107   31     26  	leay	6,y
+00211 0109   20     99  	bra	fnext
+00212                   
+00213 010B   F6   001E> fdone:	ldb	fails
+00214 010E   F7   FF02  	stb	$ff02		; exit with that number
+00215 0111   20     FE  stop:	bra	stop
+00216                   
+00217 0113        0000> itable:	fdb	imul,imulu,idiv,imod,idivu,imodu,isl,islu,isr,isru,0
+00218                   ; each 32-bit helper, and its Y
+00219 0129        0000> ltable:	fdb	ladd_b,along,laddu_b,along,lsub_b,along,lsubu_b,along
+00220 0139        0000> 	fdb	land_b,along,landu_b,along,lor_b,along,loru_b,along
+00221 0149        0000> 	fdb	leor_b,along,leoru_b,along,lmul_b,along,lmulu_b,along
+00222 0159        0000> 	fdb	ldiv_b,along,ldivu_b,along,lmod_b,along,lmodu_b,along
+00223 0169        0000> 	fdb	lcmp_b,along,lcmpu_b,along,ltst_b,along,lneg_b,along
+00224 0179        0000> 	fdb	lcom_b,along
+00225 017D        0000> 	fdb	lsl_b,5,lslu_b,5,lsr_b,5,lsru_b,5
+00226 018D        0000  	fdb	0
+00227 018F        0000> ctable:	fdb	linc_b,ldec_b,0
+00228                   ; each floating point helper, X, the bytes on the stack before the
+00229                   ; call, and after it
+00230             0195> ftable:
+00231 0195        0000> 	fdb	Fadd,0
+00232 0199          10  	fcb	16,8
+00233 019B        0000> 	fdb	Fsub,0
+00234 019F          10  	fcb	16,8
+00235 01A1        0000> 	fdb	Fmul,0
+00236 01A5          10  	fcb	16,8
+00237 01A7        0000> 	fdb	Fdiv,0
+00238 01AB          10  	fcb	16,8
+00239 01AD        0000> 	fdb	Faddd,dbl
+00240 01B1          08  	fcb	8,8
+00241 01B3        0000> 	fdb	Fsubd,dbl
+00242 01B7          08  	fcb	8,8
+00243 01B9        0000> 	fdb	Fmuld,dbl
+00244 01BD          08  	fcb	8,8
+00245 01BF        0000> 	fdb	Fdivd,dbl
+00246 01C3          08  	fcb	8,8
+00247 01C5        0000> 	fdb	Faddf,flt
+00248 01C9          08  	fcb	8,8
+00249 01CB        0000> 	fdb	Fsubf,flt
+00250 01CF          08  	fcb	8,8
+00251 01D1        0000> 	fdb	Fmulf,flt
+00252 01D5          08  	fcb	8,8
+00253 01D7        0000> 	fdb	Fdivf,flt
+00254 01DB          08  	fcb	8,8
+00255 01DD        0000> 	fdb	Fcomp,0
+00256 01E1          10  	fcb	16,0
+00257 01E3        0000> 	fdb	Fcompd,dbl
+00258 01E7          08  	fcb	8,0
+00259 01E9        0000> 	fdb	Fcompf,flt
+00260 01ED          08  	fcb	8,0
+00261 01EF        0000> 	fdb	Ftstd,dbl
+00262 01F3          00  	fcb	0,0
+00263 01F5        0000> 	fdb	Ftstf,flt
+00264 01F9          00  	fcb	0,0
+00265 01FB        0000> 	fdb	Fpushd,dbl
+00266 01FF          00  	fcb	0,8
+00267 0201        0000> 	fdb	Fnegd,dbl
+00268 0205          00  	fcb	0,8
+00269 0207        0000> 	fdb	Fneg,0
+00270 020B          08  	fcb	8,8
+00271 020D        0000> 	fdb	Fpulld,dvar
+00272 0211          08  	fcb	8,0
+00273 0213        0000> 	fdb	Fpushf,flt
+00274 0217          00  	fcb	0,8
+00275 0219        0000> 	fdb	Fnegf,flt
+00276 021D          00  	fcb	0,8
+00277 021F        0000> 	fdb	Fpullf,fvar
+00278 0223          08  	fcb	8,0
+00279 0225        0000> 	fdb	dtof,dbl
+00280 0229          00  	fcb	0,8
+00281 022B        0000> 	fdb	Fpushc,0
+00282 022F          00  	fcb	0,8
+00283 0231        0000> 	fdb	Fpushuc,0
+00284 0235          00  	fcb	0,8
+00285 0237        0000> 	fdb	Fpushs,0
+00286 023B          00  	fcb	0,8
+00287 023D        0000> 	fdb	Fpushus,0
+00288 0241          00  	fcb	0,8
+00289 0243        0000> 	fdb	Fpushi,0
+00290 0247          00  	fcb	0,8
+00291 0249        0000> 	fdb	Fpushui,0
+00292 024D          00  	fcb	0,8
+00293 024F        0000> 	fdb	Fpushl,0
+00294 0253          00  	fcb	0,8
+00295 0255        0000> 	fdb	Fpushul,0
+00296 0259          00  	fcb	0,8
+00297 025B        0000> 	fdb	dtoc,dbl
+00298 025F          00  	fcb	0,0
+00299 0261        0000> 	fdb	dtouc,dbl
+00300 0265          00  	fcb	0,0
+00301 0267        0000> 	fdb	dtos,dbl
+00302 026B          00  	fcb	0,0
+00303 026D        0000> 	fdb	dtous,dbl
+00304 0271          00  	fcb	0,0
+00305 0273        0000> 	fdb	dtoi,dbl
+00306 0277          00  	fcb	0,0
+00307 0279        0000> 	fdb	dtoui,dbl
+00308 027D          00  	fcb	0,0
+00309 027F        0000> 	fdb	dtol,dbl
+00310 0283          00  	fcb	0,0
+00311 0285        0000> 	fdb	dtoul,dbl
+00312 0289          00  	fcb	0,0
+00313 028B        0000> 	fdb	ftoc,flt
+00314 028F          00  	fcb	0,0
+00315 0291        0000> 	fdb	ftouc,flt
+00316 0295          00  	fcb	0,0
+00317 0297        0000> 	fdb	ftos,flt
+00318 029B          00  	fcb	0,0
+00319 029D        0000> 	fdb	ftous,flt
+00320 02A1          00  	fcb	0,0
+00321 02A3        0000> 	fdb	ftoi,flt
+00322 02A7          00  	fcb	0,0
+00323 02A9        0000> 	fdb	ftoui,flt
+00324 02AD          00  	fcb	0,0
+00325 02AF        0000> 	fdb	ftol,flt
+00326 02B3          00  	fcb	0,0
+00327 02B5        0000> 	fdb	ftoul,flt
+00328 02B9          00  	fcb	0,0
+00329 02BB        0000> 	fdb	Fpreincd,dvar
+00330 02BF          00  	fcb	0,0
+00331 02C1        0000> 	fdb	Fpredecd,dvar
+00332 02C5          00  	fcb	0,0
+00333 02C7        0000> 	fdb	Fpostincd,dvar
+00334 02CB          00  	fcb	0,8
+00335 02CD        0000> 	fdb	Fpostdecd,dvar
+00336 02D1          00  	fcb	0,8
+00337 02D3        0000> 	fdb	Fpreincf,fvar
+00338 02D7          00  	fcb	0,0
+00339 02D9        0000> 	fdb	Fpredecf,fvar
+00340 02DD          00  	fcb	0,0
+00341 02DF        0000> 	fdb	Fpostincf,fvar
+00342 02E3          00  	fcb	0,8
+00343 02E5        0000> 	fdb	Fpostdecf,fvar
+00344 02E9          00  	fcb	0,8
+00345 02EB        0000  	fdb	0
+00346                   
+00347 0000              	.data
+00348 0000        0001  along:	fdb	$0001,$86a0	; 100000
+00349 0004        3FF8  dbl:	fdb	$3ff8,0,0,0	; 1.5
+00350 000C        3FC0  flt:	fdb	$3fc0,0
+00351 0010        3FF8  dvar:	fdb	$3ff8,0,0,0
+00352 0018        3FC0  fvar:	fdb	$3fc0,0
+00353                   
+00354 001C              	.bss
+00355 001C        0002  helper:	.blkb	2
+00356 001E        0001  fails:	.blkb	1
+00357 001F        0002  fptr:	.blkb	2
+00358 0021        0002  fsave:	.blkb	2
 
 Symbols:
+Fadd                        0 0000 R I Faddd                       0 0000 R I 
+Faddf                       0 0000 R I Fcomp                       0 0000 R I 
+Fcompd                      0 0000 R I Fcompf                      0 0000 R I 
+Fdiv                        0 0000 R I Fdivd                       0 0000 R I 
+Fdivf                       0 0000 R I Fmul                        0 0000 R I 
+Fmuld                       0 0000 R I Fmulf                       0 0000 R I 
+Fneg                        0 0000 R I Fnegd                       0 0000 R I 
+Fnegf                       0 0000 R I Fpostdecd                   0 0000 R I 
+Fpostdecf                   0 0000 R I Fpostincd                   0 0000 R I 
+Fpostincf                   0 0000 R I Fpredecd                    0 0000 R I 
+Fpredecf                    0 0000 R I Fpreincd                    0 0000 R I 
+Fpreincf                    0 0000 R I Fpulld                      0 0000 R I 
+Fpullf                      0 0000 R I Fpushc                      0 0000 R I 
+Fpushd                      0 0000 R I Fpushf                      0 0000 R I 
+Fpushi                      0 0000 R I Fpushl                      0 0000 R I 
+Fpushs                      0 0000 R I Fpushuc                     0 0000 R I 
+Fpushui                     0 0000 R I Fpushul                     0 0000 R I 
+Fpushus                     0 0000 R I Fsub                        0 0000 R I 
+Fsubd                       0 0000 R I Fsubf                       0 0000 R I 
+Ftstd                       0 0000 R I Ftstf                       0 0000 R I 
 along                       3 0000 R   cbad                        0 0099 R   
 cgood                       0 009C R   cnext                       0 0068 R   
-ctable                      0 0124 R   done                        0 00A0 R   
-fails                       3 0006 R   helper                      3 0004 R   
+ctable                      0 018F R   dbl                         3 0004 R   
+done                        0 00A0 R   dtoc                        0 0000 R I 
+dtof                        0 0000 R I dtoi                        0 0000 R I 
+dtol                        0 0000 R I dtos                        0 0000 R I 
+dtouc                       0 0000 R I dtoui                       0 0000 R I 
+dtoul                       0 0000 R I dtous                       0 0000 R I 
+dvar                        3 0010 R   fails                       3 001E R   
+fbad                        0 00FC R   fcall                       0 00CA R   
+fdone                       0 010B R   fgood                       0 00FF R   
+flt                         3 000C R   fnext                       0 00A4 R   
+fptr                        3 001F R   fpush                       0 00B5 R   
+fsave                       3 0021 R   ftable                      0 0195 R   
+ftoc                        0 0000 R I ftoi                        0 0000 R I 
+ftol                        0 0000 R I ftos                        0 0000 R I 
+ftouc                       0 0000 R I ftoui                       0 0000 R I 
+ftoul                       0 0000 R I ftous                       0 0000 R I 
+fvar                        3 0018 R   helper                      3 001C R   
 ibad                        0 0031 R   idiv                        0 0000 R I 
 idivu                       0 0000 R I idone                       0 0038 R   
 igood                       0 0034 R   imod                        0 0000 R I 
@@ -142,7 +404,7 @@ imodu                       0 0000 R I imul                        0 0000 R I
 imulu                       0 0000 R I inext                       0 000B R   
 isl                         0 0000 R I islu                        0 0000 R I 
 isr                         0 0000 R I isru                        0 0000 R I 
-itable                      0 00A8 R   ladd_b                      0 0000 R I 
+itable                      0 0113 R   ladd_b                      0 0000 R I 
 laddu_b                     0 0000 R I land_b                      0 0000 R I 
 landu_b                     0 0000 R I lcmp_b                      0 0000 R I 
 lcmpu_b                     0 0000 R I lcom_b                      0 0000 R I 
@@ -157,8 +419,8 @@ lor_b                       0 0000 R I loru_b                      0 0000 R I
 lsl_b                       0 0000 R I lslu_b                      0 0000 R I 
 lsr_b                       0 0000 R I lsru_b                      0 0000 R I 
 lsub_b                      0 0000 R I lsubu_b                     0 0000 R I 
-ltable                      0 00BE R   ltst_b                      0 0000 R I 
-start                       0 0000 R N stop                        0 00A6 R   
+ltable                      0 0129 R   ltst_b                      0 0000 R I 
+start                       0 0000 R N stop                        0 0111 R   
 
 00000 errors
 00000 warnings

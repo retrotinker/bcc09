@@ -1,4 +1,4 @@
-/* run on sim6809: call code from control.c, switch.c and ptr.c, check
+/* run on sim6809: call code from control.c, switch.c, ptr.c and float.c, check
    each result against the value the host compiler gives for the same
    source, and exit with the number of failures */
 
@@ -6,6 +6,9 @@ extern int select(), dense(), loops(), strlen1(), sum(), ptrs();
 extern void copy(), putchar(), putnum();
 extern int tab[];
 extern char buf[];
+extern double fops(), d2;
+extern int fconv();
+extern float f1;
 
 int checks, failures;
 int one = 1;
@@ -118,6 +121,18 @@ int main()
 	check(41, lsecond(0, one ? 1L : 1) == 1L, 1);
 	check(42, lsecond(0, one ? -1L : 1) == -1L, 1);
 	check(43, lodd(2) == 100002L, 1);
+
+	/* doubles passed (on the stack) and returned (in D, X, Y and U),
+	   and float and double globals */
+	check(50, (int) (fops(3.5, 0.5) * 10), 70);
+	check(51, (int) (d2 * 100), 700);
+	check(52, (int) (fops(0.5, 2.0) * 10), 10);
+	check(53, (int) (d2 * 100), -25);
+	check(54, fconv(3), 6);
+	check(55, (int) f1, 3);
+	check(56, (int) d2, 3);
+	check(57, fconv(-5), -11);
+	check(58, (int) (f1 * 4), -20);
 
 	puts1("checks ");
 	putnum(checks);

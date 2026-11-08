@@ -3,15 +3,22 @@ selftest        +selftest.o
 control         +control.o
 switch          +switch.o
 ptr             +ptr.o
+float           +float.o
 laddsub         +libc.a(laddsub.o)
 lcmp            +libc.a(lcmp.o)
+fpcore          +libc.a(fpcore.o)
+fpops           +libc.a(fpops.o)
+fparith         +libc.a(fparith.o)
+fpcmp           +libc.a(fpcmp.o)
+fppush          +libc.a(fppush.o)
+fpconv          +libc.a(fpconv.o)
              simcrt0               _putnum  0  00001020  R
              simcrt0                  stop  0  00001013  r
              simcrt0                io_out  0  0000ff00  a
-             simcrt0                 __end  3  000017a8  R
+             simcrt0                 __end  3  000022c8  R
              simcrt0                    go  0  00001010  r
              simcrt0              _putchar  0  0000101a  R
-             simcrt0               __edata  3  00001778  R
+             simcrt0               __edata  3  00002290  R
              simcrt0                 clear  0  00001007  r
              simcrt0                 start  0  00001000  R N
              simcrt0               io_numh  0  0000ff04  a
@@ -19,32 +26,220 @@ lcmp            +libc.a(lcmp.o)
              simcrt0               io_exit  0  0000ff02  a
             selftest                _puts1  0  0000104e  R
             selftest                 _main  0  00001097  R
-            selftest                  _one  3  00001738  R
-            selftest               _checks  3  00001778  R C
+            selftest                  _one  3  00002244  R
+            selftest               _checks  3  00002290  R C
             selftest              _lsecond  0  00001024  R
             selftest                 _lodd  0  0000102c  R
             selftest                _check  0  00001066  R
-            selftest             _failures  3  0000177c  R C
-             control                _loops  0  000014cb  R
-             control               _select  0  00001478  R
-              switch                _dense  0  0000156c  R
-                 ptr              _strlen1  0  000015b8  R
-                 ptr                 _grid  3  00001780  R C
-                 ptr                 _copy  0  000015d2  R
-                 ptr                   _ip  3  00001774  R
-                 ptr                  _tab  3  0000175c  R
-                 ptr                 _msgs  3  0000176e  R
-                 ptr                  _sum  0  000015ec  R
-                 ptr                  _buf  3  00001798  R C
-                 ptr                 _ptrs  0  00001614  R
-                 ptr                  _msg  3  0000176c  R
-             laddsub                lsub_b  0  00001697  R
-             laddsub                ladd_b  0  00001688  R
-             laddsub               laddu_b  0  00001688  R
-             laddsub               lsubu_b  0  00001697  R
-                lcmp                lcdone  0  000016ba  r
-                lcmp                lcmore  0  000016b3  r
-                lcmp                lcless  0  000016b6  r
-                lcmp                lcmp_b  0  000016a8  R
-                lcmp                ltst_b  0  000016c3  R
-                lcmp               lcmpu_b  0  000016bb  R
+            selftest             _failures  3  00002294  R C
+             control                _loops  0  0000167b  R
+             control               _select  0  00001628  R
+              switch                _dense  0  0000171c  R
+                 ptr              _strlen1  0  00001768  R
+                 ptr                 _grid  3  00002298  R C
+                 ptr                 _copy  0  00001782  R
+                 ptr                   _ip  3  00002280  R
+                 ptr                  _tab  3  00002268  R
+                 ptr                 _msgs  3  0000227a  R
+                 ptr                  _sum  0  0000179c  R
+                 ptr                  _buf  3  000022b0  R C
+                 ptr                 _ptrs  0  000017c4  R
+                 ptr                  _msg  3  00002278  R
+               float                   _f1  3  00002284  R
+               float                   _d1  3  00002288  R
+               float                   _d2  3  000022c0  R C
+               float                 _fops  0  00001838  R
+               float                _fconv  0  000018b1  R
+             laddsub                lsub_b  0  000018ff  R
+             laddsub                ladd_b  0  000018f0  R
+             laddsub               laddu_b  0  000018f0  R
+             laddsub               lsubu_b  0  000018ff  R
+                lcmp                lcdone  0  00001922  r
+                lcmp                lcmore  0  0000191b  r
+                lcmp                lcless  0  0000191e  r
+                lcmp                lcmp_b  0  00001910  R
+                lcmp                ltst_b  0  0000192b  R
+                lcmp               lcmpu_b  0  00001923  R
+              fpcore                   MAN  0  00000004  a
+              fpcore                   mz1  0  00001946  r
+              fpcore                   SGN  0  00000000  a
+              fpcore                  rs2a  0  00001a9e  r
+              fpcore                   CLS  0  00000001  a
+              fpcore                  pd2a  0  00001b2f  r
+              fpcore                   rs3  0  00001aa2  r
+              fpcore                   rs4  0  00001aac  r
+              fpcore                   rs1  0  00001a6b  r
+              fpcore                   rs2  0  00001a8f  r
+              fpcore                   nm3  0  00001a66  r
+              fpcore                   nm1  0  00001a31  r
+              fpcore                   nm2  0  00001a54  r
+              fpcore                   EXP  0  00000002  a
+              fpcore                   pd0  0  00001b21  r
+              fpcore                   pd4  0  00001b5d  r
+              fpcore                   pd1  0  00001b2b  r
+              fpcore                   pd2  0  00001aff  r
+              fpcore               __fpml1  0  00001947  R
+              fpcore                   rd2  0  00001add  r
+              fpcore               __fpmr1  0  00001958  R
+              fpcore                   pf0  0  00001bc0  r
+              fpcore                   pf5  0  00001c0b  r
+              fpcore                   pf3  0  00001bce  r
+              fpcore                   pf4  0  00001bfa  r
+              fpcore                   pf1  0  00001bca  r
+              fpcore                   pf2  0  00001ba2  r
+              fpcore              __fpnorm  0  00001a29  R
+              fpcore                 pdinf  0  00001af9  r
+              fpcore                 pfinf  0  00001b9c  r
+              fpcore                 round  0  00001aaf  r
+              fpcore                 udinf  0  000019ca  r
+              fpcore                  uinf  0  000019d4  r
+              fpcore                __fpuf  0  000019d9  R
+              fpcore                __fpud  0  00001969  R
+              fpcore                __fppd  0  00001ae3  R
+              fpcore                 pdfin  0  00001b0a  r
+              fpcore                 pffin  0  00001ba9  r
+              fpcore                __fppf  0  00001b86  R
+              fpcore                 pdden  0  00001b52  r
+              fpcore                 pfden  0  00001bf1  r
+              fpcore                 pdnan  0  00001aef  r
+              fpcore                pdzero  0  00001af4  r
+              fpcore                pfzero  0  00001b97  r
+              fpcore                 uzero  0  000019c7  r
+              fpcore                 mzero  0  00001938  r
+              fpcore               __fprsh  0  00001a67  R
+              fpcore                 udsub  0  000019b1  r
+              fpcore                 ufsub  0  00001a18  r
+               fpops                   MAN  0  00000004  a
+               fpops                   SGN  0  00000000  a
+               fpops                  ad3a  0  00001c90  r
+               fpops                   CLS  0  00000001  a
+               fpops                  ad2a  0  00001c75  r
+               fpops                   mu9  0  00001de7  r
+               fpops                   dv7  0  00001e90  r
+               fpops                   dv8  0  00001eaf  r
+               fpops                   dv5  0  00001e30  r
+               fpops                   dv6  0  00001e6e  r
+               fpops                   dv3  0  00001e0c  r
+               fpops                   dv4  0  00001e19  r
+               fpops                   dv1  0  00001e04  r
+               fpops                   dv2  0  00001e05  r
+               fpops                   mu1  0  00001d55  r
+               fpops                   mu2  0  00001d5f  r
+               fpops                   mu3  0  00001d64  r
+               fpops                   mu4  0  00001d69  r
+               fpops                   mu5  0  00001d8e  r
+               fpops                   mu6  0  00001d96  r
+               fpops                   mu7  0  00001da3  r
+               fpops                   mu8  0  00001dab  r
+               fpops                   EXP  0  00000002  a
+               fpops                   ad1  0  00001c55  r
+               fpops                   ad2  0  00001c68  r
+               fpops                   ad3  0  00001c8b  r
+               fpops                   ad5  0  00001cca  r
+               fpops                   ad6  0  00001d1d  r
+               fpops                   ad9  0  00001c54  r
+               fpops                   sg3  0  00001d3d  r
+               fpops               __fpmul  0  00001d40  R
+               fpops                  copy  0  00001c19  r
+               fpops                 signs  0  00001d29  r
+               fpops                   nan  0  00001c14  r
+               fpops               __fpadd  0  00001c32  R
+               fpops               __fpdiv  0  00001dee  R
+             fparith                    RA  0  00000000  a
+             fparith                    RB  0  0000000c  a
+             fparith                  LEFT  0  0000001f  a
+             fparith                 RIGHT  0  00000027  a
+             fparith                   ar1  0  00001f07  r
+             fparith                   ar2  0  00001f0c  r
+             fparith                   ar3  0  00001f12  r
+             fparith                   ar4  0  00001f31  r
+             fparith                   ar5  0  00001f2c  r
+             fparith                   ar6  0  00001f39  r
+             fparith                   ar7  0  00001f3c  r
+             fparith                   ar8  0  00001f49  r
+             fparith                   ar9  0  00001f59  r
+             fparith                   OPF  0  00000004  a
+             fparith                    OP  0  00000018  a
+             fparith                   OPS  0  00000008  a
+             fparith                  Fdiv  0  00001ed0  R
+             fparith                 Fmulf  0  00001eeb  R
+             fparith                 Fmuld  0  00001edb  R
+             fparith                 Faddf  0  00001ee3  R
+             fparith                  Fadd  0  00001ec4  R
+             fparith                 Faddd  0  00001ed4  R
+             fparith                 Fsubf  0  00001ee7  R
+             fparith                 Fsubd  0  00001ed7  R
+             fparith                 arith  0  00001ef1  r
+             fparith                 Fdivf  0  00001eef  R
+             fparith                 Fdivd  0  00001edf  R
+             fparith                  Fmul  0  00001ecc  R
+             fparith                  Fsub  0  00001ec8  R
+               fpcmp                   ts0  0  00002044  r
+               fpcmp                   ts1  0  0000203e  r
+               fpcmp                   ts2  0  00002041  r
+               fpcmp                   cm0  0  00001fc2  r
+               fpcmp                   in1  0  00001f84  r
+               fpcmp                   cm5  0  00001fd8  r
+               fpcmp                   in2  0  00001f85  r
+               fpcmp                   cm6  0  00001fe2  r
+               fpcmp                   cm1  0  00001fbf  r
+               fpcmp                   cm2  0  00001fb5  r
+               fpcmp                   cm3  0  00001fc7  r
+               fpcmp                   cm4  0  00001fcb  r
+               fpcmp                   tf1  0  0000205a  r
+               fpcmp                Fcompf  0  0000200d  R
+               fpcmp                 Fcomp  0  00001fe8  R
+               fpcmp                Fcompd  0  00001ffb  R
+               fpcmp               compare  0  00001f99  r
+               fpcmp                   cmm  0  00001fc4  r
+               fpcmp                iszero  0  00001f86  r
+               fpcmp                 isnan  0  00001f60  r
+               fpcmp                 Ftstf  0  00002046  R
+               fpcmp                 Ftstd  0  00002030  R
+              fppush                  room  0  0000206c  r
+              fppush                Fpullf  0  000020e6  R
+              fppush                Fpulld  0  000020d0  R
+              fppush                  dtof  0  000020cb  R
+              fppush                   cpd  0  00002077  r
+              fppush                 Fnegd  0  000020b5  R
+              fppush                 Fnegf  0  000020c5  R
+              fppush                  Fneg  0  000020b9  R
+              fppush                   cvf  0  00002088  r
+              fppush                   cvd  0  0000209c  r
+              fppush                Fpushf  0  000020c0  R
+              fppush                Fpushd  0  000020b0  R
+              fpconv                   MAN  0  00000004  a
+              fpconv                   SGN  0  00000000  a
+              fpconv                   CLS  0  00000001  a
+              fpconv                   pu1  0  0000214d  r
+              fpconv                   pu0  0  0000214b  r
+              fpconv                   ti0  0  000021d0  r
+              fpconv                   ti1  0  000021ca  r
+              fpconv                   ti2  0  000021d5  r
+              fpconv                   EXP  0  00000002  a
+              fpconv                  ftos  0  0000217b  R
+              fpconv                  dtos  0  00002176  R
+              fpconv                  ftoc  0  0000217b  R
+              fpconv                 toint  0  00002194  r
+              fpconv                  dtol  0  0000218b  R
+              fpconv                  dtoi  0  00002176  R
+              fpconv                  ftol  0  00002180  R
+              fpconv                  ftoi  0  0000217b  R
+              fpconv                  dtoc  0  00002176  R
+              fpconv               Fpushul  0  00002116  R
+              fpconv               Fpushui  0  00002111  R
+              fpconv               Fpushuc  0  00002110  R
+              fpconv               Fpushus  0  00002111  R
+              fpconv                Fpushs  0  00002105  R
+              fpconv                  push  0  00002118  r
+              fpconv                Fpushc  0  00002104  R
+              fpconv                Fpushl  0  0000210c  R
+              fpconv                Fpushi  0  00002105  R
+              fpconv                 dtous  0  00002176  R
+              fpconv                 ftous  0  0000217b  R
+              fpconv                 ftoul  0  00002180  R
+              fpconv                 ftoui  0  0000217b  R
+              fpconv                 dtouc  0  00002176  R
+              fpconv                 ftouc  0  0000217b  R
+              fpconv                 dtoul  0  0000218b  R
+              fpconv                 dtoui  0  00002176  R

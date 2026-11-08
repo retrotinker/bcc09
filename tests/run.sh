@@ -160,7 +160,7 @@ rm -f libtest.a
 link helpers	-T0x1000 crt0.o helpmain.o arith.o long.o float.o struct.o \
 		calls.o
 link nomain	-T0x1000 control.o
-# and with libc: what it doesn't have yet
+# and with libc, which has them all
 link helpers-lc	-T0x1000 crt0.o helpmain.o arith.o long.o float.o struct.o \
 		calls.o -L"$LIBDIR" -lc
 
@@ -198,19 +198,19 @@ run badaddr.oc "$OC" -T 0x10000 prog.out bad.out
 rm -f nodata.os9 bad.out
 
 # programs run on sim6809: selftest.c calls code from control.c,
-# switch.c and ptr.c and checks the results against the host compiler's,
+# switch.c, ptr.c and float.c and checks the results against the host compiler's,
 # so its exit status is the number of failed checks; once as compiled,
 # and once with every module compiled with -O
-selfobjs="simcrt0.o selftest.o control.o switch.o ptr.o"
+selfobjs="simcrt0.o selftest.o control.o switch.o ptr.o float.o"
 link selftest	-m -M -T0x1000 $selfobjs -L"$LIBDIR" -lc
 "$OC" -O srec selftest.out selftest.srec
 "$SIM" -n 1000000 selftest.srec > selftest.run 2>&1
 echo $? > selftest.run.rc
-for f in selftest control switch ptr; do
+for f in selftest control switch ptr float; do
 	run $f-O.c.cc "$BCC" -O -c -o $f-O.o $f.c
 done
 link selftest-O	-T0x1000 simcrt0.o selftest-O.o control-O.o switch-O.o ptr-O.o \
-		-L"$LIBDIR" -lc
+		float-O.o -L"$LIBDIR" -lc
 "$OC" -O srec selftest-O.out selftest-O.srec
 "$SIM" -n 1000000 selftest-O.srec > selftest-O.run 2>&1
 echo $? > selftest-O.run.rc
@@ -222,9 +222,11 @@ rm -f selftest.srec selftest-O.srec selftest-O.out selftest-O.map \
 # for constants) and memcpy against tables from tests/gen-opsdata.py;
 # longops.c checks 32-bit long arithmetic, comparisons, shifts, unary
 # operations, ++, -- and conversions against tables from
-# tests/gen-longdata.py; each exits with the number of failures;
+# tests/gen-longdata.py; fptest.c checks floating point arithmetic,
+# comparisons, ++, -- and conversions against tables from
+# tests/gen-fpdata.py; each exits with the number of failures;
 # regtest.s checks that each helper leaves alone the registers the
-# compiler relies on
+# compiler relies on (and, for floating point, the stack)
 link ops	-T0x1000 simcrt0.o ops.o -L"$LIBDIR" -lc
 "$OC" -O srec ops.out ops.srec
 "$SIM" -n 50000000 ops.srec > ops.run 2>&1
@@ -233,11 +235,16 @@ link longops	-T0x1000 simcrt0.o longops.o -L"$LIBDIR" -lc
 "$OC" -O srec longops.out longops.srec
 "$SIM" -n 500000000 longops.srec > longops.run 2>&1
 echo $? > longops.run.rc
+run fptest.c.cc "$BCC" -c -o fptest.o fptest.c
+link fptest	-T0x1000 simcrt0.o fptest.o -L"$LIBDIR" -lc
+"$OC" -O srec fptest.out fptest.srec
+"$SIM" -n 50000000 fptest.srec > fptest.run 2>&1
+echo $? > fptest.run.rc
 link regtest	-T0x1000 regtest.o -L"$LIBDIR" -lc
 "$OC" -O srec regtest.out regtest.srec
 "$SIM" -n 1000000 regtest.srec > regtest.run 2>&1
 echo $? > regtest.run.rc
-rm -f ops.srec longops.srec regtest.srec
+rm -f ops.srec longops.srec fptest.srec regtest.srec
 
 # libc's C functions, mostly compiled by bcc09 from dev86's C: strtest.c
 # checks string.h's, stdtest.c ctype.h's and stdlib.h's, maltest.c
@@ -291,9 +298,9 @@ done
 # functions; chartest.c passes and returns chars with prototypes; sadd.c
 # adds and subtracts ints and signed chars; sftest.c prints a grid of
 # sscanf formats and inputs, and reads sftest.in with scanf, which must
-# be the same with the host's scanf; and a target with no start-up code
-# yet can't be linked
-for f in hello echo pftest siotest chartest sadd sftest; do
+# be the same with the host's scanf; fltcc.c uses floats and doubles in
+# many ways; and a target with no start-up code yet can't be linked
+for f in hello echo pftest siotest chartest sadd sftest fltcc; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -302,10 +309,10 @@ for f in hello echo pftest siotest chartest sadd sftest; do
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
-# pftest.c, chartest.c, sadd.c and sftest.c must print the same with the
-# host's compiler and C library (but for the count of checks, which
-# differs)
-for f in pftest chartest sadd sftest; do
+# pftest.c, chartest.c, sadd.c, sftest.c and fltcc.c must print the same
+# with the host's compiler and C library (but for the count of checks,
+# which differs)
+for f in pftest chartest sadd sftest fltcc; do
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
 	if ${CC:-cc} -std=gnu89 -w -o $f-host $f.c > /dev/null 2>&1 &&
@@ -338,7 +345,7 @@ rm -f cbrom.o cbrom.out cbrom.srec cbtest.srec cbtest-rom.srec
 # copt's rules, checked by running code: each program above that runs
 # on sim6809 is built again with -O (libc is always built with -O), and
 # must give the same output and exit status as without
-for f in ops longops strtest stdtest maltest vatest; do
+for f in ops longops fptest strtest stdtest maltest vatest; do
 	"$BCC" -O -c -o $f-O.o $f.c > /dev/null 2>&1
 	"$LD" -T0x1000 -o $f-O.out simcrt0.o $f-O.o -L"$LIBDIR" -lc \
 		> /dev/null 2>&1
@@ -353,7 +360,7 @@ for f in ops longops strtest stdtest maltest vatest; do
 	fi
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
-for f in hello echo pftest siotest chartest sadd sftest; do
+for f in hello echo pftest siotest chartest sadd sftest fltcc; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null

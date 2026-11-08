@@ -56,6 +56,8 @@ RAND_OBJS = stdlib/rand.o stdlib/srand.o
 OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/laddsub.o bcc/llogic.o bcc/lcmp.o bcc/lunary.o \
 	  bcc/lincdec.o bcc/lshift.o bcc/lmul.o bcc/ldiv.o \
+	  bcc/fpcore.o bcc/fpops.o bcc/fparith.o bcc/fpcmp.o bcc/fppush.o \
+	  bcc/fpconv.o bcc/fpincdec.o \
 	  ctype/ctype.o ctype/ctypefn.o \
 	  $(MALLOC_OBJS) $(STDIO_OBJS) $(PRINTF_OBJS) $(SCANF_OBJS) \
 	  stdlib/exit.o stdlib/atexit.o stdlib/errno.o \

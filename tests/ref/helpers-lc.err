@@ -1,15 +1,2 @@
-undefined symbol: Fpulld
-undefined symbol: Fmuld
-undefined symbol: dtoi
-undefined symbol: dtof
-undefined symbol: Fcompd
-undefined symbol: Faddd
-undefined symbol: Fsubd
-undefined symbol: Fnegd
-undefined symbol: Fpushf
-undefined symbol: Fpushd
-undefined symbol: Fpushi
-undefined symbol: Fdivd
-undefined symbol: Fmul
 undefined symbol: _ext_var
 undefined symbol: _ext_func

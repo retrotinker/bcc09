@@ -39,7 +39,12 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   prog.c` builds a whole program. libc has the 16- and 32-bit run-time helpers
   (`libc/bcc/`), `string.h`, `ctype.h`, `stdlib.h` with `malloc`, `stdarg.h` and `stdio.h`
   (dev86's `FILE` layer, and new `printf` and `scanf` families that match glibc); mostly
-  dev86's C, compiled by `bcc09` itself. No floating point yet.
+  dev86's C, compiled by `bcc09` itself. Floating point (started 2026-11-08) is IEEE 754
+  single and double, big-endian, in software: the helpers `cc1` calls are in
+  `libc/bcc/fp*.s` (round to nearest even, denormals, infinities, NaNs; results must equal
+  the host's); `printf`/`scanf` don't do `%f`/`%e`/`%g` yet, and there is no `math.h`.
+  A double argument is always passed on the stack (even the first); a double result is in
+  D, X, Y, U (in that order in memory), a float result in D:X; the helpers keep Y and U.
   `libc/README` gives the calling conventions and the changes from dev86.
 - Start-up: `crt0` clears the BSS and calls `main`; when `main` returns, `exit()` runs the
   `atexit()` functions and the target's `_exit()`. The heap grows from `__end` up to the
@@ -56,7 +61,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
   - The others can't link yet.
 - Next: Disk BASIC files for `-Me`, OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code
-  has a known bug), FLEX, floating point.
+  has a known bug), FLEX, floating point in `printf`/`scanf` (`strtod`, exact decimal
+  conversion) and `math.h`.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
@@ -84,7 +90,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 479 reference
+  `tests/src/` with this tree's tools and compare every result with the 497 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -96,13 +102,17 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - Test programs run on `sim6809`, a copy of the simulator from the plm09 project in
   `tests/sim/` (see its README). `tests/src/selftest.c` checks code from the other test
   sources against values from the host compiler and exits with the number of failures;
-  it runs both as compiled and with `-O`. It can't use code that needs the run-time
-  helpers that libc doesn't have yet (float).
+  it runs both as compiled and with `-O`; it also calls `float.c` (double arguments
+  and results).
 - `tests/src/ops.c` checks libc's 16-bit helpers and `memcpy` against `tests/src/opsdata.h`,
   which `tests/gen-opsdata.py` generates from a model of 16-bit C (rerun it after changing
   the operands or the model); `tests/src/longops.c` does the same for `long` with
-  `tests/src/longdata.h` and `tests/gen-longdata.py`. `tests/src/regtest.s` checks
-  that the helpers keep the registers the compiler relies on. `crtret.c` and `crtexit.c`
+  `tests/src/longdata.h` and `tests/gen-longdata.py`; `tests/src/fptest.c` checks the
+  floating point helpers (arithmetic, comparisons, `++`/`--`, conversions) against
+  `tests/src/fpdata.h` from `tests/gen-fpdata.py` (Python's doubles, and an exact model
+  of rounding to float), whose tables must stay below `simcrt0.s`'s stack at `$7F00`.
+  `tests/src/regtest.s` checks that the helpers keep the registers the compiler relies
+  on (and, for floating point, pop and push what it expects). `crtret.c` and `crtexit.c`
   are built by `bcc09` alone (with `crt0` and `libc`) and run under `loader.s`, which
   calls `start` as a loader would and checks that the stack comes back; `crtatexit.c`
   checks that returning from `main` runs the `atexit()` functions.
@@ -114,8 +124,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - `tests/src/pftest.c` (built with `-Mi`) prints a grid of `printf` formats, which must
   be byte-for-byte what the host's `printf` prints (as must `chartest.c`, chars passed
   and returned with prototypes, and `sadd.c`, ints and signed chars added and
-  subtracted, and `sftest.c`, a grid of `sscanf` formats and inputs and `scanf` reading
-  `sftest.in`, but for their counts of checks); `siotest.c` checks the `FILE`
+  subtracted, `sftest.c`, a grid of `sscanf` formats and inputs and `scanf` reading
+  `sftest.in`, and `fltcc.c`, floats and doubles in many places in C, but for their
+  counts of checks); `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
 - `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
   ROMs, in `~/.xroar/roms`) builds `tests/xroar/xcb.c` with `-Me`, puts it on a cassette
@@ -124,7 +135,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
   it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
   `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
-- Thirteen test programs are built again with `-O` and must run the same
+- Fifteen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
