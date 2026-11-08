@@ -1,2 +1,49 @@
 OBJECTFILE 'modes.o'
-Error: Bad magic number
+MODULE  'modes'
+BYTEPOS 0000008e
+BINLEN  000000be
+STRINGS 004f +003f
+VERSION 0.0
+SEG0 000000a2
+SEG3 0000001c
+
+SYMS 10
+SYM 0    00000005 ....A small
+SYM 1    00000000 ....D table
+SYM 2    000000a1 ....T far
+SYM 3    00000000 ..E.T modes
+SYM 4    00000067 ....T back
+SYM 5    000000a0 ....T sub
+SYM 6    0000007d ....T fwd
+SYM 7    00000000 ...IT faraway
+SYM 8    0000001a ....D counter
+SYM 9    00001234 ....A value
+
+text	data	bss	dec	hex	filename
+162	28	0	190	be	modes.o
+
+BYTECODE
+SEG 0
+: 12 4f 5f 1d 3a 3d 19 39  86 12 c6 05 cc 12 34 8e  .O_.:=.9......4.
+RELSZ 2
+DW SEG3
+: 10 8e ff ff 10 ce 7f 00  ce 00 00 81 41 1c af 1a  ............A...
+: 50 96 20 97 21 fc 10 00  fd 12 34 bd              P...!.....4.    
+DW faraway
+: 7c                                                |               
+DW SEG3+0x001a
+: a6 84 a6 05 a6 3b a6 c8  64 a6 e9 fe d4 a6 89 03  .....;..d.......
+: e8 a6 86 a6 a5 a6 cb a6  80 a6 81 a6 a2 a6 a3 a6  ................
+: 94 a6 b8 0a a6 d1 a6 9f  12 34 30 8d              .........40.    
+DW SEG3-PC
+: 31 21 32 7c 33 8b 20 fe  26 12 27 fa 24 0e 2b f6  1!2|3...&.'.$.+.
+: 8d 2d 16 00 2b 10 27 00  27 17 00 23 21 fe 1f 12  .-..+.'.'..#!...
+: 1f 8b 1e 03 34 f6 35 09  36 46 37 10 10 83 00 00  ....4.5.6F7.....
+: 11 a3 e4 11 bc 12 34 3f  10 3f 11 3f 3c ef 13 39  ......4?.?.?<..9
+: 3b                                                ;               
+SEG 3
+: 01 02 03 ff 12 34                                 .....4          
+DW SEG0
+: ff ff 74 65 78 74 78 00  ab cd 61 62 63           ..textx...abc   
+SKP 7
+

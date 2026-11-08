@@ -1,2 +1,46 @@
 OBJECTFILE 'main.o'
-Error: Bad magic number
+MODULE  'main'
+BYTEPOS 0000005a
+BINLEN  00000034
+STRINGS 0032 +0028
+VERSION 0.0
+SEG0 00000034
+
+SYMS 5
+SYM 0    00000000 ..E.T _main
+SYM 1    00000000 ...IU _loops
+SYM 2    00000000 ...IU _select
+SYM 3    00000000 ...IU _ptrs
+SYM 4    00000008 ...ID _result
+
+text	data	bss	dec	hex	filename
+52	0	8	60	3c	main.o
+
+BYTECODE
+SEG 0
+: 8e 00 0c bd                                       ....            
+RELSZ 2
+DW _loops
+: bf                                                .               
+DW _result
+: 8e 00 01 bd                                       ....            
+DW _select
+: 34 10 8e 00 07 bd                                 4.....          
+DW _select
+: 1f 10 e3 e1 fd                                    .....           
+DW _result+0x0002
+: bd                                                .               
+DW _ptrs
+: bf                                                .               
+DW _result+0x0004
+: fc                                                .               
+DW _result
+: f3                                                .               
+DW _result+0x0002
+: f3                                                .               
+DW _result+0x0004
+: fd                                                .               
+DW _result+0x0006
+: 8e 00 00 39                                       ...9            
+SEG 3
+

@@ -115,9 +115,10 @@ fi > main-as.result
 rm -f main-as.o
 
 # the librarian: the member list only, since the member headers hold
-# file dates
+# file dates; and objdump09 on the archive, which shows each member
 run libtest.ar "$AR" rc libtest.a control.o ptr.o
 "$AR" t libtest.a > libtest.t
+"$OD" libtest.a > libtest.a.dump 2>&1
 
 # the linker: the test program, from objects and from the library, with
 # maps; stripped; headerless; with separate data; at address 0 (for
@@ -151,6 +152,7 @@ for f in prog prog-s prog-D; do
 	"$OD" $f.out > $f.dump 2>&1
 done
 "$OD" -n prog.out > prog.nm 2>&1
+"$OD" -n main.o > main.o.nm 2>&1
 
 # objcopy09: each output format, and separate data (-D); the load
 # addresses are given, since ld09 only writes __btext and __bdata to the

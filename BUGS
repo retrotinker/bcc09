@@ -44,15 +44,6 @@ cc1 (code generation)
     TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X
   (Not covered by the tests.)
 
-objdump09 (and nm09, size09)
-----------------------------
-
-- Object files are rejected with "Bad magic number": objdump86.c checks
-  for the x86 dev86 magic number (A3 86), but as09 and ld09 use "S1"
-  (OMAGIC 0x5331 in ld/obj.h).  Executables are read.
-  objdump01 in retrotinker/mc6801-tools has this fixed.
-  References: crt0.o.dump, modes.o.dump, main.o.dump, long.o.dump
-
 ld09 and objcopy09
 ------------------
 

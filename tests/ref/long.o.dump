@@ -1,2 +1,179 @@
 OBJECTFILE 'long.o'
-Error: Bad magic number
+MODULE  'long'
+BYTEPOS 00000112
+BINLEN  00000173
+STRINGS 0081 +0091
+VERSION 0.0
+SEG0 00000167
+SEG3 0000000c
+
+SYMS 23
+SYM 0    00000000 ..E.D _l1
+SYM 1    00000004 ..E.D _l2
+SYM 2    00000004 ...ID _l3
+SYM 3    00000000 ...IU lor_b
+SYM 4    00000000 ...IU lsl_b
+SYM 5    00000000 ...IU lsr_b
+SYM 6    00000000 ...IU lsub_b
+SYM 7    00000000 ...IU linc_b
+SYM 8    00000000 ...IU ldec_b
+SYM 9    00000000 ...IU ladd_b
+SYM 10   00000000 ...IU lmod_b
+SYM 11   00000000 ...IU land_b
+SYM 12   00000000 ..E.T _lops
+SYM 13   00000112 ..E.T _conv
+SYM 14   00000000 ...IU lneg_b
+SYM 15   00000002 ...ID _i
+SYM 16   00000000 ...IU lmul_b
+SYM 17   00000000 ...IU lcom_b
+SYM 18   00000000 ...IU lcmp_b
+SYM 19   00000000 ...IU leor_b
+SYM 20   00000000 ...IU lsru_b
+SYM 21   00000008 ..E.D _ul
+SYM 22   00000000 ...IU ldiv_b
+
+text	data	bss	dec	hex	filename
+359	12	6	377	179	long.o
+
+BYTECODE
+SEG 0
+SEG 3
+: 00 01 86 a0 ff ff ff fb  80 00 00 00              ............    
+SEG 0
+: 34 16 ec e4 ae 62 31 66  bd                       4....b1f.       
+RELSZ 2
+DW ladd_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 31 66 bd                              ...b1f.         
+DW lsub_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 31 66 bd                              ...b1f.         
+DW lmul_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 31 66 bd                              ...b1f.         
+DW ldiv_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 31 66 bd                              ...b1f.         
+DW lmod_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 31 66 bd                              ...b1f.         
+DW land_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 31 66 bd                              ...b1f.         
+DW lor_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 31 66 bd                              ...b1f.         
+DW leor_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 bd                                    ...b.           
+DW lneg_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 bd                                    ...b.           
+DW lcom_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 10 8e 00 04  bd                       ...b.....       
+DW lsl_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: ec e4 ae 62 10 8e 00 04  bd                       ...b.....       
+DW lsr_b
+: fd                                                .               
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: fc                                                .               
+DW SEG3+0x0008
+: be                                                .               
+DW SEG3+0x000a
+: 10 8e 00 03 bd                                    .....           
+DW lsru_b
+: fd                                                .               
+DW SEG3+0x0008
+: bf                                                .               
+DW SEG3+0x000a
+: ec 66 ae 68 31 e4 bd                              .f.h1..         
+DW lcmp_b
+: 10 2f 00 0c fc                                    ./...           
+DW _l3
+: fe                                                .               
+DW _l3+0x0002
+: 8e                                                .               
+DW _l3
+: bd                                                .               
+DW linc_b
+: cc 00 00 8e 00 00 34 16  ec 64 ae 66 31 e4 bd     ......4..d.f1.. 
+DW lcmp_b
+: 32 64 10 26 00 0c fc                              2d.&...         
+DW _l3
+: fe                                                .               
+DW _l3+0x0002
+: 8e                                                .               
+DW _l3
+: bd                                                .               
+DW ldec_b
+: cc 00 00 8e 00 03 31 e4  bd                       ......1..       
+DW lmul_b
+: 35 e0 fc                                          5..             
+DW _i
+: 1f 01 5f 49 c2 00 1d fd                           .._I....        
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: fc                                                .               
+DW SEG3+0x0002
+: fd                                                .               
+DW _i
+: fc                                                .               
+DW _i
+: 1e 01 cc 00 00 fd                                 ......          
+DW _l3
+: bf                                                .               
+DW _l3+0x0002
+: fc                                                .               
+DW _i
+: 1f 01 5f 49 c2 00 1d 34  16 cc 00 01 8e 00 00 31  .._I...4.......1
+: e4 bd                                             ..              
+DW lmul_b
+: 32 64 fd                                          2d.             
+DW SEG3+0x0008
+: bf                                                .               
+DW SEG3+0x000a
+: fc                                                .               
+DW SEG3
+: be                                                .               
+DW SEG3+0x0002
+: 1f 01 5f 49 c2 00 1d 1f  10 1f 01 39              .._I.......9    
+SEG 3
+

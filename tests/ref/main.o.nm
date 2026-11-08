@@ -1,0 +1,5 @@
+00000000 T _main
+         U _loops
+         U _select
+         U _ptrs
+00000008 C _result

@@ -1,2 +1,33 @@
 OBJECTFILE 'crt0.o'
-Error: Bad magic number
+MODULE  'crt0'
+BYTEPOS 00000069
+BINLEN  00000015
+STRINGS 003c +002d
+VERSION 0.0
+SEG0 00000015
+
+SYMS 7
+SYM 0    00000013 ....T stop
+SYM 1    00000000 ...IT _main
+SYM 2    00000000 ...ID __end
+SYM 3    00000010 ....T go
+SYM 4    00000000 ...ID __edata
+SYM 5    00000007 ....T clear
+SYM 6    00000000 .NE.T start
+
+text	data	bss	dec	hex	filename
+21	0	0	21	15	crt0.o
+
+BYTECODE
+SEG 0
+SEG 3
+SEG 0
+: 10 ce 7f 00 8e                                    .....           
+RELSZ 2
+DW __edata
+: 8c                                                .               
+DW __end
+: 24 04 6f 80 20 f7 bd                              $.o....         
+DW _main
+: 20 fe                                             ..              
+
