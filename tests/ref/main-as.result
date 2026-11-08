@@ -1,0 +1,1 @@
+ok   bcc09 -c gives the same object as bcc09 -S and as09

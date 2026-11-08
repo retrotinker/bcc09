@@ -1,0 +1,110 @@
+00001                   ; 6809 instructions in each addressing mode, and assembler pseudo-ops
+00002                   
+00003 0000              	.text
+00004                   	export	modes
+00005                   	import	faraway
+00006             1234  value	equ	$1234
+00007             0005  small	equ	5
+00008                   
+00009             0000> modes:
+00010                   ; inherent
+00011 0000   12         	nop
+00012 0001   4F         	clra
+00013 0002   5F         	clrb
+00014 0003   1D         	sex
+00015 0004   3A         	abx
+00016 0005   3D         	mul
+00017 0006   19         	daa
+00018 0007   39         	rts
+00019                   ; immediate
+00020 0008   86     12  	lda	#$12
+00021 000A   C6     05  	ldb	#small
+00022 000C   CC   1234  	ldd	#value
+00023 000F   8E   0000> 	ldx	#table
+00024 0012 108E   FFFF  	ldy	#-1
+00025 0016 10CE   7F00  	lds	#$7f00
+00026 001A   CE   0000  	ldu	#0
+00027 001D   81     41  	cmpa	#'A
+00028 001F   1C     AF  	andcc	#$af
+00029 0021   1A     50  	orcc	#$50
+00030                   ; direct and extended
+00031 0023   96     20  	lda	<$20
+00032 0025   97     21  	sta	<$21
+00033 0027   FC   1000  	ldd	>$1000
+00034 002A   FD   1234  	std	value
+00035 002D   BD   0000> 	jsr	>faraway
+00036 0030   7C   001A> 	inc	counter
+00037                   ; indexed
+00038 0033   A6     84  	lda	,x
+00039 0035   A6     05  	lda	5,x
+00040 0037   A6     3B  	lda	-5,y
+00041 0039   A6C8   64  	lda	100,u
+00042 003C   A6E9 FED4  	lda	-300,s
+00043 0040   A689 03E8  	lda	1000,x
+00044 0044   A6     86  	lda	a,x
+00045 0046   A6     A5  	lda	b,y
+00046 0048   A6     CB  	lda	d,u
+00047 004A   A6     80  	lda	,x+
+00048 004C   A6     81  	lda	,x++
+00049 004E   A6     A2  	lda	,-y
+00050 0050   A6     A3  	lda	,--y
+00051 0052   A6     94  	lda	[,x]
+00052 0054   A6B8   0A  	lda	[10,y]
+00053 0057   A6     D1  	lda	[,u++]
+00054 0059   A69F 1234  	lda	[value]
+00055 005D   308D 0000> 	leax	table,pcr
+00056 0061   31     21  	leay	1,y
+00057 0063   32     7C  	leas	-4,s
+00058 0065   33     8B  	leau	d,x
+00059                   ; relative branches
+00060 0067   20     FE  back:	bra	back
+00061 0069   26     12  	bne	fwd
+00062 006B   27     FA  	beq	back
+00063 006D   24     0E  	bcc	fwd
+00064 006F   2B     F6  	bmi	back
+00065 0071   8D     2D  	bsr	sub
+00066 0073   16   002B  	lbra	far
+00067 0076 1027   0027  	lbeq	far
+00068 007A   17   0023  	lbsr	sub
+00069 007D   21     FE  fwd:	brn	fwd
+00070                   ; register operations
+00071 007F   1F     12  	tfr	x,y
+00072 0081   1F     8B  	tfr	a,dp
+00073 0083   1E     03  	exg	d,u
+00074 0085   34     F6  	pshs	a,b,x,y,u,pc
+00075 0087   35     09  	puls	cc,dp
+00076 0089   36     46  	pshu	d,s
+00077 008B   37     10  	pulu	x
+00078 008D 1083   0000  	cmpd	#0
+00079 0091 11A3     E4  	cmpu	,s
+00080 0094 11BC   1234  	cmps	value
+00081 0098   3F         	swi
+00082 0099 103F         	swi2
+00083 009B 113F         	swi3
+00084 009D   3C     EF  	cwai	#$ef
+00085 009F   13         	sync
+00086 00A0   39         sub:	rts
+00087 00A1   3B         far:	rti
+00088                   
+00089 0000              	.data
+00090 0000          01  table:	fcb	1,2,3,$ff
+00091 0004        1234  	fdb	value,modes,-1
+00092 000A          74  	fcc	"text"
+00093 000E          78  	.byte	'x,0
+00094 0010        ABCD  	.word	$abcd
+00095 0012          61  	.ascii	"abc"
+00096 0015        0003  	.blkb	3
+00097 0018        0002  	rmb	2
+00098                   
+00099 001A              	.bss
+00100 001A        0002  counter: .blkb	2
+
+Symbols:
+back                        0 0067 R   counter                     3 001A R   
+far                         0 00A1 R   faraway                     0 0000 R I 
+fwd                         0 007D R   modes                       0 0000 R E 
+small                       0 0005 A   sub                         0 00A0 R   
+table                       3 0000 R   value                       0 1234 A   
+
+00000 errors
+00000 warnings

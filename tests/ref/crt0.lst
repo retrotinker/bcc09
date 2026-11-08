@@ -1,0 +1,26 @@
+00001                   ; minimal start-up code: set the stack, clear the BSS, call main, stop
+00002                   
+00003 0000              	.data			; the linker defines these in the data segment,
+00004                   	import	__edata		; so they must be imported there
+00005                   	import	__end
+00006                   
+00007 0000              	.text
+00008                   	entry	start
+00009                   	import	_main
+00010 0000 10CE   7F00  start:	lds	#$7f00
+00011 0004   8E   0000> 	ldx	#__edata
+00012 0007   8C   0000> clear:	cmpx	#__end
+00013 000A   24     04  	bhs	go
+00014 000C   6F     80  	clr	,x+
+00015 000E   20     F7  	bra	clear
+00016 0010   BD   0000> go:	jsr	_main
+00017 0013   20     FE  stop:	bra	stop
+
+Symbols:
+__edata                     3 0000 R I __end                       3 0000 R I 
+_main                       0 0000 R I clear                       0 0007 R   
+go                          0 0010 R   start                       0 0000 R N 
+stop                        0 0013 R   
+
+00000 errors
+00000 warnings

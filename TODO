@@ -11,14 +11,6 @@
 - Need runtime init of statically initialized pointer data (ctors/dtors?)
   for PIC code (and corresponding support in startup code)
 - Improve "-C-p" option for data position independence (for use w/ OS-9)
-- In PIC mode, global (bss?) pointers and arrays are using PC-relative
-  addressing rather than direct addressing
-- Pointers to direct page objects don't work
-  (LEAX <_foo -> LDD #_foo ; TFR DP,A ; TFR D,X)
-  (           -> LEAS -1,S ; CLR 0,S ; PSHS DP ; PULS X ; LEAX _foo,X)
-  (           -> TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X)
-  (           -> TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X)
-- Create a BUGS file for items like the last two?
 - Add support for Color TRSDOS (i.e. Disk EDTASM) environment?
 - Add code generation option for 6309
 - Implement more/better copt rules

@@ -28,6 +28,20 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `.tok` file, run `make -C cpp tokens` (needs gperf 3.1 or later, which uses `size_t`
   lengths).
 
+## Tests
+
+- `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
+  `tests/src/` with this tree's tools and compare every result with the 215 reference
+  files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
+  files before committing them.
+- The references record current behavior, bugs included. `BUGS` lists the known bugs
+  and the reference files that show each one; a fix changes those references.
+- The tests run the tools through links in `tests/prefix.tmp/` and set `BCC_PREFIX`, so
+  an installed copy (such as an old one in `/usr/local/bcc09`) is never used.
+- `ld09` only loads modules that something refers to, even object files named on the
+  command line.
+- There's no 6809 simulator yet, so the tests check output, not that programs run.
+
 ## Known issues
 
 - The code is K&R C, so every Makefile builds with `-std=gnu89`. Without it, GCC 15 and

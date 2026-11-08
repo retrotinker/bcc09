@@ -1,0 +1,71 @@
+00001                   ; 1 
+00002                   ; 1 # 1 "main.c"
+00003                   ; 1  
+00004                   ; 2 
+00005                   ; 3 extern int loops(), select(), ptrs();
+00006                   ;BCC_EOS
+00007                   ; 4 
+00008                   ; 5 int result[4];
+00009                   ;BCC_EOS
+00010                   ; 6 
+00011                   ; 7 int main()
+00012                   ; 8 {
+00013                   	EXPORT	_main
+00014             0000> _main:
+00015                   ; 9 	result[0] = loops(12);
+00016                   ; Debug: rootlist int = const $C (used reg = )
+00017 0000   8E   000C  	LDX	#$C
+00018                   ; Debug: func () int = loops+0 (used reg = )
+00019 0003   BD   0000> 	JSR	>_loops
+00020                   ; Debug: eq int = X+0 to int = [result+0] (used reg = )
+00021 0006   BF   0000> 	STX	>_result
+00022                   ;BCC_EOS
+00023                   ; 10 	result[1] = select(7) + select(1);
+00024                   ; Debug: rootlist int = const 1 (used reg = )
+00025 0009   8E   0001  	LDX	#1
+00026                   ; Debug: func () int = select+0 (used reg = )
+00027 000C   BD   0000> 	JSR	>_select
+00028 000F   34     10  	PSHS	X
+00029                   ; Debug: rootlist int = const 7 (used reg = )
+00030 0011   8E   0007  	LDX	#7
+00031                   ; Debug: func () int = select+0 (used reg = )
+00032 0014   BD   0000> 	JSR	>_select
+00033                   ; Debug: add int (temp) = [S+2-2] to int = X+0 (used reg = )
+00034 0017   1F     10  	TFR	X,D
+00035 0019   E3     E1  	ADDD	,S++
+00036                   ; Debug: eq int = D+0 to int = [result+2] (used reg = )
+00037 001B   FD   0002> 	STD	>_result+2
+00038                   ;BCC_EOS
+00039                   ; 11 	result[2] = ptrs();
+00040                   ; Debug: func () int = ptrs+0 (used reg = )
+00041 001E   BD   0000> 	JSR	>_ptrs
+00042                   ; Debug: eq int = X+0 to int = [result+4] (used reg = )
+00043 0021   BF   0004> 	STX	>_result+4
+00044                   ;BCC_EOS
+00045                   ; 12 	result[3] = result[0] + result[1] + result[2];
+00046                   ; Debug: add int = [result+2] to int = [result+0] (used reg = )
+00047 0024   FC   0000> 	LDD	>_result
+00048 0027   F3   0002> 	ADDD	>_result+2
+00049                   ; Debug: add int = [result+4] to int = D+0 (used reg = )
+00050 002A   F3   0004> 	ADDD	>_result+4
+00051                   ; Debug: eq int = D+0 to int = [result+6] (used reg = )
+00052 002D   FD   0006> 	STD	>_result+6
+00053                   ;BCC_EOS
+00054                   ; 13 	return 0;
+00055 0030   8E   0000  	LDX	#0
+00056 0033   39         	RTS
+00057                   ;BCC_EOS
+00058                   ; 14 }
+00059                   ; 15 
+00060 0000              	LOC	3
+00061             0008> _result		COMM	8
+00062                   
+00063                   ; 0 errors detected
+
+Symbols:
+_loops                      F 0000 R I _main                       0 0000 R E 
+_ptrs                       F 0000 R I _result                     3 0008 R C 
+_select                     F 0000 R I 
+
+00000 errors
+00000 warnings

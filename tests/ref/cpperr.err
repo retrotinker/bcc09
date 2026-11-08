@@ -1,0 +1,3 @@
+cpperr.c:3: error: Bad #define command
+cpperr.c:4: error: Cannot open include file
+cpperr.c:7: error: #error stop here

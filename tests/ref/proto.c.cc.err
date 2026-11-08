@@ -1,0 +1,11 @@
+00040 0031   1F     91  	TFR	B,X
+*****                                     ^illegal register
+00052 0047   1F     19  	TFR	X,B
+*****                                     ^illegal register
+00040 0031   1F     91  	TFR	B,X
+*****                                     ^illegal register
+00052 0047   1F     19  	TFR	X,B
+*****                                     ^illegal register
+
+00002 errors
+00000 warnings

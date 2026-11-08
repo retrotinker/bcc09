@@ -1,0 +1,7 @@
+3 0000 --IR- __edata
+3 0000 --IR- __end
+0 0000 --IR- _main
+0 0007 ---R- clear
+0 0010 ---R- go
+0 0000 EN-R- start
+0 0013 ---R- stop

@@ -1,0 +1,70 @@
+Known bugs
+
+The regression tests (tests/run.sh) compare the tools' output with
+reference copies in tests/ref, which record what the tools do today,
+bugs included.  Each bug below names the reference files that show its
+wrong output: fixing the bug changes them, so check the new output and
+update the references (tests/run.sh -u) in the same commit, and remove
+the entry from this file.
+
+cpp
+---
+
+- Token pasting (##) doesn't paste: with "#define CAT(a, b) a##b",
+  CAT(var, 1) gives "var 1" and CAT(0x, ff) gives "0x ff", in ANSI
+  mode (-A) too.
+  References: cpp.i, cpp-A.i, cpp-D.i, cpp-E.i
+
+- #line is ignored: after '#line 500 "renamed.c"', __LINE__ gives the
+  real line number (53), and __FILE__ isn't renamed.
+  References: cpp.i, cpp-A.i, cpp-D.i, cpp-E.i
+
+- "#if" with no expression isn't an error, and "Cannot open include
+  file" doesn't say which file.
+  References: cpperr.err, cpperr.i
+
+cc1 (code generation)
+---------------------
+
+- A switch dense enough to be compiled as a jump table loads the
+  table's address with "LDX #.B:", a label definition (with its colon)
+  where an operand should be, which the assembler rejects.  casejump()
+  in bcc/codefrag.c prints the label with outnlabel(), which ends it
+  with LABELENDCHAR, instead of outlabel() and a newline.
+  References: switch.s, switch-O.s, switch.c.cc.err, switch.c.cc.rc
+
+- Passing or returning unsigned char with ANSI prototypes (the first
+  argument and the result in a register) generates 6809 transfers
+  between registers of different sizes, which aren't valid
+  instructions: "TFR B,X" in the callee, and "TFR PC,D" and "TFR X,B"
+  in the caller.
+  References: proto.s, proto-O.s, proto.c.cc.err, proto.c.cc.rc
+
+- In PIC mode, global (bss?) pointers and arrays use PC-relative
+  addressing rather than direct addressing.  (Not covered by the tests.)
+
+- Taking the address of a direct page object doesn't work: "LEAX <_foo"
+  ignores DP.  Some possible sequences instead:
+    LDD #_foo ; TFR DP,A ; TFR D,X
+    LEAS -1,S ; CLR 0,S ; PSHS DP ; PULS X ; LEAX _foo,X
+    TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X
+    TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X
+  (Not covered by the tests.)
+
+objdump09 (and nm09, size09)
+----------------------------
+
+- Object files are rejected with "Bad magic number": objdump86.c checks
+  for the x86 dev86 magic number (A3 86), but as09 and ld09 use "S1"
+  (OMAGIC 0x5331 in ld/obj.h).  Executables are read.
+  objdump01 in retrotinker/mc6801-tools has this fixed.
+  References: crt0.o.dump, modes.o.dump, main.o.dump, long.o.dump
+
+ld09 and objcopy09
+------------------
+
+- ld09 only writes __btext, __etext and __bdata to the executable if
+  the program refers to them, so objcopy09 usually can't find the load
+  addresses itself: it warns that the load address is zero and writes
+  the program at address 0, unless -T (and -D) are given.
+  References: prog-noT.srec, prog-noT.oc.err

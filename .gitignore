@@ -16,3 +16,6 @@ ld/objchop
 ld/objdump09
 ld/objcopy09
 unproto/unproto
+tests/out/
+tests/prefix.tmp/
+!tests/ref/*.o

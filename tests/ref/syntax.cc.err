@@ -1,0 +1,6 @@
+syntax.c:4.13: error: bad expression
+syntax.c:5.11: error: need ';'
+syntax.c:5.13: error: undeclared undeclared
+syntax.c:7.1: error: need ';'
+syntax.c:9.14: error: need ';'
+syntax.c:9.14: error: bad expression

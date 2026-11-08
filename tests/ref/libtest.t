@@ -1,0 +1,2 @@
+control.o
+ptr.o
