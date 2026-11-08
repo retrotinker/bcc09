@@ -18,6 +18,17 @@ long l;
 	return l;
 }
 
+/* a long result, with 3 bytes of the stack to pop on the way out (cc1
+   once popped them into B and Y, losing the long's byte in B) */
+long lodd(c)
+char c;
+{
+	char k;
+
+	k = c;
+	return 100000L + k;
+}
+
 void puts1(s)
 char *s;
 {
@@ -106,6 +117,7 @@ int main()
 	   made it a char) */
 	check(41, lsecond(0, one ? 1L : 1) == 1L, 1);
 	check(42, lsecond(0, one ? -1L : 1) == -1L, 1);
+	check(43, lodd(2) == 100002L, 1);
 
 	puts1("checks ");
 	putnum(checks);

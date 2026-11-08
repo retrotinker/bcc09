@@ -3,42 +3,48 @@ selftest        +selftest.o
 control         +control.o
 switch          +switch.o
 ptr             +ptr.o
+laddsub         +libc.a(laddsub.o)
 lcmp            +libc.a(lcmp.o)
              simcrt0               _putnum  0  00001020  R
              simcrt0                  stop  0  00001013  r
              simcrt0                io_out  0  0000ff00  a
-             simcrt0                 __end  3  00001734  R
+             simcrt0                 __end  3  000017a8  R
              simcrt0                    go  0  00001010  r
              simcrt0              _putchar  0  0000101a  R
-             simcrt0               __edata  3  00001704  R
+             simcrt0               __edata  3  00001778  R
              simcrt0                 clear  0  00001007  r
              simcrt0                 start  0  00001000  R N
              simcrt0               io_numh  0  0000ff04  a
              simcrt0               io_numl  0  0000ff05  a
              simcrt0               io_exit  0  0000ff02  a
-            selftest                _puts1  0  0000102c  R
-            selftest                 _main  0  00001075  R
-            selftest                  _one  3  000016c4  R
-            selftest               _checks  3  00001704  R C
+            selftest                _puts1  0  0000104e  R
+            selftest                 _main  0  00001097  R
+            selftest                  _one  3  00001738  R
+            selftest               _checks  3  00001778  R C
             selftest              _lsecond  0  00001024  R
-            selftest                _check  0  00001044  R
-            selftest             _failures  3  00001708  R C
-             control                _loops  0  00001477  R
-             control               _select  0  00001424  R
-              switch                _dense  0  00001518  R
-                 ptr              _strlen1  0  00001564  R
-                 ptr                 _grid  3  0000170c  R C
-                 ptr                 _copy  0  0000157e  R
-                 ptr                   _ip  3  00001700  R
-                 ptr                  _tab  3  000016e8  R
-                 ptr                 _msgs  3  000016fa  R
-                 ptr                  _sum  0  00001598  R
-                 ptr                  _buf  3  00001724  R C
-                 ptr                 _ptrs  0  000015c0  R
-                 ptr                  _msg  3  000016f8  R
-                lcmp                lcdone  0  00001646  r
-                lcmp                lcmore  0  0000163f  r
-                lcmp                lcless  0  00001642  r
-                lcmp                lcmp_b  0  00001634  R
-                lcmp                ltst_b  0  0000164f  R
-                lcmp               lcmpu_b  0  00001647  R
+            selftest                 _lodd  0  0000102c  R
+            selftest                _check  0  00001066  R
+            selftest             _failures  3  0000177c  R C
+             control                _loops  0  000014cb  R
+             control               _select  0  00001478  R
+              switch                _dense  0  0000156c  R
+                 ptr              _strlen1  0  000015b8  R
+                 ptr                 _grid  3  00001780  R C
+                 ptr                 _copy  0  000015d2  R
+                 ptr                   _ip  3  00001774  R
+                 ptr                  _tab  3  0000175c  R
+                 ptr                 _msgs  3  0000176e  R
+                 ptr                  _sum  0  000015ec  R
+                 ptr                  _buf  3  00001798  R C
+                 ptr                 _ptrs  0  00001614  R
+                 ptr                  _msg  3  0000176c  R
+             laddsub                lsub_b  0  00001697  R
+             laddsub                ladd_b  0  00001688  R
+             laddsub               laddu_b  0  00001688  R
+             laddsub               lsubu_b  0  00001697  R
+                lcmp                lcdone  0  000016ba  r
+                lcmp                lcmore  0  000016b3  r
+                lcmp                lcless  0  000016b6  r
+                lcmp                lcmp_b  0  000016a8  R
+                lcmp                ltst_b  0  000016c3  R
+                lcmp               lcmpu_b  0  000016bb  R

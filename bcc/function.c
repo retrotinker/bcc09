@@ -396,6 +396,12 @@ PUBLIC void ret()
 		reglist = JUNK4REGS | PCREG;
 		break;
 	default:
+		reglist = 0;
+	}
+	/* (not into a register that holds the result: D and X hold a long
+	   or a float, and all four a double) */
+	if (reglist == 0 || (returntype->scalar & DOUBLE) ||
+	    (returntype->scalar & (DLONG | FLOAT) && reglist & BREG)) {
 		modstk(0);
 		outreturn();
 		return;
