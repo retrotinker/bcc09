@@ -2,19 +2,19 @@
 ; 1 # 1 "strtest.c"
 ; 1 # 5
 ; 5  
-; 6 # 5 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
-; 6 # 6 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
 ; 7 # 17
 ; 17  
 ; 18 # 32
 ; 32  
-; 33 # 5 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/sys/types.h"
+; 33 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 6 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
-; 7 # 10 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 10 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 10 # 14
 ; 14 typedef unsigned int size_t;	 
 ;BCC_EOS
@@ -28,12 +28,12 @@
 ;BCC_EOS
 ; 20 typedef long time_t;
 ;BCC_EOS
-; 21 # 5 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/stddef.h"
+; 21 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 5  
-; 6 # 5 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/sys/types.h"
+; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 13 "/home/linville/claude/bcc09/tests/prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 10 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen ();
 ;BCC_EOS
@@ -430,8 +430,7 @@ _copies:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 58 	ok
-; 58 (12,strcpy(buf,"")== buf && buf[0] == 0);
+; 58 	ok(12,strcpy(buf,"")== buf && buf[0] == 0);
 	LOC	1
 .25:
 	FCB	0
@@ -638,7 +637,8 @@ _copies:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 69 	ok(17,buf[0] == 'a' && buf[1] == 'b' && buf[2] == 0
+; 69 	ok(17,buf[0] == 'a' && buf[1] == 'b' && buf
+; 69 [2] == 0
 ; 70 	   && buf[4] == 0 && buf[5] == 'z');
 ; Debug: logeq int = const $61 to char = [buf+0] (used reg = )
 	LDB	>_buf
@@ -2237,8 +2237,7 @@ _searches:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 135 	strcpy(buf,"aa
-; 135 ab");			 
+; 135 	strcpy(buf,"aaab");			 
 	LOC	1
 .C8:
 	FCC	"aaab"
@@ -2495,7 +2494,7 @@ _searches:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 144 	ok(74,strcspn("abcde","")== 5);
+; 144 	ok(74,strcspn("abcde","")==
 	LOC	1
 .E3:
 	FCC	"abcde"
@@ -2505,6 +2504,7 @@ _searches:
 .E4:
 	FCB	0
 	LOC	0
+; 144  5);
 ; Debug: list * char = .E4+0 (used reg = )
 	LDX	#.E4
 	PSHS	X
@@ -3756,8 +3756,7 @@ _main:
 ; Debug: func () void = putnum+0 (used reg = )
 	JSR	>_putnum
 ;BCC_EOS
-; 227 	return fail
-; 227 ures;
+; 227 	return failures;
 	LDX	>_failures
 	RTS
 ;BCC_EOS

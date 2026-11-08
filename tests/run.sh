@@ -50,7 +50,10 @@ mkdir -p "$prefix/lib/bcc09"
 ln -s "$top/libc/crt0.o" "$top/libc/libc.a" "$top/libc/include" \
 	"$prefix/lib/bcc09/"
 LIBDIR=$prefix/lib/bcc09
-export BCC_PREFIX=$prefix
+# (relative to $out, where everything runs: the compiler's output names
+# the headers it read, so an absolute path would make the results
+# depend on where the source tree is)
+export BCC_PREFIX=../prefix.tmp
 unset BCC_EXEC_PREFIX
 PATH=$prefix/bin:$PATH
 
