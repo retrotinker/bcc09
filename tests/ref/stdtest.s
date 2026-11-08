@@ -29,12 +29,12 @@
 ;BCC_EOS
 ; 12 # 6 "../prefix.tmp/lib/bcc09/include/limits.h"
 ; 6  
-; 7 # 6 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 7 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 5  
+; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
-; 7 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
-; 6  
-; 7 # 10 "../prefix.tmp/lib/bcc09/include/stdlib.h"
-; 10 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -57,54 +57,63 @@
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 18 "../prefix.tmp/lib/bcc09/include/stdlib.h"
-; 18 extern int atoi ();
+; 10 # 17 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 17 extern int atoi ();
 ;BCC_EOS
-; 19 extern long atol ();
+; 18 extern long atol ();
 ;BCC_EOS
-; 20 extern long strtol ();
+; 19 extern long strtol ();
 ;BCC_EOS
-; 21 extern unsigned long strtoul ();
+; 20 extern unsigned long strtoul ();
 ;BCC_EOS
-; 22 
-; 23 extern int abs ();
+; 21 
+; 22 extern int abs ();
 ;BCC_EOS
-; 24 extern long labs ();
+; 23 extern long labs ();
 ;BCC_EOS
-; 25 
-; 26 extern int rand ();
+; 24 
+; 25 extern int rand ();
 ;BCC_EOS
-; 27 extern void srand ();
+; 26 extern void srand ();
 ;BCC_EOS
-; 28 
-; 29 extern void qsort ();
+; 27 
+; 28 extern void qsort ();
 ;BCC_EOS
-; 30 extern void * bsearch 
-; 31 
-; 32 # 30
+; 29 extern void * bsearch 
 ; 30 
-; 31 ();
+; 31 # 29
+; 29 
+; 30 ();
 ;BCC_EOS
-; 32 
-; 33 extern int atexit ();
+; 31 
+; 32 extern void * malloc ();
 ;BCC_EOS
-; 34 extern void exit ();
+; 33 extern void * calloc ();
 ;BCC_EOS
-; 35 extern void _exit ();
+; 34 extern void * realloc ();
+;BCC_EOS
+; 35 extern void free ();
 ;BCC_EOS
 ; 36 
-; 37  
-; 38 extern char * itoa ();
+; 37 extern int atexit ();
 ;BCC_EOS
-; 39 extern char * ltoa ();
+; 38 extern void exit ();
 ;BCC_EOS
-; 40 extern char * ultoa ();
+; 39 extern void _exit ();
 ;BCC_EOS
-; 41 extern char * ltostr ();
+; 40 
+; 41  
+; 42 extern char * itoa ();
 ;BCC_EOS
-; 42 extern char * ultostr ();
+; 43 extern char * ltoa ();
 ;BCC_EOS
-; 43 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 44 extern char * ultoa ();
+;BCC_EOS
+; 45 extern char * ltostr ();
+;BCC_EOS
+; 46 extern char * ultostr ();
+;BCC_EOS
+; 47 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -130,51 +139,53 @@
 ;BCC_EOS
 ; 21 extern char * strncpy ();
 ;BCC_EOS
-; 22 extern int strncmp ();
+; 22 extern in
+; 22 t strncmp ();
 ;BCC_EOS
 ; 23 
 ; 24 extern char * strchr ();
 ;BCC_EOS
 ; 25 extern char * strrchr ();
 ;BCC_EOS
-; 26 
-; 27  
-; 28 extern void * memcpy ();
+; 26 extern char * strdup ();
 ;BCC_EOS
-; 29 ext
-; 29 ern void * memccpy ();
+; 27 
+; 28  
+; 29 extern void * memcpy ();
 ;BCC_EOS
-; 30 extern void * memchr ();
+; 30 extern void * memccpy ();
 ;BCC_EOS
-; 31 extern void * memset ();
+; 31 extern void * memchr ();
 ;BCC_EOS
-; 32 extern int memcmp ();
+; 32 extern void * memset ();
 ;BCC_EOS
-; 33 
-; 34 extern void * memmove ();
+; 33 extern int memcmp ();
 ;BCC_EOS
-; 35 
-; 36  
-; 37 
+; 34 
+; 35 extern void * memmove ();
+;BCC_EOS
+; 36 
+; 37  
 ; 38 
-; 39  
-; 40 
+; 39 
+; 40  
 ; 41 
 ; 42 
-; 43  
-; 44 extern char * strpbrk ();
+; 43 
+; 44  
+; 45 extern char * strpbrk ();
 ;BCC_EOS
-; 45 extern char * strsep ();
+; 46 extern char * strsep ();
 ;BCC_EOS
-; 46 extern char * strstr ();
+; 47 extern char * strstr ();
 ;BCC_EOS
-; 47 extern char * strtok ();
+; 48 extern char * strtok ();
 ;BCC_EOS
-; 48 extern size_t strcspn ();
+; 49 extern size_t strcspn ();
 ;BCC_EOS
-; 49 extern size_t strspn ();
+; 50 extern size_t strspn ();
 ;BCC_EOS
-; 50 # 15 "stdtest.c"
+; 51 # 15 "stdtest.c"
 ; 15 extern int putchar();
 ;BCC_EOS
 ; 16 extern void putnum();
@@ -817,8 +828,9 @@ _classes:
 ;BCC_EOS
 	BRA	.29
 ;BCC_EOS
-; 91 			default: r = (!!((__ctype[1+(unsigned char)c])&0x40		  )) ; break;
+; 91 			default: r = (!!((__cty
 .54:
+; 91 pe[1+(unsigned char)c])&0x40		  )) ; break;
 ; Debug: add unsigned char c = [S+6-3] to int = const 1 (used reg = )
 ; Debug: expression subtree swapping
 	LDB	3,S
@@ -901,8 +913,7 @@ _classes:
 ;BCC_EOS
 ; 96 		}
 .5D:
-; 97 	
-; 97 	putchar('\n');
+; 97 		putchar('\n');
 .26:
 ; Debug: postinc int c = [S+6-4] (used reg = )
 	LDD	2,S
@@ -2268,7 +2279,8 @@ _numbers:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 190 		errno = 0;
+; 190 		errno
+; 190  = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
 	LDD	#0
 	STD	>_errno
@@ -2321,13 +2333,12 @@ _numbers:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 193 		ok(27,strtoul("4294967296",&end,10)== 0
+; 193 		ok(27,strtoul("4294967296",&end,10)== 0xFFFFFFFFUL 
 	LOC	1
 .D7:
 	FCC	"4294967296"
 	FCB	0
 	LOC	0
-; 193 xFFFFFFFFUL 
 ; 194 		   && errno == 34		   && *end == 0);
 ; Debug: list int = const $A (used reg = )
 	LDD	#$A
@@ -3478,7 +3489,8 @@ _sorting:
 	STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
-; 283 		c[i] = i;
+; 283 		
+; 283 c[i] = i;
 	BRA	.13E
 .13F:
 ; Debug: ptradd int i = [S+$74-4] to [$32] int c = S+$74-$6C (used reg = )
@@ -3560,10 +3572,9 @@ _sorting:
 	STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
-; 287 		c[i
+; 287 		c[i] = 50 - i;
 	BRA	.148
 .149:
-; 287 ] = 50 - i;
 ; Debug: sub int i = [S+$74-4] to int = const $32 (used reg = )
 	LDD	#$32
 	SUBD	$70,S

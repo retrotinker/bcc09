@@ -3,14 +3,16 @@ libc for bcc09
 This will become the port of the dev86 C library.  So far it has:
 
   crt0.s    start-up code (see below)
-  include/  headers: ctype.h, errno.h, limits.h, stdlib.h, string.h,
-            stddef.h, sys/types.h, features.h
+  include/  headers: ctype.h, errno.h, limits.h, malloc.h, stdlib.h,
+            string.h, stddef.h, unistd.h, sys/types.h, features.h
   bcc/      run-time helpers that the compiler calls for int and long
             operations the 6809 can't do in a few instructions
   ctype/    ctype.h's table and toupper and tolower
-  stdlib/   stdlib.h's functions: atoi, atol, strtol, strtoul, abs,
-            labs, qsort, bsearch, rand, srand, atexit, exit and _exit,
-            and dev86's itoa, ltoa, ultoa, ltostr and ultostr; and errno
+  malloc/   malloc, free, calloc and realloc (dev86's)
+  stdlib/   stdlib.h's other functions: atoi, atol, strtol, strtoul,
+            abs, labs, qsort, bsearch, rand, srand, atexit, exit and
+            _exit, and dev86's itoa, ltoa, ultoa, ltostr and ultostr;
+            errno; and sbrk and brk, for malloc
   string/   string.h's functions; memcpy (which the compiler also calls
             to copy structures) is in assembly, and the rest are C,
             compiled by bcc09
@@ -47,10 +49,26 @@ Changes from dev86:
     the toupper and tolower macros evaluated their argument twice (they
     are functions now)
   - rand is the C standard's example generator
+  - malloc grows the heap 256 bytes at a time rather than 4K; calloc
+    fails if elm * sz doesn't fit in a size_t, rather than allocating
+    too little; there is no alloca (its comment says it should probably
+    be considered GPL code)
   - size_t is unsigned (memmove relies on that); string.h no longer
     defines strxfrm as strncpy, which returns the wrong type
-strdup and the rest of stdlib.h (malloc and friends, div and ldiv) are
-still to come.
+div and ldiv are still to come.
+
+The heap
+--------
+
+malloc gets memory from sbrk() and gives it back with brk() (sbrk.s,
+declared in unistd.h).  The heap starts at __end, the end of the
+program's data, and grows up toward the stack, which grows down from
+wherever the loader put it.  sbrk() and brk() won't take the heap within
+__heap_margin bytes of the stack pointer at the time of the call (256,
+unless the program changes the variable), nor below __end; then they
+fail with errno ENOMEM, and malloc returns NULL.  A program that needs a
+deeper stack after it has filled the heap should raise __heap_margin
+first.
 
 bcc09 doesn't understand const or volatile: features.h defines them
 away when __BCC__ is defined, as bcc09 does.  Each routine that a program may need on its
@@ -127,5 +145,5 @@ the operand's size or more (16 or 32), taken as unsigned, give 0, or
 copies of the sign bit for a signed right shift.
 
 The tests in tests/ (ops.c, longops.c, regtest.s, strtest.c, stdtest.c,
-and crtret.c, crtexit.c and crtatexit.c for crt0, exit and atexit) check
-all of this on sim6809.
+maltest.c, and crtret.c, crtexit.c and crtatexit.c for crt0, exit and
+atexit) check all of this on sim6809.

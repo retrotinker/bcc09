@@ -35,11 +35,13 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - `libc/` builds `crt0.o` and `libc.a` (installed in `$(PREFIX)/lib/bcc09`, where `bcc09`
   links them with `-C0` and `-lc`), so `bcc09 -o prog -X-T0x3000 prog.c` builds a whole
   program. So far libc has the 16-bit and 32-bit (`long`) run-time helpers (`libc/bcc/`),
-  `string.h`, `ctype.h` and most of `stdlib.h` (mostly dev86's C, compiled by `bcc09`
-  itself; headers in `libc/include/`); `libc/README` gives the calling conventions and
-  the changes from dev86. The default `crt0` calls `exit()` when `main` returns, and
-  `_exit()` returns to the loader (such as Color BASIC's `EXEC`) with the status in D.
-  Next: `malloc` (needs a decision on where the heap ends), more of the dev86 libc,
+  `string.h`, `ctype.h` and nearly all of `stdlib.h`, including `malloc` (mostly dev86's
+  C, compiled by `bcc09` itself; headers in `libc/include/`); `libc/README` gives the
+  calling conventions and the changes from dev86. The default `crt0` calls `exit()` when
+  `main` returns, and `_exit()` returns to the loader (such as Color BASIC's `EXEC`)
+  with the status in D. The heap grows from `__end` up to the stack pointer minus
+  `__heap_margin` (256 bytes; a decision of 2026-11-08), enforced by `sbrk()`/`brk()`.
+  Next: more of the dev86 libc (stdio needs a decision on how each target does I/O),
   then floating point, and start-up code for other `-M` targets.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
@@ -52,7 +54,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 343 reference
+  `tests/src/` with this tree's tools and compare every result with the 359 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -74,8 +76,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   are built by `bcc09` alone (with `crt0` and `libc`) and run under `loader.s`, which
   calls `start` as a loader would and checks that the stack comes back; `crtatexit.c`
   checks that returning from `main` runs the `atexit()` functions.
-- `tests/src/strtest.c` and `stdtest.c` check libc's `string.h`, `ctype.h` and
-  `stdlib.h`; `run.sh` also builds them with the host's compiler and C library
+- `tests/src/strtest.c`, `stdtest.c` and `maltest.c` check libc's `string.h`, `ctype.h`,
+  `stdlib.h` and `malloc`; `run.sh` also builds them with the host's compiler and C library
   (`tests/host/putnum.c` supplies `putnum`), and each must print the same on both,
   which checks the expected results. Checks that depend on bcc09's type sizes or on
   functions only libc has are under `#ifdef __BCC__` or `sizeof` tests.

@@ -1,8 +1,7 @@
 /* stdlib.h - for bcc09's libc
  *
  * After the dev86 C library (Copyright (C) Robert de Bath), which is
- * distributed under the GNU Library General Public License.  malloc and
- * friends will come later.
+ * distributed under the GNU Library General Public License.
  */
 
 #ifndef __STDLIB_H
@@ -29,6 +28,11 @@ extern void srand __P ((unsigned int));
 extern void qsort __P ((void *, size_t, size_t, int (*)()));
 extern void * bsearch __P ((__const void *, __const void *, size_t, size_t,
 			    int (*)()));
+
+extern void * malloc __P ((size_t));
+extern void * calloc __P ((size_t, size_t));
+extern void * realloc __P ((void *, size_t));
+extern void free __P ((void *));
 
 extern int atexit __P ((void (*)()));
 extern void exit __P ((int));

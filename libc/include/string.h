@@ -23,6 +23,7 @@ extern int strncmp __P ((__const char*, __const char*, size_t));
 
 extern char * strchr __P ((__const char*, int));
 extern char * strrchr __P ((__const char*, int));
+extern char * strdup __P ((__const char*));
 
 /* Basic mem functions */
 extern void * memcpy __P ((void*, __const void*, size_t));

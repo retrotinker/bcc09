@@ -17,13 +17,16 @@ BCCFLAGS=-O -Iinclude
 # ctype: character classes
 # stdlib: stdlib.h's functions, and errno
 # string: string and memory functions
+# malloc: malloc, free, calloc and realloc (sbrk and brk are in stdlib)
 # Some sources hold several functions, each compiled separately with
-# -DL_name: string.c (STRING_OBJS), abs.c, strtol.c and rand.c
+# -DL_name: string.c (STRING_OBJS), malloc.c, abs.c, strtol.c and rand.c
 STRING_OBJS = string/strlen.o string/strcat.o string/strcpy.o \
 	  string/strcmp.o string/strncat.o string/strncpy.o \
-	  string/strncmp.o string/strchr.o string/strrchr.o \
+	  string/strncmp.o string/strchr.o string/strrchr.o string/strdup.o \
 	  string/memccpy.o string/memchr.o string/memset.o \
 	  string/memcmp.o string/memmove.o
+MALLOC_OBJS = malloc/malloc.o malloc/free.o malloc/calloc.o \
+	  malloc/realloc.o
 ABS_OBJS = stdlib/abs.o stdlib/labs.o
 STRTOL_OBJS = stdlib/strtol.o stdlib/strtoul.o
 RAND_OBJS = stdlib/rand.o stdlib/srand.o
@@ -31,7 +34,9 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/laddsub.o bcc/llogic.o bcc/lcmp.o bcc/lunary.o \
 	  bcc/lincdec.o bcc/lshift.o bcc/lmul.o bcc/ldiv.o \
 	  ctype/ctype.o ctype/ctypefn.o \
+	  $(MALLOC_OBJS) \
 	  stdlib/_exit.o stdlib/exit.o stdlib/atexit.o stdlib/errno.o \
+	  stdlib/sbrk.o \
 	  stdlib/atoi.o stdlib/atol.o $(STRTOL_OBJS) $(ABS_OBJS) \
 	  stdlib/itoa.o stdlib/ltoa.o stdlib/ltostr.o \
 	  stdlib/qsort.o stdlib/bsearch.o $(RAND_OBJS) \
@@ -41,8 +46,9 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  string/strcasecmp.o string/strncasecmp.o
 
 HEADERS	= include/ctype.h include/errno.h include/features.h \
-	  include/limits.h include/stddef.h include/stdlib.h \
-	  include/string.h include/sys/types.h
+	  include/limits.h include/malloc.h include/stddef.h \
+	  include/stdlib.h include/string.h include/sys/types.h \
+	  include/unistd.h
 
 all: crt0.o libc.a
 
@@ -61,6 +67,8 @@ libc.a: $(OBJS)
 
 $(STRING_OBJS): string/%.o: string/string.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ string/string.c
+$(MALLOC_OBJS): malloc/%.o: malloc/malloc.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ malloc/malloc.c
 $(ABS_OBJS): stdlib/%.o: stdlib/abs.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdlib/abs.c
 $(STRTOL_OBJS): stdlib/%.o: stdlib/strtol.c $(HEADERS) .bcc/stamp

@@ -56,43 +56,45 @@
 ;BCC_EOS
 ; 25 extern char * strrchr ();
 ;BCC_EOS
-; 26 
-; 27  
-; 28 extern void * memcpy ();
+; 26 extern char * strdup ();
 ;BCC_EOS
-; 29 extern void * memccpy ();
+; 27 
+; 28  
+; 29 extern void * memcpy ();
 ;BCC_EOS
-; 30 extern void * memchr ();
+; 30 extern void * memccpy ();
 ;BCC_EOS
-; 31 extern void * memset ();
+; 31 extern void * memchr ();
 ;BCC_EOS
-; 32 extern int memcmp ();
+; 32 extern void * memset ();
 ;BCC_EOS
-; 33 
-; 34 extern void * memmove ();
+; 33 extern int memcmp ();
 ;BCC_EOS
-; 35 
-; 36  
-; 37 
+; 34 
+; 35 extern void * memmove ();
+;BCC_EOS
+; 36 
+; 37  
 ; 38 
-; 39  
-; 40 
+; 39 
+; 40  
 ; 41 
 ; 42 
-; 43  
-; 44 extern char * strpbrk ();
+; 43 
+; 44  
+; 45 extern char * strpbrk ();
 ;BCC_EOS
-; 45 extern char * strsep ();
+; 46 extern char * strsep ();
 ;BCC_EOS
-; 46 extern char * strstr ();
+; 47 extern char * strstr ();
 ;BCC_EOS
-; 47 extern char * strtok ();
+; 48 extern char * strtok ();
 ;BCC_EOS
-; 48 extern size_t strcspn ();
+; 49 extern size_t strcspn ();
 ;BCC_EOS
-; 49 extern size_t strspn ();
+; 50 extern size_t strspn ();
 ;BCC_EOS
-; 50 # 9 "strtest.c"
+; 51 # 9 "strtest.c"
 ; 9 extern int putchar();
 ;BCC_EOS
 ; 10 extern void putnum();
@@ -637,8 +639,8 @@ LDX	#$10
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 69 	ok(17,buf[0] == 'a' && buf[1] == 'b' && buf
-; 69 [2] == 0
+; 69 	ok(17,buf[0] == 'a
+; 69 ' && buf[1] == 'b' && buf[2] == 0
 ; 70 	   && buf[4] == 0 && buf[5] == 'z');
 ; Debug: logeq int = const $61 to char = [buf+0] (used reg = )
 LDB	>_buf
@@ -2494,7 +2496,8 @@ LDX	#$49
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 144 	ok(74,strcspn("abcde","")==
+; 144 	ok
+; 144 (74,strcspn("abcde","")== 5);
 LOC	1
 .E3:
 FCC	"abcde"
@@ -2504,7 +2507,6 @@ LOC	1
 .E4:
 FCB	0
 LOC	0
-; 144  5);
 ; Debug: list * char = .E4+0 (used reg = )
 LDX	#.E4
 PSHS	X

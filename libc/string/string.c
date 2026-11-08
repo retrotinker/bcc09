@@ -6,7 +6,7 @@
 /* The basic string package from the dev86 C library, for bcc09: the C
  * versions, without the 8086 assembly ones.  Each function is compiled
  * separately (with -DL_name), so that a program links only what it uses.
- * memcpy is in memcpy.s, and strdup will come with malloc.
+ * memcpy is in memcpy.s.
  *
  * Changes from dev86: strncat called memchr with its arguments in the
  * wrong order; memcmp compared its operands the wrong way round; and
@@ -163,6 +163,24 @@ int c;
       prev = p; p++;
    }
    return prev;
+}
+#endif
+
+/********************** Function strdup ************************************/
+
+#ifdef L_strdup
+#include <stdlib.h>
+
+char * strdup(s)
+const char * s;
+{
+   register size_t len;
+   register char * p;
+
+   len = strlen(s)+1;
+   p = (char *) malloc(len);
+   if(p) memcpy(p, s, len); /* Faster than strcpy */
+   return p;
 }
 #endif
 
