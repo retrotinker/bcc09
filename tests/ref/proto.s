@@ -73,7 +73,8 @@ _clip:
 	CLRA
 .4:
 ; Debug: cast unsigned char = const 0 to unsigned int = D+0 (used reg = )
-	TFR	B,X
+	CLRA
+	TFR	D,X
 	PULS	Y,PC
 ;BCC_EOS
 ; 19 }
@@ -95,9 +96,8 @@ _use:
 	LDX	#$12C
 ; Debug: func () unsigned char = clip+0 (used reg = )
 	JSR	>_clip
-	TFR	PC,D
-; Debug: rootlist unsigned char = X+0 (used reg = )
-	TFR	X,B
+	TFR	X,D
+; Debug: rootlist unsigned char = B+0 (used reg = )
 	CLRA
 	TFR	D,X
 ; Debug: func () int = add+0 (used reg = )

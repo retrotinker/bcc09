@@ -66,12 +66,16 @@ struct symstruct *source;
 	} else
 #endif
 	if (source->type->scalar & CHAR) {
+		/* a char comes back widened to an int in RETURNREG (see
+		   ret()): the char is its low byte, which is B once it is in
+		   D (this transferred the function's address, and then let
+		   the code below say RETURNREG again) */
+		source->storage = RETURNREG;
 #if RETURNREG != DREG
 		transfer(source, DREG);
 #endif
 		source->storage = BREG;
-	}
-	{
+	} else {
 		if (source->type->scalar & DOUBLE)
 			source->storage = doublreturnregs;
 		else
@@ -161,7 +165,23 @@ PUBLIC void loadretexpression()
 # endif
 	} else
 #endif
-	{
+	else if (returntype->scalar & CHAR) {
+		/* widen a char to an int, in D, before it goes in RETURNREG,
+		   as for the first argument (loading a char into an index
+		   register loaded it and the byte after it) */
+		struct nodestruct *etmark;
+		struct nodestruct *exp;
+		struct symstruct *exprmark;
+
+		etmark = etptr;
+		exprmark = exprptr;
+		exp = castnode(returntype, expression());
+		makeleaf(exp);
+		extend(exp->left.symptr);
+		load(exp->left.symptr, RETURNREG);
+		etptr = etmark;
+		exprptr = exprmark;
+	} else {
 		{
 			if (returntype->scalar & DOUBLE)
 				loadexpression(doublreturnregs, returntype);

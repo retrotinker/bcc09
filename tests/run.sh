@@ -107,8 +107,9 @@ echo $? > cpp-E.rc
 
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
-csrc="arith calls cbtest control float helpmain long longops main maltest ops
-      pftest proto ptr selftest siotest stdtest strtest struct switch vatest"
+csrc="arith calls cbtest chartest control float helpmain long longops main
+      maltest ops pftest proto ptr sadd selftest siotest stdtest strtest struct
+      switch vatest"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -287,8 +288,10 @@ done
 # upper case, checks bad file descriptors and atexit(), and returns the
 # number of lines; pftest.c prints a grid of printf formats, which must
 # be the same with the host's printf; siotest.c checks stdio's FILE
-# functions; and a target with no start-up code yet can't be linked
-for f in hello echo pftest siotest; do
+# functions; chartest.c passes and returns chars with prototypes; sadd.c
+# shows a bug (see BUGS); and a target with no start-up code yet can't
+# be linked
+for f in hello echo pftest siotest chartest sadd; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -297,14 +300,20 @@ for f in hello echo pftest siotest; do
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
-if ${CC:-cc} -std=gnu89 -w -o pftest-host pftest.c > /dev/null 2>&1 &&
-   ./pftest-host > pftest-host.run 2>&1 && cmp -s pftest.run pftest-host.run
-then
-	echo "ok   pftest prints the same as with the host's printf"
-else
-	echo "DIFF pftest with the host's printf (see pftest-host.run)"
-fi > pftest-host.result
-rm -f pftest-host pftest-host.run
+# pftest.c and chartest.c must print the same with the host's compiler
+# and C library (but for the count of checks, which differs)
+for f in pftest chartest; do
+	if ${CC:-cc} -std=gnu89 -w -o $f-host $f.c > /dev/null 2>&1 &&
+	   ./$f-host > $f-host.run 2>&1 &&
+	   grep -v '^checks ' $f.run > $f.cmp &&
+	   grep -v '^checks ' $f-host.run > $f-host.cmp &&
+	   cmp -s $f.cmp $f-host.cmp; then
+		echo "ok   $f prints the same as with the host's compiler"
+	else
+		echo "DIFF $f with the host's compiler (see $f-host.run)"
+	fi > $f-host.result
+	rm -f $f-host $f-host.run $f.cmp $f-host.cmp
+done
 # the Color BASIC target (bcc09 -Me): cbrom.s stands in for the ROM's
 # POLCAT and CHROUT at $A000, and loader.s for EXEC; cbtest.c prints,
 # reads lines from cbtest.in (with a rub-out) until BREAK, uses the heap
