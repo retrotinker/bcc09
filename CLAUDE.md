@@ -22,6 +22,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   - define symbols and entry points
   - meet or exceed the linker script functionality in the mc6801-tools project
 - verify copt/rules.6809 and expand appropriately
+- target CoCo BASIC, OS-9, FLEX, and Vectrex
 
 ## Layout
 
@@ -33,24 +34,28 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `token2.tok`, and are checked in so that building does not need gperf. After changing a
   `.tok` file, run `make -C cpp tokens` (needs gperf 3.1 or later, which uses `size_t`
   lengths).
-
-- `libc/` builds `crt0.o` and `libc.a` (installed in `$(PREFIX)/lib/bcc09`, where `bcc09`
-  links them with `-C0` and `-lc`), so `bcc09 -o prog -X-T0x3000 prog.c` builds a whole
-  program. So far libc has the 16-bit and 32-bit (`long`) run-time helpers (`libc/bcc/`),
-  `string.h`, `ctype.h` and nearly all of `stdlib.h`, including `malloc` (mostly dev86's
-  C, compiled by `bcc09` itself; headers in `libc/include/`); `libc/README` gives the
-  calling conventions and the changes from dev86. The default `crt0` calls `exit()` when
-  `main` returns, and `_exit()` returns to the loader (such as Color BASIC's `EXEC`)
-  with the status in D. The heap grows from `__end` up to the stack pointer minus
-  `__heap_margin` (256 bytes; a decision of 2026-11-08), enforced by `sbrk()`/`brk()`.
-  `stdarg.h` and `stdio.h` work (`stdio`: dev86's `FILE` layer, and a new `printf`
-  family that matches glibc's output; no `scanf` or floating point yet). Targets (2026-11-08): `libc.a` is target-independent; each `-M` target has a start-up
-  file and a library (`_exit`, `read`, `write`, and for `stdio` `close`, `lseek`, `isatty`, `open`) that the
-  driver links: `-Ms`/`-Me` →
-  `crt0.o` + `libsa.a` (returns to the loader, no I/O), `-Mi` → `crtsim.o` + `libsim.a`
-  (sim6809, with I/O). Other targets can't link yet. Next: stdio on top of `read`/`write`,
-  then OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code has a known bug), Color BASIC
-  and FLEX targets, then floating point.
+- `libc/` builds `libc.a` and each target's start-up file and library, installed in
+  `$(PREFIX)/lib/bcc09` (headers in `include/` there), so `bcc09 -o prog -X-T0x3000
+  prog.c` builds a whole program. libc has the 16- and 32-bit run-time helpers
+  (`libc/bcc/`), `string.h`, `ctype.h`, `stdlib.h` with `malloc`, `stdarg.h` and `stdio.h`
+  (dev86's `FILE` layer, and a new `printf` family that matches glibc's output); mostly
+  dev86's C, compiled by `bcc09` itself. No `scanf` or floating point yet.
+  `libc/README` gives the calling conventions and the changes from dev86.
+- Start-up: `crt0` clears the BSS and calls `main`; when `main` returns, `exit()` runs the
+  `atexit()` functions and the target's `_exit()`. The heap grows from `__end` up to the
+  stack pointer minus `__heap_margin` (256 bytes; decided 2026-11-08), which
+  `sbrk()`/`brk()` enforce.
+- Targets (decided 2026-11-08): `libc.a` is target-independent; each `-M` target has a
+  start-up file and a library (`_exit`; `read`, `write`, `close`, `lseek`, `isatty`, `open`
+  where it has I/O) that the driver links:
+  - `-Ms` → `crt0.o` + `libsa.a`: returns to its loader; no I/O.
+  - `-Me` → `crt0.o` + `libcb.a`: Color BASIC `EXEC` programs, with I/O through the
+    ROM's POLCAT/CHROUT vectors; tested with a stand-in ROM (`tests/src/cbrom.s`), not
+    on hardware; no files yet.
+  - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
+  - The others can't link yet.
+- Next: Disk BASIC files for `-Me`, OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code
+  has a known bug), FLEX, `scanf`, floating point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
@@ -70,7 +75,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 416 reference
+  `tests/src/` with this tree's tools and compare every result with the 432 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

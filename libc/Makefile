@@ -16,8 +16,10 @@ BCCFLAGS=-O -Iinclude
 # own start-up code, which bcc09 links first (ld09 -C<name>: crt<name>.o),
 # and a library of what differs (_exit, read, write), selected by bcc09's
 # -M option:
-#   sa:  the default (-Ms, -Me): crt0.o and libsa.a, which return to the
+#   sa:  the default (-Ms): crt0.o and libsa.a, which return to the
 #        program's loader; no I/O
+#   cb:  Color BASIC (-Me, a program run with EXEC): crt0.o and libcb.a,
+#        with I/O through the ROM
 #   sim: sim6809 (-Mi): crtsim.o and libsim.a
 #
 # bcc: the run-time helpers the compiler calls
@@ -70,10 +72,13 @@ HEADERS	= include/ctype.h include/errno.h include/fcntl.h \
 	  include/unistd.h
 
 SA_OBJS	= sa/_exit.o
+CB_SYS_OBJS = cb/write.o cb/read.o cb/isatty.o cb/lseek.o cb/close.o \
+	  cb/open.o
+CB_OBJS	= sa/_exit.o cb/rom.o $(CB_SYS_OBJS)
 SIM_SYS_OBJS = sim/isatty.o sim/lseek.o sim/close.o sim/open.o
 SIM_OBJS = sim/_exit.o sim/read.o sim/write.o $(SIM_SYS_OBJS)
 
-TARGETS	= crt0.o libsa.a crtsim.o libsim.a
+TARGETS	= crt0.o libsa.a libcb.a crtsim.o libsim.a
 
 all: libc.a $(TARGETS)
 
@@ -86,6 +91,10 @@ crt0.o: sa/crt0.o
 libsa.a: $(SA_OBJS)
 	rm -f $@
 	$(AR09) rc $@ $(SA_OBJS)
+
+libcb.a: $(CB_OBJS)
+	rm -f $@
+	$(AR09) rc $@ $(CB_OBJS)
 
 crtsim.o: sim/crtsim.o
 	cp sim/crtsim.o $@
@@ -108,6 +117,8 @@ $(STDIO_OBJS): stdio/%.o: stdio/stdio.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdio/stdio.c
 $(PRINTF_OBJS): stdio/%.o: stdio/printf.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdio/printf.c
+$(CB_SYS_OBJS): cb/%.o: cb/sys.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ cb/sys.c
 $(SIM_SYS_OBJS): sim/%.o: sim/sys.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ sim/sys.c
 $(MALLOC_OBJS): malloc/%.o: malloc/malloc.c $(HEADERS) .bcc/stamp
@@ -134,7 +145,7 @@ install: libc.a $(TARGETS)
 	install -m 644 include/sys/*.h $(LIBDIR)/include/sys
 
 clean realclean clobber:
-	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o sim/*.o stdio/*.o
+	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o cb/*.o sim/*.o stdio/*.o
 	rm -rf .bcc
 
 .PHONY: all install clean realclean clobber

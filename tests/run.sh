@@ -48,7 +48,8 @@ ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" "$prefix/libexec/bcc09/"
 mkdir -p "$prefix/lib/bcc09"
 ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
-	"$top/libc/libsa.a" "$top/libc/crtsim.o" "$top/libc/libsim.a" \
+	"$top/libc/libsa.a" "$top/libc/libcb.a" "$top/libc/crtsim.o" \
+	"$top/libc/libsim.a" \
 	"$prefix/lib/bcc09/"
 LIBDIR=$prefix/lib/bcc09
 # (relative to $out, where everything runs: the compiler's output names
@@ -106,8 +107,8 @@ echo $? > cpp-E.rc
 
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
-csrc="arith calls control float helpmain long longops main maltest ops pftest
-      proto ptr selftest siotest stdtest strtest struct switch vatest"
+csrc="arith calls cbtest control float helpmain long longops main maltest ops
+      pftest proto ptr selftest siotest stdtest strtest struct switch vatest"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -304,6 +305,22 @@ else
 	echo "DIFF pftest with the host's printf (see pftest-host.run)"
 fi > pftest-host.result
 rm -f pftest-host pftest-host.run
+# the Color BASIC target (bcc09 -Me): cbrom.s stands in for the ROM's
+# POLCAT and CHROUT at $A000, and loader.s for EXEC; cbtest.c prints,
+# reads lines from cbtest.in (with a rub-out) until BREAK, uses the heap
+# and returns the number of lines
+run cbrom.as "$AS" -o cbrom.o cbrom.s
+"$LD" -T0xa000 -o cbrom.out cbrom.o
+"$OC" -O srec cbrom.out cbrom.srec
+run cbtest.bcc "$BCC" -Me -o cbtest.out -X-T0x3000 loader.s cbtest.c
+"$OC" -O srec cbtest.out cbtest.srec
+entry=$("$OD" -n cbtest.out | awk '$3 == "loader" { print $1 }')
+grep -v '^S[059]' cbrom.srec | cat - cbtest.srec > cbtest-rom.srec
+"$SIM" -n 50000000 --entry "0x$entry" cbtest-rom.srec < cbtest.in \
+	> cbtest.run 2>&1
+echo $? > cbtest.run.rc
+rm -f cbrom.o cbrom.out cbrom.srec cbtest.srec cbtest-rom.srec
+
 run notarget.bcc "$BCC" -Mo -o notarget.out hello.c
 rm -f notarget.out
 

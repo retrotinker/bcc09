@@ -900,7 +900,7 @@ char **argv;
 		prepend_option("-D__CB__", 'p');
 		opt_arch = MC6809_CB_EXEC;
 		crtname = "-C0";	/* EXEC is a loader to return to */
-		targetlib = "-lsa";
+		targetlib = "-lcb";	/* I/O through the ROM */
 		break;
 	case 'u':
 		prepend_option("-D__CB__", 'p');

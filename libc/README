@@ -19,6 +19,7 @@ This will become the port of the dev86 C library.  So far it has:
             to copy structures) is in assembly, and the rest are C,
             compiled by bcc09
   sa/       the default target (see below)
+  cb/       the Color BASIC target (see below)
   sim/      the sim6809 target (see below)
 
 "make" builds libc.a, and each target's start-up code and library, with
@@ -96,7 +97,8 @@ machines and systems a program can run on is in a start-up file and a
 small library for each target, which bcc09 chooses with its -M option
 and links with libc.a (ld09 -C<name> links crt<name>.o):
 
-  -Ms, -Me  sa: crt0.o and libsa.a (the default)
+  -Ms       sa: crt0.o and libsa.a (the default)
+  -Me       cb: crt0.o and libcb.a (Color BASIC, run with EXEC)
   -Mi       sim: crtsim.o and libsim.a
 
 The others (-Mu, -Mr, -Mb, -Mo, -Mf, -Mv) have none yet, and bcc09
@@ -112,6 +114,20 @@ sa is for a program loaded and called by something it can return to,
 such as Color BASIC's EXEC, a monitor or a debugger.  It runs on the
 stack its loader gave it: crt0 saves S, and _exit() puts the status in
 D, restores S and returns to the loader.  It has no I/O.
+
+cb is for a program loaded with LOADM (or CLOADM) and run with EXEC
+under Color BASIC: like sa, it runs on BASIC's stack and returns to
+BASIC, with main's result in D, but it has I/O, through the ROM's POLCAT
+($A000) and CHROUT ($A002) vectors (cb/rom.s).  write() prints on the
+screen, with '\n' as a carriage return; read() reads a line from the
+keyboard as a terminal does, showing the keys, with the left arrow to
+rub out and ENTER to end the line; BREAK at the start of a line is the
+end of the input.  There are no files yet (Disk BASIC's will come).
+Load the program low, at $2800 or $3000 say (bcc09 -X-T0x3000), below
+BASIC's stack and strings at the top of memory: the heap is the memory
+between the end of the program and the stack.  It is tested with a
+stand-in for the ROM (tests/src/cbrom.s), not on a CoCo, and the
+Dragon's ROM, whose vectors may differ, hasn't been tried.
 
 sim is for sim6809, the simulator the tests use (tests/sim).  crtsim
 puts the stack just below the simulator's I/O block at $FF00, and
@@ -191,5 +207,5 @@ copies of the sign bit for a signed right shift.
 
 The tests in tests/ (ops.c, longops.c, regtest.s, strtest.c, stdtest.c,
 maltest.c, vatest.c; crtret.c, crtexit.c and crtatexit.c for the default target;
-hello.c, echo.c, pftest.c and siotest.c for the sim target) check all of
-this on sim6809.
+hello.c, echo.c, pftest.c and siotest.c for the sim target; cbtest.c
+for the Color BASIC target) check all of this on sim6809.

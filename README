@@ -10,6 +10,14 @@ the following:
 	ld09 -o prog.out -T0x1000 start.o prog.o
 	objcopy09 -O srec prog.out prog.s19
 
+(Update, 2026: bcc09 now links with start-up code and a C library by
+itself.  For a Color BASIC program with stdio, run with EXEC:
+
+	bcc09 -Me -o hello -X-T0x3000 hello.c
+	objcopy09 -O decb hello hello.bin
+
+then LOADM"HELLO":EXEC on the CoCo.  libc/README has the details.)
+
 objcopy09 can also write raw binaries (-O binary), Intel hex (-O ihex),
 Disk Extended Color BASIC LOADM files (-O decb), Dragon DOS binaries
 (-O ddos), OS-9 modules (-O os9) and Color BASIC cassette images (-O cas
