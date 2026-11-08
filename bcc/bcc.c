@@ -872,6 +872,7 @@ char **argv;
 	add_prefix(getenv("BCC_EXEC_PREFIX"));
 
 	prepend_option("-D__6809__", 'p');
+	prepend_option("-D__BCC__", 'p');	/* as dev86 headers expect */
 
 	if (opt_M == 0)
 		opt_M = 's';
