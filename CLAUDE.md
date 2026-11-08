@@ -16,10 +16,12 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - create a doc directory
   - create man pages for all of the generated exectuables
   - create a PDF User's Manual for the project
+  - create a PDF for the bcc09 tools, inspired by "CMOC for BASIC Programmers"
 - support linker scripts for ld09
   - control object inclusion, ordering, and placement in memory
   - define symbols and entry points
   - meet or exceed the linker script functionality in the mc6801-tools project
+- verify copt/rules.6809 and expand appropriately
 
 ## Layout
 
