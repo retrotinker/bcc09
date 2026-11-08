@@ -16,7 +16,7 @@ VALS = [0, 1, -1, 2, 7, -7, 255, 256, 1000, -1000, 12345, 32767, -32768,
         0x5555]
 COUNTS = list(range(18)) + [-1]
 # constant operands that cc1 compiles inline instead of calling helpers
-CDIV = [1, 2, 4, 8, 256, 3, 10]
+CDIV = [1, 2, 4, 8, 256, 3, 10, -1, -2, -4, -8, -256]
 CMUL = [0, 1, 2, 3, 4, 10, 256, 257]
 CSHIFT = [0, 1, 3, 8, 15]
 

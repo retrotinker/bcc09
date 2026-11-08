@@ -26,15 +26,6 @@ cpp
 cc1 (code generation)
 ---------------------
 
-- Signed division and modulus by a constant power of two (2, 4, ...,
-  256) give the wrong answer for a negative dividend that isn't an exact
-  multiple: -7 / 2 gives -4 and -7 % 2 gives 1, instead of -3 and -1.
-  diveasy() and modeasy() in bcc/codefrag.c shift and mask, which round
-  toward minus infinity, without first adding (divisor - 1) to a
-  negative dividend.  Unsigned operands, and other constants (which call
-  the run-time helpers in libc), are right.
-  References: ops.run, ops.run.rc (the 18 "FAIL 11" checks)
-
 - Passing or returning unsigned char with ANSI prototypes (the first
   argument and the result in a register) generates 6809 transfers
   between registers of different sizes, which aren't valid

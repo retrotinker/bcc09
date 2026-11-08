@@ -73,7 +73,10 @@ struct symstruct *target;
 			break;
 		case MODOP:
 			if (modeasy(sourceval, uflag)) {
-				if ((uvalue_t) sourceval <= MAXUCHTO + 1) {
+				/* an unsigned remainder by up to 256 fits in
+				   B; a signed one may be negative */
+				if (uflag
+				    && (uvalue_t) sourceval <= MAXUCHTO + 1) {
 					target->storage = BREG;
 					target->type = ctype;
 					if (uflag)

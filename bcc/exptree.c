@@ -74,6 +74,9 @@ register struct nodestruct *nodeptr;
 							   nodeptr) &
 					      redscalar(right) & CHAR)
 					     || (nodeptr->tag == MODOP
+						 /* a signed remainder may
+						    be negative */
+						 && bothscalar & UNSIGNED
 						 && right->tag == LEAF
 						 && right->left.symptr->
 						 storage == CONSTANT

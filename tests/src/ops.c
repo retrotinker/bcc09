@@ -146,6 +146,7 @@ void constants()
 	for (i = 0; i < NV; i++) {
 		a = ua = vals[i];
 		DIVC(1); DIVC(2); DIVC(4); DIVC(8); DIVC(256); DIVC(3); DIVC(10);
+		DIVC(-1); DIVC(-2); DIVC(-4); DIVC(-8); DIVC(-256);
 	}
 	start(12, cmul);
 	for (i = 0; i < NV; i++) {

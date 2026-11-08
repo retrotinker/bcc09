@@ -485,6 +485,10 @@ _incdec:
 ;BCC_EOS
 ; Debug: divab int = const 2 to int x = [S+4-2] (used reg = )
 	LDD	2,S
+	TSTA
+	BGE	.1A
+	ADDD	#1
+.1A:
 	ASRA
 	RORB
 	STD	2,S

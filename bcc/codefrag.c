@@ -556,9 +556,21 @@ bool_pt uflag;
 	if (divisor == 0)
 		clr(DREG);
 	else {
+		/* a signed shift rounds toward minus infinity, so add
+		   divisor - 1 to a negative dividend first, to truncate
+		   toward zero; and negate the quotient for a negative
+		   divisor afterwards (-32768 can't be negated first) */
+		if (!(bool_t) uflag && divisor > 1) {
+			label_no poslab;
+
+			testhi();
+			sbranch(GE, poslab = getlabel());
+			addconst((offset_T) (divisor - 1), DREG);
+			outnlabel(poslab);
+		}
+		srconst((value_t) highbit((uvalue_t) divisor), uflag);
 		if (sign)
 			negDreg();
-		srconst((value_t) highbit((uvalue_t) divisor), uflag);
 	}
 	return TRUE;
 }
@@ -767,15 +779,36 @@ bool_pt uflag;
 	}
 	if (bitcount((uvalue_t) divisor) > 1)
 		return FALSE;
-	if (--divisor == 0)
-		clrBreg();	/* original divisor 1 or -1 yields 0 */
-	else {
-		if (sign)
-			negDreg();
+	if (--divisor == 0) {
+		/* original divisor 1 or -1 yields 0 */
+		if ((bool_t) uflag)
+			clrBreg();	/* softop() reduces the type to char */
+		else
+			clr(DREG);
+	} else if ((bool_t) uflag)
 		andconst((offset_T) divisor);	/* if original divisor 0, this is
 						   null */
-		if (sign)
-			negDreg();
+	else {
+		/* the remainder has the sign of the dividend, whatever the
+		   divisor's sign: for a negative dividend, negate, mask
+		   and negate again; it needs all of D (andconst() changes
+		   only B for a mask that fits in it) */
+		label_no poslab;
+		label_no exitlab;
+
+		testhi();
+		sbranch(GE, poslab = getlabel());
+		negDreg();
+		andconst((offset_T) divisor);
+		if ((uvalue_t) divisor <= CHMASKTO)
+			ctoi();
+		negDreg();
+		sbranch(RA, exitlab = getlabel());
+		outnlabel(poslab);
+		andconst((offset_T) divisor);
+		if ((uvalue_t) divisor <= CHMASKTO)
+			ctoi();
+		outnlabel(exitlab);
 	}
 	return TRUE;
 }
