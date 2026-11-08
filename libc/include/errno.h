@@ -10,6 +10,7 @@
 
 extern int errno;
 
+#define EBADF	9		/* bad file descriptor */
 #define ENOMEM	12		/* out of memory */
 #define EINVAL	22		/* invalid argument */
 #define EDOM	33		/* argument out of a math function's domain */

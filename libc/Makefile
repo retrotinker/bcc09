@@ -12,7 +12,14 @@ AR09	=../ar/ar09
 BCC	=BCC_PREFIX=$(CURDIR)/.bcc ../bcc/bcc09
 BCCFLAGS=-O -Iinclude
 
-# crt0.o: start-up code, linked first (not part of libc.a)
+# libc.a holds what is the same for every target.  Each target has its
+# own start-up code, which bcc09 links first (ld09 -C<name>: crt<name>.o),
+# and a library of what differs (_exit, read, write), selected by bcc09's
+# -M option:
+#   sa:  the default (-Ms, -Me): crt0.o and libsa.a, which return to the
+#        program's loader; no I/O
+#   sim: sim6809 (-Mi): crtsim.o and libsim.a
+#
 # bcc: the run-time helpers the compiler calls
 # ctype: character classes
 # stdlib: stdlib.h's functions, and errno
@@ -35,7 +42,7 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/lincdec.o bcc/lshift.o bcc/lmul.o bcc/ldiv.o \
 	  ctype/ctype.o ctype/ctypefn.o \
 	  $(MALLOC_OBJS) \
-	  stdlib/_exit.o stdlib/exit.o stdlib/atexit.o stdlib/errno.o \
+	  stdlib/exit.o stdlib/atexit.o stdlib/errno.o \
 	  stdlib/sbrk.o \
 	  stdlib/atoi.o stdlib/atol.o $(STRTOL_OBJS) $(ABS_OBJS) \
 	  stdlib/itoa.o stdlib/ltoa.o stdlib/ltostr.o \
@@ -50,11 +57,28 @@ HEADERS	= include/ctype.h include/errno.h include/features.h \
 	  include/stdlib.h include/string.h include/sys/types.h \
 	  include/unistd.h
 
-all: crt0.o libc.a
+SA_OBJS	= sa/_exit.o
+SIM_OBJS = sim/_exit.o sim/read.o sim/write.o
+
+TARGETS	= crt0.o libsa.a crtsim.o libsim.a
+
+all: libc.a $(TARGETS)
 
 libc.a: $(OBJS)
 	rm -f $@
 	$(AR09) rc $@ $(OBJS)
+
+crt0.o: sa/crt0.o
+	cp sa/crt0.o $@
+libsa.a: $(SA_OBJS)
+	rm -f $@
+	$(AR09) rc $@ $(SA_OBJS)
+
+crtsim.o: sim/crtsim.o
+	cp sim/crtsim.o $@
+libsim.a: $(SIM_OBJS)
+	rm -f $@
+	$(AR09) rc $@ $(SIM_OBJS)
 
 .bcc/stamp:
 	rm -rf .bcc
@@ -84,14 +108,14 @@ $(RAND_OBJS): stdlib/%.o: stdlib/rand.c $(HEADERS) .bcc/stamp
 
 $(OBJS): .bcc/stamp $(HEADERS)
 
-install: crt0.o libc.a
+install: libc.a $(TARGETS)
 	install -d $(LIBDIR) $(LIBDIR)/include/sys
-	install -m 644 crt0.o libc.a $(LIBDIR)
+	install -m 644 libc.a $(TARGETS) $(LIBDIR)
 	install -m 644 include/*.h $(LIBDIR)/include
 	install -m 644 include/sys/*.h $(LIBDIR)/include/sys
 
 clean realclean clobber:
-	rm -f crt0.o libc.a $(OBJS)
+	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o sim/*.o
 	rm -rf .bcc
 
 .PHONY: all install clean realclean clobber

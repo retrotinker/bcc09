@@ -2,7 +2,6 @@ libc for bcc09
 
 This will become the port of the dev86 C library.  So far it has:
 
-  crt0.s    start-up code (see below)
   include/  headers: ctype.h, errno.h, limits.h, malloc.h, stdlib.h,
             string.h, stddef.h, unistd.h, sys/types.h, features.h
   bcc/      run-time helpers that the compiler calls for int and long
@@ -16,12 +15,14 @@ This will become the port of the dev86 C library.  So far it has:
   string/   string.h's functions; memcpy (which the compiler also calls
             to copy structures) is in assembly, and the rest are C,
             compiled by bcc09
+  sa/       the default target (see below)
+  sim/      the sim6809 target (see below)
 
-"make" builds crt0.o and libc.a with this tree's bcc09, as09 and ar09
-(libc/.bcc holds links that bcc09 uses to find this tree's passes);
-"make install" puts them in $(PREFIX)/lib/bcc09, where bcc09 tells ld09
-to look for them (bcc09 links with -C0, which is crt0.o, and -lc), and
-the headers in $(PREFIX)/lib/bcc09/include, where bcc09 looks for them.
+"make" builds libc.a, and each target's start-up code and library, with
+this tree's bcc09, as09 and ar09 (libc/.bcc holds links that bcc09 uses
+to find this tree's passes); "make install" puts them in
+$(PREFIX)/lib/bcc09, where bcc09 tells ld09 to look for them, and the
+headers in $(PREFIX)/lib/bcc09/include, where bcc09 looks for them.
 
 All of libc is under the GNU Library General Public License, version 2
 (see COPYING.LIB), rather than the GPL that covers the rest of bcc09,
@@ -75,18 +76,36 @@ away when __BCC__ is defined, as bcc09 does.  Each routine that a program may ne
 own is in its own module, since ld09 only loads the members of a
 library that something refers to.
 
-Start-up code
--------------
+Targets
+-------
 
-crt0.o is for the default target (bcc09 -Ms): a program loaded and
-called by something it can return to, such as Color BASIC's EXEC, a
-monitor or a debugger.  It runs on the stack its loader gave it: start
-(the program's entry point) clears the BSS, saves S and calls main.
-When main returns, its result goes to exit(), which calls the atexit()
-functions, last registered first; then _exit() (also called directly)
-puts the status in D, restores S, and an RTS returns to the loader.
-Programs that have no loader to return to, such as ROMs, will need
-start-up code of their own.
+libc.a holds what is the same everywhere.  What differs between the
+machines and systems a program can run on is in a start-up file and a
+small library for each target, which bcc09 chooses with its -M option
+and links with libc.a (ld09 -C<name> links crt<name>.o):
+
+  -Ms, -Me  sa: crt0.o and libsa.a (the default)
+  -Mi       sim: crtsim.o and libsim.a
+
+The others (-Mu, -Mr, -Mb, -Mo, -Mf, -Mv) have none yet, and bcc09
+won't link for them (bcc09 -x leaves out the start-up code, for a
+program that brings its own).  Each target's start-up code clears the
+BSS and calls main; when main returns, its result goes to exit(), which
+calls the atexit() functions, last registered first, and then _exit(),
+which is the target's.  A target's library has _exit, and read and write
+if the target has a way to do I/O.
+
+sa is for a program loaded and called by something it can return to,
+such as Color BASIC's EXEC, a monitor or a debugger.  It runs on the
+stack its loader gave it: crt0 saves S, and _exit() puts the status in
+D, restores S and returns to the loader.  It has no I/O.
+
+sim is for sim6809, the simulator the tests use (tests/sim).  crtsim
+puts the stack just below the simulator's I/O block at $FF00, and
+_exit() stops the simulator with the low byte of the status as its exit
+status.  write() to fd 1 or 2 goes to the simulator's output, and read()
+from fd 0 reads its input a line at a time, giving 0 at the end (and at
+a 0 byte, which is how the simulator marks the end).
 
 bcc09 links programs at address 0 unless told otherwise, so give it a
 load address for ld09, for example: bcc09 -o prog -X-T0x3000 prog.c
@@ -145,5 +164,5 @@ the operand's size or more (16 or 32), taken as unsigned, give 0, or
 copies of the sign bit for a signed right shift.
 
 The tests in tests/ (ops.c, longops.c, regtest.s, strtest.c, stdtest.c,
-maltest.c, and crtret.c, crtexit.c and crtatexit.c for crt0, exit and
-atexit) check all of this on sim6809.
+maltest.c; crtret.c, crtexit.c and crtatexit.c for the default target;
+hello.c and echo.c for the sim target) check all of this on sim6809.

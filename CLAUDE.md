@@ -41,20 +41,26 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `main` returns, and `_exit()` returns to the loader (such as Color BASIC's `EXEC`)
   with the status in D. The heap grows from `__end` up to the stack pointer minus
   `__heap_margin` (256 bytes; a decision of 2026-11-08), enforced by `sbrk()`/`brk()`.
-  Next: more of the dev86 libc (stdio needs a decision on how each target does I/O),
-  then floating point, and start-up code for other `-M` targets.
+  Targets (2026-11-08): `libc.a` is target-independent; each `-M` target has a start-up
+  file and a library (`_exit`, `read`, `write`) that the driver links: `-Ms`/`-Me` →
+  `crt0.o` + `libsa.a` (returns to the loader, no I/O), `-Mi` → `crtsim.o` + `libsim.a`
+  (sim6809, with I/O). Other targets can't link yet. Next: stdio on top of `read`/`write`,
+  then OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code has a known bug), Color BASIC
+  and FLEX targets, then floating point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
   as dev86's old `strcspn.c`) shouldn't be copied in.
+- `bcc/bcc.doc` is out of date (it describes `-M` as a linker option); auditing it is a
+  TODO item.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
-  macro for the `-M` target. `cc1` doesn't understand `const` or `volatile`;
+  macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
 
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 359 reference
+  `tests/src/` with this tree's tools and compare every result with the 371 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

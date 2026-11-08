@@ -1,4 +1,4 @@
-/* unistd.h - for bcc09's libc (so far, just the heap)
+/* unistd.h - for bcc09's libc
  *
  * Written for bcc09.  Like the rest of libc, it is distributed under the
  * GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -8,6 +8,14 @@
 #define __UNISTD_H
 #include <features.h>
 #include <sys/types.h>
+
+#define STDIN_FILENO	0
+#define STDOUT_FILENO	1
+#define STDERR_FILENO	2
+
+/* each target's library has these (see libc/README) */
+extern ssize_t read __P ((int, void *, size_t));
+extern ssize_t write __P ((int, __const void *, size_t));
 
 /* move the end of the heap (see sbrk.s); the heap stays __heap_margin
    bytes below the stack pointer */

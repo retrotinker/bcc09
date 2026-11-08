@@ -1,4 +1,5 @@
-; _exit(status): end the program at once, returning to its loader
+; _exit(status): end the program at once, returning to its loader (the
+; default target, bcc09 -Ms)
 ;
 ; crt0 saved the loader's stack pointer in __savesp; put it back and
 ; return to the loader, with the status in D.  (exit(), in exit.c, calls

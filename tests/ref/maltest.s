@@ -174,17 +174,22 @@
 ; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/unistd.h"
-; 10 
-; 11 
-; 12 
-; 13  
-; 14 extern int brk ();
+; 10 # 16
+; 16  
+; 17 extern ssize_t read ();
 ;BCC_EOS
-; 15 extern void * sbrk ();
+; 18 extern ssize_t write ();
 ;BCC_EOS
-; 16 extern unsigned int __heap_margin;
+; 19 
+; 20 
+; 21  
+; 22 extern int brk ();
 ;BCC_EOS
-; 17 # 15 "maltest.c"
+; 23 extern void * sbrk ();
+;BCC_EOS
+; 24 extern unsigned int __heap_margin;
+;BCC_EOS
+; 25 # 15 "maltest.c"
 ; 15 extern int putchar();
 ;BCC_EOS
 ; 16 extern void putnum();
@@ -1048,13 +1053,14 @@ _overlaps:
 ; 129 	int i, j;
 ;BCC_EOS
 ; 130 
-; 131 	for (i = 0; i < 40 ; i++)
+; 131 	for (i = 0; i < 40 ; i++
 	LEAS	-4,S
 ; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
 	LDD	#0
 	STD	2,S
 ;BCC_EOS
 ;BCC_EOS
+; 131 )
 ; 132 		for (j = i + 1; j < 40 ; j++)
 	JMP	.45
 .46:
@@ -1065,10 +1071,9 @@ _overlaps:
 	STD	0,S
 ;BCC_EOS
 ;BCC_EOS
-; 133 			if (slot[i] && slo
-	BRA	.49
+; 133 			if (slot[i] && slot[j]
+	JMP	.49
 .4A:
-; 133 t[j]
 ; 134 			    && slot[i] < slot[j] + size[j]
 ; 135 			    && slot[j] < slot[i] + size[i])
 ; Debug: ptradd int i = [S+4-2] to [$28] * char = slot+0 (used reg = )
@@ -2200,7 +2205,8 @@ _heap:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 247 	ok(47,brk(start + 50)== 0 && sbrk(0)== start + 50);
+; 247 	ok(47,brk(
+; 247 start + 50)== 0 && sbrk(0)== start + 50);
 ; Debug: ptradd int = const $32 to * char start = [S+6-2] (used reg = )
 	LDX	4,S
 ; Debug: rootlist * char = X+$32 (used reg = )
@@ -2238,8 +2244,7 @@ _heap:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 248 	ok(48,brk(st
-; 248 art)== 0);
+; 248 	ok(48,brk(start)== 0);
 ; Debug: rootlist * char start = [S+6-2] (used reg = )
 	LDX	4,S
 ; Debug: func () int = brk+0 (used reg = )

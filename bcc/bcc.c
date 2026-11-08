@@ -15,6 +15,7 @@
  *	-Mo	Microware OS-9
  *	-Mf	TSC Flex
  *	-Mv	GCE Vectrex
+ *	-Mi	sim6809, the simulator in tests/sim
  */
 #include <stdio.h>
 #ifdef __STDC__
@@ -86,7 +87,13 @@ enum supported_arches {
 	MC6809_OS9,
 	MC6809_FLEX,
 	MC6809_VECTREX,
+	MC6809_SIM,
 } opt_arch;
+
+/* each target's start-up code (ld09 -C: crt<name>.o) and library of what
+   differs between targets (_exit, read, write); 0 if there are none yet */
+char *crtname = 0;
+char *targetlib = 0;
 
 int opt_v, opt_V, opt_e, opt_x, opt_I, opt_L, opt_W, opt_O, opt_M;
 
@@ -421,13 +428,19 @@ void run_link()
 	if (!opt_L)
 		command_opt(default_libdir);
 
-	if (!opt_x)
-		command_opt("-C0");
+	if (!opt_x) {
+		if (!crtname)
+			fatal("no start-up code for this -M target yet "
+			      "(use -x, and your own)");
+		command_opt(crtname);
+	}
 
 	for (next_file = files; next_file; next_file = next_file->next)
 		command_opt(next_file->file);
 
 	command_opt(libc);
+	if (targetlib)
+		command_opt(targetlib);
 	run_command(0);
 }
 
@@ -880,10 +893,14 @@ char **argv;
 	case 's':
 		prepend_option("-D__STANDALONE_", 'p');
 		opt_arch = MC6809_STANDALONE;
+		crtname = "-C0";	/* returns to its loader */
+		targetlib = "-lsa";
 		break;
 	case 'e':
 		prepend_option("-D__CB__", 'p');
 		opt_arch = MC6809_CB_EXEC;
+		crtname = "-C0";	/* EXEC is a loader to return to */
+		targetlib = "-lsa";
 		break;
 	case 'u':
 		prepend_option("-D__CB__", 'p');
@@ -911,9 +928,15 @@ char **argv;
 		prepend_option("-D__VECTREX__", 'p');
 		opt_arch = MC6809_VECTREX;
 		break;
+	case 'i':
+		prepend_option("-D__SIM6809__", 'p');
+		opt_arch = MC6809_SIM;
+		crtname = "-Csim";
+		targetlib = "-lsim";
+		break;
 	default:
 		fatal("Unknown model specifier for -M valid are: "
-		      "s,e,u,r,b,o,f,v");
+		      "s,e,u,r,b,o,f,v,i");
 	}
 
 	if (do_optim)

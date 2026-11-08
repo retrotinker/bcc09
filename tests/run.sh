@@ -47,7 +47,8 @@ ln -s "$top/as/as09" "$top/ld/ld09" "$top/ar/ar09" "$top/bcc/bcc09" \
 ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" "$prefix/libexec/bcc09/"
 mkdir -p "$prefix/lib/bcc09"
-ln -s "$top/libc/crt0.o" "$top/libc/libc.a" "$top/libc/include" \
+ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
+	"$top/libc/libsa.a" "$top/libc/crtsim.o" "$top/libc/libsim.a" \
 	"$prefix/lib/bcc09/"
 LIBDIR=$prefix/lib/bcc09
 # (relative to $out, where everything runs: the compiler's output names
@@ -277,6 +278,21 @@ for f in crtret crtexit crtatexit; do
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
+
+# programs for the sim6809 target (bcc09 -Mi), built by bcc09 alone and
+# run as the simulator runs them: hello.c prints a line and returns 3;
+# echo.c echoes its input (echo.in) in upper case, checks bad file
+# descriptors and atexit(), and returns the number of lines; and a
+# target with no start-up code yet can't be linked
+for f in hello echo; do
+	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
+	"$OC" -O srec $f.out $f.srec
+	"$SIM" -n 10000000 $f.srec < echo.in > $f.run 2>&1
+	echo $? > $f.run.rc
+	rm -f $f.srec
+done
+run notarget.bcc "$BCC" -Mo -o notarget.out hello.c
+rm -f notarget.out
 
 # the copied sources aren't results
 for f in "$tests"/src/*; do
