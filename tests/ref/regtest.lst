@@ -1,60 +1,164 @@
-00001                   ; run on sim6809: each run-time helper in libc must leave Y and U as
-00002                   ; they were (the compiler keeps values in them across the call); exits
-00003                   ; with the number of helpers that changed one of them
-00004                   
-00005 0000              	.text
-00006                   	entry	start
-00007                   	import	imul
-00008                   	import	imulu
-00009                   	import	idiv
-00010                   	import	imod
-00011                   	import	idivu
-00012                   	import	imodu
-00013                   	import	isl
-00014                   	import	islu
-00015                   	import	isr
-00016                   	import	isru
-00017                   
-00018 0000 10CE   7F00  start:	lds	#$7f00
-00019 0004   7F   0002> 	clr	fails
-00020 0007 108E   0040> 	ldy	#table
-00021 000B   AE     A1  next:	ldx	,y++		; the next helper, or 0 at the end
-00022 000D   27     29  	beq	done
-00023 000F   34     20  	pshs	y
-00024 0011 108E   A55A  	ldy	#$a55a		; values to look for afterwards
-00025 0015   CE   5AA5  	ldu	#$5aa5
-00026 0018   BF   0000> 	stx	helper
-00027 001B   CC   FC18  	ldd	#-1000		; operands that make each helper loop
-00028 001E   8E   0007  	ldx	#7
-00029 0021   AD9F 0000> 	jsr	[helper]
-00030 0025 108C   A55A  	cmpy	#$a55a
-00031 0029   26     06  	bne	bad
-00032 002B 1183   5AA5  	cmpu	#$5aa5
-00033 002F   27     03  	beq	good
-00034 0031   7C   0002> bad:	inc	fails
-00035 0034   35     20  good:	puls	y
-00036 0036   20     D3  	bra	next
-00037 0038   F6   0002> done:	ldb	fails
-00038 003B   F7   FF02  	stb	$ff02		; exit with that number
-00039 003E   20     FE  stop:	bra	stop
-00040                   
-00041 0040        0000> table:	fdb	imul,imulu,idiv,imod,idivu,imodu,isl,islu,isr,isru,0
-00042                   
-00043 0000              	.bss
-00044 0000        0002  helper:	.blkb	2
-00045 0002        0001  fails:	.blkb	1
+00001                   ; run on sim6809: each run-time helper in libc must leave alone the
+00002                   ; registers the compiler keeps values in across the call: Y and U for
+00003                   ; the 16-bit helpers, U for the 32-bit ones, and all but CC for linc_b
+00004                   ; and ldec_b; exits with the number of helpers that changed one of them
+00005                   
+00006 0000              	.text
+00007                   	entry	start
+00008                   	import	imul
+00009                   	import	imulu
+00010                   	import	idiv
+00011                   	import	imod
+00012                   	import	idivu
+00013                   	import	imodu
+00014                   	import	isl
+00015                   	import	islu
+00016                   	import	isr
+00017                   	import	isru
+00018                   	import	ladd_b
+00019                   	import	laddu_b
+00020                   	import	lsub_b
+00021                   	import	lsubu_b
+00022                   	import	land_b
+00023                   	import	landu_b
+00024                   	import	lor_b
+00025                   	import	loru_b
+00026                   	import	leor_b
+00027                   	import	leoru_b
+00028                   	import	lmul_b
+00029                   	import	lmulu_b
+00030                   	import	ldiv_b
+00031                   	import	ldivu_b
+00032                   	import	lmod_b
+00033                   	import	lmodu_b
+00034                   	import	lcmp_b
+00035                   	import	lcmpu_b
+00036                   	import	ltst_b
+00037                   	import	lneg_b
+00038                   	import	lcom_b
+00039                   	import	lsl_b
+00040                   	import	lslu_b
+00041                   	import	lsr_b
+00042                   	import	lsru_b
+00043                   	import	linc_b
+00044                   	import	ldec_b
+00045                   
+00046 0000 10CE   7F00  start:	lds	#$7f00
+00047 0004   7F   0006> 	clr	fails
+00048                   
+00049                   ; 16-bit helpers: D and X are the operands; keep Y and U
+00050 0007 108E   00A8> 	ldy	#itable
+00051 000B   AE     A1  inext:	ldx	,y++		; the next helper, or 0 at the end
+00052 000D   27     29  	beq	idone
+00053 000F   34     20  	pshs	y
+00054 0011   BF   0004> 	stx	helper
+00055 0014 108E   A55A  	ldy	#$a55a		; values to look for afterwards
+00056 0018   CE   5AA5  	ldu	#$5aa5
+00057 001B   CC   FC18  	ldd	#-1000		; operands that make each helper loop
+00058 001E   8E   0007  	ldx	#7
+00059 0021   AD9F 0004> 	jsr	[helper]
+00060 0025 108C   A55A  	cmpy	#$a55a
+00061 0029   26     06  	bne	ibad
+00062 002B 1183   5AA5  	cmpu	#$5aa5
+00063 002F   27     03  	beq	igood
+00064 0031   7C   0006> ibad:	inc	fails
+00065 0034   35     20  igood:	puls	y
+00066 0036   20     D3  	bra	inext
+00067                   
+00068                   ; 32-bit helpers: D:X and the long at Y are the operands (Y is the
+00069                   ; count for shifts); keep U
+00070 0038 108E   00BE> idone:	ldy	#ltable
+00071 003C   AE     A1  lnext:	ldx	,y++
+00072 003E   27     24  	beq	ldone
+00073 0040   34     20  	pshs	y
+00074 0042   BF   0004> 	stx	helper
+00075 0045 10AE     A4  	ldy	,y		; the long, or the count
+00076 0048   CE   5AA5  	ldu	#$5aa5
+00077 004B   CC   FFFE  	ldd	#$fffe		; -100000
+00078 004E   8E   7960  	ldx	#$7960
+00079 0051   AD9F 0004> 	jsr	[helper]
+00080 0055 1183   5AA5  	cmpu	#$5aa5
+00081 0059   27     03  	beq	lgood
+00082 005B   7C   0006> 	inc	fails
+00083 005E   35     20  lgood:	puls	y
+00084 0060   31     22  	leay	2,y
+00085 0062   20     D8  	bra	lnext
+00086                   
+00087                   ; linc_b and ldec_b: X points at the long; keep D, X, Y and U
+00088 0064 108E   0124> ldone:	ldy	#ctable
+00089 0068   AE     A1  cnext:	ldx	,y++
+00090 006A   27     34  	beq	done
+00091 006C   34     20  	pshs	y
+00092 006E   BF   0004> 	stx	helper
+00093 0071   CC   1234  	ldd	#$1234
+00094 0074   8E   0000> 	ldx	#along
+00095 0077 108E   A55A  	ldy	#$a55a
+00096 007B   CE   5AA5  	ldu	#$5aa5
+00097 007E   AD9F 0004> 	jsr	[helper]
+00098 0082 1083   1234  	cmpd	#$1234
+00099 0086   26     11  	bne	cbad
+00100 0088   8C   0000> 	cmpx	#along
+00101 008B   26     0C  	bne	cbad
+00102 008D 108C   A55A  	cmpy	#$a55a
+00103 0091   26     06  	bne	cbad
+00104 0093 1183   5AA5  	cmpu	#$5aa5
+00105 0097   27     03  	beq	cgood
+00106 0099   7C   0006> cbad:	inc	fails
+00107 009C   35     20  cgood:	puls	y
+00108 009E   20     C8  	bra	cnext
+00109                   
+00110 00A0   F6   0006> done:	ldb	fails
+00111 00A3   F7   FF02  	stb	$ff02		; exit with that number
+00112 00A6   20     FE  stop:	bra	stop
+00113                   
+00114 00A8        0000> itable:	fdb	imul,imulu,idiv,imod,idivu,imodu,isl,islu,isr,isru,0
+00115                   ; each 32-bit helper, and its Y
+00116 00BE        0000> ltable:	fdb	ladd_b,along,laddu_b,along,lsub_b,along,lsubu_b,along
+00117 00CE        0000> 	fdb	land_b,along,landu_b,along,lor_b,along,loru_b,along
+00118 00DE        0000> 	fdb	leor_b,along,leoru_b,along,lmul_b,along,lmulu_b,along
+00119 00EE        0000> 	fdb	ldiv_b,along,ldivu_b,along,lmod_b,along,lmodu_b,along
+00120 00FE        0000> 	fdb	lcmp_b,along,lcmpu_b,along,ltst_b,along,lneg_b,along
+00121 010E        0000> 	fdb	lcom_b,along
+00122 0112        0000> 	fdb	lsl_b,5,lslu_b,5,lsr_b,5,lsru_b,5
+00123 0122        0000  	fdb	0
+00124 0124        0000> ctable:	fdb	linc_b,ldec_b,0
+00125                   
+00126 0000              	.data
+00127 0000        0001  along:	fdb	$0001,$86a0	; 100000
+00128                   
+00129 0004              	.bss
+00130 0004        0002  helper:	.blkb	2
+00131 0006        0001  fails:	.blkb	1
 
 Symbols:
-bad                         0 0031 R   done                        0 0038 R   
-fails                       3 0002 R   good                        0 0034 R   
-helper                      3 0000 R   idiv                        0 0000 R I 
-idivu                       0 0000 R I imod                        0 0000 R I 
+along                       3 0000 R   cbad                        0 0099 R   
+cgood                       0 009C R   cnext                       0 0068 R   
+ctable                      0 0124 R   done                        0 00A0 R   
+fails                       3 0006 R   helper                      3 0004 R   
+ibad                        0 0031 R   idiv                        0 0000 R I 
+idivu                       0 0000 R I idone                       0 0038 R   
+igood                       0 0034 R   imod                        0 0000 R I 
 imodu                       0 0000 R I imul                        0 0000 R I 
-imulu                       0 0000 R I isl                         0 0000 R I 
-islu                        0 0000 R I isr                         0 0000 R I 
-isru                        0 0000 R I next                        0 000B R   
-start                       0 0000 R N stop                        0 003E R   
-table                       0 0040 R   
+imulu                       0 0000 R I inext                       0 000B R   
+isl                         0 0000 R I islu                        0 0000 R I 
+isr                         0 0000 R I isru                        0 0000 R I 
+itable                      0 00A8 R   ladd_b                      0 0000 R I 
+laddu_b                     0 0000 R I land_b                      0 0000 R I 
+landu_b                     0 0000 R I lcmp_b                      0 0000 R I 
+lcmpu_b                     0 0000 R I lcom_b                      0 0000 R I 
+ldec_b                      0 0000 R I ldiv_b                      0 0000 R I 
+ldivu_b                     0 0000 R I ldone                       0 0064 R   
+leor_b                      0 0000 R I leoru_b                     0 0000 R I 
+lgood                       0 005E R   linc_b                      0 0000 R I 
+lmod_b                      0 0000 R I lmodu_b                     0 0000 R I 
+lmul_b                      0 0000 R I lmulu_b                     0 0000 R I 
+lneg_b                      0 0000 R I lnext                       0 003C R   
+lor_b                       0 0000 R I loru_b                      0 0000 R I 
+lsl_b                       0 0000 R I lslu_b                      0 0000 R I 
+lsr_b                       0 0000 R I lsru_b                      0 0000 R I 
+lsub_b                      0 0000 R I lsubu_b                     0 0000 R I 
+ltable                      0 00BE R   ltst_b                      0 0000 R I 
+start                       0 0000 R N stop                        0 00A6 R   
 
 00000 errors
 00000 warnings

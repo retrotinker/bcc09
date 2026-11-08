@@ -2,8 +2,8 @@ libc for bcc09
 
 This will become the port of the dev86 C library.  So far it has:
 
-  bcc/      run-time helpers that the compiler calls for operations the
-            6809 can't do in a few instructions
+  bcc/      run-time helpers that the compiler calls for int and long
+            operations the 6809 can't do in a few instructions
   string/   memcpy (which the compiler also calls to copy structures)
 
 "make" builds libc.a with this tree's as09 and ar09; "make install"
@@ -28,13 +28,42 @@ the compiler keeps values in Y and U across the call.
   isr             D >> X, arithmetic
   isru            D >> X, logical
 
+The helpers for 32-bit long and unsigned long operations (cc1's
+longop.c and hardop.c) hold a long in the register pair D:X, with the
+high word in D and the low word in X (longs are big-endian, like the
+6809).  For a binary operation, the left operand is in D:X and Y points
+at the right one, high word first; the result is in D:X.  A shift
+count, an int, is in Y instead.  The name ends in "u" for unsigned
+operands (where it matters), then "_b" for big-endian.  They may change
+D, X, Y and CC, and must leave U as it was.
+
+  ladd_b, lsub_b                  D:X + [Y], D:X - [Y]
+  land_b, lor_b, leor_b           D:X & [Y], | [Y], ^ [Y]
+  lmul_b                          D:X * [Y] (low 32 bits)
+  ldiv_b, ldivu_b                 D:X / [Y]
+  lmod_b, lmodu_b                 D:X % [Y]
+  lsl_b, lsr_b, lsru_b            D:X << Y, >> Y (arithmetic, logical)
+  lneg_b, lcom_b                  -D:X, ~D:X
+  lcmp_b, lcmpu_b                 set CC as a 32-bit compare of D:X
+                                  with [Y] would, for signed (LT, GE,
+                                  ...) or unsigned (LO, HS, ...) branches
+  ltst_b                          set CC as comparing D:X with 0 would
+  linc_b, ldec_b                  add 1 to, or subtract 1 from, the long
+                                  at X; change only it and CC (the
+                                  compiler keeps the old value in D:U)
+
+(laddu_b, lsubu_b, landu_b, loru_b, leoru_b, lmulu_b and lslu_b are the
+same routines as their signed names.)
+
 Ordinary C functions such as memcpy take their first argument in X and
 the others on the stack, in order, above the return address; the caller
 removes them.  An int or pointer result is returned in X.
 
 Behavior C leaves undefined: signed division truncates toward zero and
 the remainder has the sign of the dividend (as C99 requires); division
-by zero doesn't trap (see bcc/idiv.s); shift counts of 16 or more, taken
-as unsigned, give 0, or copies of the sign bit for isr.
+by zero doesn't trap (see bcc/idiv.s and bcc/ldiv.s); shift counts of
+the operand's size or more (16 or 32), taken as unsigned, give 0, or
+copies of the sign bit for a signed right shift.
 
-The tests in tests/ (ops.c, regtest.s) check all of this on sim6809.
+The tests in tests/ (ops.c, longops.c, regtest.s) check all of this on
+sim6809.

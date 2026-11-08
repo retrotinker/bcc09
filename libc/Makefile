@@ -10,6 +10,8 @@ AR09	=../ar/ar09
 # bcc: the run-time helpers the compiler calls
 # string: string and memory functions
 OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
+	  bcc/laddsub.o bcc/llogic.o bcc/lcmp.o bcc/lunary.o \
+	  bcc/lincdec.o bcc/lshift.o bcc/lmul.o bcc/ldiv.o \
 	  string/memcpy.o
 
 all: libc.a

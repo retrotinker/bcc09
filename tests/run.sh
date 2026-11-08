@@ -101,8 +101,8 @@ echo $? > cpp-E.rc
 
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
-csrc="arith calls control float helpmain long main ops proto ptr selftest
-      struct switch"
+csrc="arith calls control float helpmain long longops main ops proto ptr
+      selftest struct switch"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -211,18 +211,25 @@ rm -f selftest.srec selftest-O.srec selftest-O.out selftest-O.map \
 
 # libc's run-time helpers: ops.c checks 16-bit multiply, divide,
 # modulus and shifts (through the helpers, and the compiler's own code
-# for constants) and memcpy against tables from tests/gen-opsdata.py, and
-# exits with the number of failures; regtest.s checks that each helper
-# leaves Y and U alone
+# for constants) and memcpy against tables from tests/gen-opsdata.py;
+# longops.c checks 32-bit long arithmetic, comparisons, shifts, unary
+# operations, ++, -- and conversions against tables from
+# tests/gen-longdata.py; each exits with the number of failures;
+# regtest.s checks that each helper leaves alone the registers the
+# compiler relies on
 link ops	-T0x1000 simcrt0.o ops.o -L"$LIBDIR" -lc
 "$OC" -O srec ops.out ops.srec
 "$SIM" -n 50000000 ops.srec > ops.run 2>&1
 echo $? > ops.run.rc
+link longops	-T0x1000 simcrt0.o longops.o -L"$LIBDIR" -lc
+"$OC" -O srec longops.out longops.srec
+"$SIM" -n 500000000 longops.srec > longops.run 2>&1
+echo $? > longops.run.rc
 link regtest	-T0x1000 regtest.o -L"$LIBDIR" -lc
 "$OC" -O srec regtest.out regtest.srec
 "$SIM" -n 1000000 regtest.srec > regtest.run 2>&1
 echo $? > regtest.run.rc
-rm -f ops.srec regtest.srec
+rm -f ops.srec longops.srec regtest.srec
 
 # the copied sources aren't results
 for f in "$tests"/src/*; do
