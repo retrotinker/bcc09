@@ -915,10 +915,8 @@ char **argv;
 		      "s,e,u,r,b,o,f,v");
 	}
 
-	if (do_optim) {
+	if (do_optim)
 		append_option("-O", 'C');
-		append_option("-O", 'a');
-	}
 
 #ifdef VERSION
 	{
