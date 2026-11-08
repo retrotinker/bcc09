@@ -76,7 +76,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 462 reference
+  `tests/src/` with this tree's tools and compare every result with the 463 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -105,7 +105,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   functions only libc has are under `#ifdef __BCC__` or `sizeof` tests.
 - `tests/src/pftest.c` (built with `-Mi`) prints a grid of `printf` formats, which must
   be byte-for-byte what the host's `printf` prints (as must `chartest.c`, chars passed
-  and returned with prototypes, but for its count of checks); `siotest.c` checks the `FILE`
+  and returned with prototypes, and `sadd.c`, ints and signed chars added and
+  subtracted, but for their counts of checks); `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
 - `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
   ROMs, in `~/.xroar/roms`) builds `tests/xroar/xcb.c` with `-Me`, puts it on a cassette

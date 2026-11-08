@@ -289,8 +289,8 @@ done
 # number of lines; pftest.c prints a grid of printf formats, which must
 # be the same with the host's printf; siotest.c checks stdio's FILE
 # functions; chartest.c passes and returns chars with prototypes; sadd.c
-# shows a bug (see BUGS); and a target with no start-up code yet can't
-# be linked
+# adds and subtracts ints and signed chars; and a target with no start-up
+# code yet can't be linked
 for f in hello echo pftest siotest chartest sadd; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
@@ -300,9 +300,9 @@ for f in hello echo pftest siotest chartest sadd; do
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
-# pftest.c and chartest.c must print the same with the host's compiler
-# and C library (but for the count of checks, which differs)
-for f in pftest chartest; do
+# pftest.c, chartest.c and sadd.c must print the same with the host's
+# compiler and C library (but for the count of checks, which differs)
+for f in pftest chartest sadd; do
 	if ${CC:-cc} -std=gnu89 -w -o $f-host $f.c > /dev/null 2>&1 &&
 	   ./$f-host > $f-host.run 2>&1 &&
 	   grep -v '^checks ' $f.run > $f.cmp &&

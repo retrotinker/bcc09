@@ -44,21 +44,15 @@ signed char sc_neg(signed char c)
 	return -c;
 }
 
-/* (the signed chars go into ints first: adding a signed char in memory
-   to an int doesn't sign-extend it yet; see BUGS) */
 int widen(unsigned char a, signed char b)
 {
-	int ib = b;
-
-	return a * 100 + ib;
+	return a * 100 + b;
 }
 
 /* a char as the second argument, on the stack */
 int second(int a, unsigned char b, signed char c)
 {
-	int ic = c;
-
-	return a + b * 2 + ic;
+	return a + b * 2 + c;
 }
 
 unsigned char uc_rec(unsigned char n)

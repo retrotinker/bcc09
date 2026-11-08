@@ -35,13 +35,6 @@ cc1 (code generation)
   References: none stable (maltest.s's JMP .49 has come and gone as
   headers it includes changed size)
 
-- Adding a signed char in memory to an int adds it as if it were
-  unsigned: with int a = 10 and signed char c = -1, a + c gives 265.
-  add() in bcc/hardop.c adds the byte with ADDB and then ADCA #0, which
-  zero-extends it; a signed char needs sign-extending.  (Plain char is
-  unsigned in bcc09, so only signed char is affected.)
-  References: sadd.run (265; tests/src/chartest.c works around it)
-
 - In PIC mode, global (bss?) pointers and arrays use PC-relative
   addressing rather than direct addressing.  (Not covered by the tests.)
 

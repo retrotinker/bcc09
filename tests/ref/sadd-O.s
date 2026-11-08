@@ -1,8 +1,10 @@
 ; 1 
 ; 1 # 1 "sadd.c"
 ; 1 
-; 2  
-; 3 # 8 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 2 
+; 3 
+; 4  
+; 5 # 8 "../prefix.tmp/lib/bcc09/include/stdio.h"
 ; 8  
 ; 9 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -141,35 +143,96 @@
 ;BCC_EOS
 ; 134 extern int vsnprintf ();
 ;BCC_EOS
-; 135 # 6 "sadd.c"
-; 6 int main()
-; 7 {
+; 135 # 8 "sadd.c"
+; 8 signed char gc = -1;
+LOC	3
+EXPORT	_gc
+_gc:
+FCB	$FF
+;BCC_EOS
+; 9 unsigned char guc = 255;
+EXPORT	_guc
+_guc:
+FCB	$FF
+;BCC_EOS
+; 10 
+; 11 unsigned char ucf(v)
+; 12 # 11 "sadd.c"
+; 11 unsigned char v;
+LOC	0
+EXPORT	_ucf
+_ucf:
+;BCC_EOS
+; 12 {
+; 13 	return v;
+PSHS	X
+LDB	1,S
+CLRA
+TFR	D,X
+PULS	Y,PC
+;BCC_EOS
+; 14 }
+; 15 
+; 16 signed char scf(v)
+; 17 # 16 "sadd.c"
+; 16 signed char v;
+EXPORT	_scf
+_scf:
+;BCC_EOS
+; 17 {
+; 18 	return v;
+PSHS	X
+LDB	1,S
+SEX
+TFR	D,X
+PULS	Y,PC
+;BCC_EOS
+; 19 }
+; 20 
+; 21 int main()
+; 22 {
 EXPORT	_main
 _main:
-; 8 	int a = 10;
+; 23 	int a = 10, r, i, t;
 LEAS	-2,S
 ; Debug: eq int = const $A to int a = [S+2-2] (used reg = )
 LDD	#$A
 STD	0,S
 ;BCC_EOS
-; 9 	signed char c = -1;
+; 24 	signed char c = -1, d = -3, *p = &c;
+LEAS	-7,S
+; Debug: eq int = const -1 to char c = [S+9-9] (used reg = )
+LDB	#$FF
+STB	0,S
 LEAS	-1,S
-; Debug: eq int = const -1 to char c = [S+3-3] (used reg = )
+; Debug: eq int = const -3 to char d = [S+$A-$A] (used reg = )
+LDB	#$FD
+STB	0,S
+LEAS	-2,S
+; Debug: eq * char c = S+$C-9 to * char p = [S+$C-$C] (used reg = )
+LEAX	3,S
+STX	0,S
+;BCC_EOS
+; 25 	unsigned char uc = 255;
+LEAS	-1,S
+; Debug: eq int = const $FF to unsigned char uc = [S+$D-$D] (used reg = )
 LDB	#$FF
 STB	0,S
 ;BCC_EOS
-; 10 
-; 11 	printf("%d\n",a + c);
+; 26 
+; 27 	printf("a + c %d\n",a + c);
 LOC	1
 .1:
-FCC	"%d"
+FCC	"a + c %d"
 FCB	$A
 FCB	0
 LOC	0
-; Debug: add char c = [S+3-3] to int a = [S+3-2] (used reg = )
-LDD	1,S
-ADDB	0,S
-ADCA	#0
+; Debug: add char c = [S+$D-9] to int a = [S+$D-2] (used reg = )
+LDB	4,S
+SEX
+PSHS	D
+LDD	$D,S
+ADDD	,S++
 ; Debug: list int = D+0 (used reg = )
 PSHS	D
 ; Debug: rootlist * char = .1+0 (used reg = )
@@ -178,10 +241,570 @@ LDX	#.1
 JSR	>_printf
 LEAS	2,S
 ;BCC_EOS
-; 12 	return 0;
-LDX	#0
-PULS	B,Y,PC
+; 28 	printf("c + a %d\n",c + a);
+LOC	1
+.2:
+FCC	"c + a %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: add int a = [S+$D-2] to char c = [S+$D-9] (used reg = )
+LDB	4,S
+SEX
+ADDD	$B,S
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .2+0 (used reg = )
+LDX	#.2
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
 ;BCC_EOS
-; 13 }
-; 14 
+; 29 	printf("a - c %d\n",a - c);
+LOC	1
+.3:
+FCC	"a - c %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: sub char c = [S+$D-9] to int a = [S+$D-2] (used reg = )
+LDB	4,S
+SEX
+PSHS	D
+LDD	$D,S
+SUBD	,S++
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .3+0 (used reg = )
+LDX	#.3
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 30 	printf("c - a %d\n",c - a);
+LOC	1
+.4:
+FCC	"c - a %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: sub int a = [S+$D-2] to char c = [S+$D-9] (used reg = )
+LDB	4,S
+SEX
+SUBD	$B,S
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .4+0 (used reg = )
+LDX	#.4
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 31 	printf("a + gc %d\n",a + gc);
+LOC	1
+.5:
+FCC	"a + gc %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: add char = [gc+0] to int a = [S+$D-2] (used reg = )
+LDB	>_gc
+SEX
+PSHS	D
+LDD	$D,S
+ADDD	,S++
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .5+0 (used reg = )
+LDX	#.5
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 32 	printf("a + *p %d\n",a + *p);
+LOC	1
+.6:
+FCC	"a + *p %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: add char p = [[S+$D-$C]] to int a = [S+$D-2] (used reg = )
+LDB	[1,S]
+SEX
+PSHS	D
+LDD	$D,S
+ADDD	,S++
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .6+0 (used reg = )
+LDX	#.6
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 33 	printf("a + uc %d\n",a + uc);
+LOC	1
+.7:
+FCC	"a + uc %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: add unsigned char uc = [S+$D-$D] to int a = [S+$D-2] (used reg = )
+LDD	$B,S
+ADDB	0,S
+ADCA	#0
+; Debug: list unsigned int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .7+0 (used reg = )
+LDX	#.7
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 34 	printf("a + guc %d\n",a + guc);
+LOC	1
+.8:
+FCC	"a + guc %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: add unsigned char = [guc+0] to int a = [S+$D-2] (used reg = )
+LDD	$B,S
+ADDB	>_guc
+ADCA	#0
+; Debug: list unsigned int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .8+0 (used reg = )
+LDX	#.8
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 35 	r = a;
+; Debug: eq int a = [S+$D-2] to int r = [S+$D-4] (used reg = )
+LDD	$B,S
+STD	9,S
+;BCC_EOS
+; 36 	r += c;
+; Debug: addab char c = [S+$D-9] to int r = [S+$D-4] (used reg = )
+LDB	4,S
+SEX
+PSHS	D
+LDD	$B,S
+ADDD	,S++
+STD	9,S
+;BCC_EOS
+; 37 	printf
+; 37 ("r += c %d\n",r);
+LOC	1
+.9:
+FCC	"r += c %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: list int r = [S+$D-4] (used reg = )
+LDD	9,S
+PSHS	D
+; Debug: rootlist * char = .9+0 (used reg = )
+LDX	#.9
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 38 	r = a;
+; Debug: eq int a = [S+$D-2] to int r = [S+$D-4] (used reg = )
+LDD	$B,S
+STD	9,S
+;BCC_EOS
+; 39 	r -= c;
+; Debug: subab char c = [S+$D-9] to int r = [S+$D-4] (used reg = )
+LDB	4,S
+SEX
+PSHS	D
+LDD	$B,S
+SUBD	,S++
+STD	9,S
+;BCC_EOS
+; 40 	printf("r -= c %d\n",r);
+LOC	1
+.A:
+FCC	"r -= c %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: list int r = [S+$D-4] (used reg = )
+LDD	9,S
+PSHS	D
+; Debug: rootlist * char = .A+0 (used reg = )
+LDX	#.A
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 41 	r = a;
+; Debug: eq int a = [S+$D-2] to int r = [S+$D-4] (used reg = )
+LDD	$B,S
+STD	9,S
+;BCC_EOS
+; 42 	r += gc;
+; Debug: addab char = [gc+0] to int r = [S+$D-4] (used reg = )
+LDB	>_gc
+SEX
+PSHS	D
+LDD	$B,S
+ADDD	,S++
+STD	9,S
+;BCC_EOS
+; 43 	printf("r += gc %d\n",r);
+LOC	1
+.B:
+FCC	"r += gc %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: list int r = [S+$D-4] (used reg = )
+LDD	9,S
+PSHS	D
+; Debug: rootlist * char = .B+0 (used reg = )
+LDX	#.B
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 44 	printf("c + c %d\n",c + c);
+LOC	1
+.C:
+FCC	"c + c %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: add char c = [S+$D-9] to char c = [S+$D-9] (used reg = )
+LDB	4,S
+SEX
+PSHS	D
+LDB	6,S
+SEX
+ADDD	,S++
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .C+0 (used reg = )
+LDX	#.C
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 45 	printf("c + d %d\n",c + d);
+LOC	1
+.D:
+FCC	"c + d %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: add char d = [S+$D-$A] to char c = [S+$D-9] (used reg = )
+LDB	3,S
+SEX
+PSHS	D
+LDB	6,S
+SEX
+ADDD	,S++
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .D+0 (used reg = )
+LDX	#.D
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 46 	printf("c - d %d\n",c - d);
+LOC	1
+.E:
+FCC	"c - d %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: sub char d = [S+$D-$A] to char c = [S+$D-9] (used reg = )
+LDB	3,S
+SEX
+PSHS	D
+LDB	6,S
+SEX
+SUBD	,S++
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .E+0 (used reg = )
+LDX	#.E
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 47 	printf("a + c + 1 %d\n",a + c + 1);
+LOC	1
+.F:
+FCC	"a + c + 1 %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: add char c = [S+$D-9] to int a = [S+$D-2] (used reg = )
+LDB	4,S
+SEX
+PSHS	D
+LDD	$D,S
+ADDD	,S++
+; Debug: add int = const 1 to int = D+0 (used reg = )
+; Debug: list int = D+1 (used reg = )
+ADDD	#1
+PSHS	D
+; Debug: rootlist * char = .F+0 (used reg = )
+LDX	#.F
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 48 	printf("a * 2 + c %d\n",a * 2 + c);
+LOC	1
+.10:
+FCC	"a * 2 + c %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: mul int = const 2 to int a = [S+$D-2] (used reg = )
+LDD	$B,S
+LSLB
+ROLA
+; Debug: add char c = [S+$D-9] to int = D+0 (used reg = )
+PSHS	D
+LDB	6,S
+SEX
+PSHS	D
+LDD	2,S
+ADDD	,S++
+LEAS	2,S
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .10+0 (used reg = )
+LDX	#.10
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 49 	printf("(a + c) * (a - c) %d\n",(a + c)* (a - c));
+LOC	1
+.11:
+FCC	"(a + c) * (a - c) %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: sub char c = [S+$D-9] to int a = [S+$D-2] (used reg = )
+LDB	4,S
+SEX
+PSHS	D
+LDD	$D,S
+SUBD	,S++
+PSHS	D
+; Debug: add char c = [S+$F-9] to int a = [S+$F-2] (used reg = )
+LDB	6,S
+SEX
+PSHS	D
+LDD	$F,S
+ADDD	,S++
+; Debug: mul int (temp) = [S+$F-$F] to int = D+0 (used reg = )
+LDX	,S++
+JSR	>imul
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .11+0 (used reg = )
+LDX	#.11
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 50 	printf("a + ucf(200) %d\n",a + ucf(200));
+LOC	1
+.12:
+FCC	"a + ucf(200) %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: rootlist int = const $C8 (used reg = )
+LDX	#$C8
+; Debug: func () unsigned char = ucf+0 (used reg = )
+JSR	>_ucf
+TFR	X,D
+; Debug: add unsigned char = B+0 to int a = [S+$D-2] (used reg = )
+; Debug: expression subtree swapping
+CLRA
+ADDD	$B,S
+; Debug: list unsigned int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .12+0 (used reg = )
+LDX	#.12
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 51 	printf("ucf(200) + a %d\n",ucf(200)+ a);
+LOC	1
+.13:
+FCC	"ucf(200) + a %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: rootlist int = const $C8 (used reg = )
+LDX	#$C8
+; Debug: func () unsigned char = ucf+0 (used reg = )
+JSR	>_ucf
+TFR	X,D
+; Debug: add int a = [S+$D-2] to unsigned char = B+0 (used reg = )
+CLRA
+ADDD	$B,S
+; Debug: list unsigned int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .13+0 (used reg = )
+LDX	#.13
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 52 	printf("a + scf(-5) %d\n",a + scf(-5));
+LOC	1
+.14:
+FCC	"a + scf(-5) %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: rootlist int = const -5 (used reg = )
+LDX	#-5
+; Debug: func () char = scf+0 (used reg = )
+JSR	>_scf
+TFR	X,D
+; Debug: add char = B+0 to int a = [S+$D-2] (used reg = )
+; Debug: expression subtree swapping
+SEX
+ADDD	$B,S
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .14+0 (used reg = )
+LDX	#.14
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 53 	printf("a - scf(-5) %d\n",a - scf(-5));
+LOC	1
+.15:
+FCC	"a - scf(-5) %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: rootlist int = const -5 (used reg = )
+LDX	#-5
+; Debug: func () char = scf+0 (used reg = )
+JSR	>_scf
+TFR	X,D
+; Debug: sub char = B+0 to int a = [S+$D-2] (used reg = )
+PSHS	B
+LDB	,S+
+SEX
+PSHS	D
+LDD	$D,S
+SUBD	,S++
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .15+0 (used reg = )
+LDX	#.15
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 54 	printf("scf(-5) - a %d\n",scf(-5)- a);
+LOC	1
+.16:
+FCC	"scf(-5) - a %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: rootlist int = const -5 (used reg = )
+LDX	#-5
+; Debug: func () char = scf+0 (used reg = )
+JSR	>_scf
+TFR	X,D
+; Debug: sub int a = [S+$D-2] to char = B+0 (used reg = )
+SEX
+SUBD	$B,S
+; Debug: list int = D+0 (used reg = )
+PSHS	D
+; Debug: rootlist * char = .16+0 (used reg = )
+LDX	#.16
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 55 	t = 0;
+; Debug: eq int = const 0 to int t = [S+$D-8] (used reg = )
+LDD	#0
+STD	5,S
+;BCC_EOS
+; 56 	for (i = 0; i < 100; i++)
+; Debug: eq int = const 0 to int i = [S+$D-6] (used reg = )
+LDD	#0
+STD	7,S
+;BCC_EOS
+;BCC_EOS
+; 57 		t += c + d - c;		 
+BRA	.19
+.1A:
+; Debug: add char d = [S+$D-$A] to char c = [S+$D-9] (used reg = )
+LDB	3,S
+SEX
+PSHS	D
+LDB	6,S
+SEX
+ADDD	,S++
+; Debug: sub char c = [S+$D-9] to int = D+0 (used reg = )
+PSHS	D
+LDB	6,S
+SEX
+PSHS	D
+LDD	2,S
+SUBD	,S++
+LEAS	2,S
+; Debug: addab int = D+0 to int t = [S+$D-8] (used reg = )
+ADDD	5,S
+STD	5,S
+;BCC_EOS
+; 58 	printf("loop %d\n",t);
+.18:
+; Debug: postinc int i = [S+$D-6] (used reg = )
+LDD	7,S
+ADDD	#1
+STD	7,S
+.19:
+; Debug: lt int = const $64 to int i = [S+$D-6] (used reg = )
+LDD	7,S
+SUBD	#$64
+BLT	.1A
+.1B:
+.17:
+LOC	1
+.1C:
+FCC	"loop %d"
+FCB	$A
+FCB	0
+LOC	0
+; Debug: list int t = [S+$D-8] (used reg = )
+LDD	5,S
+PSHS	D
+; Debug: rootlist * char = .1C+0 (used reg = )
+LDX	#.1C
+; Debug: func () int = printf+0 (used reg = )
+JSR	>_printf
+LEAS	2,S
+;BCC_EOS
+; 59 	return 0;
+LDX	#0
+LEAS	$D,S
+RTS
+;BCC_EOS
+; 60 }
+; 61 
 ; 0 errors detected

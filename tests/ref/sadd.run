@@ -1,1 +1,23 @@
-265
+a + c 9
+c + a 9
+a - c 11
+c - a -11
+a + gc 9
+a + *p 9
+a + uc 265
+a + guc 265
+r += c 9
+r -= c 11
+r += gc 9
+c + c -2
+c + d -4
+c - d 2
+a + c + 1 10
+a * 2 + c 19
+(a + c) * (a - c) 99
+a + ucf(200) 210
+ucf(200) + a 210
+a + scf(-5) 5
+a - scf(-5) 15
+scf(-5) - a -15
+loop -300

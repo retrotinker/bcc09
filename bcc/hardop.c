@@ -13,6 +13,7 @@
 #include "type.h"
 
 FORWARD void sub1 P((struct symstruct * source, struct symstruct * target));
+FORWARD void sxsource P((struct symstruct * source, struct symstruct * target));
 
 PUBLIC void add(source, target)
 struct symstruct *source;
@@ -43,6 +44,8 @@ struct symstruct *target;
 		indexadr(source, target);
 	} else {
 		/* source is indirect and not DREG */
+		if (source->type == sctype)
+			sxsource(source, target);
 		extend(target);
 		load(target, DREG);
 		outadd();
@@ -51,6 +54,22 @@ struct symstruct *target;
 			adc0();
 	}
 	target->type = iscalartotype(target->type->scalar | sscalar);
+}
+
+/* Adding or subtracting a char in memory with ADDB and ADCA #0 (SUBB and
+   SBCA #0) extends it with zeros, which is wrong for a signed char: make
+   a signed char source an int on the stack first, from where it can be
+   added (subtracted) as an int.  The target is put aside if it is in D.
+   (The char is read only once, since it may be popped as it is read.) */
+
+PRIVATE void sxsource(source, target)
+struct symstruct *source;
+struct symstruct *target;
+{
+	if (target->storage & ALLDATREGS)
+		push(target);
+	extend(source);		/* LDB, SEX */
+	push(source);
 }
 
 PUBLIC void incdec(op, source)
@@ -431,6 +450,8 @@ struct symstruct *target;
 		loadpres(source, target);
 		push(source);
 	}
+	if (source->type == sctype)
+		sxsource(source, target);
 	extend(target);
 	load(target, DREG);
 	outsub();

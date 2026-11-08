@@ -288,9 +288,11 @@ _sc_neg:
 ; 44 	return -c;
 PSHS	X
 ; Debug: neg char c = [S+2-1] (used reg = )
+LDB	1,S
+SEX
+PSHS	D
 LDD	#0
-SUBB	1,S
-SBCA	#0
+SUBD	,S++
 ; Debug: cast char = const 0 to int = D+0 (used reg = )
 SEX
 TFR	D,X
@@ -298,29 +300,20 @@ PULS	Y,PC
 ;BCC_EOS
 ; 45 }
 ; 46 
-; 47 
-; 48  
-; 49 int widen(a,b)
-; 50 # 49 "chartest.c"
-; 49 unsigned char a;
+; 47 int widen(a,b)
+; 48 # 47 "chartest.c"
+; 47 unsigned char a;
 EXPORT	_widen
 _widen:
 ;BCC_EOS
-; 50 # 49 "chartest.c"
-; 49 signed char b;
+; 48 # 47 "chartest.c"
+; 47 signed char b;
 ;BCC_EOS
-; 50 {
-; 51 	int ib = b;
-PSHS	D,X
-; Debug: eq char b = [S+4+3] to int ib = [S+4-4] (used reg = )
-LDB	7,S
-SEX
-STD	0,S
-;BCC_EOS
-; 52 
-; 53 	return a * 100 + ib;
-; Debug: mul int = const $64 to unsigned char a = [S+4-1] (used reg = )
-LDB	3,S
+; 48 {
+; 49 	return a * 100 + b;
+PSHS	X
+; Debug: mul int = const $64 to unsigned char a = [S+2-1] (used reg = )
+LDB	1,S
 CLRA
 PSHS	D
 LSLB
@@ -337,61 +330,66 @@ LSLB
 ROLA
 LSLB
 ROLA
-; Debug: add int ib = [S+4-4] to unsigned int = D+0 (used reg = )
-ADDD	0,S
+; Debug: add char b = [S+2+3] to unsigned int = D+0 (used reg = )
+PSHS	D
+LDB	7,S
+SEX
+PSHS	D
+LDD	2,S
+ADDD	,S++
+LEAS	2,S
 ; Debug: cast int = const 0 to unsigned int = D+0 (used reg = )
 TFR	D,X
-PULS	U,Y,PC
+PULS	Y,PC
 ;BCC_EOS
-; 54 }
-; 55 
-; 56  
-; 57 int second(a,b,c)
-; 58 # 57 "chartest.c"
-; 57 int a;
+; 50 }
+; 51 
+; 52  
+; 53 int second(a,b,c)
+; 54 # 53 "chartest.c"
+; 53 int a;
 EXPORT	_second
 _second:
 ;BCC_EOS
-; 58 # 57 "chartest.c"
-; 57 unsigned char b;
+; 54 # 53 "chartest.c"
+; 53 unsigned char b;
 ;BCC_EOS
-; 58 # 57 "chartest.c"
-; 57 signed char c;
+; 54 # 53 "chartest.c"
+; 53 signed char c;
 ;BCC_EOS
-; 58 {
-; 59 	int ic = c;
-PSHS	D,X
-; Debug: eq char c = [S+4+5] to int ic = [S+4-4] (used reg = )
-LDB	9,S
-SEX
-STD	0,S
-;BCC_EOS
-; 60 
-; 61 	return a + b * 2 + ic;
-; Debug: mul int = const 2 to unsigned char b = [S+4+3] (used reg = )
-LDB	7,S
+; 54 {
+; 55 	return a + b * 2 + c;
+PSHS	X
+; Debug: mul int = const 2 to unsigned char b = [S+2+3] (used reg = )
+LDB	5,S
 CLRA
 LSLB
 ROLA
-; Debug: add unsigned int = D+0 to int a = [S+4-2] (used reg = )
+; Debug: add unsigned int = D+0 to int a = [S+2-2] (used reg = )
 ; Debug: expression subtree swapping
-ADDD	2,S
-; Debug: add int ic = [S+4-4] to unsigned int = D+0 (used reg = )
 ADDD	0,S
+; Debug: add char c = [S+2+5] to unsigned int = D+0 (used reg = )
+PSHS	D
+LDB	9,S
+SEX
+PSHS	D
+LDD	2,S
+ADDD	,S++
+LEAS	2,S
 ; Debug: cast int = const 0 to unsigned int = D+0 (used reg = )
 TFR	D,X
-PULS	U,Y,PC
+PULS	Y,PC
 ;BCC_EOS
-; 62 }
-; 63 
-; 64 unsigned char uc_rec(n)
-; 65 # 64 "chartest.c"
-; 64 unsigned char n;
+; 56 }
+; 57 
+; 58 unsigned char uc_rec(n)
+; 59 # 58 "chartest.c"
+; 58 unsigned char n;
 EXPORT	_uc_rec
 _uc_rec:
 ;BCC_EOS
-; 65 {
-; 66 	return n == 0 ? 0 : uc_rec(n - 1) + 2;
+; 59 {
+; 60 	return n == 0 ? 0 : uc_rec(n - 1) + 2;
 PSHS	X
 ; Debug: logeq int = const 0 to unsigned char n = [S+2-1] (used reg = )
 LDB	1,S
@@ -418,44 +416,44 @@ CLRA
 TFR	D,X
 PULS	Y,PC
 ;BCC_EOS
-; 67 }
-; 68 
-; 69 unsigned char (*ucp)()= uc_low;
+; 61 }
+; 62 
+; 63 unsigned char (*ucp)()= uc_low;
 LOC	3
 EXPORT	_ucp
 _ucp:
 FDB	_uc_low
 ;BCC_EOS
-; 70 
-; 71 
-; 72 char c_low(v)
-; 73 # 72 "chartest.c"
-; 72 int v;
+; 64 
+; 65 
+; 66 char c_low(v)
+; 67 # 66 "chartest.c"
+; 66 int v;
 LOC	0
 EXPORT	_c_low
 _c_low:
 ;BCC_EOS
-; 73 {
-; 74 	return (char) v;
+; 67 {
+; 68 	return (char) v;
 PSHS	X
 LDB	1,S
 CLRA
 TFR	D,X
 PULS	Y,PC
 ;BCC_EOS
-; 75 }
-; 76 
-; 77 
-; 78 int main()
-; 79 {
+; 69 }
+; 70 
+; 71 
+; 72 int main()
+; 73 {
 EXPORT	_main
 _main:
-; 80 	unsigned char u;
+; 74 	unsigned char u;
 ;BCC_EOS
-; 81 	signed char s;
+; 75 	signed char s;
 ;BCC_EOS
-; 82 
-; 83 	printf("%d %d %d %d\n",uc_low(0x1234),uc_low(300),uc_low(255),
+; 76 
+; 77 	printf("%d %d %d %d\n",uc_low(0x1234),uc_low(300),uc_low(255),
 LEAS	-2,S
 LOC	1
 .A:
@@ -463,7 +461,7 @@ FCC	"%d %d %d %d"
 FCB	$A
 FCB	0
 LOC	0
-; 84 uc_low(0));
+; 78 uc_low(0));
 ; Debug: rootlist int = const 0 (used reg = )
 LDX	#0
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
@@ -502,14 +500,14 @@ LDX	#.A
 JSR	>_printf
 LEAS	8,S
 ;BCC_EOS
-; 85 	printf("%d %d %d %d\n",sc_low(0x1234),sc_low(200),sc_low(-1),
+; 79 	printf("%d %d %d %d\n",sc_low(0x1234),sc_low(200),sc_low(-1),
 LOC	1
 .B:
 FCC	"%d %d %d %d"
 FCB	$A
 FCB	0
 LOC	0
-; 86 sc_low(127));
+; 80 sc_low(127));
 ; Debug: rootlist int = const $7F (used reg = )
 LDX	#$7F
 ; Debug: func () char = sc_low+0 (used reg = )
@@ -548,7 +546,7 @@ LDX	#.B
 JSR	>_printf
 LEAS	8,S
 ;BCC_EOS
-; 87 	printf("%d %d %d\n",uc_clip(300),uc_clip(77),uc_clip(256));
+; 81 	printf("%d %d %d\n",uc_clip(300),uc_clip(77),uc_clip(256));
 LOC	1
 .C:
 FCC	"%d %d %d"
@@ -585,7 +583,7 @@ LDX	#.C
 JSR	>_printf
 LEAS	6,S
 ;BCC_EOS
-; 88 	printf("%d %d\n",uc_add(200,100),uc_add(1,2));
+; 82 	printf("%d %d\n",uc_add(200,100),uc_add(1,2));
 LOC	1
 .D:
 FCC	"%d %d"
@@ -622,7 +620,7 @@ LDX	#.D
 JSR	>_printf
 LEAS	4,S
 ;BCC_EOS
-; 89 	printf("%d %d %d\n",sc_neg(5),sc_neg(-128),sc_neg(0));
+; 83 	printf("%d %d %d\n",sc_neg(5),sc_neg(-128),sc_neg(0));
 LOC	1
 .E:
 FCC	"%d %d %d"
@@ -659,14 +657,14 @@ LDX	#.E
 JSR	>_printf
 LEAS	6,S
 ;BCC_EOS
-; 90 	printf("%d %d\n",widen(uc_low(250),sc_low(-3)),
+; 84 	printf("%d %d\n",widen(uc_low(250),sc_low(-3)),
 LOC	1
 .F:
 FCC	"%d %d"
 FCB	$A
 FCB	0
 LOC	0
-; 91 widen(uc_add(255,1),sc_neg(7)));
+; 85 widen(uc_add(255,1),sc_neg(7)));
 ; Debug: rootlist int = const 7 (used reg = )
 LDX	#7
 ; Debug: func () char = sc_neg+0 (used reg = )
@@ -719,14 +717,14 @@ LDX	#.F
 JSR	>_printf
 LEAS	4,S
 ;BCC_EOS
-; 92 	printf("%d %d\n",second(10,uc_low(0x1ff),sc_low(-1)),
+; 86 	printf("%d %d\n",second(10,uc_low(0x1ff),sc_low(-1)),
 LOC	1
 .10:
 FCC	"%d %d"
 FCB	$A
 FCB	0
 LOC	0
-; 93 second(uc_clip(9),200,-100));
+; 87 second(uc_clip(9),200,-100));
 ; Debug: list int = const -$64 (used reg = )
 LDD	#-$64
 PSHS	D
@@ -775,7 +773,7 @@ LDX	#.10
 JSR	>_printf
 LEAS	4,S
 ;BCC_EOS
-; 94 	printf("%d %d\n",uc_rec(10),uc_rec(200));
+; 88 	printf("%d %d\n",uc_rec(10),uc_rec(200));
 LOC	1
 .11:
 FCC	"%d %d"
@@ -804,7 +802,7 @@ LDX	#.11
 JSR	>_printf
 LEAS	4,S
 ;BCC_EOS
-; 95 	printf("%d\n",(*ucp)(0x4142));
+; 89 	printf("%d\n",(*ucp)(0x4142));
 LOC	1
 .12:
 FCC	"%d"
@@ -825,9 +823,9 @@ LDX	#.12
 JSR	>_printf
 LEAS	2,S
 ;BCC_EOS
-; 96 
-; 97 	 
-; 98 	u = uc_low(0x81);
+; 90 
+; 91 	 
+; 92 	u = uc_low(0x81);
 ; Debug: rootlist int = const $81 (used reg = )
 LDX	#$81
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
@@ -836,7 +834,7 @@ TFR	X,D
 ; Debug: eq unsigned char = B+0 to unsigned char u = [S+2-1] (used reg = )
 STB	1,S
 ;BCC_EOS
-; 99 	s = sc_low(0x81);
+; 93 	s = sc_low(0x81);
 ; Debug: rootlist int = const $81 (used reg = )
 LDX	#$81
 ; Debug: func () char = sc_low+0 (used reg = )
@@ -845,7 +843,7 @@ TFR	X,D
 ; Debug: eq char = B+0 to char s = [S+2-2] (used reg = )
 STB	0,S
 ;BCC_EOS
-; 100 	printf("%d %d %d\n",u,s,uc_low(3)+ sc_low(-5)* 2);
+; 94 	printf("%d %d %d\n",u,s,uc_low(3)+ sc_low(-5)* 2);
 LOC	1
 .13:
 FCC	"%d %d %d"
@@ -886,7 +884,7 @@ LDX	#.13
 JSR	>_printf
 LEAS	6,S
 ;BCC_EOS
-; 101 	ok(1,u == 0x81 && s == -127);
+; 95 	ok(1,u == 0x81 && s == -127);
 ; Debug: logeq int = const $81 to unsigned char u = [S+2-1] (used reg = )
 LDB	1,S
 SUBB	#$81
@@ -912,7 +910,7 @@ LDX	#1
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 102 	ok(2,uc_low(0x1234)== 0x34 && sc_low(0xff)== -1);
+; 96 	ok(2,uc_low(0x1234)== 0x34 && sc_low(0xff)== -1);
 ; Debug: rootlist int = const $1234 (used reg = )
 LDX	#$1234
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
@@ -946,7 +944,7 @@ LDX	#2
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 103 	ok(3,uc_add(uc_low(250),uc_low(10))== 4);
+; 97 	ok(3,uc_add(uc_low(250),uc_low(10))== 4);
 ; Debug: rootlist int = const $A (used reg = )
 LDX	#$A
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
@@ -984,8 +982,8 @@ LDX	#3
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 104 
-; 105 	ok(4,c_low(0x1fe)== 0xfe);	 
+; 98 
+; 99 	ok(4,c_low(0x1fe)== 0xfe);	 
 ; Debug: rootlist int = const $1FE (used reg = )
 LDX	#$1FE
 ; Debug: func () char = c_low+0 (used reg = )
@@ -1008,8 +1006,8 @@ LDX	#4
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 106 
-; 107 	printf("checks %d failures %d\n",checks,failures);
+; 100 
+; 101 	printf("checks %d failures %d\n",checks,failures);
 LOC	1
 .20:
 FCC	"checks %d failures %d"
@@ -1028,12 +1026,12 @@ LDX	#.20
 JSR	>_printf
 LEAS	4,S
 ;BCC_EOS
-; 108 	return failures;
+; 102 	return failures;
 LDX	>_failures
 PULS	Y,PC
 ;BCC_EOS
-; 109 }
-; 110 
+; 103 }
+; 104 
 LOC	3
 _checks		COMM	2
 _failures		COMM	2
