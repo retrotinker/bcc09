@@ -75,6 +75,24 @@ int main()
 	check(37, buf[0], 't');
 	check(38, strlen1(buf), 5);
 
+	/* a long string, which copt -O once garbled (an overlapping
+	   strcpy): every character, against one spelled out a character
+	   at a time */
+	{
+		static char spelled[] = {
+			'0','1','2','3','4','5','6','7','8','9','a','b','c','d',
+			'e','f','0','1','2','3','4','5','6','7','8','9','A','B',
+			'C','D','E','F', 0
+		};
+		char *lit = "0123456789abcdef0123456789ABCDEF";
+		int i, same = 1;
+
+		for (i = 0; i < 33; i++)
+			if (lit[i] != spelled[i])
+				same = 0;
+		check(40, same, 1);
+	}
+
 	puts1("checks ");
 	putnum(checks);
 	puts1("failures ");

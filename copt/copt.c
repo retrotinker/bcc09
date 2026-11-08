@@ -159,10 +159,10 @@ static char *readline(FILE * fp)
 	if ((cp = strchr(buf, '\n')) != NULL)
 		*cp = '\0';
 
-	/* Delete leading white spaces */
+	/* Delete leading white spaces (memmove, since they overlap) */
 	for (cp = buf; *cp && isspace(*cp); cp++) ;
 	if (cp != buf && *cp)
-		strcpy(buf, cp);
+		memmove(buf, cp, strlen(cp) + 1);
 
 	return (buf);
 }

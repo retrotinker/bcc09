@@ -652,47 +652,167 @@ JSR	>_check
 LEAS	4,S
 ;BCC_EOS
 ; 77 
-; 78 	puts1("checks ");
-LOC	1
+; 78 
+; 79 
+; 80 	 
+; 81 	{
+; 82 		static char spelled[] = {
+LOC	3
 .A:
+; 83 			'0','1','2','3','4','5','6','7','8','9','a','b','c','d',
+FCB	$30
+FCB	$31
+FCB	$32
+FCB	$33
+FCB	$34
+FCB	$35
+FCB	$36
+FCB	$37
+FCB	$38
+FCB	$39
+FCB	$61
+FCB	$62
+FCB	$63
+FCB	$64
+; 84 			'e','f','0','1','2','3','4','5','6','7','8','9','A','B',
+FCB	$65
+FCB	$66
+FCB	$30
+FCB	$31
+FCB	$32
+FCB	$33
+FCB	$34
+FCB	$35
+FCB	$36
+FCB	$37
+FCB	$38
+FCB	$39
+FCB	$41
+FCB	$42
+; 85 			'C','D','E','F', 0
+FCB	$43
+FCB	$44
+FCB	$45
+FCB	$46
+; 86 		};
+FCB	0
+LOC	0
+;BCC_EOS
+; 87 		char *lit = "0123456789abcdef0123456789ABCDEF";
+LEAS	-2,S
+LOC	1
+.B:
+FCC	"0123456789abcdef0123456789ABCDEF"
+FCB	0
+LOC	0
+; Debug: eq [$21] char = .B+0 to * char lit = [S+$A-$A] (used reg = )
+LDX	#.B
+STX	0,S
+;BCC_EOS
+; 88 		int i, same = 1;
+LEAS	-4,S
+; Debug: eq int = const 1 to int same = [S+$E-$E] (used reg = )
+LDD	#1
+STD	0,S
+;BCC_EOS
+; 89 
+; 90 		for (i = 0; i < 33; i++)
+; Debug: eq int = const 0 to int i = [S+$E-$C] (used reg = )
+LDD	#0
+STD	2,S
+;BCC_EOS
+;BCC_EOS
+; 91 			if (lit[i] != spelled[i])
+BRA	.E
+.F:
+; Debug: ptradd int i = [S+$E-$C] to [$21] char = .A+0 (used reg = )
+LDD	2,S
+LDX	#.A
+LEAX	D,X
+; Debug: ptradd int i = [S+$E-$C] to * char lit = [S+$E-$A] (used reg = X)
+LDD	2,S
+ADDD	4,S
+TFR	D,U
+; Debug: ne char = [X+0] to char = [U+0] (used reg = )
+LDB	0,U
+SUBB	0,X
+BEQ	.10
+.11:
+; 92 				same = 0;
+; Debug: eq int = const 0 to int same = [S+$E-$E] (used reg = )
+LDD	#0
+STD	0,S
+;BCC_EOS
+; 93 		check(40,same,1);
+.10:
+.D:
+; Debug: postinc int i = [S+$E-$C] (used reg = )
+LDD	2,S
+ADDD	#1
+STD	2,S
+.E:
+; Debug: lt int = const $21 to int i = [S+$E-$C] (used reg = )
+LDD	2,S
+SUBD	#$21
+BLT	.F
+.12:
+.C:
+; Debug: list int = const 1 (used reg = )
+LDD	#1
+PSHS	D
+; Debug: list int same = [S+$10-$E] (used reg = )
+LDD	2,S
+PSHS	D
+; Debug: rootlist int = const $28 (used reg = )
+LDX	#$28
+; Debug: func () void = check+0 (used reg = )
+JSR	>_check
+LEAS	4,S
+;BCC_EOS
+; 94 	}
+LEAS	6,S
+; 95 
+; 96 	puts1("checks ");
+LOC	1
+.13:
 FCC	"checks "
 FCB	0
 LOC	0
-; Debug: rootlist * char = .A+0 (used reg = )
-LDX	#.A
+; Debug: rootlist * char = .13+0 (used reg = )
+LDX	#.13
 ; Debug: func () void = puts1+0 (used reg = )
 JSR	>_puts1
 ;BCC_EOS
-; 79 	putnum(checks);
+; 97 	putnum(checks);
 ; Debug: rootlist int = [checks+0] (used reg = )
 LDX	>_checks
 ; Debug: func () void = putnum+0 (used reg = )
 JSR	>_putnum
 ;BCC_EOS
-; 80 	puts1("failures ");
+; 98 	puts1("failures ");
 LOC	1
-.B:
+.14:
 FCC	"failures "
 FCB	0
 LOC	0
-; Debug: rootlist * char = .B+0 (used reg = )
-LDX	#.B
+; Debug: rootlist * char = .14+0 (used reg = )
+LDX	#.14
 ; Debug: func () void = puts1+0 (used reg = )
 JSR	>_puts1
 ;BCC_EOS
-; 81 	putnum(failures);
+; 99 	putnum(failures);
 ; Debug: rootlist int = [failures+0] (used reg = )
 LDX	>_failures
 ; Debug: func () void = putnum+0 (used reg = )
 JSR	>_putnum
 ;BCC_EOS
-; 82 	return failures;
+; 100 	return failures;
 LDX	>_failures
 LEAS	8,S
 RTS
 ;BCC_EOS
-; 83 }
-; 84 
+; 101 }
+; 102 
 LOC	3
 _checks		COMM	2
 _failures		COMM	2
