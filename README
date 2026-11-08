@@ -7,8 +7,13 @@ the following:
 
 	as09 -o start.o start.s
 	bcc09 -o prog.o -c prog.c
-	ld09 -d -o prog.bin -T0x1000 start.o prog.o
-	objcopy --change-address=0x1000 -I binary -O srec prog.bin prog.s19
+	ld09 -o prog.out -T0x1000 start.o prog.o
+	objcopy09 -O srec -T0x1000 prog.out prog.s19
+
+objcopy09 can also write raw binaries (-O binary), Intel hex (-O ihex),
+Disk Extended Color BASIC LOADM files (-O decb), Dragon DOS binaries
+(-O ddos), OS-9 modules (-O os9) and Color BASIC cassette images (-O cas
+or -O wav).
 
 The resulting binary can be loaded onto your 6809-based target device
 using whatever tools you have available to you.  Loading that code

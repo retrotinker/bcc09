@@ -17,6 +17,7 @@
 #include <getopt.h>
 
 #include "x86_aout.h"
+#include "srec.h"
 
 #define SREC_LINESIZE	16
 #define IHEX_LINESIZE	16
@@ -91,6 +92,27 @@ void warning(char *str)
 	fprintf(stderr, "%s: %s\n", progname, str);
 }
 
+/*
+ * Parse an address like C: 0x (or $) for hex, leading 0 for octal,
+ * otherwise decimal.  Anything else, or more than 16 bits, is an error.
+ */
+unsigned int parse_addr(char *str, char *message)
+{
+	char *end;
+	unsigned long value;
+	int base = 0;
+
+	if (*str == '$') {
+		str++;
+		base = 16;
+	}
+	errno = 0;
+	value = strtoul(str, &end, base);
+	if (errno || end == str || *end != '\0' || value > 0xffff)
+		fatal(message);
+	return value;
+}
+
 void match_syms(FILE *ifd, struct exec header)
 {
 	struct nlist symbol;
@@ -104,6 +126,8 @@ void match_syms(FILE *ifd, struct exec header)
 	while (numsearchsyms && numsyms--) {
 		if (fread(&symbol, sizeof(symbol), 1, ifd) != 1)
 			fatal("Cannot read symbol information!");
+		if (symbol.n_sclass == 0)	/* the rest of a long name */
+			continue;
 
 		for (i = 0; i < NUM_SEARCH_SYMS; i++) {
 			if (!strncmp(symbol.n_name, searchsyms[i].n_name,
@@ -193,11 +217,12 @@ void raw_output(FILE *ifd, FILE *ofd, struct exec header)
 		textaddr = textstart;
 	if (!textend)
 		textend = textstart + header.a_text;
-	if (!dataaddr)
+	if (!dataaddr) {
 		if (header.a_flags & A_SEP)
 			dataaddr = datastart;
 		else
 			dataaddr = textend;
+	}
 
 	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
 		fatal("Cannot seek to start of text");
@@ -221,7 +246,7 @@ void decb_output(FILE *ifd, FILE *ofd, struct exec header)
 	if (!textaddr)
 		textaddr = textstart;
 	if (!textaddr)
-		warning("BIN load address is zero");
+		warning("BIN load address is zero (use -T)");
 
 	binsize = header.a_text;
 	if (!(header.a_flags & A_SEP) ||
@@ -247,7 +272,7 @@ void decb_output(FILE *ifd, FILE *ofd, struct exec header)
 		if (!dataaddr)
 			dataaddr = datastart;
 		if (!dataaddr)
-			warning("BIN data load address is zero");
+			warning("BIN data load address is zero (use -D)");
 
 		binsize = header.a_data;
 
@@ -283,7 +308,7 @@ void ddos_output(FILE *ifd, FILE *ofd, struct exec header)
 	if (!textaddr)
 		textaddr = textstart;
 	if (!textaddr)
-		warning("BIN load address is zero");
+		warning("BIN load address is zero (use -T)");
 
 	if ((header.a_flags & A_SEP) &&
 	    (dataaddr || datastart != textend))
@@ -331,7 +356,7 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 	if (datasize < heapsize)
 		datasize = heapsize;
 	if (!datasize)
-		fatal("OS-9 module data size is zero");
+		fatal("OS-9 module data size is zero (use -d)");
 
 	/* can claim reentrant if no r/w static data allocations */
 	if (!reentrant)
@@ -396,8 +421,7 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 unsigned int write_s1(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 {
 	unsigned char buffer[SREC_LINESIZE];
-	unsigned int i, ssize, lines = 0;
-	unsigned char csum;
+	unsigned int ssize, lines = 0;
 
 	while (bsize > 0) {
 		if (bsize > sizeof(buffer))
@@ -408,44 +432,29 @@ unsigned int write_s1(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
 			fatal("Error reading segment from executable");
 
-		fprintf(ofd, "S1%02X%04X", ssize + 3, address);
-		csum = ssize + 3 +
-		       ((address & 0xff00) >> 8) + (address & 0x00ff);
+		lines += srec_data(ofd, buffer, ssize, address);
 		address += ssize;
-		for (i = 0; i < ssize; i++) {
-			csum += buffer[i];
-			fprintf(ofd, "%02X", buffer[i]);
-		}
-		csum ^= 0xff;
-		fprintf(ofd, "%02X\n", csum);
-
 		bsize -= ssize;
-		lines++;
 	}
 	return lines;
 }
 
 void srec_output(FILE *ifd, FILE *ofd, struct exec header)
 {
-	unsigned int i, len, s1count;
-	unsigned char csum;
+	unsigned int s1count;
 
 	if (!textaddr)
 		textaddr = textstart;
 	if (!textaddr)
-		warning("SREC load address is zero");
+		warning("SREC load address is zero (use -T)");
 	if (!dataaddr)
 		dataaddr = datastart;
-	if (!dataaddr)
-		warning("SREC data load address is zero");
+	if (!dataaddr && !(header.a_flags & A_SEP))
+		dataaddr = textaddr + header.a_text;
+	if (!dataaddr && header.a_data)
+		warning("SREC data load address is zero (use -D)");
 
-	csum = len = strlen(objname);
-	fprintf(ofd, "S0%02X0000", len+3);
-	for (i = 0; i < len; i++) {
-		fprintf(ofd, "%02X", objname[i]);
-	}
-	csum ^= 0xff;
-	fprintf(ofd, "%02X\n", csum);
+	srec_header(ofd, objname);
 
 	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
 		fatal("Cannot seek to start of text");
@@ -457,22 +466,13 @@ void srec_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	s1count += write_s1(ifd, ofd, header.a_data, dataaddr);
 
-	fprintf(ofd, "S503%04X", s1count);
-	csum  = 3 + ((s1count & 0xff00) >> 8) + (s1count & 0x00ff);
-	csum ^= 0xff;
-	fprintf(ofd, "%02X\n", csum);
-
-	fprintf(ofd, "S903%04X", header.a_entry);
-	csum  = 3 + ((header.a_entry & 0xff00) >> 8) + (header.a_entry & 0x00ff);
-	csum ^= 0xff;
-	fprintf(ofd, "%02X\n", csum);
+	srec_end(ofd, s1count, header.a_entry);
 }
 
 void write_ihex(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 {
 	unsigned char buffer[IHEX_LINESIZE];
-	unsigned int i, ssize;
-	unsigned char csum;
+	unsigned int ssize;
 
 	while (bsize > 0) {
 		if (bsize > sizeof(buffer))
@@ -483,33 +483,25 @@ void write_ihex(FILE *ifd, FILE *ofd, unsigned bsize, unsigned address)
 		if ((ssize = fread(buffer, 1, ssize, ifd)) <= 0)
 			fatal("Error reading segment from executable");
 
-		fprintf(ofd, ":%02X%04X00", ssize, address);
-		csum = ssize +
-		       ((address & 0xff00) >> 8) + (address & 0x00ff);
+		ihex_data(ofd, buffer, ssize, address);
 		address += ssize;
-		for (i = 0; i < ssize; i++) {
-			csum += buffer[i];
-			fprintf(ofd, "%02X", buffer[i]);
-		}
-		csum = (csum ^ 0xff) + 1;
-		fprintf(ofd, "%02X\r\n", csum);
-
 		bsize -= ssize;
 	}
 }
 
 void ihex_output(FILE *ifd, FILE *ofd, struct exec header)
 {
-	unsigned char csum;
 
 	if (!textaddr)
 		textaddr = textstart;
 	if (!textaddr)
-		warning("IHEX load address is zero");
+		warning("IHEX load address is zero (use -T)");
 	if (!dataaddr)
 		dataaddr = datastart;
-	if (!dataaddr)
-		warning("IHEX data load address is zero");
+	if (!dataaddr && !(header.a_flags & A_SEP))
+		dataaddr = textaddr + header.a_text;
+	if (!dataaddr && header.a_data)
+		warning("IHEX data load address is zero (use -D)");
 
 	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
 		fatal("Cannot seek to start of text");
@@ -521,10 +513,7 @@ void ihex_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	write_ihex(ifd, ofd, header.a_data, dataaddr);
 
-	fprintf(ofd, ":00%04X01", header.a_entry);
-	csum = 1 + ((header.a_entry & 0xff00) >> 8) + (header.a_entry & 0x00ff);
-	csum = (csum ^ 0xff) + 1;
-	fprintf(ofd, "%02X\n", csum);
+	ihex_end(ofd, header.a_entry);
 }
 
 void write_cas(FILE *ifd, FILE *ofd, unsigned bsize)
@@ -563,7 +552,7 @@ void cas_output(FILE *ifd, FILE *ofd, struct exec header)
 	if (!textaddr)
 		textaddr = textstart;
 	if (!textaddr)
-		warning("Color BASIC executable load address is zero");
+		warning("Color BASIC executable load address is zero (use -T)");
 
 	if ((header.a_flags & A_SEP) &&
 	    (dataaddr || datastart != textend))
@@ -712,7 +701,7 @@ void wav_output(FILE *ifd, FILE *ofd, struct exec header)
 	if (!textaddr)
 		textaddr = textstart;
 	if (!textaddr)
-		warning("Color BASIC executable load address is zero");
+		warning("Color BASIC executable load address is zero (use -T)");
 
 	if ((header.a_flags & A_SEP) &&
 	    (dataaddr || datastart != textend))
@@ -815,9 +804,9 @@ int main(int argc, char *argv[])
 		case 'O':
 			if (!strncmp(optarg, "binary", 3))
 				outform = BINARY;
-			else if(!strncmp(optarg, "decb", 4))
+			else if (!strncmp(optarg, "decb", 4))
 				outform = DECB_BIN;
-			else if(!strncmp(optarg, "ddos", 4))
+			else if (!strncmp(optarg, "ddos", 4))
 				outform = DDOS_BIN;
 			else if (!strncmp(optarg, "os9", 3))
 				outform = OS9_MODULE;
@@ -833,31 +822,19 @@ int main(int argc, char *argv[])
 				fatal("Unknown output format!\n");
 			break;
 		case 'T':
-			errno = 0;
-			textaddr = strtol(optarg, NULL, 0);
-			if (errno)
-				fatal("Bad text address value");
+			textaddr = parse_addr(optarg, "Bad text address value");
 			break;
 		case 'D':
-			errno = 0;
-			dataaddr = strtol(optarg, NULL, 0);
-			if (errno)
-				fatal("Bad data address value");
+			dataaddr = parse_addr(optarg, "Bad data address value");
 			break;
 		case 'd':
-			errno = 0;
-			datasize = strtol(optarg, NULL, 0);
-			if (errno)
-				fatal("Bad data size value");
+			datasize = parse_addr(optarg, "Bad data size value");
 			break;
 		case 'n':
 			objname = optarg;
 			break;
 		case 'v':
-			errno = 0;
-			objversion = strtol(optarg, NULL, 0);
-			if (errno)
-				fatal("Bad version value");
+			objversion = parse_addr(optarg, "Bad version value");
 			break;
 		case 'r':
 			reentrant = 1;

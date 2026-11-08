@@ -28,10 +28,10 @@ ld09: $(OBJS)
 objdump09: objdump86.c
 	$(CC) $(LDFLAGS) $< -o $@
 
-objcopy09: objcopy.c
-	$(CC) $(LDFLAGS) $< -o $@
+objcopy09: objcopy.c srec.c srec.h
+	$(CC) $(CFLAGS) $(LDFLAGS) objcopy.c srec.c -o $@
 
-install: ld09 objdump09
+install: ld09 objdump09 objcopy09
 	install -d $(LIBDIR)
 	install -m 755 ld09 $(LIBDIR)
 	install -m 755 objdump09 $(LIBDIR)
