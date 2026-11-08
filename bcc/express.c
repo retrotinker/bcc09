@@ -180,6 +180,10 @@ PRIVATE struct nodestruct *listargs()
 		return NULLNODE;
 	}
 	parent = node(arg1op, assignment_exp(), NULLNODE);
+	/* a double (a float is one, as an argument) is always passed on
+	   the stack: it doesn't fit in the registers for the first one */
+	if (parent->nodetype->scalar & RSCALAR)
+		parent->tag = LISTOP;
 	nextright = parent;
 	while (sym == COMMA) {
 		nextsym();

@@ -12,9 +12,9 @@ _f1:
 ; 4 double d1 = 2.25, d2;
 	EXPORT	_d1
 _d1:
-	FDB	0
-	FDB	0
 	FDB	$4002
+	FDB	0
+	FDB	0
 	FDB	0
 ;BCC_EOS
 ; 5 
@@ -26,49 +26,48 @@ _fops:
 ;BCC_EOS
 ; 8 {
 ; 9 	d2 = a + b;
-	PSHS	D,X,U,Y
-; Debug: add double b = [S+8+2] to double a = [S+8-8] (used reg = )
-	LEAX	0,S
+; Debug: add double b = [S+0+$A] to double a = [S+0+2] (used reg = )
+	LEAX	2,S
 	JSR	>Fpushd
 	LEAX	$12,S
 	JSR	>Faddd
-; Debug: eq double (temp) = [S+$10-$10] to double = [d2+0] (used reg = )
+; Debug: eq double (temp) = [S+8-8] to double = [d2+0] (used reg = )
 	LDX	#_d2
 	JSR	>Fpulld
 ;BCC_EOS
 ; 10 	d2 = a - b;
-; Debug: sub double b = [S+8+2] to double a = [S+8-8] (used reg = )
-	LEAX	0,S
+; Debug: sub double b = [S+0+$A] to double a = [S+0+2] (used reg = )
+	LEAX	2,S
 	JSR	>Fpushd
 	LEAX	$12,S
 	JSR	>Fsubd
-; Debug: eq double (temp) = [S+$10-$10] to double = [d2+0] (used reg = )
+; Debug: eq double (temp) = [S+8-8] to double = [d2+0] (used reg = )
 	LDX	#_d2
 	JSR	>Fpulld
 ;BCC_EOS
 ; 11 	d2 = a * b;
-; Debug: mul double b = [S+8+2] to double a = [S+8-8] (used reg = )
-	LEAX	0,S
+; Debug: mul double b = [S+0+$A] to double a = [S+0+2] (used reg = )
+	LEAX	2,S
 	JSR	>Fpushd
 	LEAX	$12,S
 	JSR	>Fmuld
-; Debug: eq double (temp) = [S+$10-$10] to double = [d2+0] (used reg = )
+; Debug: eq double (temp) = [S+8-8] to double = [d2+0] (used reg = )
 	LDX	#_d2
 	JSR	>Fpulld
 ;BCC_EOS
 ; 12 	d2 = a / b;
-; Debug: div double b = [S+8+2] to double a = [S+8-8] (used reg = )
-	LEAX	0,S
+; Debug: div double b = [S+0+$A] to double a = [S+0+2] (used reg = )
+	LEAX	2,S
 	JSR	>Fpushd
 	LEAX	$12,S
 	JSR	>Fdivd
-; Debug: eq double (temp) = [S+$10-$10] to double = [d2+0] (used reg = )
+; Debug: eq double (temp) = [S+8-8] to double = [d2+0] (used reg = )
 	LDX	#_d2
 	JSR	>Fpulld
 ;BCC_EOS
 ; 13 	if (a < b)
-; Debug: lt double b = [S+8+2] to double a = [S+8-8] (used reg = )
-	LEAX	0,S
+; Debug: lt double b = [S+0+$A] to double a = [S+0+2] (used reg = )
+	LEAX	2,S
 	JSR	>Fpushd
 	LEAX	$12,S
 	JSR	>Fcompd
@@ -78,27 +77,26 @@ _fops:
 ; Debug: neg double = [d2+0] (used reg = )
 	LDX	#_d2
 	JSR	>Fnegd
-; Debug: eq double (temp) = [S+$10-$10] to double = [d2+0] (used reg = )
+; Debug: eq double (temp) = [S+8-8] to double = [d2+0] (used reg = )
 	LDX	#_d2
 	JSR	>Fpulld
 ;BCC_EOS
 ; 15 	return a * 2.0;
 .1:
-; Debug: mul double = const (whatever) to double a = [S+8-8] (used reg = )
+; Debug: mul double = const (whatever) to double a = [S+0+2] (used reg = )
 ; Debug: expression subtree swapping
+	LDD	#0
+	PSHS	D
+	LDD	#0
+	PSHS	D
+	LDD	#0
+	PSHS	D
 	LDD	#$4000
 	PSHS	D
-	LDD	#0
-	PSHS	D
-	LDD	#0
-	PSHS	D
-	LDD	#0
-	PSHS	D
-	LEAX	8,S
+	LEAX	$A,S
 	JSR	>Fmuld
-; Debug: cast double = const (whatever) to double (temp) = [S+$10-$10] (used reg = )
+; Debug: cast double = const (whatever) to double (temp) = [S+8-8] (used reg = )
 	PULS	D,X,U,Y
-	LEAS	8,S
 	RTS
 ;BCC_EOS
 ; 16 }

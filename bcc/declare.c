@@ -638,7 +638,8 @@ PRIVATE void declfunc()
 			stackarg = TRUE;
 #endif
 		if (arg1inreg && symptr == &locsyms[0]
-		    && symptr->flags != REGVAR) {
+		    && symptr->flags != REGVAR
+		    && !(symptr->type->scalar & DOUBLE)) {
 			if ((arg1size = argsize) < itypesize)
 				arg1size = itypesize;
 			argsp = softsp -= arg1size;
@@ -655,7 +656,8 @@ PRIVATE void declfunc()
 		else
 			argsp += itypesize;
 #endif
-		if (arg1inreg && symptr == &locsyms[0])
+		if (arg1inreg && symptr == &locsyms[0]
+		    && !(symptr->type->scalar & DOUBLE))
 			argsp = returnadrsize;	/* skip return adr after 1st arg */
 	}
 	lbrace();

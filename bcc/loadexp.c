@@ -68,14 +68,14 @@ struct typestruct *type;
 			symptr = exp->left.symptr;
 		}
 		if (type->scalar & RSCALAR) {
-			if (type->scalar & FLOAT) {
-				float val;
+			unsigned short w[4];
+			int i, n;
 
-				val = *symptr->offset.offd;
-				deflong(((uoffset_T *) & val)[0]);
-			} else {
-				deflong(((uoffset_T *) symptr->offset.offd)[0]);
-				deflong(((uoffset_T *) symptr->offset.offd)[1]);
+			n = type->scalar & FLOAT ? 2 : 4;
+			fltwords(*symptr->offset.offd, n == 2, w);
+			for (i = 0; i < n; i++) {
+				defword();
+				outnhex((uoffset_T) w[i]);
 			}
 			etptr = etmark;	/* XXX - stuff from end of function */
 			exprptr = exprmark;

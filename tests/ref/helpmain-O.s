@@ -26,12 +26,20 @@ CLRB
 LDX	#1
 ; Debug: func () long = lops+0 (used reg = )
 JSR	>_lops
-LEAS	4,S
-;BCC_EOS
-; 11 	fops(1.0,2.0);
+LEAS	-$4,S
 ; Debug: list double = const (whatever) (used reg = )
+CLRA
+CLRB
+PSHS	D
+CLRA
+CLRB
+PSHS	D
+CLRA
+CLRB
+PSHS	D
 LDD	#$4000
 PSHS	D
+; Debug: list double = const (whatever) (used reg = )
 CLRA
 CLRB
 PSHS	D
@@ -41,12 +49,15 @@ PSHS	D
 CLRA
 CLRB
 PSHS	D
-; Debug: rootlist double = const (whatever) (used reg = )
-CLRA
-CLRB
-LDX	#0
+LDD	#$3FF0
+PSHS	D
 ; Debug: func () double = fops+0 (used reg = )
 JSR	>_fops
+LEAS	$10,S
+STD	0,S
+STX	2,S
+STU	6,S
+STY	4,S
 LEAS	8,S
 ;BCC_EOS
 ; 12 	arith(3,4);

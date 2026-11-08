@@ -10,6 +10,37 @@
 #include "type.h"
 
 /*-----------------------------------------------------------------------------
+	fltwords(value, isfloat, words)
+	put the 16-bit words of value as a float (2 words) or a double (4) in
+	words, high word first, as the 6809 holds them, whatever order the
+	host keeps them in
+-----------------------------------------------------------------------------*/
+
+PUBLIC void fltwords(d, isfloat, w)
+double d;
+int isfloat;
+unsigned short *w;
+{
+	unsigned char b[sizeof(double)], ob[sizeof(double)];
+	double one = 1.0;
+	float f;
+	int i, n, little;
+
+	if (isfloat) {
+		f = d;
+		memcpy(b, &f, n = sizeof f);
+	} else
+		memcpy(b, &d, n = sizeof d);
+	memcpy(ob, &one, sizeof one);
+	little = ob[0] == 0;	/* (1.0 is 3FF0 0000 0000 0000) */
+	for (i = 0; i < n / 2; i++)
+		if (little)
+			w[i] = b[n - 1 - 2 * i] << 8 | b[n - 2 - 2 * i];
+		else
+			w[i] = b[2 * i] << 8 | b[2 * i + 1];
+}
+
+/*-----------------------------------------------------------------------------
 	f_indirect(target leaf)
 	make the float or double target indirect if it is not already
 	return nonzero iff the result is a temp double on the base of the stack
@@ -20,30 +51,17 @@ struct symstruct *target;
 {
 	if (target->indcount == 0) {
 		if (target->storage == CONSTANT) {
-			{
-				if (target->type->scalar & FLOAT) {
-					float val = *target->offset.offd;
-					push(constsym
-					     (((unsigned short *)&val)[1]));
-					push(constsym
-					     (((unsigned short *)&val)[0]));
-				} else {
-					push(constsym
-					     (((unsigned short *)target->offset.
-					       offd)[3]));
-					push(constsym
-					     (((unsigned short *)target->offset.
-					       offd)[2]));
-					push(constsym
-					     (((unsigned short *)target->offset.
-					       offd)[1]));
-					push(constsym
-					     (((unsigned short *)target->offset.
-					       offd)[0]));
-				}
-			}
+			/* (the low word first, so the high word is lowest) */
+			unsigned short w[4];
+			int i;
+
+			i = target->type->scalar & FLOAT ? 2 : 4;
+			fltwords(*target->offset.offd, i == 2, w);
+			while (i > 0)
+				push(constsym(w[--i]));
 		} else if (target->type->scalar & FLOAT)
-			pushlist(target->storage);	/* XXX - floatregs */
+			/* in D:X, as a long is (storage says X) */
+			pushlist(target->storage | DREG);
 		else
 			pushlist(doubleregs);
 		onstack(target);
@@ -151,7 +169,7 @@ struct symstruct *source;
 	else
 		load(source, DREG);
 	call("Fpush");
-	if (scalar & UNSIGNED)
+	if (scalar & UNSIGNED || source->type == ctype)	/* (char is unsigned) */
 		outbyte('u');
 	outntypechar(source->type);
 	justpushed(source);

@@ -263,18 +263,18 @@ store_pt targreg;
 		if (source->storage == targreg && source->indcount == 0)
 			return;
 		if (source->storage == CONSTANT) {
-			{
-				int regs, i, off = 1;
-				loadconst(((unsigned short *)source->offset.
-					   offd)[0], DREG);
-				regs = (targreg & ~DREG);
-				for (i = 1; i; i <<= 1) {
-					if (regs & i)
-						loadconst(((unsigned short *)
-							   source->offset.
-							   offd)[off++], i);
-				}
-			}
+			/* high word in D, then X, Y and U (as PSHS D,X,U,Y
+			   leaves them in memory) */
+			unsigned short w[4];
+
+			fltwords(*source->offset.offd, 0, w);
+			loadconst((offset_T) w[0], DREG);
+			if (targreg & INDREG0)
+				loadconst((offset_T) w[1], INDREG0);
+			if (targreg & INDREG2)
+				loadconst((offset_T) w[2], INDREG2);
+			if (targreg & INDREG1)
+				loadconst((offset_T) w[3], INDREG1);
 		} else {
 			push(source);
 			poplist(targreg | DREG);	/* actually it's the full reg list */
@@ -286,13 +286,11 @@ store_pt targreg;
 			source->level = EXPRLEVEL;
 		source->offset.offi = 0;
 	} else if (source->type->scalar & FLOAT && source->storage == CONSTANT) {
-		float val;
+		unsigned short w[2];
 
-		val = *source->offset.offd;
-		{
-			loadconst(((unsigned short *)&val)[0], DREG);
-			loadconst(((unsigned short *)&val)[1], targreg & ~DREG);
-		}
+		fltwords(*source->offset.offd, 1, w);
+		loadconst((offset_T) w[0], DREG);
+		loadconst((offset_T) w[1], targreg & ~DREG);
 	} else if (source->type->scalar & FLOAT) {
 		/* Treat a float just like a long ... */
 		if (source->indcount == 0) {

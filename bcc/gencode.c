@@ -403,8 +403,10 @@ struct nodestruct *exp;
 			onstack(structarg = constsym((value_t) 0));
 		} else {
 			if (exp->nodetype->scalar & DOUBLE) {
-				if (regmark & doublreturnregs)
-					savelist = doublreturnregs;
+				/* always: a double left in D, X, Y and U
+				   would be lost to the next constant, which
+				   is loaded in D to be pushed */
+				savelist = doublreturnregs;
 			} else if (regmark & RETURNREG)	/* XXX size long == float ? */
 				savelist = exp->nodetype->scalar & DLONG
 				    ? LONGRETURNREGS : RETURNREG;

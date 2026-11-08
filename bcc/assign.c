@@ -42,7 +42,8 @@ struct symstruct *target;
 			&& strcmp(source->name.namep,
 				  target->name.namep) != 0)))) {
 		tscalar = target->type->scalar;
-		if (tscalar & CHAR && source->storage == CONSTANT) {
+		if (tscalar & CHAR && source->storage == CONSTANT
+		    && !(source->type->scalar & RSCALAR)) {
 			source->offset.offv &= CHMASKTO;
 			source->type = target->type;
 		}
@@ -57,18 +58,17 @@ struct symstruct *target;
 				load(source, doubleregs & ~DREG);
 			if (source->storage != CONSTANT
 			    && source->indcount == 0) {
-				/* XXX - 386 only */
+				/* the high word in D, then X (all of a float),
+				   then Y and U, as PSHS D,X,U,Y leaves them */
+				static store_t order[] =
+				    { INDREG0, INDREG2, INDREG1 };
+				int i;
+
 				storereg(DREG, target);
-				if (tscalar & DOUBLE) {
-					int i;
-					for (i = 1; i; i <<= 1)
-						if (i != DREG
-						    && (doubleregs & i)) {
-							target->indcount = 1;	/* XXX outnnadr clobbers this */
-							target->offset.offi +=
-							    accregsize;
-							storereg(i, target);
-						}
+				for (i = 0; i < (tscalar & DOUBLE ? 3 : 1); i++) {
+					target->indcount = 1;	/* XXX outnnadr clobbers this */
+					target->offset.offi += accregsize;
+					storereg(order[i], target);
 				}
 				target->storage = source->storage;
 				target->offset.offi = 0;
@@ -214,6 +214,31 @@ struct symstruct *target;
 		oldsize = target->type->typesize;
 	newscalar = type->scalar;
 	oldscalar = target->type->scalar;
+	if (target->storage == CONSTANT && oldscalar & RSCALAR
+	    && !(newscalar & RSCALAR)) {
+		/* a floating constant to an integer: here, as exptree.c
+		   does for a cast (code would load it as a double) */
+		static double maxulong = (double)0xFFFFFFFFL + 1;
+		double val;
+
+		val = *target->offset.offd;
+		if (val > maxlongto)
+			val -= maxulong;
+		target->offset.offv = (value_t) val;
+		if (type->typesize == ctypesize) {
+			target->offset.offv &= CHMASKTO;
+			if (type == sctype
+			    && target->offset.offv & ((~CHMASKTO) >> 1))
+				target->offset.offv |= ~CHMASKTO;
+		} else if (type->typesize == itypesize) {
+			target->offset.offv &= intmaskto;
+			if (!(newscalar & UNSIGNED)
+			    && target->offset.offv > maxintto)
+				target->offset.offv -= (maxuintto + 1);
+		}
+		target->type = type;
+		return;
+	}
 	if ((newsize = type->typesize) == oldsize &&
 	    !((newscalar | oldscalar) & RSCALAR)) ;
 	else if (newsize == ctypesize) {	/* char only */
@@ -332,7 +357,7 @@ struct typestruct *type;
 		call("dto");
 	else
 		call("fto");
-	if (type->scalar & UNSIGNED)
+	if (type->scalar & UNSIGNED || type == ctype)	/* (char is unsigned) */
 		outbyte('u');
 	outntypechar(type);
 	if (type->scalar & DLONG) {

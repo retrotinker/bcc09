@@ -134,6 +134,7 @@ struct nodestruct *node P((op_pt t, struct nodestruct *p1,
 
 /* floatop.c */
 bool_pt f_indirect P((struct symstruct *target));
+void fltwords P((double d, int isfloat, unsigned short *w));
 void float1op P((op_pt op, struct symstruct *source));
 void floatop P((op_pt op, struct symstruct *source, struct symstruct *target));
 void fpush P((struct symstruct *source));
