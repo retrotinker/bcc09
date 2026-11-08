@@ -2,8 +2,9 @@ libc for bcc09
 
 This will become the port of the dev86 C library.  So far it has:
 
-  include/  headers: ctype.h, errno.h, limits.h, malloc.h, stdlib.h,
-            string.h, stddef.h, unistd.h, sys/types.h, features.h
+  include/  headers: ctype.h, errno.h, limits.h, malloc.h, stdarg.h,
+            stdlib.h, string.h, stddef.h, unistd.h, sys/types.h,
+            features.h
   bcc/      run-time helpers that the compiler calls for int and long
             operations the 6809 can't do in a few instructions
   ctype/    ctype.h's table and toupper and tolower
@@ -157,6 +158,16 @@ Ordinary C functions such as memcpy take their first argument in X and
 the others on the stack, in order, above the return address; the caller
 removes them.  An int or pointer result is returned in X.
 
+Variable argument lists: because the first argument comes in a
+register, which the function keeps below its return address, the
+address of the last named parameter doesn't lead to the variable
+arguments when that is the first parameter.  So unproto (built with
+_VA_ALIST_; see unproto/Makefile) puts an int parameter named __va_alist
+where the "..." was in such a function's definition; it is on the stack
+where the first variable argument is, and stdarg.h's va_start takes its
+address.  There is no varargs.h, since va_alist is usually the first
+parameter there.
+
 Behavior C leaves undefined: signed division truncates toward zero and
 the remainder has the sign of the dividend (as C99 requires); division
 by zero doesn't trap (see bcc/idiv.s and bcc/ldiv.s); shift counts of
@@ -164,5 +175,5 @@ the operand's size or more (16 or 32), taken as unsigned, give 0, or
 copies of the sign bit for a signed right shift.
 
 The tests in tests/ (ops.c, longops.c, regtest.s, strtest.c, stdtest.c,
-maltest.c; crtret.c, crtexit.c and crtatexit.c for the default target;
+maltest.c, vatest.c; crtret.c, crtexit.c and crtatexit.c for the default target;
 hello.c and echo.c for the sim target) check all of this on sim6809.

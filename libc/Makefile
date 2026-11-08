@@ -53,7 +53,7 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  string/strcasecmp.o string/strncasecmp.o
 
 HEADERS	= include/ctype.h include/errno.h include/features.h \
-	  include/limits.h include/malloc.h include/stddef.h \
+	  include/limits.h include/malloc.h include/stdarg.h include/stddef.h \
 	  include/stdlib.h include/string.h include/sys/types.h \
 	  include/unistd.h
 

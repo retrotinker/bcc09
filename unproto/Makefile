@@ -83,7 +83,14 @@ OBJECTS	= tok_io.o tok_class.o tok_pool.o unproto.o vstring.o symbol.o error.o \
 
 CFLAGS	= -O -std=gnu89
 LDFLAGS =
-CCFLAGS = $(CFLAGS) -w $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -DREOPEN
+# For bcc09: in the definition of a function with a variable argument
+# list, put an int parameter named __va_alist where the "..." was, which
+# libc's stdarg.h takes the address of (the first argument is passed in
+# a register, so the last named one can't be used)
+VA_ALIST = -D_VA_ALIST_=\"__va_alist\"
+
+CCFLAGS = $(CFLAGS) -w $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -DREOPEN \
+	  $(VA_ALIST)
 
 #CFLAGS	= -O $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -p -Dstatic=
 #CFLAGS	= -g $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -DDEBUG

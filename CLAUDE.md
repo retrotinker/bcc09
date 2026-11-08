@@ -41,7 +41,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `main` returns, and `_exit()` returns to the loader (such as Color BASIC's `EXEC`)
   with the status in D. The heap grows from `__end` up to the stack pointer minus
   `__heap_margin` (256 bytes; a decision of 2026-11-08), enforced by `sbrk()`/`brk()`.
-  Targets (2026-11-08): `libc.a` is target-independent; each `-M` target has a start-up
+  `stdarg.h` works (see below). Targets (2026-11-08): `libc.a` is target-independent; each `-M` target has a start-up
   file and a library (`_exit`, `read`, `write`) that the driver links: `-Ms`/`-Me` →
   `crt0.o` + `libsa.a` (returns to the loader, no I/O), `-Mi` → `crtsim.o` + `libsim.a`
   (sim6809, with I/O). Other targets can't link yet. Next: stdio on top of `read`/`write`,
@@ -51,6 +51,12 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
   as dev86's old `strcspn.c`) shouldn't be copied in.
+- `unproto` is built with `_VA_ALIST_` (`unproto/Makefile`), so the definition of a
+  function with `...` gets an `int __va_alist` parameter in its place, whose address
+  `libc/include/stdarg.h`'s `va_start` uses (the first argument is in a register, so the
+  last named parameter can't be used). No `varargs.h`.
+- With a 16-bit `int`, a decimal constant over 32767 is a `long` (C's rules): tests
+  that also run on the host must say `40000U` where they mean an `unsigned int`.
 - `bcc/bcc.doc` is out of date (it describes `-M` as a linker option); auditing it is a
   TODO item.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
@@ -60,7 +66,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 371 reference
+  `tests/src/` with this tree's tools and compare every result with the 387 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -82,8 +88,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   are built by `bcc09` alone (with `crt0` and `libc`) and run under `loader.s`, which
   calls `start` as a loader would and checks that the stack comes back; `crtatexit.c`
   checks that returning from `main` runs the `atexit()` functions.
-- `tests/src/strtest.c`, `stdtest.c` and `maltest.c` check libc's `string.h`, `ctype.h`,
-  `stdlib.h` and `malloc`; `run.sh` also builds them with the host's compiler and C library
+- `tests/src/strtest.c`, `stdtest.c`, `maltest.c` and `vatest.c` check libc's `string.h`,
+  `ctype.h`, `stdlib.h`, `malloc` and `stdarg.h`; `run.sh` also builds them with the host's compiler and C library
   (`tests/host/putnum.c` supplies `putnum`), and each must print the same on both,
   which checks the expected results. Checks that depend on bcc09's type sizes or on
   functions only libc has are under `#ifdef __BCC__` or `sizeof` tests.

@@ -107,7 +107,7 @@ echo $? > cpp-E.rc
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
 csrc="arith calls control float helpmain long longops main maltest ops proto
-      ptr selftest stdtest strtest struct switch"
+      ptr selftest stdtest strtest struct switch vatest"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -237,8 +237,8 @@ echo $? > regtest.run.rc
 rm -f ops.srec longops.srec regtest.srec
 
 # libc's C functions, mostly compiled by bcc09 from dev86's C: strtest.c
-# checks string.h's, stdtest.c ctype.h's and stdlib.h's, and maltest.c
-# malloc and friends, and sbrk and brk; each exits
+# checks string.h's, stdtest.c ctype.h's and stdlib.h's, maltest.c
+# malloc and friends, and sbrk and brk, and vatest.c stdarg.h; each exits
 # with the number of failures; each is also built for the host, with the
 # host's C library, where it must print the same, which checks the
 # expected results
@@ -255,7 +255,7 @@ hostcheck() {
 	fi > $1-host.result
 	rm -f $1-host $1-host.run $1.cmp $1-host.cmp
 }
-for f in strtest stdtest maltest; do
+for f in strtest stdtest maltest vatest; do
 	link $f	-T0x1000 simcrt0.o $f.o -L"$LIBDIR" -lc
 	"$OC" -O srec $f.out $f.srec
 	"$SIM" -n 50000000 $f.srec > $f.run 2>&1
