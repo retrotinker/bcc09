@@ -22,6 +22,13 @@ if [ "${1:-}" = "-u" ]; then
 	update=1
 fi
 
+# sim6809 runs the test programs (make check builds it)
+SIM=$tests/sim/sim6809
+if [ ! -x "$SIM" ]; then
+	echo "run.sh: $SIM is missing (make check builds it)" >&2
+	exit 2
+fi
+
 export LC_ALL=C
 
 rm -rf "$out"
@@ -91,7 +98,8 @@ echo $? > cpp-E.rc
 
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
-csrc="arith calls control float helpmain long main proto ptr struct switch"
+csrc="arith calls control float helpmain long main proto ptr selftest struct
+      switch"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -102,7 +110,7 @@ run syntax.cc "$BCC" -S -o syntax.s syntax.c
 rm -f syntax.s
 
 # the assembler: object file, listing and symbol file
-for f in crt0 modes; do
+for f in crt0 modes simcrt0; do
 	run $f.as "$AS" -o $f.o -l $f.lst -s $f.sym $f.s
 done
 # the compiler's output, assembled with a listing (-u, as bcc09 runs as09)
@@ -175,6 +183,25 @@ run os9-nodata.oc "$OC" -O os9 -n Prog prog-0.out nodata.os9
 run badformat.oc "$OC" -O nosuch prog.out bad.out
 run badaddr.oc "$OC" -T 0x10000 prog.out bad.out
 rm -f nodata.os9 bad.out
+
+# programs run on sim6809: selftest.c calls code from control.c,
+# switch.c and ptr.c and checks the results against the host compiler's,
+# so its exit status is the number of failed checks; once as compiled,
+# and once with every module compiled with -O
+selfobjs="simcrt0.o selftest.o control.o switch.o ptr.o"
+link selftest	-m -M -T0x1000 $selfobjs
+"$OC" -O srec selftest.out selftest.srec
+"$SIM" -n 1000000 selftest.srec > selftest.run 2>&1
+echo $? > selftest.run.rc
+for f in selftest control switch ptr; do
+	run $f-O.c.cc "$BCC" -O -c -o $f-O.o $f.c
+done
+link selftest-O	-T0x1000 simcrt0.o selftest-O.o control-O.o switch-O.o ptr-O.o
+"$OC" -O srec selftest-O.out selftest-O.srec
+"$SIM" -n 1000000 selftest-O.srec > selftest-O.run 2>&1
+echo $? > selftest-O.run.rc
+rm -f selftest.srec selftest-O.srec selftest-O.out selftest-O.map \
+	selftest-O.err selftest-O.rc
 
 # the copied sources aren't results
 for f in "$tests"/src/*; do

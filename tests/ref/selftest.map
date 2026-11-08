@@ -1,0 +1,35 @@
+simcrt0         +simcrt0.o
+selftest        +selftest.o
+control         +control.o
+switch          +switch.o
+ptr             +ptr.o
+             simcrt0               _putnum  0  00001020  R
+             simcrt0                 _exit  0  00001013  R
+             simcrt0                io_out  0  0000ff00  a
+             simcrt0                 __end  3  000015ec  R
+             simcrt0                    go  0  00001010  r
+             simcrt0              _putchar  0  0000101a  R
+             simcrt0               __edata  3  000015bc  R
+             simcrt0                 clear  0  00001007  r
+             simcrt0                 start  0  00001000  R N
+             simcrt0               io_numh  0  0000ff04  a
+             simcrt0               io_numl  0  0000ff05  a
+             simcrt0               io_exit  0  0000ff02  a
+            selftest                _puts1  0  00001024  R
+            selftest                 _main  0  0000106f  R
+            selftest               _checks  3  000015bc  R C
+            selftest                _check  0  0000103c  R
+            selftest             _failures  3  000015c0  R C
+             control                _loops  0  0000138f  R
+             control               _select  0  0000133c  R
+              switch                _dense  0  00001438  R
+                 ptr              _strlen1  0  00001488  R
+                 ptr                 _grid  3  000015c4  R C
+                 ptr                 _copy  0  000014a2  R
+                 ptr                   _ip  3  000015b8  R
+                 ptr                  _tab  3  000015a0  R
+                 ptr                 _msgs  3  000015b2  R
+                 ptr                  _sum  0  000014bc  R
+                 ptr                  _buf  3  000015dc  R C
+                 ptr                 _ptrs  0  000014e4  R
+                 ptr                  _msg  3  000015b0  R

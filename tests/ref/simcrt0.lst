@@ -1,0 +1,52 @@
+00001                   ; start-up code for programs run on sim6809: set the stack, clear the
+00002                   ; BSS, call main, and exit with the low byte of its result; and routines
+00003                   ; for C that use the simulator's I/O block at $FF00
+00004                   
+00005             FF00  io_out	equ	$ff00		; write a character
+00006             FF02  io_exit	equ	$ff02		; stop, with this exit status
+00007             FF04  io_numh	equ	$ff04		; high byte of a number to print
+00008             FF05  io_numl	equ	$ff05		; low byte: print the number
+00009                   
+00010 0000              	.data			; the linker defines these in the data segment,
+00011                   	import	__edata		; so they must be imported there
+00012                   	import	__end
+00013                   
+00014 0000              	.text
+00015                   	entry	start
+00016                   	import	_main
+00017 0000 10CE   7F00  start:	lds	#$7f00
+00018 0004   8E   0000> 	ldx	#__edata
+00019 0007   8C   0000> clear:	cmpx	#__end
+00020 000A   24     04  	bhs	go
+00021 000C   6F     80  	clr	,x+
+00022 000E   20     F7  	bra	clear
+00023 0010   BD   0000> go:	jsr	_main
+00024                   	export	_exit
+00025 0013   1F     10  _exit:	tfr	x,d		; the first argument, or main's result,
+00026 0015   F7   FF02  	stb	io_exit		; is in X
+00027 0018   20     F9  	bra	_exit
+00028                   
+00029                   ; putchar(c): write c
+00030                   	export	_putchar
+00031             001A> _putchar:
+00032 001A   1F     10  	tfr	x,d
+00033 001C   F7   FF00  	stb	io_out
+00034 001F   39         	rts
+00035                   
+00036                   ; putnum(n): print n as an unsigned decimal number and a newline
+00037                   	export	_putnum
+00038             0020> _putnum:
+00039 0020   BF   FF04  	stx	io_numh
+00040 0023   39         	rts
+
+Symbols:
+__edata                     3 0000 R I __end                       3 0000 R I 
+_exit                       0 0013 R E _main                       0 0000 R I 
+_putchar                    0 001A R E _putnum                     0 0020 R E 
+clear                       0 0007 R   go                          0 0010 R   
+io_exit                     0 FF02 A   io_numh                     0 FF04 A   
+io_numl                     0 FF05 A   io_out                      0 FF00 A   
+start                       0 0000 R N 
+
+00000 errors
+00000 warnings
