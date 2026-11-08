@@ -15,16 +15,40 @@
 ; 9 
 ; 10 int checks, failures;
 ;BCC_EOS
-; 11 
-; 12 void puts1(s)
-; 13 char *s;
+; 11 int one = 1;
+LOC	3
+EXPORT	_one
+_one:
+FDB	1
+;BCC_EOS
+; 12 
+; 13  
+; 14 long lsecond(d,l)
+; 15 int d;
+LOC	0
+EXPORT	_lsecond
+_lsecond:
+;BCC_EOS
+; 16 long l;
+;BCC_EOS
+; 17 {
+; 18 	return l;
+PSHS	X
+LDD	4,S
+LDX	6,S
+PULS	Y,PC
+;BCC_EOS
+; 19 }
+; 20 
+; 21 void puts1(s)
+; 22 char *s;
 EXPORT	_puts1
 _puts1:
 ;BCC_EOS
-; 14 {
-; 15 	while (*s)
+; 23 {
+; 24 	while (*s)
 PSHS	X
-; 16 		putchar(*s++);
+; 25 		putchar(*s++);
 BRA	.2
 .3:
 ; Debug: postinc * char s = [S+2-2] (used reg = )
@@ -38,41 +62,41 @@ TFR	D,X
 ; Debug: func () void = putchar+0 (used reg = )
 JSR	>_putchar
 ;BCC_EOS
-; 17 }
+; 26 }
 .2:
 LDB	[0,S]
 BNE	.3
 .4:
 .1:
 PULS	Y,PC
-; 18 
-; 19  
-; 20 void check(n,got,want)
-; 21 int n, got, want;
+; 27 
+; 28  
+; 29 void check(n,got,want)
+; 30 int n, got, want;
 EXPORT	_check
 _check:
 ;BCC_EOS
-; 22 {
-; 23 	++checks;
+; 31 {
+; 32 	++checks;
 PSHS	X
 ; Debug: preinc int = [checks+0] (used reg = )
 LDD	>_checks
 ADDD	#1
 STD	>_checks
 ;BCC_EOS
-; 24 	if (got != want) {
+; 33 	if (got != want) {
 ; Debug: ne int want = [S+2+4] to int got = [S+2+2] (used reg = )
 LDD	4,S
 SUBD	6,S
 BEQ	.5
 .6:
-; 25 		++failures;
+; 34 		++failures;
 ; Debug: preinc int = [failures+0] (used reg = )
 LDD	>_failures
 ADDD	#1
 STD	>_failures
 ;BCC_EOS
-; 26 		puts1("FAIL ");
+; 35 		puts1("FAIL ");
 LOC	1
 .7:
 FCC	"FAIL "
@@ -83,38 +107,38 @@ LDX	#.7
 ; Debug: func () void = puts1+0 (used reg = )
 JSR	>_puts1
 ;BCC_EOS
-; 27 		putnum(n);
+; 36 		putnum(n);
 ; Debug: rootlist int n = [S+2-2] (used reg = )
 LDX	0,S
 ; Debug: func () void = putnum+0 (used reg = )
 JSR	>_putnum
 ;BCC_EOS
-; 28 		putnum(got);
+; 37 		putnum(got);
 ; Debug: rootlist int got = [S+2+2] (used reg = )
 LDX	4,S
 ; Debug: func () void = putnum+0 (used reg = )
 JSR	>_putnum
 ;BCC_EOS
-; 29 		putnum(want);
+; 38 		putnum(want);
 ; Debug: rootlist int want = [S+2+4] (used reg = )
 LDX	6,S
 ; Debug: func () void = putnum+0 (used reg = )
 JSR	>_putnum
 ;BCC_EOS
-; 30 	}
-; 31 }
+; 39 	}
+; 40 }
 .5:
 PULS	Y,PC
-; 32 
-; 33 int main()
-; 34 {
+; 41 
+; 42 int main()
+; 43 {
 EXPORT	_main
 _main:
-; 35 	char tmp[8];
+; 44 	char tmp[8];
 ;BCC_EOS
-; 36 
-; 37 	 
-; 38 	check(1,select(0),10);
+; 45 
+; 46 	 
+; 47 	check(1,select(0),10);
 LEAS	-8,S
 ; Debug: list int = const $A (used reg = )
 LDD	#$A
@@ -131,7 +155,7 @@ LDX	#1
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 39 	check(2,select(1),6);
+; 48 	check(2,select(1),6);
 ; Debug: list int = const 6 (used reg = )
 LDD	#6
 PSHS	D
@@ -147,7 +171,7 @@ LDX	#2
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 40 	check(3,select(2),7);
+; 49 	check(3,select(2),7);
 ; Debug: list int = const 7 (used reg = )
 LDD	#7
 PSHS	D
@@ -163,7 +187,7 @@ LDX	#3
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 41 	check(4,select(3),0);
+; 50 	check(4,select(3),0);
 ; Debug: list int = const 0 (used reg = )
 LDD	#0
 PSHS	D
@@ -179,7 +203,7 @@ LDX	#4
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 42 	check(5,select(7),-14);
+; 51 	check(5,select(7),-14);
 ; Debug: list int = const -$E (used reg = )
 LDD	#-$E
 PSHS	D
@@ -195,7 +219,7 @@ LDX	#5
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 43 	check(6,select(8),16);
+; 52 	check(6,select(8),16);
 ; Debug: list int = const $10 (used reg = )
 LDD	#$10
 PSHS	D
@@ -211,7 +235,7 @@ LDX	#6
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 44 	check(7,select(100),1);
+; 53 	check(7,select(100),1);
 ; Debug: list int = const 1 (used reg = )
 LDD	#1
 PSHS	D
@@ -227,7 +251,7 @@ LDX	#7
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 45 	check(8,select(-1),0);
+; 54 	check(8,select(-1),0);
 ; Debug: list int = const 0 (used reg = )
 LDD	#0
 PSHS	D
@@ -243,9 +267,9 @@ LDX	#8
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 46 
-; 47 	 
-; 48 	check(10,dense(0),-1);
+; 55 
+; 56 	 
+; 57 	check(10,dense(0),-1);
 ; Debug: list int = const -1 (used reg = )
 LDD	#-1
 PSHS	D
@@ -261,7 +285,7 @@ LDX	#$A
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 49 	check(11,dense(1),11);
+; 58 	check(11,dense(1),11);
 ; Debug: list int = const $B (used reg = )
 LDD	#$B
 PSHS	D
@@ -277,7 +301,7 @@ LDX	#$B
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 50 	check(12,dense(2),22);
+; 59 	check(12,dense(2),22);
 ; Debug: list int = const $16 (used reg = )
 LDD	#$16
 PSHS	D
@@ -293,7 +317,7 @@ LDX	#$C
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 51 	check(13,dense(3),33);
+; 60 	check(13,dense(3),33);
 ; Debug: list int = const $21 (used reg = )
 LDD	#$21
 PSHS	D
@@ -309,7 +333,7 @@ LDX	#$D
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 52 	check(14,dense(4),44);
+; 61 	check(14,dense(4),44);
 ; Debug: list int = const $2C (used reg = )
 LDD	#$2C
 PSHS	D
@@ -325,7 +349,7 @@ LDX	#$E
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 53 	check(15,dense(5),55);
+; 62 	check(15,dense(5),55);
 ; Debug: list int = const $37 (used reg = )
 LDD	#$37
 PSHS	D
@@ -341,7 +365,7 @@ LDX	#$F
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 54 	check(16,dense(6),66);
+; 63 	check(16,dense(6),66);
 ; Debug: list int = const $42 (used reg = )
 LDD	#$42
 PSHS	D
@@ -357,7 +381,7 @@ LDX	#$10
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 55 	check(17,dense(7),-1);
+; 64 	check(17,dense(7),-1);
 ; Debug: list int = const -1 (used reg = )
 LDD	#-1
 PSHS	D
@@ -373,9 +397,9 @@ LDX	#$11
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 56 
-; 57 	 
-; 58 	check(20,loops(0),0);
+; 65 
+; 66 	 
+; 67 	check(20,loops(0),0);
 ; Debug: list int = const 0 (used reg = )
 LDD	#0
 PSHS	D
@@ -391,7 +415,7 @@ LDX	#$14
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 59 	check(21,loops(1),1);
+; 68 	check(21,loops(1),1);
 ; Debug: list int = const 1 (used reg = )
 LDD	#1
 PSHS	D
@@ -407,7 +431,7 @@ LDX	#$15
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 60 	check(22,loops(3),5);
+; 69 	check(22,loops(3),5);
 ; Debug: list int = const 5 (used reg = )
 LDD	#5
 PSHS	D
@@ -423,7 +447,7 @@ LDX	#$16
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 61 	check(23,loops(4),5);
+; 70 	check(23,loops(4),5);
 ; Debug: list int = const 5 (used reg = )
 LDD	#5
 PSHS	D
@@ -439,7 +463,7 @@ LDX	#$17
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 62 	check(24,loops(5),10);
+; 71 	check(24,loops(5),10);
 ; Debug: list int = const $A (used reg = )
 LDD	#$A
 PSHS	D
@@ -455,7 +479,7 @@ LDX	#$18
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 63 	check(25,loops(12),58);
+; 72 	check(25,loops(12),58);
 ; Debug: list int = const $3A (used reg = )
 LDD	#$3A
 PSHS	D
@@ -471,7 +495,7 @@ LDX	#$19
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 64 	check(26,loops(20),62);
+; 73 	check(26,loops(20),62);
 ; Debug: list int = const $3E (used reg = )
 LDD	#$3E
 PSHS	D
@@ -487,9 +511,9 @@ LDX	#$1A
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 65 
-; 66 	 
-; 67 	check(30,strlen1("hello, world"),12);
+; 74 
+; 75 	 
+; 76 	check(30,strlen1("hello, world"),12);
 LOC	1
 .8:
 FCC	"hello, world"
@@ -510,7 +534,7 @@ LDX	#$1E
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 68 	copy(tmp,"abc");
+; 77 	copy(tmp,"abc");
 LOC	1
 .9:
 FCC	"abc"
@@ -525,7 +549,7 @@ LEAX	2,S
 JSR	>_copy
 LEAS	2,S
 ;BCC_EOS
-; 69 	check(31,tmp[0],'a');
+; 78 	check(31,tmp[0],'a');
 ; Debug: list int = const $61 (used reg = )
 LDD	#$61
 PSHS	D
@@ -539,7 +563,7 @@ LDX	#$1F
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 70 	check(32,tmp[2],'c');
+; 79 	check(32,tmp[2],'c');
 ; Debug: list int = const $63 (used reg = )
 LDD	#$63
 PSHS	D
@@ -553,7 +577,7 @@ LDX	#$20
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 71 	check(33,tmp[3],0);
+; 80 	check(33,tmp[3],0);
 ; Debug: list int = const 0 (used reg = )
 LDD	#0
 PSHS	D
@@ -567,7 +591,7 @@ LDX	#$21
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 72 	check(34,sum(tab,8),87);
+; 81 	check(34,sum(tab,8),87);
 ; Debug: list int = const $57 (used reg = )
 LDD	#$57
 PSHS	D
@@ -587,7 +611,7 @@ LDX	#$22
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 73 	check(35,sum(tab + 2,3),16);
+; 82 	check(35,sum(tab + 2,3),16);
 ; Debug: list int = const $10 (used reg = )
 LDD	#$10
 PSHS	D
@@ -607,7 +631,7 @@ LDX	#$23
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 74 	check(36,ptrs(),221);
+; 83 	check(36,ptrs(),221);
 ; Debug: list int = const $DD (used reg = )
 LDD	#$DD
 PSHS	D
@@ -621,7 +645,7 @@ LDX	#$24
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 75 	check(37,buf[0],'t');
+; 84 	check(37,buf[0],'t');
 ; Debug: list int = const $74 (used reg = )
 LDD	#$74
 PSHS	D
@@ -635,7 +659,7 @@ LDX	#$25
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 76 	check(38,strlen1(buf),5);
+; 85 	check(38,strlen1(buf),5);
 ; Debug: list int = const 5 (used reg = )
 LDD	#5
 PSHS	D
@@ -651,15 +675,15 @@ LDX	#$26
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 77 
-; 78 
-; 79 
-; 80 	 
-; 81 	{
-; 82 		static char spelled[] = {
+; 86 
+; 87 
+; 88 
+; 89 	 
+; 90 	{
+; 91 		static char spelled[] = {
 LOC	3
 .A:
-; 83 			'0','1','2','3','4','5','6','7','8','9','a','b','c','d',
+; 92 			'0','1','2','3','4','5','6','7','8','9','a','b','c','d',
 FCB	$30
 FCB	$31
 FCB	$32
@@ -674,7 +698,7 @@ FCB	$61
 FCB	$62
 FCB	$63
 FCB	$64
-; 84 			'e','f','0','1','2','3','4','5','6','7','8','9','A','B',
+; 93 			'e','f','0','1','2','3','4','5','6','7','8','9','A','B',
 FCB	$65
 FCB	$66
 FCB	$30
@@ -689,16 +713,16 @@ FCB	$38
 FCB	$39
 FCB	$41
 FCB	$42
-; 85 			'C','D','E','F', 0
+; 94 			'C','D','E','F', 0
 FCB	$43
 FCB	$44
 FCB	$45
 FCB	$46
-; 86 		};
+; 95 		};
 FCB	0
 LOC	0
 ;BCC_EOS
-; 87 		char *lit = "0123456789abcdef0123456789ABCDEF";
+; 96 		char *lit = "0123456789abcdef0123456789ABCDEF";
 LEAS	-2,S
 LOC	1
 .B:
@@ -709,20 +733,20 @@ LOC	0
 LDX	#.B
 STX	0,S
 ;BCC_EOS
-; 88 		int i, same = 1;
+; 97 		int i, same = 1;
 LEAS	-4,S
 ; Debug: eq int = const 1 to int same = [S+$E-$E] (used reg = )
 LDD	#1
 STD	0,S
 ;BCC_EOS
-; 89 
-; 90 		for (i = 0; i < 33; i++)
+; 98 
+; 99 		for (i = 0; i < 33; i++)
 ; Debug: eq int = const 0 to int i = [S+$E-$C] (used reg = )
 LDD	#0
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
-; 91 			if (lit[i] != spelled[i])
+; 100 			if (lit[i] != spelled[i])
 BRA	.E
 .F:
 ; Debug: ptradd int i = [S+$E-$C] to [$21] char = .A+0 (used reg = )
@@ -738,12 +762,12 @@ LDB	0,U
 SUBB	0,X
 BEQ	.10
 .11:
-; 92 				same = 0;
+; 101 				same = 0;
 ; Debug: eq int = const 0 to int same = [S+$E-$E] (used reg = )
 LDD	#0
 STD	0,S
 ;BCC_EOS
-; 93 		check(40,same,1);
+; 102 		check(40,same,1);
 .10:
 .D:
 ; Debug: postinc int i = [S+$E-$C] (used reg = )
@@ -769,50 +793,145 @@ LDX	#$28
 JSR	>_check
 LEAS	4,S
 ;BCC_EOS
-; 94 	}
+; 103 	}
 LEAS	6,S
-; 95 
-; 96 	puts1("checks ");
-LOC	1
+; 104 
+; 105 
+; 106 	 
+; 107 	check(41,lsecond(0,one ? 1L : 1)== 1L,1);
+; Debug: list int = const 1 (used reg = )
+LDD	#1
+PSHS	D
+LDD	>_one
+BEQ	.13
+.14:
+LDD	#0
+LDX	#1
+BRA	.15
 .13:
+LDD	#0
+LDX	#1
+.15:
+; Debug: list long = X+0 (used reg = )
+PSHS	D,X
+; Debug: rootlist int = const 0 (used reg = )
+LDX	#0
+; Debug: func () long = lsecond+0 (used reg = )
+JSR	>_lsecond
+LEAS	4,S
+; Debug: logeq long = const 1 to long = X+0 (used reg = )
+PSHS	D,X
+LDD	#0
+LDX	#1
+PSHS	D,X
+LDD	4,S
+LDX	6,S
+LEAY	0,S
+JSR	>lcmp_b
+BNE	.16
+LDB	#1
+BRA	.17
+.16:
+CLRB
+.17:
+LEAS	8,S
+; Debug: list char = B+0 (used reg = )
+CLRA
+PSHS	D
+; Debug: rootlist int = const $29 (used reg = )
+LDX	#$29
+; Debug: func () void = check+0 (used reg = )
+JSR	>_check
+LEAS	4,S
+;BCC_EOS
+; 108 	check(42,lsecond(0,one ? -1L : 1)== -1L,1);
+; Debug: list int = const 1 (used reg = )
+LDD	#1
+PSHS	D
+LDD	>_one
+BEQ	.18
+.19:
+LDD	#$FFFF
+LDX	#$FFFF
+BRA	.1A
+.18:
+LDD	#0
+LDX	#1
+.1A:
+; Debug: list long = X+0 (used reg = )
+PSHS	D,X
+; Debug: rootlist int = const 0 (used reg = )
+LDX	#0
+; Debug: func () long = lsecond+0 (used reg = )
+JSR	>_lsecond
+LEAS	4,S
+; Debug: logeq long = const -1 to long = X+0 (used reg = )
+PSHS	D,X
+LDD	#$FFFF
+LDX	#$FFFF
+PSHS	D,X
+LDD	4,S
+LDX	6,S
+LEAY	0,S
+JSR	>lcmp_b
+BNE	.1B
+LDB	#1
+BRA	.1C
+.1B:
+CLRB
+.1C:
+LEAS	8,S
+; Debug: list char = B+0 (used reg = )
+CLRA
+PSHS	D
+; Debug: rootlist int = const $2A (used reg = )
+LDX	#$2A
+; Debug: func () void = check+0 (used reg = )
+JSR	>_check
+LEAS	4,S
+;BCC_EOS
+; 109 
+; 110 	puts1("checks ");
+LOC	1
+.1D:
 FCC	"checks "
 FCB	0
 LOC	0
-; Debug: rootlist * char = .13+0 (used reg = )
-LDX	#.13
+; Debug: rootlist * char = .1D+0 (used reg = )
+LDX	#.1D
 ; Debug: func () void = puts1+0 (used reg = )
 JSR	>_puts1
 ;BCC_EOS
-; 97 	putnum(checks);
+; 111 	putnum(checks);
 ; Debug: rootlist int = [checks+0] (used reg = )
 LDX	>_checks
 ; Debug: func () void = putnum+0 (used reg = )
 JSR	>_putnum
 ;BCC_EOS
-; 98 	puts1("failures ");
+; 112 	puts1("failures ");
 LOC	1
-.14:
+.1E:
 FCC	"failures "
 FCB	0
 LOC	0
-; Debug: rootlist * char = .14+0 (used reg = )
-LDX	#.14
+; Debug: rootlist * char = .1E+0 (used reg = )
+LDX	#.1E
 ; Debug: func () void = puts1+0 (used reg = )
 JSR	>_puts1
 ;BCC_EOS
-; 99 	putnum(failures);
+; 113 	putnum(failures);
 ; Debug: rootlist int = [failures+0] (used reg = )
 LDX	>_failures
 ; Debug: func () void = putnum+0 (used reg = )
 JSR	>_putnum
 ;BCC_EOS
-; 100 	return failures;
+; 114 	return failures;
 LDX	>_failures
 LEAS	8,S
 RTS
 ;BCC_EOS
-; 101 }
-; 102 
+; 115 }
+; 116 
 LOC	3
 _checks		COMM	2
 _failures		COMM	2

@@ -200,14 +200,15 @@ rm -f nodata.os9 bad.out
 # so its exit status is the number of failed checks; once as compiled,
 # and once with every module compiled with -O
 selfobjs="simcrt0.o selftest.o control.o switch.o ptr.o"
-link selftest	-m -M -T0x1000 $selfobjs
+link selftest	-m -M -T0x1000 $selfobjs -L"$LIBDIR" -lc
 "$OC" -O srec selftest.out selftest.srec
 "$SIM" -n 1000000 selftest.srec > selftest.run 2>&1
 echo $? > selftest.run.rc
 for f in selftest control switch ptr; do
 	run $f-O.c.cc "$BCC" -O -c -o $f-O.o $f.c
 done
-link selftest-O	-T0x1000 simcrt0.o selftest-O.o control-O.o switch-O.o ptr-O.o
+link selftest-O	-T0x1000 simcrt0.o selftest-O.o control-O.o switch-O.o ptr-O.o \
+		-L"$LIBDIR" -lc
 "$OC" -O srec selftest-O.out selftest-O.srec
 "$SIM" -n 1000000 selftest-O.srec > selftest-O.run 2>&1
 echo $? > selftest-O.run.rc

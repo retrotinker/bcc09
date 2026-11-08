@@ -8,6 +8,15 @@ extern int tab[];
 extern char buf[];
 
 int checks, failures;
+int one = 1;
+
+/* a long as the second argument, which is passed on the stack */
+long lsecond(d, l)
+int d;
+long l;
+{
+	return l;
+}
 
 void puts1(s)
 char *s;
@@ -92,6 +101,11 @@ int main()
 				same = 0;
 		check(40, same, 1);
 	}
+
+	/* c ? 1L : 1 is a long, though both are small constants (cc1 once
+	   made it a char) */
+	check(41, lsecond(0, one ? 1L : 1) == 1L, 1);
+	check(42, lsecond(0, one ? -1L : 1) == -1L, 1);
 
 	puts1("checks ");
 	putnum(checks);

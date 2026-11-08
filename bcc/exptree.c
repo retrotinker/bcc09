@@ -169,9 +169,11 @@ register struct nodestruct *nodeptr;
 {
 	register struct symstruct *symptr;
 
+	/* (not long: in "c ? 1L : 1" the result is a long, however small) */
 	if (nodeptr->tag == LEAF &&
 	    (symptr = nodeptr->left.symptr)->storage == CONSTANT &&
-	    ischarconst(symptr->offset.offv) && symptr->type->scalar & ISCALAR)
+	    ischarconst(symptr->offset.offv) &&
+	    symptr->type->scalar & (CHAR | SHORT | INT))
 		return TRUE;
 	return FALSE;
 }
