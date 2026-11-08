@@ -2,17 +2,17 @@ ARCHIVEFILE 'libtest.a'
 OBJECTFILE 'control.o'
 MODULE  'control'
 BYTEPOS 0000003d
-BINLEN  000000f9
+BINLEN  000000f1
 STRINGS 006a +0017
 VERSION 0.0
-SEG0 000000f9
+SEG0 000000f1
 
 SYMS 2
 SYM 0    00000053 ..E.T _loops
 SYM 1    00000000 ..E.T _select
 
 text	data	bss	dec	hex	filename
-249	0	0	249	f9	libtest.a(control.o)
+241	0	0	241	f1	libtest.a(control.o)
 
 BYTECODE
 SEG 0
@@ -22,23 +22,23 @@ SEG 0
 : 00 00 27 d2 83 00 01 27  d2 83 00 01 27 cd 83 00  ..'....'....'...
 : 05 27 d1 83 00 01 27 d3  83 00 5c 27 d6 20 d9 ae  .'....'...\'....
 : e4 35 a0 34 10 32 7a cc  00 00 ed e4 cc 00 00 ed  .5.4.2z.........
-: 64 20 22 ae 64 30 1d 10  26 00 02 20 11 ec 64 83  d.".d0..&.....d.
-: 00 0a 10 2f 00 02 20 13  ec e4 e3 64 ed e4 ec 64  .../.......d...d
-: c3 00 01 ed 64 ec 64 a3  66 2d d8 20 07 ec e4 c3  ....d.d.f-......
-: ff f9 ed e4 ec e4 83 00  64 2e f2 cc 00 00 ed 62  ........d......b
-: ec 62 c3 00 01 ed 62 ec  62 a3 66 2d f3 ec 62 c3  .b....b.b.f-..b.
-: ff ff ed 62 83 00 00 10  2e 00 06 32 e9 00 00 20  ...b.......2....
-: 02 20 ea cc 00 00 ed 64  ec 66 ed 62 20 20 ec e4  .......d.f.b....
-: 10 27 00 07 ec e4 c3 00  01 20 03 cc 00 01 ed e4  .'..............
-: ec 64 c3 00 01 ed 64 ec  62 c3 ff ff ed 62 ec 64  .d....d.b....b.d
-: a3 62 2d da ae e4 32 68  39                       .b-...2h9       
+: 64 20 1e ae 64 30 1d 26  02 20 0f ec 64 83 00 0a  d...d0.&....d...
+: 2f 02 20 13 ec e4 e3 64  ed e4 ec 64 c3 00 01 ed  /......d...d....
+: 64 ec 64 a3 66 2d dc 20  07 ec e4 c3 ff f9 ed e4  d.d.f-..........
+: ec e4 83 00 64 2e f2 cc  00 00 ed 62 ec 62 c3 00  ....d......b.b..
+: 01 ed 62 ec 62 a3 66 2d  f3 ec 62 c3 ff ff ed 62  ..b.b.f-..b....b
+: 83 00 00 2e 06 32 e9 00  00 20 02 20 ec cc 00 00  .....2..........
+: ed 64 ec 66 ed 62 20 1e  ec e4 27 07 ec e4 c3 00  .d.f.b....'.....
+: 01 20 03 cc 00 01 ed e4  ec 64 c3 00 01 ed 64 ec  .........d....d.
+: 62 c3 ff ff ed 62 ec 64  a3 62 2d dc ae e4 32 68  b....b.d.b-...2h
+: 39                                                9               
 
 ARCHIVEFILE 'libtest.a'
 OBJECTFILE 'ptr.o'
 MODULE  'ptr'
 BYTEPOS 0000008e
 BINLEN  00000103
-STRINGS 020d +003d
+STRINGS 0205 +003d
 VERSION 0.0
 SEG0 000000ce
 SEG1 0000001b

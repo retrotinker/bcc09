@@ -8705,12 +8705,12 @@ _expect:
 ; Debug: ne unsigned int w = [S+$C-$C] to unsigned int g = [S+$C-8] (used reg = )
 	LDD	4,S
 	SUBD	0,S
-	LBNE	.7
+		BNE	.7
 .8:
 ; Debug: ne unsigned int w = [S+$C-$A] to unsigned int g = [S+$C-6] (used reg = )
 	LDD	6,S
 	SUBD	2,S
-	LBEQ	.6
+		BEQ	.6
 .7:
 ; 55 		fail(g.w[0],g.w[1],w.w[0],w.w[1]);
 ; Debug: list unsigned int w = [S+$C-$A] (used reg = )
@@ -8756,7 +8756,7 @@ _iexpect:
 ; Debug: ne int = [[iep+0]] to int got = [S+2-2] (used reg = )
 	LDD	0,S
 	SUBD	[>_iep]
-	LBEQ	.9
+		BEQ	.9
 .A:
 ; 64 		fail(0,got,0,*iep);
 ; Debug: list int = [[iep+0]] (used reg = )
@@ -9931,7 +9931,7 @@ _pairs:
 	LDX	$A,S
 	LEAY	$C,S
 	JSR	>lcmp_b
-	LBLE	.81
+		BLE	.81
 .82:
 ; 177 				bits |= 1;
 ; Debug: orab int = const 1 to int bits = [S+$16-6] (used reg = )
@@ -9946,7 +9946,7 @@ _pairs:
 	LDX	$A,S
 	LEAY	$C,S
 	JSR	>lcmp_b
-	LBLT	.83
+		BLT	.83
 .84:
 ; 179 				bits |= 2;
 ; Debug: orab int = const 2 to int bits = [S+$16-6] (used reg = )
@@ -9961,7 +9961,7 @@ _pairs:
 	LDX	$A,S
 	LEAY	$C,S
 	JSR	>lcmp_b
-	LBGE	.85
+		BGE	.85
 .86:
 ; 181 				bits |= 4;
 ; Debug: orab int = const 4 to int bits = [S+$16-6] (used reg = )
@@ -9976,7 +9976,7 @@ _pairs:
 	LDX	$A,S
 	LEAY	$C,S
 	JSR	>lcmp_b
-	LBGT	.87
+		BGT	.87
 .88:
 ; 183 				bits |= 8;
 ; Debug: orab int = const 8 to int bits = [S+$16-6] (used reg = )
@@ -9991,7 +9991,7 @@ _pairs:
 	LDX	$A,S
 	LEAY	$C,S
 	JSR	>lcmp_b
-	LBNE	.89
+		BNE	.89
 .8A:
 ; 185 				bits |= 0x10;
 ; Debug: orab int = const $10 to int bits = [S+$16-6] (used reg = )
@@ -10006,7 +10006,7 @@ _pairs:
 	LDX	$A,S
 	LEAY	$C,S
 	JSR	>lcmp_b
-	LBEQ	.8B
+		BEQ	.8B
 .8C:
 ; 187 				bits |= 0x20;
 ; Debug: orab int = const $20 to int bits = [S+$16-6] (used reg = )
@@ -10021,7 +10021,7 @@ _pairs:
 	LDX	2,S
 	LEAY	4,S
 	JSR	>lcmpu_b
-	LBLS	.8D
+		BLS	.8D
 .8E:
 ; 189 				bits |= 0x40;
 ; Debug: orab int = const $40 to int bits = [S+$16-6] (used reg = )
@@ -10036,7 +10036,7 @@ _pairs:
 	LDX	2,S
 	LEAY	4,S
 	JSR	>lcmpu_b
-	LBLO	.8F
+		BLO	.8F
 .90:
 ; 191 				bits |= 0x80;
 ; Debug: orab int = const $80 to int bits = [S+$16-6] (used reg = )
@@ -10051,7 +10051,7 @@ _pairs:
 	LDX	2,S
 	LEAY	4,S
 	JSR	>lcmpu_b
-	LBHS	.91
+		BHS	.91
 .92:
 ; 193 				bits |= 0x100;
 ; Debug: orab int = const $100 to int bits = [S+$16-6] (used reg = )
@@ -10067,7 +10067,7 @@ _pairs:
 	LDX	2,S
 	LEAY	4,S
 	JSR	>lcmpu_b
-	LBHI	.93
+		BHI	.93
 .94:
 ; 195 				bits |= 0x200;
 ; Debug: orab int = const $200 to int bits = [S+$16-6] (used reg = )
@@ -10988,7 +10988,7 @@ _unaries:
 	LDD	6,S
 	LDX	8,S
 	JSR	>ltst_b
-	LBNE	.D1
+		BNE	.D1
 .D2:
 	LDB	#1
 	BRA	.D3

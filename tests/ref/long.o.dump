@@ -1,10 +1,10 @@
 OBJECTFILE 'long.o'
 MODULE  'long'
 BYTEPOS 00000112
-BINLEN  00000173
+BINLEN  0000016f
 STRINGS 0081 +0091
 VERSION 0.0
-SEG0 00000167
+SEG0 00000163
 SEG3 0000000c
 
 SYMS 23
@@ -21,7 +21,7 @@ SYM 9    00000000 ...IU ladd_b
 SYM 10   00000000 ...IU lmod_b
 SYM 11   00000000 ...IU land_b
 SYM 12   00000000 ..E.T _lops
-SYM 13   00000112 ..E.T _conv
+SYM 13   0000010e ..E.T _conv
 SYM 14   00000000 ...IU lneg_b
 SYM 15   00000002 ...ID _i
 SYM 16   00000000 ...IU lmul_b
@@ -33,7 +33,7 @@ SYM 21   00000008 ..E.D _ul
 SYM 22   00000000 ...IU ldiv_b
 
 text	data	bss	dec	hex	filename
-359	12	6	377	179	long.o
+355	12	6	373	175	long.o
 
 BYTECODE
 SEG 0
@@ -125,7 +125,7 @@ DW SEG3+0x0008
 DW SEG3+0x000a
 : ec 66 ae 68 31 e4 bd                              .f.h1..         
 DW lcmp_b
-: 10 2f 00 0c fc                                    ./...           
+: 2f 0c fc                                          /..             
 DW _l3
 : fe                                                .               
 DW _l3+0x0002
@@ -135,7 +135,7 @@ DW _l3
 DW linc_b
 : cc 00 00 8e 00 00 34 16  ec 64 ae 66 31 e4 bd     ......4..d.f1.. 
 DW lcmp_b
-: 32 64 10 26 00 0c fc                              2d.&...         
+: 32 64 26 0c fc                                    2d&..           
 DW _l3
 : fe                                                .               
 DW _l3+0x0002

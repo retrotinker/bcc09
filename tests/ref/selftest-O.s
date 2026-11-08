@@ -64,7 +64,7 @@ STD	>_checks
 ; Debug: ne int want = [S+2+4] to int got = [S+2+2] (used reg = )
 LDD	4,S
 SUBD	6,S
-LBEQ	.5
+BEQ	.5
 .6:
 ; 25 		++failures;
 ; Debug: preinc int = [failures+0] (used reg = )

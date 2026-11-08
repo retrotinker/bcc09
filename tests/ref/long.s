@@ -164,7 +164,7 @@ _lops:
 	LDX	8,S
 	LEAY	0,S
 	JSR	>lcmp_b
-	LBLE	.1
+		BLE	.1
 .2:
 ; Debug: postinc long = [l3+0] (used reg = )
 	LDD	>_l3
@@ -184,7 +184,7 @@ _lops:
 	LEAY	0,S
 	JSR	>lcmp_b
 	LEAS	4,S
-	LBNE	.3
+		BNE	.3
 .4:
 ; Debug: postdec long = [l3+0] (used reg = )
 	LDD	>_l3

@@ -181,7 +181,9 @@ label_no label;
 							strncpy(labpatch,
 								"\tBRA\t", 5);
 						else
-							*labpatch = '\t';
+							/* the L of LBcc, after
+							   opcodeleadin()'s tab */
+							*(labpatch + 1) = '\t';
 						goto over;
 # endif
 						*(labpatch + 2) =

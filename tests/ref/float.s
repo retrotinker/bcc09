@@ -72,7 +72,7 @@ _fops:
 	JSR	>Fpushd
 	LEAX	$12,S
 	JSR	>Fcompd
-	LBGE	.1
+		BGE	.1
 .2:
 ; 14 		d2 = -d2;
 ; Debug: neg double = [d2+0] (used reg = )

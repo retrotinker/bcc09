@@ -116,7 +116,7 @@ BRA	.D
 ; Debug: logeq int = const 3 to int i = [S+8-4] (used reg = )
 LDX	4,S
 LEAX	-3,X
-LBNE	.F
+BNE	.F
 .10:
 ; 34 			continue;
 BRA	.C
@@ -126,7 +126,7 @@ BRA	.C
 ; Debug: gt int = const $A to int i = [S+8-4] (used reg = )
 LDD	4,S
 SUBD	#$A
-LBLE	.11
+BLE	.11
 .12:
 ; 36 			break;
 BRA	.B
@@ -200,7 +200,7 @@ ADDD	#-1
 STD	2,S
 ; Debug: le int = const 0 to int = D+0 (used reg = )
 SUBD	#0
-LBGT	.1F
+BGT	.1F
 .20:
 ; 47 			goto out;
 LEAS	..FFFE+8,S
@@ -227,7 +227,7 @@ STD	2,S
 BRA	.23
 .24:
 LDD	0,S
-LBEQ	.25
+BEQ	.25
 .26:
 ; Debug: add int = const 1 to int t = [S+8-8] (used reg = )
 LDD	0,S

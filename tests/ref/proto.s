@@ -63,7 +63,7 @@ _clip:
 ; Debug: gt int = const $FF to unsigned int v = [S+2-2] (used reg = )
 	LDD	0,S
 	SUBD	#$FF
-	LBLS	.2
+		BLS	.2
 .3:
 	LDD	#$FF
 	BRA	.4

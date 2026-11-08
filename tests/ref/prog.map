@@ -3,22 +3,22 @@ main            +main.o
 control         +control.o
 ptr             +ptr.o
                 crt0                  stop  0  00001013  r
-                crt0                 __end  3  00001280  R
+                crt0                 __end  3  00001278  R
                 crt0                    go  0  00001010  r
-                crt0               __edata  3  00001250  R
+                crt0               __edata  3  00001248  R
                 crt0                 clear  0  00001007  r
                 crt0                 start  0  00001000  R N
                 main                 _main  0  00001018  R
-                main               _result  3  00001250  R C
+                main               _result  3  00001248  R C
              control                _loops  0  0000109f  R
              control               _select  0  0000104c  R
-                 ptr              _strlen1  0  00001148  R
-                 ptr                 _grid  3  00001258  R C
-                 ptr                 _copy  0  00001162  R
-                 ptr                   _ip  3  0000124c  R
-                 ptr                  _tab  3  00001234  R
-                 ptr                 _msgs  3  00001246  R
-                 ptr                  _sum  0  0000117c  R
-                 ptr                  _buf  3  00001270  R C
-                 ptr                 _ptrs  0  000011a4  R
-                 ptr                  _msg  3  00001244  R
+                 ptr              _strlen1  0  00001140  R
+                 ptr                 _grid  3  00001250  R C
+                 ptr                 _copy  0  0000115a  R
+                 ptr                   _ip  3  00001244  R
+                 ptr                  _tab  3  0000122c  R
+                 ptr                 _msgs  3  0000123e  R
+                 ptr                  _sum  0  00001174  R
+                 ptr                  _buf  3  00001268  R C
+                 ptr                 _ptrs  0  0000119c  R
+                 ptr                  _msg  3  0000123c  R

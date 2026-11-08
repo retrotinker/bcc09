@@ -147,7 +147,7 @@ STD	>_checks
 ;BCC_EOS
 ; 26 	if (!cond) {
 LDD	4,S
-LBNE	.5
+BNE	.5
 .6:
 ; 27 		++failures;
 ; Debug: preinc int = [failures+0] (used reg = )
@@ -187,7 +187,7 @@ _sign:
 PSHS	X
 ; Debug: lt int = const 0 to int n = [S+2-2] (used reg = )
 LDD	0,S
-LBGE	.8
+BGE	.8
 .9:
 LDD	#-1
 BRA	.A
@@ -410,11 +410,11 @@ JSR	>_strcmp
 LEAS	2,S
 ; Debug: logeq int = const 0 to int = X+0 (used reg = )
 LEAX	0,X
-LBNE	.21
+BNE	.21
 .23:
 ; Debug: logeq int = const 0 to char = [buf+3] (used reg = )
 LDB	>_buf+3
-LBNE	.21
+BNE	.21
 .22:
 LDB	#1
 BRA	.24
@@ -445,11 +445,11 @@ JSR	>_strcpy
 LEAS	2,S
 ; Debug: logeq * char = buf+0 to * char = X+0 (used reg = )
 CMPX	#_buf
-LBNE	.26
+BNE	.26
 .28:
 ; Debug: logeq int = const 0 to char = [buf+0] (used reg = )
 LDB	>_buf
-LBNE	.26
+BNE	.26
 .27:
 LDB	#1
 BRA	.29
@@ -643,25 +643,25 @@ LEAS	2,S
 ; Debug: logeq int = const $61 to char = [buf+0] (used reg = )
 LDB	>_buf
 SUBB	#$61
-LBNE	.38
+BNE	.38
 .3D:
 ; Debug: logeq int = const $62 to char = [buf+1] (used reg = )
 LDB	>_buf+1
 SUBB	#$62
-LBNE	.38
+BNE	.38
 .3C:
 ; Debug: logeq int = const 0 to char = [buf+2] (used reg = )
 LDB	>_buf+2
-LBNE	.38
+BNE	.38
 .3B:
 ; Debug: logeq int = const 0 to char = [buf+4] (used reg = )
 LDB	>_buf+4
-LBNE	.38
+BNE	.38
 .3A:
 ; Debug: logeq int = const $7A to char = [buf+5] (used reg = )
 LDB	>_buf+5
 SUBB	#$7A
-LBNE	.38
+BNE	.38
 .39:
 LDB	#1
 BRA	.3E
@@ -712,12 +712,12 @@ LEAS	4,S
 ; Debug: logeq int = const $63 to char = [buf+2] (used reg = )
 LDB	>_buf+2
 SUBB	#$63
-LBNE	.40
+BNE	.40
 .42:
 ; Debug: logeq int = const $7A to char = [buf+3] (used reg = )
 LDB	>_buf+3
 SUBB	#$7A
-LBNE	.40
+BNE	.40
 .41:
 LDB	#1
 BRA	.43
@@ -814,12 +814,12 @@ JSR	>_strcmp
 LEAS	2,S
 ; Debug: logeq int = const 0 to int = X+0 (used reg = )
 LEAX	0,X
-LBNE	.49
+BNE	.49
 .4B:
 ; Debug: logeq int = const $7A to char = [buf+5] (used reg = )
 LDB	>_buf+5
 SUBB	#$7A
-LBNE	.49
+BNE	.49
 .4A:
 LDB	#1
 BRA	.4C
@@ -897,17 +897,17 @@ JSR	>_strcmp
 LEAS	2,S
 ; Debug: logeq int = const 0 to int = X+0 (used reg = )
 LEAX	0,X
-LBNE	.50
+BNE	.50
 .53:
 ; Debug: logeq int = const $7A to char = [buf+5] (used reg = )
 LDB	>_buf+5
 SUBB	#$7A
-LBNE	.50
+BNE	.50
 .52:
 ; Debug: logeq int = const $7A to char = [buf+$C] (used reg = )
 LDB	>_buf+$C
 SUBB	#$7A
-LBNE	.50
+BNE	.50
 .51:
 LDB	#1
 BRA	.54
@@ -2649,7 +2649,7 @@ LOC	0
 ; Debug: logeq * char = buf+1 to * char p = [S+4-2] (used reg = )
 LDX	#_buf+1
 CMPX	2,S
-LBNE	.F0
+BNE	.F0
 .F2:
 ; Debug: list * char = .EF+0 (used reg = )
 LDX	#.EF
@@ -2661,7 +2661,7 @@ JSR	>_strcmp
 LEAS	2,S
 ; Debug: logeq int = const 0 to int = X+0 (used reg = )
 LEAX	0,X
-LBNE	.F0
+BNE	.F0
 .F1:
 LDB	#1
 BRA	.F3
@@ -2703,7 +2703,7 @@ LOC	0
 ; Debug: logeq * char = buf+6 to * char p = [S+4-2] (used reg = )
 LDX	#_buf+6
 CMPX	2,S
-LBNE	.F6
+BNE	.F6
 .F8:
 ; Debug: list * char = .F5+0 (used reg = )
 LDX	#.F5
@@ -2715,7 +2715,7 @@ JSR	>_strcmp
 LEAS	2,S
 ; Debug: logeq int = const 0 to int = X+0 (used reg = )
 LEAX	0,X
-LBNE	.F6
+BNE	.F6
 .F7:
 LDB	#1
 BRA	.F9
@@ -2855,7 +2855,7 @@ LOC	0
 ; Debug: logeq * char = buf+0 to * char p = [S+4-2] (used reg = )
 LDX	#_buf
 CMPX	2,S
-LBNE	.104
+BNE	.104
 .106:
 ; Debug: list * char = .103+0 (used reg = )
 LDX	#.103
@@ -2867,7 +2867,7 @@ JSR	>_strcmp
 LEAS	2,S
 ; Debug: logeq int = const 0 to int = X+0 (used reg = )
 LEAX	0,X
-LBNE	.104
+BNE	.104
 .105:
 LDB	#1
 BRA	.107
@@ -3011,11 +3011,11 @@ JSR	>_strcmp
 LEAS	2,S
 ; Debug: logeq int = const 0 to int = X+0 (used reg = )
 LEAX	0,X
-LBNE	.112
+BNE	.112
 .114:
 ; Debug: logeq int = const 0 to * char q = [S+4-4] (used reg = )
 LDD	0,S
-LBNE	.112
+BNE	.112
 .113:
 LDB	#1
 BRA	.115
@@ -3123,7 +3123,7 @@ LEAX	D,X
 ; Debug: ne int = const $71 to char = [X+0] (used reg = )
 LDB	0,X
 SUBB	#$71
-LBEQ	.11F
+BEQ	.11F
 .120:
 ; 183 			good = 0;
 ; Debug: eq int = const 0 to int good = [S+4-4] (used reg = )
@@ -3172,18 +3172,18 @@ LEAS	4,S
 LDB	>_buf
 ; Debug: logeq int = const $FF to char = B+0 (used reg = )
 SUBB	#$FF
-LBNE	.122
+BNE	.122
 .125:
 ; Debug: and int = const $FF to char = [buf+2] (used reg = )
 LDB	>_buf+2
 ; Debug: logeq int = const $FF to char = B+0 (used reg = )
 SUBB	#$FF
-LBNE	.122
+BNE	.122
 .124:
 ; Debug: logeq int = const $71 to char = [buf+3] (used reg = )
 LDB	>_buf+3
 SUBB	#$71
-LBNE	.122
+BNE	.122
 .123:
 LDB	#1
 BRA	.126
@@ -3267,7 +3267,7 @@ JSR	>_memcpy
 LEAS	4,S
 ; Debug: logeq * char = buf2+0 to * void = X+0 (used reg = )
 CMPX	#_buf2
-LBNE	.12B
+BNE	.12B
 .12D:
 ; Debug: list * char = .12A+0 (used reg = )
 LDX	#.12A
@@ -3279,7 +3279,7 @@ JSR	>_strcmp
 LEAS	2,S
 ; Debug: logeq int = const 0 to int = X+0 (used reg = )
 LEAX	0,X
-LBNE	.12B
+BNE	.12B
 .12C:
 LDB	#1
 BRA	.12E
@@ -3590,12 +3590,12 @@ LEAS	2,S
 ; Debug: logeq int = const $63 to char = [buf2+2] (used reg = )
 LDB	>_buf2+2
 SUBB	#$63
-LBNE	.143
+BNE	.143
 .145:
 ; Debug: logeq int = const $7A to char = [buf2+3] (used reg = )
 LDB	>_buf2+3
 SUBB	#$7A
-LBNE	.143
+BNE	.143
 .144:
 LDB	#1
 BRA	.146
@@ -3633,12 +3633,12 @@ JSR	>_memccpy
 LEAS	6,S
 ; Debug: logeq int = const 0 to * void = X+0 (used reg = )
 LEAX	0,X
-LBNE	.148
+BNE	.148
 .14A:
 ; Debug: logeq int = const $66 to char = [buf2+5] (used reg = )
 LDB	>_buf2+5
 SUBB	#$66
-LBNE	.148
+BNE	.148
 .149:
 LDB	#1
 BRA	.14B

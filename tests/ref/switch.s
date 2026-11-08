@@ -47,9 +47,9 @@ _dense:
 	BRA	.1
 .3:
 	SUBD	#1
-	LBLT	.1
+		BLT	.1
 	CMPD	#5
-	LBHI	.A
+		BHI	.A
 	LSLB
 	ROLA
 	LDX	#.B

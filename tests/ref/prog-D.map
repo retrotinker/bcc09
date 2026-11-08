@@ -12,13 +12,13 @@ ptr             +ptr.o
                 main               _result  3  0000401c  R C
              control                _loops  0  0000109f  R
              control               _select  0  0000104c  R
-                 ptr              _strlen1  0  00001148  R
+                 ptr              _strlen1  0  00001140  R
                  ptr                 _grid  3  00004024  R C
-                 ptr                 _copy  0  00001162  R
+                 ptr                 _copy  0  0000115a  R
                  ptr                   _ip  3  00004018  R
                  ptr                  _tab  3  00004000  R
                  ptr                 _msgs  3  00004012  R
-                 ptr                  _sum  0  0000117c  R
+                 ptr                  _sum  0  00001174  R
                  ptr                  _buf  3  0000403c  R C
-                 ptr                 _ptrs  0  000011a4  R
+                 ptr                 _ptrs  0  0000119c  R
                  ptr                  _msg  3  00004010  R

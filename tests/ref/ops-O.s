@@ -3138,7 +3138,7 @@ STD	>_checks
 ; Debug: ne int = [[ep+0]] to int got = [S+2-2] (used reg = )
 LDD	0,S
 SUBD	[>_ep]
-LBEQ	.5
+BEQ	.5
 .6:
 ; 31 		++failures;
 ; Debug: preinc int = [failures+0] (used reg = )
@@ -5289,7 +5289,7 @@ LEAU	D,U
 ; Debug: logeq char = [X+0] to char = [U+0] (used reg = )
 LDB	0,U
 SUBB	0,X
-LBNE	.A5
+BNE	.A5
 .A6:
 ; 192 			sum++;
 ; Debug: postinc int sum = [S+4-4] (used reg = )

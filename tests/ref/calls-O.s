@@ -38,7 +38,7 @@ PSHS	X
 ; Debug: le int = const 1 to int n = [S+2-2] (used reg = )
 LDD	0,S
 SUBD	#1
-LBGT	.1
+BGT	.1
 .2:
 LDD	#1
 BRA	.3

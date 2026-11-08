@@ -280,7 +280,7 @@ _compare:
 ; Debug: logeq int b = [S+4+2] to int a = [S+4-2] (used reg = )
 	LDD	2,S
 	SUBD	6,S
-	LBNE	.1
+		BNE	.1
 .2:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -292,7 +292,7 @@ _compare:
 ; Debug: ne int b = [S+4+2] to int a = [S+4-2] (used reg = )
 	LDD	2,S
 	SUBD	6,S
-	LBEQ	.3
+		BEQ	.3
 .4:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -304,7 +304,7 @@ _compare:
 ; Debug: lt int b = [S+4+2] to int a = [S+4-2] (used reg = )
 	LDD	2,S
 	SUBD	6,S
-	LBGE	.5
+		BGE	.5
 .6:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -316,7 +316,7 @@ _compare:
 ; Debug: le int b = [S+4+2] to int a = [S+4-2] (used reg = )
 	LDD	2,S
 	SUBD	6,S
-	LBGT	.7
+		BGT	.7
 .8:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -328,7 +328,7 @@ _compare:
 ; Debug: gt int b = [S+4+2] to int a = [S+4-2] (used reg = )
 	LDD	2,S
 	SUBD	6,S
-	LBLE	.9
+		BLE	.9
 .A:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -340,7 +340,7 @@ _compare:
 ; Debug: ge int b = [S+4+2] to int a = [S+4-2] (used reg = )
 	LDD	2,S
 	SUBD	6,S
-	LBLT	.B
+		BLT	.B
 .C:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -352,7 +352,7 @@ _compare:
 ; Debug: lt unsigned int = [u2+0] to unsigned int = [u1+0] (used reg = )
 	LDD	>_u1
 	SUBD	>_u2
-	LBHS	.D
+		BHS	.D
 .E:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -364,7 +364,7 @@ _compare:
 ; Debug: gt int = const $7530 to unsigned int = [u1+0] (used reg = )
 	LDD	>_u1
 	SUBD	#$7530
-	LBLS	.F
+		BLS	.F
 .10:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -374,10 +374,10 @@ _compare:
 ; 59 	if (a && b) n++;
 .F:
 	LDD	2,S
-	LBEQ	.11
+		BEQ	.11
 .13:
 	LDD	6,S
-	LBEQ	.11
+		BEQ	.11
 .12:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -387,10 +387,10 @@ _compare:
 ; 60 	if (a || !b) n++;
 .11:
 	LDD	2,S
-	LBNE	.15
+		BNE	.15
 .16:
 	LDD	6,S
-	LBNE	.14
+		BNE	.14
 .15:
 ; Debug: postinc int n = [S+4-4] (used reg = )
 	LDD	0,S
@@ -402,7 +402,7 @@ _compare:
 ; Debug: lt int b = [S+4+2] to int a = [S+4-2] (used reg = )
 	LDD	2,S
 	SUBD	6,S
-	LBGE	.17
+		BGE	.17
 .18:
 	LDD	2,S
 	BRA	.19
