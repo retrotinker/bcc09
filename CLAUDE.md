@@ -20,9 +20,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Layout
 
 - `ld/` builds `ld09` (linker), `objdump09` (also installed as `nm09` and `size09`) and
-  `objcopy09` (`objcopy.c`, `srec.c`). objcopy09 is derived from `objcopy01` in
-  `retrotinker/mc6801-tools`. It writes binary, srec, ihex, cas, wav, decb, ddos and os9
-  output, and replaces the old `decbcopy` and `os9copy`.
+  `objcopy09` (`objcopy.c`, `srec.c`). objcopy09 writes binary, srec, ihex, cas, wav,
+  decb, ddos and os9 output. `objcopy01` in `retrotinker/mc6801-tools` is derived from it;
+  bug fixes made there should be brought back here.
 
 ## Known issues
 
