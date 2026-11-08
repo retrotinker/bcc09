@@ -297,7 +297,8 @@ _fill:
 ; 48 	for (i = 0; i < size; i++)
 PSHS	D,X
 ; Debug: eq int = const 0 to int i = [S+4-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ;BCC_EOS
@@ -358,7 +359,8 @@ _intact:
 ; 59 	for (i = 0; i < n; i++)
 PSHS	D,X
 ; Debug: eq int = const 0 to int i = [S+4-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ;BCC_EOS
@@ -611,7 +613,8 @@ STD	0,S
 ;BCC_EOS
 ; 83 	for (i = 0; zero && i < 60; i++)
 ; Debug: eq int = const 0 to int i = [S+8-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -628,7 +631,8 @@ BEQ	.25
 .26:
 ; 85 			zero = 0;
 ; Debug: eq int = const 0 to int zero = [S+8-8] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 86 	ok(4,zero);
@@ -1013,7 +1017,8 @@ LDY	#_seed
 JSR	>lmulu_b
 ; Debug: add unsigned long = const $3039 to unsigned long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#$3039
 PSHS	D,X
 LDD	4,S
@@ -1031,10 +1036,11 @@ STX	>_seed+2
 LDD	>_seed
 LDX	>_seed+2
 EXG	D,X
-LDD	#0
-; Debug: and unsigned long = const $7FFF to unsigned long = X+0 (used reg = )
+CLRA
+CLRB
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#$7FFF
 PSHS	D,X
 LDD	4,S
@@ -1063,7 +1069,8 @@ _overlaps:
 ; 131 	for (i = 0; i < 40 ; i++)
 LEAS	-4,S
 ; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -1206,12 +1213,14 @@ STD	6,S
 ;BCC_EOS
 ; 146 	nomem = 0;
 ; Debug: eq int = const 0 to int nomem = [S+$C-8] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	4,S
 ;BCC_EOS
 ; 147 	for (n = 0; n < 3000; n++) {
 ; Debug: eq int = const 0 to int n = [S+$C-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ;BCC_EOS
@@ -1273,7 +1282,8 @@ BNE	.58
 .59:
 ; 151 				good = 0;
 ; Debug: eq int = const 0 to int good = [S+$C-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	6,S
 ;BCC_EOS
 ; 152 			if (rnd(4)== 0) {	 
@@ -1379,7 +1389,8 @@ BNE	.5E
 .5F:
 ; 161 					good = 0;
 ; Debug: eq int = const 0 to int good = [S+$C-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	6,S
 ;BCC_EOS
 ; 162 				slot[s] = p;
@@ -1441,7 +1452,8 @@ ROLA
 LDX	#_slot
 LEAX	D,X
 ; Debug: eq int = const 0 to * char = [X+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,X
 ;BCC_EOS
 ; 168 			}
@@ -1533,7 +1545,8 @@ BEQ	.67
 .68:
 ; 181 			good = 0;
 ; Debug: eq int = const 0 to int good = [S+$C-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	6,S
 ;BCC_EOS
 ; 182 	}
@@ -1600,7 +1613,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 186 	for (s = 0; s < 40 ; s++)
 ; Debug: eq int = const 0 to int s = [S+$C-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	8,S
 ;BCC_EOS
 ;BCC_EOS
@@ -1654,7 +1668,8 @@ BNE	.76
 .77:
 ; 189 				good = 0;
 ; Debug: eq int = const 0 to int good = [S+$C-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	6,S
 ;BCC_EOS
 ; 190 			free(slot[s]);
@@ -1678,7 +1693,8 @@ ROLA
 LDX	#_slot
 LEAX	D,X
 ; Debug: eq int = const 0 to * char = [X+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,X
 ;BCC_EOS
 ; 192 		}
@@ -1703,10 +1719,7 @@ PSHS	D
 LDX	#$17
 ; Debug: func () void = ok+0 (used reg = )
 JSR	>_ok
-LEAS	2,S
-;BCC_EOS
-; 194 }
-LEAS	$C,S
+LEAS	$e,S
 RTS
 ; 195 
 ; 196 
@@ -1722,7 +1735,8 @@ _exhaust:
 ; 203 	char *list = 0, *p, *top;
 LEAS	-2,S
 ; Debug: eq int = const 0 to * char list = [S+2-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 204 	char here;
@@ -1730,17 +1744,20 @@ STD	0,S
 ; 205 	unsigned total = 0, blocks = 0;
 LEAS	-7,S
 ; Debug: eq int = const 0 to unsigned int total = [S+9-9] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 LEAS	-2,S
 ; Debug: eq int = const 0 to unsigned int blocks = [S+$B-$B] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 206 
 ; 207 	errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 208 	while ((p = malloc(100))!= 0) {
@@ -1829,7 +1846,8 @@ STX	5,S
 ;BCC_EOS
 ; 217 	ok(32,top <= &here - __heap_margin && top > _end);
 ; Debug: neg unsigned int = [__heap_margin+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 SUBD	>___heap_margin
 ; Debug: ptradd unsigned int = D+0 to * char here = S+$B-7 (used reg = )
 LEAX	D,S
@@ -2090,7 +2108,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 241 	errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 242 	ok(43,sbrk(30000)== (char *)-1 && errno == 12		  );	 
@@ -2145,7 +2164,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 244 	errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 245 	ok(45,sbrk(-30000)== (char *)-1 && errno == 12	
@@ -2343,7 +2363,8 @@ JSR	>_free
 ; 259 	 
 ; 260 	errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 261 	ok(51,calloc(300,300)== 0 && errno == 12		  );
@@ -2376,10 +2397,7 @@ PSHS	D
 LDX	#$33
 ; Debug: func () void = ok+0 (used reg = )
 JSR	>_ok
-LEAS	2,S
-;BCC_EOS
-; 262 }
-LEAS	6,S
+LEAS	$8,S
 RTS
 ; 263 
 ; 264 

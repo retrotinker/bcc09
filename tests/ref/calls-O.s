@@ -191,7 +191,8 @@ PSHS	D
 LDX	#.5
 PSHS	X
 ; Debug: list long = const 3 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#3
 PSHS	D,X
 ; Debug: list int = const 2 (used reg = )

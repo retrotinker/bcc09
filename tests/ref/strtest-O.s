@@ -304,7 +304,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 48 	for (i = 0; i < 40; i++)
 ; Debug: eq int = const 0 to int i = [S+2-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ;BCC_EOS
@@ -1295,7 +1296,8 @@ FCC	"xyz"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list * char = .7A+0 (used reg = )
 LDX	#.7A
@@ -1539,7 +1541,8 @@ FCC	"xyz"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list * char = .92+0 (used reg = )
 LDX	#.92
@@ -1776,7 +1779,8 @@ LEAS	2,S
 ; 118 	ok(52,strchr(s,0)== s + 12);
 ; Debug: expression subtree swapping
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char s = [S+4-2] (used reg = )
 LDX	2,S
@@ -1890,7 +1894,8 @@ LEAS	2,S
 ; 122 	ok(56,strrchr(s,0)== s + 12);
 ; Debug: expression subtree swapping
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char s = [S+4-2] (used reg = )
 LDX	2,S
@@ -2019,7 +2024,8 @@ LEAS	2,S
 LDD	#$D
 PSHS	D
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char s = [S+6-2] (used reg = )
 LDX	4,S
@@ -2078,7 +2084,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 129 	ok(62,memchr(s,'h',0)== 0);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const $68 (used reg = )
 LDD	#$68
@@ -3111,7 +3118,8 @@ STD	0,S
 ;BCC_EOS
 ; 181 	for (i = 0; i < 10; i++)
 ; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -3129,7 +3137,8 @@ BEQ	.11F
 .120:
 ; 183 			good = 0;
 ; Debug: eq int = const 0 to int good = [S+4-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 184 	ok(91,good);
@@ -3203,7 +3212,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 188 	memset(buf,'r',0);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const $72 (used reg = )
 LDD	#$72

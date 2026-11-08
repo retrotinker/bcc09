@@ -138,6 +138,12 @@ $(RAND_OBJS): stdlib/%.o: stdlib/rand.c $(HEADERS) .bcc/stamp
 
 $(OBJS): .bcc/stamp $(HEADERS)
 
+# everything is built again when the tools change, the optimizer's rules
+# too (libc is built with -O)
+TOOLS	= ../bcc/bcc09 ../bcc/cc1 ../cpp/cpp ../unproto/unproto \
+	  ../copt/copt ../copt/rules.6809 $(AS09)
+$(OBJS) $(SA_OBJS) $(CB_OBJS) $(SIM_OBJS) sa/crt0.o sim/crtsim.o: $(TOOLS)
+
 install: libc.a $(TARGETS)
 	install -d $(LIBDIR) $(LIBDIR)/include/sys
 	install -m 644 libc.a $(TARGETS) $(LIBDIR)

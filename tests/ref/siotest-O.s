@@ -530,13 +530,15 @@ JSR	>_printf
 ; 39 	 
 ; 40 	ok(5,setvbuf(stdout,(char *)0,0x02	  ,0)== 0);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const 2 (used reg = )
 LDD	#2
 PSHS	D
 ; Debug: list * char = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * struct __stdio_file = stdout+0 (used reg = )
 LDX	#_stdout
@@ -608,7 +610,8 @@ JSR	>_printf
 LDD	#$100
 PSHS	D
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list * char buf = S+$104-$100 (used reg = )
 LEAX	4,S
@@ -698,7 +701,8 @@ PSHS	D
 LDD	#1
 PSHS	D
 ; Debug: list * char = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * struct __stdio_file = stdout+0 (used reg = )
 LDX	#_stdout
@@ -1035,7 +1039,8 @@ LEAS	2,S
 LDX	#_stdin
 PSHS	X
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char buf = S+$28-$20 (used reg = )
 LEAX	8,S
@@ -1061,7 +1066,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 73 	n = 0;
 ; Debug: eq int = const 0 to int n = [S+$24-$24] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 74 	while ((c = (((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++)))!= '\n' && c != (-1))
@@ -1429,10 +1435,7 @@ PSHS	D
 LDX	#$17
 ; Debug: func () void = ok+0 (used reg = )
 JSR	>_ok
-LEAS	2,S
-;BCC_EOS
-; 87 }
-LEAS	$24,S
+LEAS	$26,S
 RTS
 ; 88 
 ; 89 void files()
@@ -1445,7 +1448,8 @@ _files:
 ; 93 	errno = 0;
 LEAS	-4,S
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 94 	ok(30,fopen("nofile","r")== 0 && errno == 2		  );

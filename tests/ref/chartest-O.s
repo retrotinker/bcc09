@@ -291,7 +291,8 @@ PSHS	X
 LDB	1,S
 SEX
 PSHS	D
-LDD	#0
+CLRA
+CLRB
 SUBD	,S++
 ; Debug: cast char = const 0 to int = D+0 (used reg = )
 SEX

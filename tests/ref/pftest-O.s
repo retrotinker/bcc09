@@ -461,7 +461,8 @@ _grid:
 PSHS	X
 LEAS	-$2A,S
 ; Debug: eq int = const 0 to int f = [S+$2C-$24] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	8,S
 ;BCC_EOS
 ;BCC_EOS
@@ -469,7 +470,8 @@ STD	8,S
 JMP	.19
 .1A:
 ; Debug: eq int = const 0 to int w = [S+$2C-$26] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	6,S
 ;BCC_EOS
 ;BCC_EOS
@@ -477,7 +479,8 @@ STD	6,S
 JMP	.1D
 .1E:
 ; Debug: eq int = const 0 to int p = [S+$2C-$28] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	4,S
 ;BCC_EOS
 ;BCC_EOS
@@ -603,7 +606,8 @@ BNE	.26
 .27:
 ; 53 					for (v = 0; v < (sizeof(ivals)/ sizeof(ivals[0])); v++)
 ; Debug: eq int = const 0 to int v = [S+$2C-$2A] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -646,7 +650,8 @@ BNE	.30
 .31:
 ; 56 					for (v = 0; v < (sizeof(uvals)/ sizeof(uvals[0])); v++)
 ; Debug: eq int = const 0 to int v = [S+$2C-$2A] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -697,7 +702,8 @@ BNE	.38
 .39:
 ; 59 					for (v = 0; v < (sizeof(lvals)/ sizeof(lvals[0])); v++)
 ; Debug: eq int = const 0 to int v = [S+$2C-$2A] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -739,7 +745,8 @@ BLT	.3E
 BRA	.40
 .38:
 ; Debug: eq int = const 0 to int v = [S+$2C-$2A] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -786,7 +793,8 @@ BEQ	.46
 .47:
 ; 66 					n = printf(fmt,1L);
 ; Debug: list long = const 1 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 PSHS	D,X
 ; Debug: rootlist * char fmt = S+$30-$22 (used reg = )
@@ -898,7 +906,8 @@ _others:
 ; 79 	char *np = 0;
 LEAS	-$2C,S
 ; Debug: eq int = const 0 to * char np = [S+$2C-$2C] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 80 
@@ -1208,11 +1217,13 @@ FCB	0
 LOC	0
 ; 98 0xdeadbeefUL,0xcafeUL,8L);
 ; Debug: list long = const 8 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#8
 PSHS	D,X
 ; Debug: list unsigned long = const $CAFE (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#$CAFE
 PSHS	D,X
 ; Debug: list unsigned long = const $DEADBEEF (used reg = )
@@ -1247,13 +1258,16 @@ FCB	$A
 FCB	0
 LOC	0
 ; Debug: list * void = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list * void = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list * void = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .63+0 (used reg = )
 LDX	#.63
@@ -1288,7 +1302,8 @@ LEAS	6,S
 ; 105 	 
 ; 106 	n = 0;
 ; Debug: eq int = const 0 to int n = [S+$2C-$22] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ; 107 	printf("abc%ndef\n",&n);
@@ -1328,12 +1343,14 @@ LEAS	2,S
 ;BCC_EOS
 ; 109 	sh = 0;
 ; Debug: eq int = const 0 to short sh = [S+$2C-$26] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	6,S
 ;BCC_EOS
 ; 110 	ln = 0;
 ; Debug: eq int = const 0 to long ln = [S+$2C-$2A] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 STD	2,S
 STX	4,S
@@ -1349,7 +1366,8 @@ LOC	0
 LEAX	2,S
 PSHS	X
 ; Debug: list long = const 7 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#7
 PSHS	D,X
 ; Debug: list * short sh = S+$32-$26 (used reg = )
@@ -1372,7 +1390,8 @@ BNE	.69
 .6B:
 ; Debug: logeq long = const 6 to long ln = [S+$2C-$2A] (used reg = )
 ; Debug: expression subtree swapping
-LDD	#0
+CLRA
+CLRB
 LDX	#6
 PSHS	D,X
 LDD	6,S
@@ -1576,7 +1595,8 @@ LOC	0
 LDX	#.75
 PSHS	X
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char buf = S+$30-$20 (used reg = )
 LEAX	$10,S
@@ -1741,10 +1761,7 @@ PSHS	D
 LDX	#.7E
 ; Debug: func () int = printf+0 (used reg = )
 JSR	>_printf
-LEAS	2,S
-;BCC_EOS
-; 135 }
-LEAS	$2C,S
+LEAS	$2e,S
 RTS
 ; 136 
 ; 137 int main()
@@ -1758,7 +1775,8 @@ FCC	"d"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .7F+0 (used reg = )
 LDX	#.7F
@@ -1773,7 +1791,8 @@ FCC	"i"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .80+0 (used reg = )
 LDX	#.80
@@ -1788,7 +1807,8 @@ FCC	"u"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .81+0 (used reg = )
 LDX	#.81
@@ -1803,7 +1823,8 @@ FCC	"o"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .82+0 (used reg = )
 LDX	#.82
@@ -1818,7 +1839,8 @@ FCC	"x"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .83+0 (used reg = )
 LDX	#.83
@@ -1833,7 +1855,8 @@ FCC	"X"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .84+0 (used reg = )
 LDX	#.84

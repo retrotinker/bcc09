@@ -329,7 +329,8 @@ STX	2,S
 ; 52 
 ; 53 	if (l < 0)
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 LEAY	$12,S
 JSR	>lcmp_b
@@ -358,7 +359,8 @@ STB	0,X
 .11:
 ; 57 		*--p = '0' + (int) (u % 10);
 ; Debug: mod unsigned long = const $A to unsigned long u = [S+$16-$16] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#$A
 PSHS	D,X
 LDD	4,S
@@ -382,7 +384,8 @@ STB	0,X
 ;BCC_EOS
 ; 58 		u /= 10;
 ; Debug: divab unsigned long = const $A to unsigned long u = [S+$16-$16] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#$A
 PSHS	D,X
 LDD	4,S
@@ -404,7 +407,8 @@ BNE	.11
 ; 60 	if (l < 0)
 .F:
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 LEAY	$12,S
 JSR	>lcmp_b
@@ -523,7 +527,8 @@ LOC	0
 ; 76 	for (i = 0; names[i]; i++) {
 LEAS	-6,S
 ; Debug: eq int = const 0 to int i = [S+6-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	4,S
 ;BCC_EOS
 ;BCC_EOS
@@ -1311,7 +1316,8 @@ FCC	"b"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list * char = .87+0 (used reg = )
 LDX	#.87
@@ -1448,7 +1454,8 @@ LEAS	4,S
 ; Debug: cast long = const 0 to unsigned long = X+0 (used reg = )
 ; Debug: and long = const $FFFF to long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#$FFFF
 PSHS	D,X
 LDD	4,S
@@ -1677,7 +1684,8 @@ FCC	"0x1F"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .9B+0 (used reg = )
 LDX	#.9B
@@ -1692,7 +1700,8 @@ FCC	"0X1f"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .9C+0 (used reg = )
 LDX	#.9C
@@ -1707,7 +1716,8 @@ FCC	"0x"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .9D+0 (used reg = )
 LDX	#.9D
@@ -1737,7 +1747,8 @@ FCC	"017"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .9F+0 (used reg = )
 LDX	#.9F
@@ -1752,7 +1763,8 @@ FCC	"08"
 FCB	0
 LOC	0
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .A0+0 (used reg = )
 LDX	#.A0
@@ -1908,7 +1920,8 @@ JSR	>_strtol
 LEAS	4,S
 ; Debug: logeq long = const 0 to long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 PSHS	D,X
 LDD	4,S
@@ -1940,7 +1953,8 @@ JSR	>_strtol
 LEAS	4,S
 ; Debug: logeq long = const 0 to long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 PSHS	D,X
 LDD	4,S
@@ -1980,7 +1994,8 @@ LOC	0
 LDD	#$A
 PSHS	D
 ; Debug: list * * char = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * char = .B2+0 (used reg = )
 LDX	#.B2
@@ -1989,7 +2004,8 @@ JSR	>_strtol
 LEAS	4,S
 ; Debug: logeq long = const $7B to long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#$7B
 PSHS	D,X
 LDD	4,S
@@ -2014,7 +2030,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 176 	errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 177 	ok(21,strtol("99",&end,10)== 99 && errno == 0);
@@ -2036,7 +2053,8 @@ JSR	>_strtol
 LEAS	4,S
 ; Debug: logeq long = const $63 to long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#$63
 PSHS	D,X
 LDD	4,S
@@ -2069,7 +2087,8 @@ LEAS	2,S
 .BB:
 ; 180 		errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 181 		ok(22,strtol("2147483647",&end,10)== 2147483647L 
@@ -2179,7 +2198,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 185 		errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 186 		ok(24,strtol("-2147483648",&end,10)== (-2147483647L-1)
@@ -2282,7 +2302,8 @@ LEAS	2,S
 ; 190 		errno
 ; 190  = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 191 		ok(26,strtoul("4294967295",&end,10)== 0xFFFFFFFFUL 
@@ -2388,7 +2409,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 195 		errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_errno
 ;BCC_EOS
 ; 196 		ok(28,strtoul("-1",&end,10)== 0xFFFFFFFFUL  && errno == 0);
@@ -2605,13 +2627,15 @@ LEAS	8,S
 BNE	.F4
 .F6:
 ; Debug: rootlist long = const 7 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#7
 ; Debug: func () long = labs+0 (used reg = )
 JSR	>_labs
 ; Debug: logeq long = const 7 to long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#7
 PSHS	D,X
 LDD	4,S
@@ -2816,7 +2840,8 @@ LOC	0
 LDX	#.108
 PSHS	X
 ; Debug: rootlist long = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 ; Debug: func () * char = ltoa+0 (used reg = )
 JSR	>_ltoa
@@ -2994,7 +3019,8 @@ PSHS	X
 LDD	#$10
 PSHS	D
 ; Debug: rootlist long = const $FF (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#$FF
 ; Debug: func () * char = ltostr+0 (used reg = )
 JSR	>_ltostr
@@ -3103,7 +3129,8 @@ LEAS	2,S
 LDD	#1
 PSHS	D
 ; Debug: rootlist long = const 1 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 ; Debug: func () * char = ltostr+0 (used reg = )
 JSR	>_ltostr
@@ -3116,7 +3143,8 @@ BNE	.120
 LDD	#$25
 PSHS	D
 ; Debug: rootlist long = const 1 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 ; Debug: func () * char = ltostr+0 (used reg = )
 JSR	>_ltostr
@@ -3379,7 +3407,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 274 	for (i = 0; i < n; i++)
 ; Debug: eq int = const 0 to int i = [S+$74-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
@@ -3454,7 +3483,8 @@ PSHS	X
 LDD	#2
 PSHS	D
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist * int = .131+0 (used reg = )
 LDX	#.131
@@ -3485,7 +3515,8 @@ LEAS	2,S
 ; 281 	 
 ; 282 	for (i = 0; i < 50; i++)
 ; Debug: eq int = const 0 to int i = [S+$74-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
@@ -3568,7 +3599,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 286 	for (i = 0; i < 50; i++)
 ; Debug: eq int = const 0 to int i = [S+$74-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
@@ -3655,7 +3687,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 290 	for (i = 0; i < 50; i++)
 ; Debug: eq int = const 0 to int i = [S+$74-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
@@ -3746,7 +3779,8 @@ LEAS	6,S
 ;BCC_EOS
 ; 297 	for (i = 0; i < 7; i++)
 ; Debug: eq int = const 0 to int i = [S+$74-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
@@ -3791,7 +3825,8 @@ JSR	>_putchar
 ; 300 	ok(66,r[0].val == 4L && r[6].val == 7L && r[3].val == 1L);
 ; Debug: logeq long = const 4 to long = [.132+1] (used reg = )
 ; Debug: expression subtree swapping
-LDD	#0
+CLRA
+CLRB
 LDX	#4
 PSHS	D,X
 LDD	>.132+1
@@ -3803,7 +3838,8 @@ BNE	.15E
 .161:
 ; Debug: logeq long = const 7 to long = [.132+$25] (used reg = )
 ; Debug: expression subtree swapping
-LDD	#0
+CLRA
+CLRB
 LDX	#7
 PSHS	D,X
 LDD	>.132+$25
@@ -3815,7 +3851,8 @@ BNE	.15E
 .160:
 ; Debug: logeq long = const 1 to long = [.132+$13] (used reg = )
 ; Debug: expression subtree swapping
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 PSHS	D,X
 LDD	>.132+$13
@@ -3842,7 +3879,8 @@ LEAS	2,S
 ; 301 
 ; 302 	for (i = 0; i < n; i++) {
 ; Debug: eq int = const 0 to int i = [S+$74-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
@@ -4019,7 +4057,8 @@ PSHS	X
 LDD	#2
 PSHS	D
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list * int = .130+0 (used reg = )
 LDX	#.130
@@ -4082,7 +4121,8 @@ BEQ	.172
 LDX	0,S
 ; Debug: logeq long = const 5 to long = [X+1] (used reg = )
 ; Debug: expression subtree swapping
-LDD	#0
+CLRA
+CLRB
 LDU	#5
 PSHS	D,U
 LDD	1,X
@@ -4104,10 +4144,7 @@ PSHS	D
 LDX	#$5D
 ; Debug: func () void = ok+0 (used reg = )
 JSR	>_ok
-LEAS	2,S
-;BCC_EOS
-; 316 }
-LEAS	$74,S
+LEAS	$76,S
 RTS
 ; 317 
 ; 318 void randoms()
@@ -4131,7 +4168,8 @@ STD	0,S
 ;BCC_EOS
 ; 324 	for (i = 0; i < 5; i++) {
 ; Debug: eq int = const 0 to int i = [S+$10-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$E,S
 ;BCC_EOS
 ;BCC_EOS
@@ -4170,7 +4208,8 @@ BLE	.17A
 .17B:
 ; 327 			good = 0;
 ; Debug: eq int = const 0 to int good = [S+$10-$10] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 328 	}
@@ -4205,7 +4244,8 @@ JSR	>_srand
 ;BCC_EOS
 ; 331 	for (i = 0; i < 5; i++)
 ; Debug: eq int = const 0 to int i = [S+$10-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$E,S
 ;BCC_EOS
 ;BCC_EOS
@@ -4226,7 +4266,8 @@ BEQ	.182
 .183:
 ; 333 			good = 0;
 ; Debug: eq int = const 0 to int good = [S+$10-$10] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 334 	ok(101,good);			 
@@ -4314,10 +4355,7 @@ PSHS	D
 LDX	#$67
 ; Debug: func () void = ok+0 (used reg = )
 JSR	>_ok
-LEAS	2,S
-;BCC_EOS
-; 342 }
-LEAS	$10,S
+LEAS	$12,S
 RTS
 ; 343 
 ; 344 int main()

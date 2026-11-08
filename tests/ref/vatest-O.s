@@ -118,7 +118,8 @@ STX	2,S
 ; 36 
 ; 37 	if (l < 0)
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 LEAY	$12,S
 JSR	>lcmp_b
@@ -147,7 +148,8 @@ STB	0,X
 .C:
 ; 41 		*--p = '0' + (int) (u % 10);
 ; Debug: mod unsigned long = const $A to unsigned long u = [S+$16-$16] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#$A
 PSHS	D,X
 LDD	4,S
@@ -171,7 +173,8 @@ STB	0,X
 ;BCC_EOS
 ; 42 		u /= 10;
 ; Debug: divab unsigned long = const $A to unsigned long u = [S+$16-$16] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#$A
 PSHS	D,X
 LDD	4,S
@@ -193,7 +196,8 @@ BNE	.C
 ; 44 	if (l < 0)
 .A:
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 LEAY	$12,S
 JSR	>lcmp_b
@@ -238,7 +242,8 @@ _sum:
 ; 54 	int t = 0;
 PSHS	CC,D,X,DP
 ; Debug: eq int = const 0 to int t = [S+6-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 55 
@@ -295,7 +300,8 @@ _lsum:
 PSHS	X
 LEAS	-6,S
 ; Debug: eq int = const 0 to long t = [S+8-8] (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 STD	0,S
 STX	2,S
@@ -748,7 +754,8 @@ _vsum:
 ; 148 	int t = 0;
 PSHS	D,X
 ; Debug: eq int = const 0 to int t = [S+4-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 149 
@@ -828,7 +835,8 @@ _twice:
 PSHS	X
 LEAS	-6,S
 ; Debug: eq int = const 0 to int t = [S+8-8] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 171 
@@ -841,7 +849,8 @@ STX	4,S
 ;BCC_EOS
 ; 174 	for (i = 0; i < n; i++)
 ; Debug: eq int = const 0 to int i = [S+$A-$A] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ;BCC_EOS
@@ -873,7 +882,8 @@ BLT	.39
 .3A:
 .36:
 ; Debug: eq int = const 0 to int i = [S+$A-$A] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ;BCC_EOS
@@ -1139,7 +1149,8 @@ JSR	>_putlong
 ;BCC_EOS
 ; 208 	putnum(two(1,2,3,4,0));
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const 4 (used reg = )
 LDD	#4
@@ -1161,7 +1172,8 @@ JSR	>_putnum
 ;BCC_EOS
 ; 209 	putnum(two(5,6,0));
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const 6 (used reg = )
 LDD	#6
@@ -1177,7 +1189,8 @@ JSR	>_putnum
 ;BCC_EOS
 ; 210 	putlong(lfirst(70000L,1,2,3,0));
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const 3 (used reg = )
 LDD	#3
@@ -1200,7 +1213,8 @@ JSR	>_putlong
 ;BCC_EOS
 ; 211 	putnum(cfirst('A',1,2,0));
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const 2 (used reg = )
 LDD	#2
@@ -1433,7 +1447,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 222 	ok(3,two(1,2,3,0)== 1203);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const 3 (used reg = )
 LDD	#3
@@ -1465,7 +1480,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 223 	ok(4,lfirst(-1L,1,0)== 0L);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int = const 1 (used reg = )
 LDD	#1
@@ -1478,7 +1494,8 @@ JSR	>_lfirst
 LEAS	4,S
 ; Debug: logeq long = const 0 to long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 PSHS	D,X
 LDD	4,S

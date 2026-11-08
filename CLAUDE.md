@@ -67,6 +67,14 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   last named parameter can't be used). No `varargs.h`.
 - With a 16-bit `int`, a decimal constant over 32767 is a `long` (C's rules): tests
   that also run on the host must say `40000U` where they mean an `unsigned int`.
+- `copt` is the peephole optimizer that `bcc09 -O` runs with `copt/rules.6809` on the
+  assembly. A rule's lines match consecutive instructions (comments are skipped, and
+  dropped from a match; a label ends one); `%(expr)` is arithmetic, and a rule with an
+  expression that isn't a number (a symbol's offset) doesn't apply. A rule can't
+  replace lines with nothing: an empty replacement ends the reading of the rules. The
+  rules (checked 2026-11-08) favor size: `LDD #0` becomes `CLRA`/`CLRB` (a byte smaller,
+  a cycle slower), only before instructions that don't read C; adjacent `LEAS n,S` are
+  merged.
 - `bcc/bcc.doc` is out of date (it describes `-M` as a linker option); auditing it is a
   TODO item.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
@@ -76,7 +84,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 463 reference
+  `tests/src/` with this tree's tools and compare every result with the 464 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -115,6 +123,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
   it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
   `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
+- Twelve test programs are built again with `-O` and must run the same
+  (`optimize.result`), which checks the copt rules.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
 

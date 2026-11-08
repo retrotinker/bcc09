@@ -88,11 +88,14 @@ JSR	>Fpulld
 ; Debug: expression subtree swapping
 LDD	#$4000
 PSHS	D
-LDD	#0
+CLRA
+CLRB
 PSHS	D
-LDD	#0
+CLRA
+CLRB
 PSHS	D
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 LEAX	8,S
 JSR	>Fmuld

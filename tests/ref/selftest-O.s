@@ -189,7 +189,8 @@ LEAS	4,S
 ;BCC_EOS
 ; 50 	check(4,select(3),0);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist int = const 3 (used reg = )
 LDX	#3
@@ -253,7 +254,8 @@ LEAS	4,S
 ;BCC_EOS
 ; 54 	check(8,select(-1),0);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist int = const -1 (used reg = )
 LDX	#-1
@@ -401,7 +403,8 @@ LEAS	4,S
 ; 66 	 
 ; 67 	check(20,loops(0),0);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist int = const 0 (used reg = )
 LDX	#0
@@ -579,7 +582,8 @@ LEAS	4,S
 ;BCC_EOS
 ; 80 	check(33,tmp[3],0);
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list char tmp = [S+$A-5] (used reg = )
 LDB	5,S
@@ -742,7 +746,8 @@ STD	0,S
 ; 98 
 ; 99 		for (i = 0; i < 33; i++)
 ; Debug: eq int = const 0 to int i = [S+$E-$C] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -764,7 +769,8 @@ BEQ	.10
 .11:
 ; 101 				same = 0;
 ; Debug: eq int = const 0 to int same = [S+$E-$E] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 102 		check(40,same,1);
@@ -791,10 +797,7 @@ PSHS	D
 LDX	#$28
 ; Debug: func () void = check+0 (used reg = )
 JSR	>_check
-LEAS	4,S
-;BCC_EOS
-; 103 	}
-LEAS	6,S
+LEAS	$a,S
 ; 104 
 ; 105 
 ; 106 	 
@@ -805,11 +808,13 @@ PSHS	D
 LDD	>_one
 BEQ	.13
 .14:
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 BRA	.15
 .13:
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 .15:
 ; Debug: list long = X+0 (used reg = )
@@ -821,7 +826,8 @@ JSR	>_lsecond
 LEAS	4,S
 ; Debug: logeq long = const 1 to long = X+0 (used reg = )
 PSHS	D,X
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 PSHS	D,X
 LDD	4,S
@@ -855,7 +861,8 @@ LDD	#$FFFF
 LDX	#$FFFF
 BRA	.1A
 .18:
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 .1A:
 ; Debug: list long = X+0 (used reg = )

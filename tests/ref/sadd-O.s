@@ -741,12 +741,14 @@ LEAS	2,S
 ;BCC_EOS
 ; 55 	t = 0;
 ; Debug: eq int = const 0 to int t = [S+$D-8] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	5,S
 ;BCC_EOS
 ; 56 	for (i = 0; i < 100; i++)
 ; Debug: eq int = const 0 to int i = [S+$D-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	7,S
 ;BCC_EOS
 ;BCC_EOS

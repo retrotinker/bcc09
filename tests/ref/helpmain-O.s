@@ -16,11 +16,13 @@ EXPORT	_main
 _main:
 ; 10 	lops(1L,2L);
 ; Debug: list long = const 2 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#2
 PSHS	D,X
 ; Debug: rootlist long = const 1 (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#1
 ; Debug: func () long = lops+0 (used reg = )
 JSR	>_lops
@@ -30,14 +32,18 @@ LEAS	4,S
 ; Debug: list double = const (whatever) (used reg = )
 LDD	#$4000
 PSHS	D
-LDD	#0
+CLRA
+CLRB
 PSHS	D
-LDD	#0
+CLRA
+CLRB
 PSHS	D
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: rootlist double = const (whatever) (used reg = )
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 ; Debug: func () double = fops+0 (used reg = )
 JSR	>_fops

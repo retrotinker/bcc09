@@ -8763,7 +8763,8 @@ BEQ	.9
 LDD	[>_iep]
 PSHS	D
 ; Debug: list int = const 0 (used reg = )
-LDD	#0
+CLRA
+CLRB
 PSHS	D
 ; Debug: list int got = [S+6-2] (used reg = )
 LDD	4,S
@@ -8806,7 +8807,8 @@ STD	>_group
 ;BCC_EOS
 ; 74 	index = 0;
 ; Debug: eq int = const 0 to int = [index+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_index
 ;BCC_EOS
 ; 75 	ep = table;
@@ -8833,7 +8835,8 @@ STD	>_group
 ;BCC_EOS
 ; 83 	index = 0;
 ; Debug: eq int = const 0 to int = [index+0] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	>_index
 ;BCC_EOS
 ; 84 	iep = table;
@@ -8869,7 +8872,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 94 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -8877,7 +8881,8 @@ STD	$14,S
 BRA	.D
 .E:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -8960,7 +8965,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 101 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -8968,7 +8974,8 @@ STD	$14,S
 BRA	.17
 .18:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9051,7 +9058,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 108 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9059,7 +9067,8 @@ STD	$14,S
 BRA	.21
 .22:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9142,7 +9151,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 115 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9150,7 +9160,8 @@ STD	$14,S
 BRA	.2B
 .2C:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9233,7 +9244,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 122 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9241,7 +9253,8 @@ STD	$14,S
 BRA	.35
 .36:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9324,7 +9337,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 129 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9332,7 +9346,8 @@ STD	$14,S
 BRA	.3F
 .40:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9415,7 +9430,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 136 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9423,7 +9439,8 @@ STD	$14,S
 BRA	.49
 .4A:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9506,7 +9523,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 143 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9514,7 +9532,8 @@ STD	$14,S
 BRA	.53
 .54:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9597,7 +9616,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 150 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9605,7 +9625,8 @@ STD	$14,S
 BRA	.5D
 .5E:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9688,7 +9709,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 157 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9696,7 +9718,8 @@ STD	$14,S
 BRA	.67
 .68:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9779,7 +9802,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 164 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9787,7 +9811,8 @@ STD	$14,S
 BRA	.71
 .72:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9870,7 +9895,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 171 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$16-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$14,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9878,7 +9904,8 @@ STD	$14,S
 JMP	.7B
 .7C:
 ; Debug: eq int = const 0 to int j = [S+$16-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$12,S
 ;BCC_EOS
 ;BCC_EOS
@@ -9922,7 +9949,8 @@ STX	$A,S
 ;BCC_EOS
 ; 175 			bits = 0;
 ; Debug: eq int = const 0 to int bits = [S+$16-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$10,S
 ;BCC_EOS
 ; 176 			if (a < b)
@@ -10136,7 +10164,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 207 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$E-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$C,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10144,7 +10173,8 @@ STD	$C,S
 BRA	.99
 .9A:
 ; Debug: eq int = const 0 to int j = [S+$E-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ; 208  ; j++) {
@@ -10224,7 +10254,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 214 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$E-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$C,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10232,7 +10263,8 @@ STD	$C,S
 BRA	.A3
 .A4:
 ; Debug: eq int = const 0 to int j = [S+$E-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10311,7 +10343,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 221 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$E-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$C,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10319,7 +10352,8 @@ STD	$C,S
 BRA	.AD
 .AE:
 ; Debug: eq int = const 0 to int j = [S+$E-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10398,7 +10432,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 228 	for (i = 0; i < 16 ; i++)
 ; Debug: eq int = const 0 to int i = [S+$E-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$C,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10406,7 +10441,8 @@ STD	$C,S
 BRA	.B7
 .B8:
 ; Debug: eq int = const 0 to int j = [S+$E-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10504,7 +10540,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 246 	for (i = 0; i < 16 ; i++) {
 ; Debug: eq int = const 0 to int i = [S+$A-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	8,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10663,9 +10700,8 @@ JSR	>_expect
 LDD	0,S
 LDX	2,S
 EXG	D,X
-LDD	#0
-; Debug: rootlist unsigned long = X+0 (used reg = )
-; Debug: func () void = expect+0 (used reg = )
+CLRA
+CLRB
 JSR	>_expect
 ;BCC_EOS
 ; Debug: sl int = const $11 to long a = [S+$A-6] (used reg = )
@@ -10699,9 +10735,8 @@ LDX	2,S
 LSRA
 RORB
 EXG	D,X
-LDD	#0
-; Debug: rootlist unsigned long = X+0 (used reg = )
-; Debug: func () void = expect+0 (used reg = )
+CLRA
+CLRB
 JSR	>_expect
 ;BCC_EOS
 ; Debug: sl int = const $18 to long a = [S+$A-6] (used reg = )
@@ -10735,9 +10770,8 @@ LDX	2,S
 TFR	A,B
 CLRA
 EXG	D,X
-LDD	#0
-; Debug: rootlist unsigned long = X+0 (used reg = )
-; Debug: func () void = expect+0 (used reg = )
+CLRA
+CLRB
 JSR	>_expect
 ;BCC_EOS
 ; Debug: sl int = const $1F to long a = [S+$A-6] (used reg = )
@@ -10813,9 +10847,8 @@ RORB
 LSRA
 RORB
 EXG	D,X
-LDD	#0
-; Debug: rootlist unsigned long = X+0 (used reg = )
-; Debug: func () void = expect+0 (used reg = )
+CLRA
+CLRB
 JSR	>_expect
 ;BCC_EOS
 ; 250 	}
@@ -10859,7 +10892,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 260 	for (i = 0; i < 16 ; i++) {
 ; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ;BCC_EOS
@@ -10963,7 +10997,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 272 	for (i = 0; i < 16 ; i++) {
 ; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ;BCC_EOS
@@ -11032,7 +11067,8 @@ LEAS	2,S
 ;BCC_EOS
 ; 278 	for (i = 0; i < 7 ; i++) {
 ; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	$A,S
 ;BCC_EOS
 ;BCC_EOS
@@ -11071,9 +11107,8 @@ STX	0,S
 ; Debug: cast long = const 0 to unsigned int u = [S+$C-$C] (used reg = )
 LDD	0,S
 EXG	D,X
-LDD	#0
-; Debug: rootlist long = X+0 (used reg = )
-; Debug: func () void = expect+0 (used reg = )
+CLRA
+CLRB
 JSR	>_expect
 ;BCC_EOS
 ; 282 	}

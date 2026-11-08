@@ -330,6 +330,40 @@ grep -v '^S[059]' cbrom.srec | cat - cbtest.srec > cbtest-rom.srec
 echo $? > cbtest.run.rc
 rm -f cbrom.o cbrom.out cbrom.srec cbtest.srec cbtest-rom.srec
 
+# copt's rules, checked by running code: each program above that runs
+# on sim6809 is built again with -O (libc is always built with -O), and
+# must give the same output and exit status as without
+for f in ops longops strtest stdtest maltest vatest; do
+	"$BCC" -O -c -o $f-O.o $f.c > /dev/null 2>&1
+	"$LD" -T0x1000 -o $f-O.out simcrt0.o $f-O.o -L"$LIBDIR" -lc \
+		> /dev/null 2>&1
+	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
+	"$SIM" -n 500000000 $f-O.srec > $f-O.run 2>&1
+	echo $? >> $f-O.run
+	cat $f.run $f.run.rc > $f-plain.run
+	if cmp -s $f-plain.run $f-O.run; then
+		echo "ok   $f runs the same with -O"
+	else
+		echo "DIFF $f with -O"
+	fi
+	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
+done > optimize.result
+for f in hello echo pftest siotest chartest sadd; do
+	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
+	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
+	input=/dev/null
+	[ -f $f.in ] && input=$f.in
+	"$SIM" -n 500000000 $f-O.srec < $input > $f-O.run 2>&1
+	echo $? >> $f-O.run
+	cat $f.run $f.run.rc > $f-plain.run
+	if cmp -s $f-plain.run $f-O.run; then
+		echo "ok   $f runs the same with -O"
+	else
+		echo "DIFF $f with -O"
+	fi
+	rm -f $f-O.out $f-O.srec $f-O.run $f-plain.run
+done >> optimize.result
+
 run notarget.bcc "$BCC" -Mo -o notarget.out hello.c
 rm -f notarget.out
 

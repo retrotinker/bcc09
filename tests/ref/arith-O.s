@@ -75,7 +75,8 @@ STD	>_i3
 ;BCC_EOS
 ; 16 	i3 = -a;
 ; Debug: neg int a = [S+2-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 SUBD	0,S
 ; Debug: eq int = D+0 to int = [i3+0] (used reg = )
 STD	>_i3
@@ -272,7 +273,8 @@ _compare:
 ; 49 	int n = 0;
 PSHS	D,X
 ; Debug: eq int = const 0 to int n = [S+4-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 50 

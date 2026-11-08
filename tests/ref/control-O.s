@@ -35,7 +35,8 @@ BRA	.1
 ; 14 		n = -n;
 .7:
 ; Debug: neg int n = [S+2-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 SUBD	0,S
 ; Debug: eq int = D+0 to int n = [S+2-2] (used reg = )
 STD	0,S
@@ -63,7 +64,8 @@ PULS	Y,PC
 ; 22 		n = 0;
 .A:
 ; Debug: eq int = const 0 to int n = [S+2-2] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 23 	}
@@ -100,13 +102,15 @@ _loops:
 PSHS	X
 LEAS	-6,S
 ; Debug: eq int = const 0 to int t = [S+8-8] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 31 
 ; 32 	for (i = 0; i < n; i++) {
 ; Debug: eq int = const 0 to int i = [S+8-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	4,S
 ;BCC_EOS
 ;BCC_EOS
@@ -169,7 +173,8 @@ BGT	.16
 .17:
 .14:
 ; Debug: eq int = const 0 to int j = [S+8-6] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	2,S
 ;BCC_EOS
 ; 42 	do {
@@ -216,7 +221,8 @@ BRA	.1E
 ..FFFE		=	-8
 ; 50 	for (i = 0,j = n; i < j; i++,j--)
 ; Debug: eq int = const 0 to int i = [S+8-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	4,S
 ; Debug: eq int n = [S+8-2] to int j = [S+8-6] (used reg = )
 LDD	6,S

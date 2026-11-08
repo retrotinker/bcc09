@@ -136,7 +136,8 @@ _sum:
 ; 31 	int t = 0;
 PSHS	D,X
 ; Debug: eq int = const 0 to int t = [S+4-4] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 32 

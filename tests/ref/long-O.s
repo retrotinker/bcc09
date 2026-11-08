@@ -176,7 +176,8 @@ JSR	>linc_b
 .1:
 ; Debug: logeq long = const 0 to long a = [S+4-4] (used reg = )
 ; Debug: expression subtree swapping
-LDD	#0
+CLRA
+CLRB
 LDX	#0
 PSHS	D,X
 LDD	4,S
@@ -196,7 +197,8 @@ JSR	>ldec_b
 .3:
 ; Debug: mul long = const 3 to long a = [S+4-4] (used reg = )
 ; Debug: expression subtree swapping
-LDD	#0
+CLRA
+CLRB
 LDX	#3
 LEAY	0,S
 JSR	>lmul_b
@@ -225,7 +227,8 @@ STX	>_l3+2
 LDD	>_l1+2
 STD	>_i
 EXG	D,X
-LDD	#0
+CLRA
+CLRB
 STD	>_l3
 STX	>_l3+2
 ;BCC_EOS
@@ -259,8 +262,6 @@ SBCB	#0
 SEX
 ; Debug: cast int = const 0 to long = X+0 (used reg = )
 TFR	X,D
-; Debug: cast int = const 0 to int = D+0 (used reg = )
-TFR	D,X
 RTS
 ;BCC_EOS
 ; 35 }

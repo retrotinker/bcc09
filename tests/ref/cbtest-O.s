@@ -294,7 +294,8 @@ _main:
 ; 13 	int lines = 0;
 LEAS	-$2C,S
 ; Debug: eq int = const 0 to int lines = [S+$2C-$2C] (used reg = )
-LDD	#0
+CLRA
+CLRB
 STD	0,S
 ;BCC_EOS
 ; 14 
