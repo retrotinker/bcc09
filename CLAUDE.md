@@ -38,8 +38,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `$(PREFIX)/lib/bcc09` (headers in `include/` there), so `bcc09 -o prog -X-T0x3000
   prog.c` builds a whole program. libc has the 16- and 32-bit run-time helpers
   (`libc/bcc/`), `string.h`, `ctype.h`, `stdlib.h` with `malloc`, `stdarg.h` and `stdio.h`
-  (dev86's `FILE` layer, and a new `printf` family that matches glibc's output); mostly
-  dev86's C, compiled by `bcc09` itself. No `scanf` or floating point yet.
+  (dev86's `FILE` layer, and new `printf` and `scanf` families that match glibc); mostly
+  dev86's C, compiled by `bcc09` itself. No floating point yet.
   `libc/README` gives the calling conventions and the changes from dev86.
 - Start-up: `crt0` clears the BSS and calls `main`; when `main` returns, `exit()` runs the
   `atexit()` functions and the target's `_exit()`. The heap grows from `__end` up to the
@@ -56,7 +56,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
   - The others can't link yet.
 - Next: Disk BASIC files for `-Me`, OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code
-  has a known bug), FLEX, `scanf`, floating point.
+  has a known bug), FLEX, floating point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
@@ -84,7 +84,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 464 reference
+  `tests/src/` with this tree's tools and compare every result with the 479 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -114,7 +114,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - `tests/src/pftest.c` (built with `-Mi`) prints a grid of `printf` formats, which must
   be byte-for-byte what the host's `printf` prints (as must `chartest.c`, chars passed
   and returned with prototypes, and `sadd.c`, ints and signed chars added and
-  subtracted, but for their counts of checks); `siotest.c` checks the `FILE`
+  subtracted, and `sftest.c`, a grid of `sscanf` formats and inputs and `scanf` reading
+  `sftest.in`, but for their counts of checks); `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
 - `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
   ROMs, in `~/.xroar/roms`) builds `tests/xroar/xcb.c` with `-Me`, puts it on a cassette
@@ -123,7 +124,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
   it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
   `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
-- Twelve test programs are built again with `-O` and must run the same
+- Thirteen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.

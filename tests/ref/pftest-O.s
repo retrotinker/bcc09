@@ -141,7 +141,20 @@
 ;BCC_EOS
 ; 134 extern int vsnprintf ();
 ;BCC_EOS
-; 135 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 135 
+; 136 extern int scanf ();
+;BCC_EOS
+; 137 extern int fscanf ();
+;BCC_EOS
+; 138 extern int sscanf ();
+;BCC_EOS
+; 139 extern int vscanf ();
+;BCC_EOS
+; 140 extern int vfscanf ();
+;BCC_EOS
+; 141 extern int vsscanf ();
+;BCC_EOS
+; 142 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -154,7 +167,8 @@
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
+; 10 # 13 "../prefix.tmp/lib/
+; 12 bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen ();
 ;BCC_EOS
@@ -166,8 +180,7 @@
 ; 18 extern int strcmp ();
 ;BCC_EOS
 ; 19 
-; 20 extern ch
-; 20 ar * strncat ();
+; 20 extern char * strncat ();
 ;BCC_EOS
 ; 21 extern char * strncpy ();
 ;BCC_EOS
@@ -791,7 +804,8 @@ BLT	.44
 LDD	$2E,S
 BEQ	.46
 .47:
-; 66 					n = printf(fmt,1L);
+; 66 					n 
+; 66 = printf(fmt,1L);
 ; Debug: list long = const 1 (used reg = )
 CLRA
 CLRB
@@ -899,7 +913,6 @@ _others:
 ; 76 	int n, m;
 ;BCC_EOS
 ; 77 	short sh;
-; 77 
 ;BCC_EOS
 ; 78 	long ln;
 ;BCC_EOS

@@ -143,7 +143,20 @@
 ;BCC_EOS
 ; 134 extern int vsnprintf ();
 ;BCC_EOS
-; 135 # 8 "sadd.c"
+; 135 
+; 136 extern int scanf ();
+;BCC_EOS
+; 137 extern int fscanf ();
+;BCC_EOS
+; 138 extern int sscanf ();
+;BCC_EOS
+; 139 extern int vscanf ();
+;BCC_EOS
+; 140 extern int vfscanf ();
+;BCC_EOS
+; 141 extern int vsscanf ();
+;BCC_EOS
+; 142 # 8 "sadd.c"
 ; 8 signed char gc = -1;
 	LOC	3
 	EXPORT	_gc
@@ -300,7 +313,8 @@ _main:
 	JSR	>_printf
 	LEAS	2,S
 ;BCC_EOS
-; 31 	printf("a + gc %d\n",a + gc);
+; 31 	printf("a + gc 
+; 31 %d\n",a + gc);
 	LOC	1
 .5:
 	FCC	"a + gc %d"
@@ -394,8 +408,7 @@ _main:
 	ADDD	,S++
 	STD	9,S
 ;BCC_EOS
-; 37 	printf
-; 37 ("r += c %d\n",r);
+; 37 	printf("r += c %d\n",r);
 	LOC	1
 .9:
 	FCC	"r += c %d"

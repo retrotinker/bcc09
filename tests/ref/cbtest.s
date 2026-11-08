@@ -143,7 +143,20 @@
 ;BCC_EOS
 ; 134 extern int vsnprintf ();
 ;BCC_EOS
-; 135 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 135 
+; 136 extern int scanf ();
+;BCC_EOS
+; 137 extern int fscanf ();
+;BCC_EOS
+; 138 extern int sscanf ();
+;BCC_EOS
+; 139 extern int vscanf ();
+;BCC_EOS
+; 140 extern int vfscanf ();
+;BCC_EOS
+; 141 extern int vsscanf ();
+;BCC_EOS
+; 142 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -156,7 +169,8 @@
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 17 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 10 # 17 "../prefix.tmp/lib/b
+; 16 cc09/include/stdlib.h"
 ; 17 extern int atoi ();
 ;BCC_EOS
 ; 18 extern long atol ();
@@ -166,8 +180,7 @@
 ; 20 extern unsigned long strtoul ();
 ;BCC_EOS
 ; 21 
-; 22 extern int ab
-; 22 s ();
+; 22 extern int abs ();
 ;BCC_EOS
 ; 23 extern long labs ();
 ;BCC_EOS

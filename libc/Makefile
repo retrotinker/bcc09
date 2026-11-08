@@ -27,9 +27,10 @@ BCCFLAGS=-O -Iinclude
 # stdlib: stdlib.h's functions, and errno
 # string: string and memory functions
 # malloc: malloc, free, calloc and realloc (sbrk and brk are in stdlib)
-# stdio: the FILE functions (stdio.c, dev86's) and the printf family
+# stdio: the FILE functions (stdio.c, dev86's) and the printf and scanf
+#        families
 # Some sources hold several functions, each compiled separately with
-# -DL_name: string.c (STRING_OBJS), malloc.c, stdio.c, printf.c, abs.c,
+# -DL_name: string.c (STRING_OBJS), malloc.c, stdio.c, printf.c, scanf.c, abs.c,
 # strtol.c and rand.c, and sim/sys.c
 STRING_OBJS = string/strlen.o string/strcat.o string/strcpy.o \
 	  string/strcmp.o string/strncat.o string/strncpy.o \
@@ -47,6 +48,8 @@ STDIO_OBJS = stdio/_stdio_init.o stdio/fputc.o stdio/fgetc.o \
 PRINTF_OBJS = stdio/__vformat.o stdio/vfprintf.o stdio/vprintf.o \
 	  stdio/printf.o stdio/fprintf.o stdio/vsnprintf.o \
 	  stdio/vsprintf.o stdio/sprintf.o stdio/snprintf.o
+SCANF_OBJS = stdio/__vscan.o stdio/vfscanf.o stdio/vscanf.o \
+	  stdio/vsscanf.o stdio/scanf.o stdio/fscanf.o stdio/sscanf.o
 ABS_OBJS = stdlib/abs.o stdlib/labs.o
 STRTOL_OBJS = stdlib/strtol.o stdlib/strtoul.o
 RAND_OBJS = stdlib/rand.o stdlib/srand.o
@@ -54,7 +57,7 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/laddsub.o bcc/llogic.o bcc/lcmp.o bcc/lunary.o \
 	  bcc/lincdec.o bcc/lshift.o bcc/lmul.o bcc/ldiv.o \
 	  ctype/ctype.o ctype/ctypefn.o \
-	  $(MALLOC_OBJS) $(STDIO_OBJS) $(PRINTF_OBJS) \
+	  $(MALLOC_OBJS) $(STDIO_OBJS) $(PRINTF_OBJS) $(SCANF_OBJS) \
 	  stdlib/exit.o stdlib/atexit.o stdlib/errno.o \
 	  stdlib/sbrk.o \
 	  stdlib/atoi.o stdlib/atol.o $(STRTOL_OBJS) $(ABS_OBJS) \
@@ -117,6 +120,8 @@ $(STDIO_OBJS): stdio/%.o: stdio/stdio.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdio/stdio.c
 $(PRINTF_OBJS): stdio/%.o: stdio/printf.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdio/printf.c
+$(SCANF_OBJS): stdio/%.o: stdio/scanf.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdio/scanf.c
 $(CB_SYS_OBJS): cb/%.o: cb/sys.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ cb/sys.c
 $(SIM_SYS_OBJS): sim/%.o: sim/sys.c $(HEADERS) .bcc/stamp

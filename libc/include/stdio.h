@@ -133,6 +133,13 @@ extern int vfprintf __P ((FILE*, __const char*, char*));
 extern int vsprintf __P ((char*, __const char*, char*));
 extern int vsnprintf __P ((char*, size_t, __const char*, char*));
 
+extern int scanf __P ((__const char*, ...));
+extern int fscanf __P ((FILE*, __const char*, ...));
+extern int sscanf __P ((__const char*, __const char*, ...));
+extern int vscanf __P ((__const char*, char*));
+extern int vfscanf __P ((FILE*, __const char*, char*));
+extern int vsscanf __P ((__const char*, __const char*, char*));
+
 #define stdio_pending(fp) ((fp)->bufread>(fp)->bufpos)
 
 #endif /* __STDIO_H */

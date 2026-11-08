@@ -108,8 +108,8 @@ echo $? > cpp-E.rc
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
 csrc="arith calls cbtest chartest control float helpmain long longops main
-      maltest ops pftest proto ptr sadd selftest siotest stdtest strtest struct
-      switch vatest"
+      maltest ops pftest proto ptr sadd selftest sftest siotest stdtest strtest
+      struct switch vatest"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -289,9 +289,11 @@ done
 # number of lines; pftest.c prints a grid of printf formats, which must
 # be the same with the host's printf; siotest.c checks stdio's FILE
 # functions; chartest.c passes and returns chars with prototypes; sadd.c
-# adds and subtracts ints and signed chars; and a target with no start-up
-# code yet can't be linked
-for f in hello echo pftest siotest chartest sadd; do
+# adds and subtracts ints and signed chars; sftest.c prints a grid of
+# sscanf formats and inputs, and reads sftest.in with scanf, which must
+# be the same with the host's scanf; and a target with no start-up code
+# yet can't be linked
+for f in hello echo pftest siotest chartest sadd sftest; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -300,11 +302,14 @@ for f in hello echo pftest siotest chartest sadd; do
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
-# pftest.c, chartest.c and sadd.c must print the same with the host's
-# compiler and C library (but for the count of checks, which differs)
-for f in pftest chartest sadd; do
+# pftest.c, chartest.c, sadd.c and sftest.c must print the same with the
+# host's compiler and C library (but for the count of checks, which
+# differs)
+for f in pftest chartest sadd sftest; do
+	input=/dev/null
+	[ -f $f.in ] && input=$f.in
 	if ${CC:-cc} -std=gnu89 -w -o $f-host $f.c > /dev/null 2>&1 &&
-	   ./$f-host > $f-host.run 2>&1 &&
+	   ./$f-host < $input > $f-host.run 2>&1 &&
 	   grep -v '^checks ' $f.run > $f.cmp &&
 	   grep -v '^checks ' $f-host.run > $f-host.cmp &&
 	   cmp -s $f.cmp $f-host.cmp; then
@@ -348,7 +353,7 @@ for f in ops longops strtest stdtest maltest vatest; do
 	fi
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
-for f in hello echo pftest siotest chartest sadd; do
+for f in hello echo pftest siotest chartest sadd sftest; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null

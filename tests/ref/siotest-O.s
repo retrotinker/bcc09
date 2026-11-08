@@ -143,7 +143,20 @@
 ;BCC_EOS
 ; 134 extern int vsnprintf ();
 ;BCC_EOS
-; 135 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
+; 135 
+; 136 extern int scanf ();
+;BCC_EOS
+; 137 extern int fscanf ();
+;BCC_EOS
+; 138 extern int sscanf ();
+;BCC_EOS
+; 139 extern int vscanf ();
+;BCC_EOS
+; 140 extern int vfscanf ();
+;BCC_EOS
+; 141 extern int vsscanf ();
+;BCC_EOS
+; 142 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
 ; 6  
 ; 7 # 11
 ; 11 extern int errno;
@@ -160,14 +173,14 @@
 ; 5  
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 6 #
+; 6  10 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 10 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen ();
 ;BCC_EOS
 ; 15 
-; 16 extern char
-; 16  * strcat ();
+; 16 extern char * strcat ();
 ;BCC_EOS
 ; 17 extern char * strcpy ();
 ;BCC_EOS
@@ -726,6 +739,7 @@ LDX	#8
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
+; 53 
 ; 53 	printf("[line again ");
 LOC	1
 .25:
@@ -780,9 +794,8 @@ _input:
 ; 61 	int c, n;
 ;BCC_EOS
 ; 62 
-; 63 	c = (((stdin)->bufpos >= (stdi
+; 63 	c = (((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++))  ;
 LEAS	-$24,S
-; 63 n)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++))  ;
 ; Debug: ge * unsigned char = [stdin+2] to * unsigned char = [stdin+0] (used reg = )
 LDX	>_stdin
 CMPX	>_stdin+2
@@ -1421,7 +1434,7 @@ ANDA	#1
 CLRB
 ; Debug: ne int = const 0 to int = D+0 (used reg = )
 SUBD	#0
-BNE	.72
+LBNE	.72
 .73:
 LDB	#1
 BRA	.74

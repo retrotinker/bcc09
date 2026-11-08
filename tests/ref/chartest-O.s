@@ -141,7 +141,20 @@
 ;BCC_EOS
 ; 134 extern int vsnprintf ();
 ;BCC_EOS
-; 135 # 11 "chartest.c"
+; 135 
+; 136 extern int scanf ();
+;BCC_EOS
+; 137 extern int fscanf ();
+;BCC_EOS
+; 138 extern int sscanf ();
+;BCC_EOS
+; 139 extern int vscanf ();
+;BCC_EOS
+; 140 extern int vfscanf ();
+;BCC_EOS
+; 141 extern int vsscanf ();
+;BCC_EOS
+; 142 # 11 "chartest.c"
 ; 11 int checks, failures;
 ;BCC_EOS
 ; 12 
@@ -232,8 +245,9 @@ EXPORT	_uc_clip
 _uc_clip:
 ;BCC_EOS
 ; 33 {
-; 34 	return v > 255 ? 255 : (unsigned char) v;
+; 34 	return 
 PSHS	X
+; 34 v > 255 ? 255 : (unsigned char) v;
 ; Debug: gt int = const $FF to unsigned int v = [S+2-2] (used reg = )
 LDD	0,S
 SUBD	#$FF
@@ -262,7 +276,6 @@ _uc_add:
 ; 38 # 37 "chartest.c"
 ; 37 unsigned char b;
 ;BCC_EOS
-; 38 
 ; 38 {
 ; 39 	return a + b;			 
 PSHS	X

@@ -10,3 +10,4 @@ ok   pftest runs the same with -O
 ok   siotest runs the same with -O
 ok   chartest runs the same with -O
 ok   sadd runs the same with -O
+ok   sftest runs the same with -O

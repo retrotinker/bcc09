@@ -10,7 +10,8 @@ This will become the port of the dev86 C library.  So far it has:
   ctype/    ctype.h's table and toupper and tolower
   malloc/   malloc, free, calloc and realloc (dev86's)
   stdio/    stdio.h: the FILE functions (stdio.c, dev86's) and the
-            printf family (printf.c, written for bcc09)
+            printf and scanf families (printf.c and scanf.c, written
+            for bcc09)
   stdlib/   stdlib.h's other functions: atoi, atol, strtol, strtoul,
             abs, labs, qsort, bsearch, rand, srand, atexit, exit and
             _exit, and dev86's itoa, ltoa, ultoa, ltostr and ultostr;
@@ -65,10 +66,12 @@ Changes from dev86:
     ungetc(EOF) pushed back a byte, and ungetc didn't clear the end of
     file indicator; fgets with a count of 0 overran its buffer; BUFSIZ
     is 256
-  - the printf family is new: dev86's printf.c (and scanf.c) had no
-    license, and its printf departed from the C standard (precision on
-    integers, %X, # and %p); see stdio/printf.c
-div and ldiv, scanf, and floating point in printf are still to come.
+  - the printf and scanf families are new: dev86's printf.c and
+    scanf.c had no license, and its printf departed from the C standard
+    (precision on integers, %X, # and %p); see stdio/printf.c and
+    stdio/scanf.c
+div and ldiv, and floating point in printf and scanf, are still to
+come.
 putchar and getchar are only macros (as in dev86).
 
 The heap
