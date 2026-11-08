@@ -28,10 +28,15 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `.tok` file, run `make -C cpp tokens` (needs gperf 3.1 or later, which uses `size_t`
   lengths).
 
+- `libc/` builds `libc.a` (installed in `$(PREFIX)/lib/bcc09`, where `bcc09` links it
+  with `-lc`). So far it has the 16-bit run-time helpers (`libc/bcc/`) and `memcpy`;
+  `libc/README` gives the calling conventions. Next: the `long` helpers, then floating
+  point, then start-up code (`crt0`) and the rest of the dev86 libc.
+
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 252 reference
+  `tests/src/` with this tree's tools and compare every result with the 281 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -44,7 +49,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `tests/sim/` (see its README). `tests/src/selftest.c` checks code from the other test
   sources against values from the host compiler and exits with the number of failures;
   it runs both as compiled and with `-O`. It can't use code that needs the run-time
-  helpers (multiply, divide, variable shifts, long, float, struct copy) until they exist.
+  helpers that libc doesn't have yet (long and float).
+- `tests/src/ops.c` checks libc's 16-bit helpers and `memcpy` against `tests/src/opsdata.h`,
+  which `tests/gen-opsdata.py` generates from a model of 16-bit C (rerun it after changing
+  the operands or the model). `tests/src/regtest.s` checks that the helpers keep Y and U.
 
 ## Known issues
 

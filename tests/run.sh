@@ -46,6 +46,9 @@ ln -s "$top/as/as09" "$top/ld/ld09" "$top/ar/ar09" "$top/bcc/bcc09" \
 	"$top/ld/objdump09" "$top/ld/objcopy09" "$prefix/bin/"
 ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" "$prefix/libexec/bcc09/"
+mkdir -p "$prefix/lib/bcc09"
+ln -s "$top/libc/libc.a" "$prefix/lib/bcc09/"
+LIBDIR=$prefix/lib/bcc09
 export BCC_PREFIX=$prefix
 unset BCC_EXEC_PREFIX
 PATH=$prefix/bin:$PATH
@@ -98,8 +101,8 @@ echo $? > cpp-E.rc
 
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
-csrc="arith calls control float helpmain long main proto ptr selftest struct
-      switch"
+csrc="arith calls control float helpmain long main ops proto ptr selftest
+      struct switch"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -110,7 +113,7 @@ run syntax.cc "$BCC" -S -o syntax.s syntax.c
 rm -f syntax.s
 
 # the assembler: object file, listing and symbol file
-for f in crt0 modes simcrt0; do
+for f in crt0 modes regtest simcrt0; do
 	run $f.as "$AS" -o $f.o -l $f.lst -s $f.sym $f.s
 done
 # the compiler's output, assembled with a listing (-u, as bcc09 runs as09)
@@ -150,6 +153,9 @@ rm -f libtest.a
 link helpers	-T0x1000 crt0.o helpmain.o arith.o long.o float.o struct.o \
 		calls.o
 link nomain	-T0x1000 control.o
+# and with libc: what it doesn't have yet
+link helpers-lc	-T0x1000 crt0.o helpmain.o arith.o long.o float.o struct.o \
+		calls.o -L"$LIBDIR" -lc
 
 # objdump09 (and nm09 and size09, which are the same program) on
 # object files and executables
@@ -202,6 +208,21 @@ link selftest-O	-T0x1000 simcrt0.o selftest-O.o control-O.o switch-O.o ptr-O.o
 echo $? > selftest-O.run.rc
 rm -f selftest.srec selftest-O.srec selftest-O.out selftest-O.map \
 	selftest-O.err selftest-O.rc
+
+# libc's run-time helpers: ops.c checks 16-bit multiply, divide,
+# modulus and shifts (through the helpers, and the compiler's own code
+# for constants) and memcpy against tables from tests/gen-opsdata.py, and
+# exits with the number of failures; regtest.s checks that each helper
+# leaves Y and U alone
+link ops	-T0x1000 simcrt0.o ops.o -L"$LIBDIR" -lc
+"$OC" -O srec ops.out ops.srec
+"$SIM" -n 50000000 ops.srec > ops.run 2>&1
+echo $? > ops.run.rc
+link regtest	-T0x1000 regtest.o -L"$LIBDIR" -lc
+"$OC" -O srec regtest.out regtest.srec
+"$SIM" -n 1000000 regtest.srec > regtest.run 2>&1
+echo $? > regtest.run.rc
+rm -f ops.srec regtest.srec
 
 # the copied sources aren't results
 for f in "$tests"/src/*; do

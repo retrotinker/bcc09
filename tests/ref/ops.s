@@ -1,0 +1,4819 @@
+; 1 
+; 1 # 1 "ops.c"
+; 1 # 5
+; 5  
+; 6 # 1 "opsdata.h"
+; 1  
+; 2 
+; 3 
+; 4 
+; 5 int vals[] = {
+	LOC	3
+	EXPORT	_vals
+_vals:
+; 6 	0, 1, -1, 2, 7, -7, 255, 256, 1000, -1000, 12345, 32767, -32768,
+	FDB	0
+	FDB	1
+	FDB	$FFFF
+	FDB	2
+	FDB	7
+	FDB	$FFF9
+	FDB	$FF
+	FDB	$100
+	FDB	$3E8
+	FDB	$FC18
+	FDB	$3039
+	FDB	$7FFF
+	FDB	$8000
+; 7 	21845,
+	FDB	$5555
+; 8 };
+;BCC_EOS
+; 9 int counts[] = {
+	EXPORT	_counts
+_counts:
+; 10 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, -1,
+	FDB	0
+	FDB	1
+	FDB	2
+	FDB	3
+	FDB	4
+	FDB	5
+	FDB	6
+	FDB	7
+	FDB	8
+	FDB	9
+	FDB	$A
+	FDB	$B
+	FDB	$C
+	FDB	$D
+	FDB	$E
+	FDB	$F
+	FDB	$10
+	FDB	$11
+	FDB	$FFFF
+; 11 };
+;BCC_EOS
+; 12 
+; 13  
+; 14 int smul[] = {
+	EXPORT	_smul
+_smul:
+; 15 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1, 2, 7, -7, 255,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	$FFFF
+	FDB	2
+	FDB	7
+	FDB	$FFF9
+	FDB	$FF
+; 16 	256, 1000, -1000, 12345, 32767, -32768, 21845, 0, -1, 1, -2, -7, 7,
+	FDB	$100
+	FDB	$3E8
+	FDB	$FC18
+	FDB	$3039
+	FDB	$7FFF
+	FDB	$8000
+	FDB	$5555
+	FDB	0
+	FDB	$FFFF
+	FDB	1
+	FDB	$FFFE
+	FDB	$FFF9
+	FDB	7
+; 17 	-255, -256, -1000, 1000, -12345, -32767, -32768, -21845, 0, 2, -2, 4,
+	FDB	$FF01
+	FDB	$FF00
+	FDB	$FC18
+	FDB	$3E8
+	FDB	$CFC7
+	FDB	$8001
+	FDB	$8000
+	FDB	$AAAB
+	FDB	0
+	FDB	2
+	FDB	$FFFE
+	FDB	4
+; 18 	14, -14, 510, 512, 2000, -2000, 24690, -2, 0, -21846, 0, 7, -7, 14,
+	FDB	$E
+	FDB	$FFF2
+	FDB	$1FE
+	FDB	$200
+	FDB	$7D0
+	FDB	$F830
+	FDB	$6072
+	FDB	$FFFE
+	FDB	0
+	FDB	$AAAA
+	FDB	0
+	FDB	7
+	FDB	$FFF9
+	FDB	$E
+; 19 	49, -49, 1785, 1792, 7000, -7000, 20879, 32761, -32768, 21843, 0, -7,
+	FDB	$31
+	FDB	$FFCF
+	FDB	$6F9
+	FDB	$700
+	FDB	$1B58
+	FDB	$E4A8
+	FDB	$518F
+	FDB	$7FF9
+	FDB	$8000
+	FDB	$5553
+	FDB	0
+	FDB	$FFF9
+; 20 	7, -14, -49, 49, -1785, -1792, -7000, 7000, -20879, -32761, -32768,
+	FDB	7
+	FDB	$FFF2
+	FDB	$FFCF
+	FDB	$31
+	FDB	$F907
+	FDB	$F900
+	FDB	$E4A8
+	FDB	$1B58
+	FDB	$AE71
+	FDB	$8007
+	FDB	$8000
+; 21 	-21843, 0, 255, -255, 510, 1785, -1785, -511, -256, -7144, 7144, 2247,
+	FDB	$AAAD
+	FDB	0
+	FDB	$FF
+	FDB	$FF01
+	FDB	$1FE
+	FDB	$6F9
+	FDB	$F907
+	FDB	$FE01
+	FDB	$FF00
+	FDB	$E418
+	FDB	$1BE8
+	FDB	$8C7
+; 22 	32513, -32768, -85, 0, 256, -256, 512, 1792, -1792, -256, 0, -6144,
+	FDB	$7F01
+	FDB	$8000
+	FDB	$FFAB
+	FDB	0
+	FDB	$100
+	FDB	$FF00
+	FDB	$200
+	FDB	$700
+	FDB	$F900
+	FDB	$FF00
+	FDB	0
+	FDB	$E800
+; 23 	6144, 14592, -256, 0, 21760, 0, 1000, -1000, 2000, 7000, -7000, -7144,
+	FDB	$1800
+	FDB	$3900
+	FDB	$FF00
+	FDB	0
+	FDB	$5500
+	FDB	0
+	FDB	$3E8
+	FDB	$FC18
+	FDB	$7D0
+	FDB	$1B58
+	FDB	$E4A8
+	FDB	$E418
+; 24 	-6144, 16960, -16960, 24232, -1000, 0, 21512, 0, -1000, 1000, -2000,
+	FDB	$E800
+	FDB	$4240
+	FDB	$BDC0
+	FDB	$5EA8
+	FDB	$FC18
+	FDB	0
+	FDB	$5408
+	FDB	0
+	FDB	$FC18
+	FDB	$3E8
+	FDB	$F830
+; 25 	-7000, 7000, 7144, 6144, -16960, 16960, -24232, 1000, 0, -21512, 0,
+	FDB	$E4A8
+	FDB	$1B58
+	FDB	$1BE8
+	FDB	$1800
+	FDB	$BDC0
+	FDB	$4240
+	FDB	$A158
+	FDB	$3E8
+	FDB	0
+	FDB	$ABF8
+	FDB	0
+; 26 	12345, -12345, 24690, 20879, -20879, 2247, 14592, 24232, -24232,
+	FDB	$3039
+	FDB	$CFC7
+	FDB	$6072
+	FDB	$518F
+	FDB	$AE71
+	FDB	$8C7
+	FDB	$3900
+	FDB	$5EA8
+	FDB	$A158
+; 27 	27825, 20423, -32768, -4115, 0, 32767, -32767, -2, 32761, -32761,
+	FDB	$6CB1
+	FDB	$4FC7
+	FDB	$8000
+	FDB	$EFED
+	FDB	0
+	FDB	$7FFF
+	FDB	$8001
+	FDB	$FFFE
+	FDB	$7FF9
+	FDB	$8007
+; 28 	32513, -256, -1000, 1000, 20423, 1, -32768, 10923, 0, -32768, -32768,
+	FDB	$7F01
+	FDB	$FF00
+	FDB	$FC18
+	FDB	$3E8
+	FDB	$4FC7
+	FDB	1
+	FDB	$8000
+	FDB	$2AAB
+	FDB	0
+	FDB	$8000
+	FDB	$8000
+; 29 	0, -32768, -32768, -32768, 0, 0, 0, -32768, -32768, 0, -32768, 0,
+	FDB	0
+	FDB	$8000
+	FDB	$8000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$8000
+	FDB	$8000
+	FDB	0
+	FDB	$8000
+	FDB	0
+; 30 	21845, -21845, -21846, 21843, -21843, -85, 21760, 21512, -21512,
+	FDB	$5555
+	FDB	$AAAB
+	FDB	$AAAA
+	FDB	$5553
+	FDB	$AAAD
+	FDB	$FFAB
+	FDB	$5500
+	FDB	$5408
+	FDB	$ABF8
+; 31 	-4115, 10923, -32768, -29127,
+	FDB	$EFED
+	FDB	$2AAB
+	FDB	$8000
+	FDB	$8E39
+; 32 };
+;BCC_EOS
+; 33 int sdiv[] = {
+	EXPORT	_sdiv
+_sdiv:
+; 34 	-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, -1, 0, 0, 0, 0, 0,
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	1
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 35 	0, 0, 0, 0, 0, 0, 1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 2,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	$FFFF
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	2
+; 36 	-2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 7, -7, 3, 1, -1, 0, 0, 0, 0,
+	FDB	$FFFE
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	7
+	FDB	$FFF9
+	FDB	3
+	FDB	1
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 37 	0, 0, 0, 0, 1, -7, 7, -3, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, 255,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	$FFF9
+	FDB	7
+	FDB	$FFFD
+	FDB	$FFFF
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FF
+; 38 	-255, 127, 36, -36, 1, 0, 0, 0, 0, 0, 0, 0, -1, 256, -256, 128, 36,
+	FDB	$FF01
+	FDB	$7F
+	FDB	$24
+	FDB	$FFDC
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$100
+	FDB	$FF00
+	FDB	$80
+	FDB	$24
+; 39 	-36, 1, 1, 0, 0, 0, 0, 0, 0, -1, 1000, -1000, 500, 142, -142, 3, 3, 1,
+	FDB	$FFDC
+	FDB	1
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$3E8
+	FDB	$FC18
+	FDB	$1F4
+	FDB	$8E
+	FDB	$FF72
+	FDB	3
+	FDB	3
+	FDB	1
+; 40 	-1, 0, 0, 0, 0, 1, -1000, 1000, -500, -142, 142, -3, -3, -1, 1, 0, 0,
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	$FC18
+	FDB	$3E8
+	FDB	$FE0C
+	FDB	$FF72
+	FDB	$8E
+	FDB	$FFFD
+	FDB	$FFFD
+	FDB	$FFFF
+	FDB	1
+	FDB	0
+	FDB	0
+; 41 	0, 0, -1, 12345, -12345, 6172, 1763, -1763, 48, 48, 12, -12, 1, 0, 0,
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$3039
+	FDB	$CFC7
+	FDB	$181C
+	FDB	$6E3
+	FDB	$F91D
+	FDB	$30
+	FDB	$30
+	FDB	$C
+	FDB	$FFF4
+	FDB	1
+	FDB	0
+	FDB	0
+; 42 	0, -1, 32767, -32767, 16383, 4681, -4681, 128, 127, 32, -32, 2, 1, 0,
+	FDB	0
+	FDB	$FFFF
+	FDB	$7FFF
+	FDB	$8001
+	FDB	$3FFF
+	FDB	$1249
+	FDB	$EDB7
+	FDB	$80
+	FDB	$7F
+	FDB	$20
+	FDB	$FFE0
+	FDB	2
+	FDB	1
+	FDB	0
+; 43 	1, 1, -32768, -32768, -16
+	FDB	1
+	FDB	1
+	FDB	$8000
+	FDB	$8000
+; 43 384, -4681, 4681, -128, -128, -32, 32, -2,
+	FDB	$C000
+	FDB	$EDB7
+	FDB	$1249
+	FDB	$FF80
+	FDB	$FF80
+	FDB	$FFE0
+	FDB	$20
+	FDB	$FFFE
+; 44 	-1, 1, -1, -1, 21845, -21845, 10922, 3120, -3120, 85, 85, 21, -21, 1,
+	FDB	$FFFF
+	FDB	1
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$5555
+	FDB	$AAAB
+	FDB	$2AAA
+	FDB	$C30
+	FDB	$F3D0
+	FDB	$55
+	FDB	$55
+	FDB	$15
+	FDB	$FFEB
+	FDB	1
+; 45 	0, 0, 1,
+	FDB	0
+	FDB	0
+	FDB	1
+; 46 };
+;BCC_EOS
+; 47 int smod[] = {
+	EXPORT	_smod
+_smod:
+; 48 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+; 49 	1, 1, 1, 1, 1, -1, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+; 50 	2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 0, 0, 1, 0, 0, 7, 7, 7,
+	FDB	2
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	7
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	7
+	FDB	7
+	FDB	7
+; 51 	7, 7, 7, 7, 7, -7, 0, 0, -1, 0, 0, -7, -7, -7, -7, -7, -7, -7, -7,
+	FDB	7
+	FDB	7
+	FDB	7
+	FDB	7
+	FDB	7
+	FDB	$FFF9
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	$FFF9
+	FDB	$FFF9
+	FDB	$FFF9
+	FDB	$FFF9
+	FDB	$FFF9
+	FDB	$FFF9
+	FDB	$FFF9
+	FDB	$FFF9
+; 52 	255, 0, 0, 1, 3, 3, 0, 255, 255, 255, 255, 255, 255, 255, 256, 0, 0,
+	FDB	$FF
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	3
+	FDB	3
+	FDB	0
+	FDB	$FF
+	FDB	$FF
+	FDB	$FF
+	FDB	$FF
+	FDB	$FF
+	FDB	$FF
+	FDB	$FF
+	FDB	$100
+	FDB	0
+	FDB	0
+; 53 	0, 4, 4, 1, 0, 256, 256, 256, 256, 256, 256, 1000, 0, 0, 0, 6, 6, 235,
+	FDB	0
+	FDB	4
+	FDB	4
+	FDB	1
+	FDB	0
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$3E8
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	6
+	FDB	6
+	FDB	$EB
+; 54 	232, 0, 0, 1000, 1000, 1000, 1000, -1000, 0, 0, 0, -6, -6, -235, -232,
+	FDB	$E8
+	FDB	0
+	FDB	0
+	FDB	$3E8
+	FDB	$3E8
+	FDB	$3E8
+	FDB	$3E8
+	FDB	$FC18
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFA
+	FDB	$FFFA
+	FDB	$FF15
+	FDB	$FF18
+; 55 	0, 0, -1000, -1000, -1000, -1000, 12345, 0, 0, 1, 4, 4, 105, 57, 345,
+	FDB	0
+	FDB	0
+	FDB	$FC18
+	FDB	$FC18
+	FDB	$FC18
+	FDB	$FC18
+	FDB	$3039
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	4
+	FDB	4
+	FDB	$69
+	FDB	$39
+	FDB	$159
+; 56 	345, 0, 12345, 12345, 12345, 32767, 0, 0, 1, 0, 0, 127, 255, 767, 767,
+	FDB	$159
+	FDB	0
+	FDB	$3039
+	FDB	$3039
+	FDB	$3039
+	FDB	$7FFF
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	$7F
+	FDB	$FF
+	FDB	$2FF
+	FDB	$2FF
+; 57 	8077, 0, 32767, 10922, -32768, 0, 0, 0, -1, -1, -128, 0, -768, -768,
+	FDB	$1F8D
+	FDB	0
+	FDB	$7FFF
+	FDB	$2AAA
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FF80
+	FDB	0
+	FDB	$FD00
+	FDB	$FD00
+; 58 	-8078, -1, 0, -10923, 21845, 0, 0, 1, 5, 5, 170, 85, 845, 845, 9500,
+	FDB	$E072
+	FDB	$FFFF
+	FDB	0
+	FDB	$D555
+	FDB	$5555
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	5
+	FDB	5
+	FDB	$AA
+	FDB	$55
+	FDB	$34D
+	FDB	$34D
+	FDB	$251C
+; 59 	21845, 21845, 0,
+	FDB	$5555
+	FDB	$5555
+	FDB	0
+; 60 };
+;BCC_EOS
+; 61 int udiv[] = {
+	EXPORT	_udiv
+_udiv:
+; 62 	-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0,
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 63 	0, 0, 0, 0, 0, -1, -1, 1, 32767, 9362, 1, 257, 255, 65, 1, 5, 2, 1, 3,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	1
+	FDB	$7FFF
+	FDB	$2492
+	FDB	1
+	FDB	$101
+	FDB	$FF
+	FDB	$41
+	FDB	1
+	FDB	5
+	FDB	2
+	FDB	1
+	FDB	3
+; 64 	-1, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 7, 0, 3, 1, 0, 0, 0, 0,
+	FDB	$FFFF
+	FDB	2
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	7
+	FDB	0
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 65 	0, 0, 0, 0, 0, -1, -7, 0, 32764, 9361, 1, 256, 255, 65, 1, 5, 1, 1, 2,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FFF9
+	FDB	0
+	FDB	$7FFC
+	FDB	$2491
+	FDB	1
+	FDB	$100
+	FDB	$FF
+	FDB	$41
+	FDB	1
+	FDB	5
+	FDB	1
+	FDB	1
+	FDB	2
+; 66 	-1, 255, 0, 127, 36, 0, 1, 0, 0, 0, 0, 0, 0, 0, -1, 256, 0, 128, 36,
+	FDB	$FFFF
+	FDB	$FF
+	FDB	0
+	FDB	$7F
+	FDB	$24
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$100
+	FDB	0
+	FDB	$80
+	FDB	$24
+; 67 	0, 1, 1, 0, 0, 0, 0, 0, 0, -1, 1000, 0, 500, 142, 0, 3, 3, 1, 0, 0, 0,
+	FDB	0
+	FDB	1
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$3E8
+	FDB	0
+	FDB	$1F4
+	FDB	$8E
+	FDB	0
+	FDB	3
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+; 68 	0, 0, -1, -1000, 0, 32268, 9219, 0, 253, 252, 64, 1, 5, 1, 1, 2, -1,
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FC18
+	FDB	0
+	FDB	$7E0C
+	FDB	$2403
+	FDB	0
+	FDB	$FD
+	FDB	$FC
+	FDB	$40
+	FDB	1
+	FDB	5
+	FDB	1
+	FDB	1
+	FDB	2
+	FDB	$FFFF
+; 69 	12345, 0, 6172, 1763, 0, 48, 48, 12, 0, 1, 0, 0, 0, -1, 32767, 0,
+	FDB	$3039
+	FDB	0
+	FDB	$181C
+	FDB	$6E3
+	FDB	0
+	FDB	$30
+	FDB	$30
+	FDB	$C
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$7FFF
+	FDB	0
+; 70 	16383, 4681, 0, 128, 127, 32, 0, 2, 1, 0, 1, -1, -32768, 0, 16384,
+	FDB	$3FFF
+	FDB	$1249
+	FDB	0
+	FDB	$80
+	FDB	$7F
+	FDB	$20
+	FDB	0
+	FDB	2
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	$FFFF
+	FDB	$8000
+	FDB	0
+	FDB	$4000
+; 71 	4681, 0, 128, 128, 32, 0, 2, 1, 1, 1, -1, 21845, 0, 10922, 3120, 0,
+	FDB	$1249
+	FDB	0
+	FDB	$80
+	FDB	$80
+	FDB	$20
+	FDB	0
+	FDB	2
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	$FFFF
+	FDB	$5555
+	FDB	0
+	FDB	$2AAA
+	FDB	$C30
+	FDB	0
+; 72 	85, 85, 21, 0, 1, 0, 0, 1,
+	FDB	$55
+	FDB	$55
+	FDB	$15
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	1
+; 73 };
+;BCC_EOS
+; 74 int umod[] = {
+	EXPORT	_umod
+_umod:
+; 75 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+; 76 	1, 1, 1, 1, 1, -1, 0, 0, 1, 1, 6, 0, 255, 535, 999, 3810, 1, 32767, 0,
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	1
+	FDB	6
+	FDB	0
+	FDB	$FF
+	FDB	$217
+	FDB	$3E7
+	FDB	$EE2
+	FDB	1
+	FDB	$7FFF
+	FDB	0
+; 77 	2, 0, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 0, 7, 1, 0, 7, 7, 7, 7,
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	7
+	FDB	0
+	FDB	7
+	FDB	1
+	FDB	0
+	FDB	7
+	FDB	7
+	FDB	7
+	FDB	7
+; 78 	7, 7, 7, 7, 7, -7, 0, -7, 1, 2, 0, 249, 249, 529, 993, 3804, 32762,
+	FDB	7
+	FDB	7
+	FDB	7
+	FDB	7
+	FDB	7
+	FDB	$FFF9
+	FDB	0
+	FDB	$FFF9
+	FDB	1
+	FDB	2
+	FDB	0
+	FDB	$F9
+	FDB	$F9
+	FDB	$211
+	FDB	$3E1
+	FDB	$EDC
+	FDB	$7FFA
+; 79 	32761, 21839, 255, 0, 255, 1, 3, 255, 0, 255, 255, 255, 255, 25
+	FDB	$7FF9
+	FDB	$554F
+	FDB	$FF
+	FDB	0
+	FDB	$FF
+	FDB	1
+	FDB	3
+	FDB	$FF
+	FDB	0
+	FDB	$FF
+	FDB	$FF
+	FDB	$FF
+	FDB	$FF
+; 79 5, 255,
+	FDB	$FF
+	FDB	$FF
+; 80 	255, 256, 0, 256, 0, 4, 256, 1, 0, 256, 256, 256, 256, 256, 256, 1000,
+	FDB	$FF
+	FDB	$100
+	FDB	0
+	FDB	$100
+	FDB	0
+	FDB	4
+	FDB	$100
+	FDB	1
+	FDB	0
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$3E8
+; 81 	0, 1000, 0, 6, 1000, 235, 232, 0, 1000, 1000, 1000, 1000, 1000, -1000,
+	FDB	0
+	FDB	$3E8
+	FDB	0
+	FDB	6
+	FDB	$3E8
+	FDB	$EB
+	FDB	$E8
+	FDB	0
+	FDB	$3E8
+	FDB	$3E8
+	FDB	$3E8
+	FDB	$3E8
+	FDB	$3E8
+	FDB	$FC18
+; 82 	0, -1000, 0, 3, -1000, 21, 24, 536, 0, 2811, 31769, 31768, 20846,
+	FDB	0
+	FDB	$FC18
+	FDB	0
+	FDB	3
+	FDB	$FC18
+	FDB	$15
+	FDB	$18
+	FDB	$218
+	FDB	0
+	FDB	$AFB
+	FDB	$7C19
+	FDB	$7C18
+	FDB	$516E
+; 83 	12345, 0, 12345, 1, 4, 12345, 105, 57, 345, 12345, 0, 12345, 12345,
+	FDB	$3039
+	FDB	0
+	FDB	$3039
+	FDB	1
+	FDB	4
+	FDB	$3039
+	FDB	$69
+	FDB	$39
+	FDB	$159
+	FDB	$3039
+	FDB	0
+	FDB	$3039
+	FDB	$3039
+; 84 	12345, 32767, 0, 32767, 1, 0, 32767, 127, 255, 767, 32767, 8077, 0,
+	FDB	$3039
+	FDB	$7FFF
+	FDB	0
+	FDB	$7FFF
+	FDB	1
+	FDB	0
+	FDB	$7FFF
+	FDB	$7F
+	FDB	$FF
+	FDB	$2FF
+	FDB	$7FFF
+	FDB	$1F8D
+	FDB	0
+; 85 	32767, 10922, -32768, 0, -32768, 0, 1, -32768, 128, 0, 768, -32768,
+	FDB	$7FFF
+	FDB	$2AAA
+	FDB	$8000
+	FDB	0
+	FDB	$8000
+	FDB	0
+	FDB	1
+	FDB	$8000
+	FDB	$80
+	FDB	0
+	FDB	$300
+	FDB	$8000
+; 86 	8078, 1, 0, 10923, 21845, 0, 21845, 1, 5, 21845, 170, 85, 845, 21845,
+	FDB	$1F8E
+	FDB	1
+	FDB	0
+	FDB	$2AAB
+	FDB	$5555
+	FDB	0
+	FDB	$5555
+	FDB	1
+	FDB	5
+	FDB	$5555
+	FDB	$AA
+	FDB	$55
+	FDB	$34D
+	FDB	$5555
+; 87 	9500, 21845, 21845, 0,
+	FDB	$251C
+	FDB	$5555
+	FDB	$5555
+	FDB	0
+; 88 };
+;BCC_EOS
+; 89 
+; 90  
+; 91 int sshl[] = {
+	EXPORT	_sshl
+_sshl:
+; 92 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 4, 8,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	2
+	FDB	4
+	FDB	8
+; 93 	16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, -32768, 0,
+	FDB	$10
+	FDB	$20
+	FDB	$40
+	FDB	$80
+	FDB	$100
+	FDB	$200
+	FDB	$400
+	FDB	$800
+	FDB	$1000
+	FDB	$2000
+	FDB	$4000
+	FDB	$8000
+	FDB	0
+; 94 	0, 0, -1, -2, -4, -8, -16, -32, -64, -128, -256, -512, -1024, -2048,
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FFFE
+	FDB	$FFFC
+	FDB	$FFF8
+	FDB	$FFF0
+	FDB	$FFE0
+	FDB	$FFC0
+	FDB	$FF80
+	FDB	$FF00
+	FDB	$FE00
+	FDB	$FC00
+	FDB	$F800
+; 95 	-4096, -8192, -16384, -32768, 0, 0, 0, 2, 4, 8, 16, 32, 64, 128, 256,
+	FDB	$F000
+	FDB	$E000
+	FDB	$C000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	2
+	FDB	4
+	FDB	8
+	FDB	$10
+	FDB	$20
+	FDB	$40
+	FDB	$80
+	FDB	$100
+; 96 	512, 1024, 2048, 4096, 8192, 16384, -32768, 0, 0, 0, 0, 7, 14, 28, 56,
+	FDB	$200
+	FDB	$400
+	FDB	$800
+	FDB	$1000
+	FDB	$2000
+	FDB	$4000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	7
+	FDB	$E
+	FDB	$1C
+	FDB	$38
+; 97 	112, 224, 448, 896, 1792, 3584, 7168, 14336, 28672, -8192, -16384,
+	FDB	$70
+	FDB	$E0
+	FDB	$1C0
+	FDB	$380
+	FDB	$700
+	FDB	$E00
+	FDB	$1C00
+	FDB	$3800
+	FDB	$7000
+	FDB	$E000
+	FDB	$C000
+; 98 	-32768, 0, 0, 0, -7, -14, -28, -56, -112, -224, -448, -896, -1792,
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFF9
+	FDB	$FFF2
+	FDB	$FFE4
+	FDB	$FFC8
+	FDB	$FF90
+	FDB	$FF20
+	FDB	$FE40
+	FDB	$FC80
+	FDB	$F900
+; 99 	-3584, -7168, -14336, -28672, 8192, 16384, -32768, 0, 0, 0, 255, 510,
+	FDB	$F200
+	FDB	$E400
+	FDB	$C800
+	FDB	$9000
+	FDB	$2000
+	FDB	$4000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FF
+	FDB	$1FE
+; 100 	1020, 2040, 4080, 8160, 16320, 32640, -256, -512, -1024, -2048, -4096,
+	FDB	$3FC
+	FDB	$7F8
+	FDB	$FF0
+	FDB	$1FE0
+	FDB	$3FC0
+	FDB	$7F80
+	FDB	$FF00
+	FDB	$FE00
+	FDB	$FC00
+	FDB	$F800
+	FDB	$F000
+; 101 	-8192, -16384, -32768, 0, 0, 0, 256, 512, 1024, 2048, 4096, 8192,
+	FDB	$E000
+	FDB	$C000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$100
+	FDB	$200
+	FDB	$400
+	FDB	$800
+	FDB	$1000
+	FDB	$2000
+; 102 	16384, -32768, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 2000, 4000,
+	FDB	$4000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$3E8
+	FDB	$7D0
+	FDB	$FA0
+; 103 	8000, 16000, 32000, -1536, -3072, -6144, -12288, -24576, 16384,
+	FDB	$1F40
+	FDB	$3E80
+	FDB	$7D00
+	FDB	$FA00
+	FDB	$F400
+	FDB	$E800
+	FDB	$D000
+	FDB	$A000
+	FDB	$4000
+; 104 	-32768, 0, 0, 0, 0, 0, 0, -1000, -2000, -4000, -8000, -16000, -32000,
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FC18
+	FDB	$F830
+	FDB	$F060
+	FDB	$E0C0
+	FDB	$C180
+	FDB	$8300
+; 105 	1536, 3072, 6144, 12288, 24576, -16384, -32768, 0, 0, 0, 0, 0, 0,
+	FDB	$600
+	FDB	$C00
+	FDB	$1800
+	FDB	$3000
+	FDB	$6000
+	FDB	$C000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 106 	12345, 24690, -16156, -32312, 912, 1824, 3648, 7296, 14592, 29184,
+	FDB	$3039
+	FDB	$6072
+	FDB	$C0E4
+	FDB	$81C8
+	FDB	$390
+	FDB	$720
+	FDB	$E40
+	FDB	$1C80
+	FDB	$3900
+	FDB	$7200
+; 107 	-7168, -14336, -28672, 8192, 16384, -32768, 0, 0, 0, 32767, -2, -4,
+	FDB	$E400
+	FDB	$C800
+	FDB	$9000
+	FDB	$2000
+	FDB	$4000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$7FFF
+	FDB	$FFFE
+	FDB	$FFFC
+; 108 	-8, -16, -32, -64, -128, -256, -512, -1024, -2048, -4096, -8192,
+	FDB	$FFF8
+	FDB	$FFF0
+	FDB	$FFE0
+	FDB	$FFC0
+	FDB	$FF80
+	FDB	$FF00
+	FDB	$FE00
+	FDB	$FC00
+	FDB	$F800
+	FDB	$F000
+	FDB	$E000
+; 109 	-16384, -32768, 0, 0, 0, -32768, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	FDB	$C000
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 110 	0, 0, 0, 0, 0, 0, 21845, -21846, 21844, -21848, 21840, -21856, 21824,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$5555
+	FDB	$AAAA
+	FDB	$5554
+	FDB	$AAA8
+	FDB	$5550
+	FDB	$AAA0
+	FDB	$5540
+; 111 	-21888, 21760, -22016, 21504, -22528, 20480, -24576, 16384, -32768, 0,
+	FDB	$AA80
+	FDB	$5500
+	FDB	$AA00
+	FDB	$5400
+	FDB	$A800
+	FDB	$5000
+	FDB	$A000
+	FDB	$4000
+	FDB	$8000
+	FDB	0
+; 112 	0, 0,
+	FDB	0
+	FDB	0
+; 113 };
+;BCC_EOS
+; 114 int sshr[] = {
+	EXPORT	_sshr
+_sshr:
+; 115 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+; 116 	0, 0, 0, 0, 0, 0, 0, 0, 0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 116 , 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+; 117 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, 1, 0, 0, 0, 0,
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	2
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 118 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 3, 1, 0, 0, 0, 0, 0, 0, 0,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 119 	0, 0, 0, 0, 0, 0, 0, 0, 0, -7, -4, -2, -1, -1, -1, -1, -1, -1, -1, -1,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFF9
+	FDB	$FFFC
+	FDB	$FFFE
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+; 120 	-1, -1, -1, -1, -1, -1, -1, -1, 255, 127, 63, 31, 15, 7, 3, 1, 0, 0,
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FF
+	FDB	$7F
+	FDB	$3F
+	FDB	$1F
+	FDB	$F
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+; 121 	0, 0, 0, 0, 0, 0, 0, 0, 0, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0, 0, 0,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$100
+	FDB	$80
+	FDB	$40
+	FDB	$20
+	FDB	$10
+	FDB	8
+	FDB	4
+	FDB	2
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+; 122 	0, 0, 0, 0, 0, 0, 0, 1000, 500, 250, 125, 62, 31, 15, 7, 3, 1, 0, 0,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$3E8
+	FDB	$1F4
+	FDB	$FA
+	FDB	$7D
+	FDB	$3E
+	FDB	$1F
+	FDB	$F
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+; 123 	0, 0, 0, 0, 0, 0, 0, -1000, -500, -250, -125, -63, -32, -16, -8, -4,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FC18
+	FDB	$FE0C
+	FDB	$FF06
+	FDB	$FF83
+	FDB	$FFC1
+	FDB	$FFE0
+	FDB	$FFF0
+	FDB	$FFF8
+	FDB	$FFFC
+; 124 	-2, -1, -1, -1, -1, -1, -1, -1, -1, -1, 12345, 6172, 3086, 1543, 771,
+	FDB	$FFFE
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$3039
+	FDB	$181C
+	FDB	$C0E
+	FDB	$607
+	FDB	$303
+; 125 	385, 192, 96, 48, 24, 12, 6, 3, 1, 0, 0, 0, 0, 0, 32767, 16383, 8191,
+	FDB	$181
+	FDB	$C0
+	FDB	$60
+	FDB	$30
+	FDB	$18
+	FDB	$C
+	FDB	6
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$7FFF
+	FDB	$3FFF
+	FDB	$1FFF
+; 126 	4095, 2047, 1023, 511, 255, 127, 63, 31, 15, 7, 3, 1, 0, 0, 0, 0,
+	FDB	$FFF
+	FDB	$7FF
+	FDB	$3FF
+	FDB	$1FF
+	FDB	$FF
+	FDB	$7F
+	FDB	$3F
+	FDB	$1F
+	FDB	$F
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 127 	-32768, -16384, -8192, -4096, -2048, -1024, -512, -256, -128, -64,
+	FDB	$8000
+	FDB	$C000
+	FDB	$E000
+	FDB	$F000
+	FDB	$F800
+	FDB	$FC00
+	FDB	$FE00
+	FDB	$FF00
+	FDB	$FF80
+	FDB	$FFC0
+; 128 	-32, -16, -8, -4, -2, -1, -1, -1, -1, 21845, 10922, 5461, 2730, 1365,
+	FDB	$FFE0
+	FDB	$FFF0
+	FDB	$FFF8
+	FDB	$FFFC
+	FDB	$FFFE
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$5555
+	FDB	$2AAA
+	FDB	$1555
+	FDB	$AAA
+	FDB	$555
+; 129 	682, 341, 170, 85, 42, 21, 10, 5, 2, 1, 0, 0, 0, 0,
+	FDB	$2AA
+	FDB	$155
+	FDB	$AA
+	FDB	$55
+	FDB	$2A
+	FDB	$15
+	FDB	$A
+	FDB	5
+	FDB	2
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 130 };
+;BCC_EOS
+; 131 int ushr[] = {
+	EXPORT	_ushr
+_ushr:
+; 132 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+; 133 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 32767, 16383, 8191,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$7FFF
+	FDB	$3FFF
+	FDB	$1FFF
+; 134 	4095, 2047, 1023, 511, 255, 127, 63, 31, 15, 7, 3, 1, 0, 0, 0, 2, 1,
+	FDB	$FFF
+	FDB	$7FF
+	FDB	$3FF
+	FDB	$1FF
+	FDB	$FF
+	FDB	$7F
+	FDB	$3F
+	FDB	$1F
+	FDB	$F
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	2
+	FDB	1
+; 135 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 3, 1, 0, 0, 0,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+; 136 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -7, 32764, 16382, 8191, 4095,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FFF9
+	FDB	$7FFC
+	FDB	$3FFE
+	FDB	$1FFF
+	FDB	$FFF
+; 137 	2047, 1023, 511, 255, 127, 63, 31, 15, 7, 3, 1, 0, 0, 0, 255, 127, 63,
+	FDB	$7FF
+	FDB	$3FF
+	FDB	$1FF
+	FDB	$FF
+	FDB	$7F
+	FDB	$3F
+	FDB	$1F
+	FDB	$F
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FF
+	FDB	$7F
+	FDB	$3F
+; 138 	31, 15, 7, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 256, 128, 64, 32,
+	FDB	$1F
+	FDB	$F
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$100
+	FDB	$80
+	FDB	$40
+	FDB	$20
+; 139 	16, 8, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 500, 250, 125, 62,
+	FDB	$10
+	FDB	8
+	FDB	4
+	FDB	2
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$3E8
+	FDB	$1F4
+	FDB	$FA
+	FDB	$7D
+	FDB	$3E
+; 140 	31, 15, 7, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1000, 32268, 16134, 8067,
+	FDB	$1F
+	FDB	$F
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$FC18
+	FDB	$7E0C
+	FDB	$3F06
+	FDB	$1F83
+; 141 	4033, 2016, 1008, 504, 252, 126, 63, 31, 15, 7, 3, 1, 0, 0, 0, 12345,
+	FDB	$FC1
+	FDB	$7E0
+	FDB	$3F0
+	FDB	$1F8
+	FDB	$FC
+	FDB	$7E
+	FDB	$3F
+	FDB	$1F
+	FDB	$F
+	FDB	7
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$3039
+; 142 	6172, 3086, 1543, 771, 385, 192, 96, 48, 24, 12, 6, 3, 1, 0, 0, 0, 0,
+	FDB	$181C
+	FDB	$C0E
+	FDB	$607
+	FDB	$303
+	FDB	$181
+	FDB	$C0
+	FDB	$60
+	FDB	$30
+	FDB	$18
+	FDB	$C
+	FDB	6
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 143 	0, 32767, 16383, 8191, 4095, 2047, 1023, 511, 255, 127, 63, 31, 15, 7,
+	FDB	0
+	FDB	$7FFF
+	FDB	$3FFF
+	FDB	$1FFF
+	FDB	$FFF
+	FDB	$7FF
+	FDB	$3FF
+	FDB	$1FF
+	FDB	$FF
+	FDB	$7F
+	FDB	$3F
+	FDB	$1F
+	FDB	$F
+	FDB	7
+; 144 	3, 1, 0, 0, 0, 0, -32768, 16384, 8192, 4096, 2048, 1024, 512, 256,
+	FDB	3
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$8000
+	FDB	$4000
+	FDB	$2000
+	FDB	$1000
+	FDB	$800
+	FDB	$400
+	FDB	$200
+	FDB	$100
+; 145 	128, 64, 32, 16, 8, 4, 2, 1, 0, 0, 0, 21845, 10922, 5461, 2730, 1365,
+	FDB	$80
+	FDB	$40
+	FDB	$20
+	FDB	$10
+	FDB	8
+	FDB	4
+	FDB	2
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$5555
+	FDB	$2AAA
+	FDB	$1555
+	FDB	$AAA
+	FDB	$555
+; 146 	682, 341, 170, 85, 42, 21, 10, 5, 2, 1, 0, 0, 0, 0,
+	FDB	$2AA
+	FDB	$155
+	FDB	$AA
+	FDB	$55
+	FDB	$2A
+	FDB	$15
+	FDB	$A
+	FDB	5
+	FDB	2
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 147 };
+;BCC_EOS
+; 148 
+; 149 
+; 150  
+; 151 int cdivmod[] = {
+	EXPORT	_cdivmod
+_cdivmod:
+; 152 	0, 0, 0, 0, 0, 0, 0, 0, 
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 152 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+; 153 	0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+; 154 	0, 1, 0, 1, 0, 1, 0, 1, 0, 1, -1, 0, -1, 0, 0, -1, 32767, 1, 0, -1,
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	$FFFF
+	FDB	0
+	FDB	$FFFF
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$7FFF
+	FDB	1
+	FDB	0
+	FDB	$FFFF
+; 155 	16383, 3, 0, -1, 8191, 7, 0, -1, 255, 255, 0, -1, 21845, 0, 0, -1,
+	FDB	$3FFF
+	FDB	3
+	FDB	0
+	FDB	$FFFF
+	FDB	$1FFF
+	FDB	7
+	FDB	0
+	FDB	$FFFF
+	FDB	$FF
+	FDB	$FF
+	FDB	0
+	FDB	$FFFF
+	FDB	$5555
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+; 156 	6553, 5, 2, 0, 2, 0, 1, 0, 1, 0, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2,
+	FDB	$1999
+	FDB	5
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+; 157 	0, 2, 0, 2, 0, 2, 0, 2, 7, 0, 7, 0, 3, 1, 3, 1, 1, 3, 1, 3, 0, 7, 0,
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	0
+	FDB	2
+	FDB	7
+	FDB	0
+	FDB	7
+	FDB	0
+	FDB	3
+	FDB	1
+	FDB	3
+	FDB	1
+	FDB	1
+	FDB	3
+	FDB	1
+	FDB	3
+	FDB	0
+	FDB	7
+	FDB	0
+; 158 	7, 0, 7, 0, 7, 2, 1, 2, 1, 0, 7, 0, 7, -7, 0, -7, 0, -3, -1, 32764, 1,
+	FDB	7
+	FDB	0
+	FDB	7
+	FDB	0
+	FDB	7
+	FDB	2
+	FDB	1
+	FDB	2
+	FDB	1
+	FDB	0
+	FDB	7
+	FDB	0
+	FDB	7
+	FDB	$FFF9
+	FDB	0
+	FDB	$FFF9
+	FDB	0
+	FDB	$FFFD
+	FDB	$FFFF
+	FDB	$7FFC
+	FDB	1
+; 159 	-1, -3, 16382, 1, 0, -7, 8191, 1, 0, -7, 255, 249, -2, -1, 21843, 0,
+	FDB	$FFFF
+	FDB	$FFFD
+	FDB	$3FFE
+	FDB	1
+	FDB	0
+	FDB	$FFF9
+	FDB	$1FFF
+	FDB	1
+	FDB	0
+	FDB	$FFF9
+	FDB	$FF
+	FDB	$F9
+	FDB	$FFFE
+	FDB	$FFFF
+	FDB	$5553
+	FDB	0
+; 160 	0, -7, 6552, 9, 255, 0, 255, 0, 127, 1, 127, 1, 63, 3, 63, 3, 31, 7,
+	FDB	0
+	FDB	$FFF9
+	FDB	$1998
+	FDB	9
+	FDB	$FF
+	FDB	0
+	FDB	$FF
+	FDB	0
+	FDB	$7F
+	FDB	1
+	FDB	$7F
+	FDB	1
+	FDB	$3F
+	FDB	3
+	FDB	$3F
+	FDB	3
+	FDB	$1F
+	FDB	7
+; 161 	31, 7, 0, 255, 0, 255, 85, 0, 85, 0, 25, 5, 25, 5, 256, 0, 256, 0,
+	FDB	$1F
+	FDB	7
+	FDB	0
+	FDB	$FF
+	FDB	0
+	FDB	$FF
+	FDB	$55
+	FDB	0
+	FDB	$55
+	FDB	0
+	FDB	$19
+	FDB	5
+	FDB	$19
+	FDB	5
+	FDB	$100
+	FDB	0
+	FDB	$100
+	FDB	0
+; 162 	128, 0, 128, 0, 64, 0, 64, 0, 32, 0, 32, 0, 1, 0, 1, 0, 85, 1, 85, 1,
+	FDB	$80
+	FDB	0
+	FDB	$80
+	FDB	0
+	FDB	$40
+	FDB	0
+	FDB	$40
+	FDB	0
+	FDB	$20
+	FDB	0
+	FDB	$20
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	1
+	FDB	0
+	FDB	$55
+	FDB	1
+	FDB	$55
+	FDB	1
+; 163 	25, 6, 25, 6, 1000, 0, 1000, 0, 500, 0, 500, 0, 250, 0, 250, 0, 125,
+	FDB	$19
+	FDB	6
+	FDB	$19
+	FDB	6
+	FDB	$3E8
+	FDB	0
+	FDB	$3E8
+	FDB	0
+	FDB	$1F4
+	FDB	0
+	FDB	$1F4
+	FDB	0
+	FDB	$FA
+	FDB	0
+	FDB	$FA
+	FDB	0
+	FDB	$7D
+; 164 	0, 125, 0, 3, 232, 3, 232, 333, 1, 333, 1, 100, 0, 100, 0, -1000, 0,
+	FDB	0
+	FDB	$7D
+	FDB	0
+	FDB	3
+	FDB	$E8
+	FDB	3
+	FDB	$E8
+	FDB	$14D
+	FDB	1
+	FDB	$14D
+	FDB	1
+	FDB	$64
+	FDB	0
+	FDB	$64
+	FDB	0
+	FDB	$FC18
+	FDB	0
+; 165 	-1000, 0, -500, 0, 32268, 0, -250, 0, 16134, 0, -125, 0, 8067, 0, -3,
+	FDB	$FC18
+	FDB	0
+	FDB	$FE0C
+	FDB	0
+	FDB	$7E0C
+	FDB	0
+	FDB	$FF06
+	FDB	0
+	FDB	$3F06
+	FDB	0
+	FDB	$FF83
+	FDB	0
+	FDB	$1F83
+	FDB	0
+	FDB	$FFFD
+; 166 	-232, 252, 24, -333, -1, 21512, 0, -100, 0, 6453, 6, 12345, 0, 12345,
+	FDB	$FF18
+	FDB	$FC
+	FDB	$18
+	FDB	$FEB3
+	FDB	$FFFF
+	FDB	$5408
+	FDB	0
+	FDB	$FF9C
+	FDB	0
+	FDB	$1935
+	FDB	6
+	FDB	$3039
+	FDB	0
+	FDB	$3039
+; 167 	0, 6172, 1, 6172, 1, 3086, 1, 3086, 1, 1543, 1, 1543, 1, 48, 57, 48,
+	FDB	0
+	FDB	$181C
+	FDB	1
+	FDB	$181C
+	FDB	1
+	FDB	$C0E
+	FDB	1
+	FDB	$C0E
+	FDB	1
+	FDB	$607
+	FDB	1
+	FDB	$607
+	FDB	1
+	FDB	$30
+	FDB	$39
+	FDB	$30
+; 168 	57, 4115, 0, 4115, 0, 1234, 5, 1234, 5, 32767, 0, 32767, 0, 16383, 1,
+	FDB	$39
+	FDB	$1013
+	FDB	0
+	FDB	$1013
+	FDB	0
+	FDB	$4D2
+	FDB	5
+	FDB	$4D2
+	FDB	5
+	FDB	$7FFF
+	FDB	0
+	FDB	$7FFF
+	FDB	0
+	FDB	$3FFF
+	FDB	1
+; 169 	16383, 1, 8191, 3, 8191, 3, 4095, 7, 4095, 7, 127, 255, 127, 255,
+	FDB	$3FFF
+	FDB	1
+	FDB	$1FFF
+	FDB	3
+	FDB	$1FFF
+	FDB	3
+	FDB	$FFF
+	FDB	7
+	FDB	$FFF
+	FDB	7
+	FDB	$7F
+	FDB	$FF
+	FDB	$7F
+	FDB	$FF
+; 170 	10922, 1, 10922, 1, 3276, 7, 3276, 7, -32768, 0, -32768, 0, -16384, 0,
+	FDB	$2AAA
+	FDB	1
+	FDB	$2AAA
+	FDB	1
+	FDB	$CCC
+	FDB	7
+	FDB	$CCC
+	FDB	7
+	FDB	$8000
+	FDB	0
+	FDB	$8000
+	FDB	0
+	FDB	$C000
+	FDB	0
+; 171 	16384, 0, -8192, 0, 8192, 0, -4096, 0, 4096, 0, -128, 0, 128, 0,
+	FDB	$4000
+	FDB	0
+	FDB	$E000
+	FDB	0
+	FDB	$2000
+	FDB	0
+	FDB	$F000
+	FDB	0
+	FDB	$1000
+	FDB	0
+	FDB	$FF80
+	FDB	0
+	FDB	$80
+	FDB	0
+; 172 	-10922, -2, 10922, 2, -3276, -8, 3276, 8, 21845, 0, 21845, 0, 10922,
+	FDB	$D556
+	FDB	$FFFE
+	FDB	$2AAA
+	FDB	2
+	FDB	$F334
+	FDB	$FFF8
+	FDB	$CCC
+	FDB	8
+	FDB	$5555
+	FDB	0
+	FDB	$5555
+	FDB	0
+	FDB	$2AAA
+; 173 	1, 10922, 1, 5461, 1, 5461, 1, 2730, 5, 2730, 5, 85, 85, 85, 85, 7281,
+	FDB	1
+	FDB	$2AAA
+	FDB	1
+	FDB	$1555
+	FDB	1
+	FDB	$1555
+	FDB	1
+	FDB	$AAA
+	FDB	5
+	FDB	$AAA
+	FDB	5
+	FDB	$55
+	FDB	$55
+	FDB	$55
+	FDB	$55
+	FDB	$1C71
+; 174 	2, 7281, 2, 2184, 5, 2184, 5,
+	FDB	2
+	FDB	$1C71
+	FDB	2
+	FDB	$888
+	FDB	5
+	FDB	$888
+	FDB	5
+; 175 };
+;BCC_EOS
+; 176 int cmul[] = {
+	EXPORT	_cmul
+_cmul:
+; 177 	0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 10, 256, 257, 0, -1, -2, -3,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	2
+	FDB	3
+	FDB	4
+	FDB	$A
+	FDB	$100
+	FDB	$101
+	FDB	0
+	FDB	$FFFF
+	FDB	$FFFE
+	FDB	$FFFD
+; 178 	-4, -10, -256, -257, 0, 2, 4, 6, 8, 20, 512, 514, 0, 7, 14, 21, 28,
+	FDB	$FFFC
+	FDB	$FFF6
+	FDB	$FF00
+	FDB	$FEFF
+	FDB	0
+	FDB	2
+	FDB	4
+	FDB	6
+	FDB	8
+	FDB	$14
+	FDB	$200
+	FDB	$202
+	FDB	0
+	FDB	7
+	FDB	$E
+	FDB	$15
+	FDB	$1C
+; 179 	70, 1792, 1799, 0, -7, -14, -21, -28, -70, -1792, -1799, 0, 255, 510,
+	FDB	$46
+	FDB	$700
+	FDB	$707
+	FDB	0
+	FDB	$FFF9
+	FDB	$FFF2
+	FDB	$FFEB
+	FDB	$FFE4
+	FDB	$FFBA
+	FDB	$F900
+	FDB	$F8F9
+	FDB	0
+	FDB	$FF
+	FDB	$1FE
+; 180 	765, 1020, 2550, -256, -1, 0, 256, 512, 768, 1024, 2560, 0, 256, 0,
+	FDB	$2FD
+	FDB	$3FC
+	FDB	$9F6
+	FDB	$FF00
+	FDB	$FFFF
+	FDB	0
+	FDB	$100
+	FDB	$200
+	FDB	$300
+	FDB	$400
+	FDB	$A00
+	FDB	0
+	FDB	$100
+	FDB	0
+; 181 	1000, 2000, 3000, 4000, 10000, -6144, -5144, 0, -1000, -2000, -3000,
+	FDB	$3E8
+	FDB	$7D0
+	FDB	$BB8
+	FDB	$FA0
+	FDB	$2710
+	FDB	$E800
+	FDB	$EBE8
+	FDB	0
+	FDB	$FC18
+	FDB	$F830
+	FDB	$F448
+; 182 	-4000, -10000, 6144, 5144, 0, 12345, 24690, -28501, -16156, -7622,
+	FDB	$F060
+	FDB	$D8F0
+	FDB	$1800
+	FDB	$1418
+	FDB	0
+	FDB	$3039
+	FDB	$6072
+	FDB	$90AB
+	FDB	$C0E4
+	FDB	$E23A
+; 183 	14592, 26937, 0, 32767, -2, 32765, -4, -10, -256, 32511, 0, -32768, 0
+	FDB	$3900
+	FDB	$6939
+	FDB	0
+	FDB	$7FFF
+	FDB	$FFFE
+	FDB	$7FFD
+	FDB	$FFFC
+	FDB	$FFF6
+	FDB	$FF00
+	FDB	$7EFF
+	FDB	0
+	FDB	$8000
+; 183 ,
+	FDB	0
+; 184 	-32768, 0, 0, 0, -32768, 0, 21845, -21846, -1, 21844, 21842, 21760,
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$8000
+	FDB	0
+	FDB	$5555
+	FDB	$AAAA
+	FDB	$FFFF
+	FDB	$5554
+	FDB	$5552
+	FDB	$5500
+; 185 	-21931,
+	FDB	$AA55
+; 186 };
+;BCC_EOS
+; 187 int cshift[] = {
+	EXPORT	_cshift
+_cshift:
+; 188 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 0, 0, 8, 0,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	1
+	FDB	1
+	FDB	1
+	FDB	2
+	FDB	0
+	FDB	0
+	FDB	8
+	FDB	0
+; 189 	0, 256, 0, 0, -32768, 0, 0, -1, -1, -1, -2, -1, 32767, -8, -1, 8191,
+	FDB	0
+	FDB	$100
+	FDB	0
+	FDB	0
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFF
+	FDB	$FFFE
+	FDB	$FFFF
+	FDB	$7FFF
+	FDB	$FFF8
+	FDB	$FFFF
+	FDB	$1FFF
+; 190 	-256, -1, 255, -32768, -1, 1, 2, 2, 2, 4, 1, 1, 16, 0, 0, 512, 0, 0,
+	FDB	$FF00
+	FDB	$FFFF
+	FDB	$FF
+	FDB	$8000
+	FDB	$FFFF
+	FDB	1
+	FDB	2
+	FDB	2
+	FDB	2
+	FDB	4
+	FDB	1
+	FDB	1
+	FDB	$10
+	FDB	0
+	FDB	0
+	FDB	$200
+	FDB	0
+	FDB	0
+; 191 	0, 0, 0, 7, 7, 7, 14, 3, 3, 56, 0, 0, 1792, 0, 0, -32768, 0, 0, -7,
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	7
+	FDB	7
+	FDB	7
+	FDB	$E
+	FDB	3
+	FDB	3
+	FDB	$38
+	FDB	0
+	FDB	0
+	FDB	$700
+	FDB	0
+	FDB	0
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	$FFF9
+; 192 	-7, -7, -14, -4, 32764, -56, -1, 8191, -1792, -1, 255, -32768, -1, 1,
+	FDB	$FFF9
+	FDB	$FFF9
+	FDB	$FFF2
+	FDB	$FFFC
+	FDB	$7FFC
+	FDB	$FFC8
+	FDB	$FFFF
+	FDB	$1FFF
+	FDB	$F900
+	FDB	$FFFF
+	FDB	$FF
+	FDB	$8000
+	FDB	$FFFF
+	FDB	1
+; 193 	255, 255, 255, 510, 127, 127, 2040, 31, 31, -256, 0, 0, -32768, 0, 0,
+	FDB	$FF
+	FDB	$FF
+	FDB	$FF
+	FDB	$1FE
+	FDB	$7F
+	FDB	$7F
+	FDB	$7F8
+	FDB	$1F
+	FDB	$1F
+	FDB	$FF00
+	FDB	0
+	FDB	0
+	FDB	$8000
+	FDB	0
+	FDB	0
+; 194 	256, 256, 256, 512, 128, 128, 2048, 32, 32, 0, 1, 1, 0, 0, 0, 1000,
+	FDB	$100
+	FDB	$100
+	FDB	$100
+	FDB	$200
+	FDB	$80
+	FDB	$80
+	FDB	$800
+	FDB	$20
+	FDB	$20
+	FDB	0
+	FDB	1
+	FDB	1
+	FDB	0
+	FDB	0
+	FDB	0
+	FDB	$3E8
+; 195 	1000, 1000, 2000, 500, 500, 8000, 125, 125, -6144, 3, 3, 0, 0, 0,
+	FDB	$3E8
+	FDB	$3E8
+	FDB	$7D0
+	FDB	$1F4
+	FDB	$1F4
+	FDB	$1F40
+	FDB	$7D
+	FDB	$7D
+	FDB	$E800
+	FDB	3
+	FDB	3
+	FDB	0
+	FDB	0
+	FDB	0
+; 196 	-1000, -1000, -1000, -2000, -500, 32268, -8000, -125, 8067, 6144, -4,
+	FDB	$FC18
+	FDB	$FC18
+	FDB	$FC18
+	FDB	$F830
+	FDB	$FE0C
+	FDB	$7E0C
+	FDB	$E0C0
+	FDB	$FF83
+	FDB	$1F83
+	FDB	$1800
+	FDB	$FFFC
+; 197 	252, 0, -1, 1, 12345, 12345, 12345, 24690, 6172, 6172, -32312, 1543,
+	FDB	$FC
+	FDB	0
+	FDB	$FFFF
+	FDB	1
+	FDB	$3039
+	FDB	$3039
+	FDB	$3039
+	FDB	$6072
+	FDB	$181C
+	FDB	$181C
+	FDB	$81C8
+	FDB	$607
+; 198 	1543, 14592, 48, 48, -32768, 0, 0, 32767, 32767, 32767, -2, 16383,
+	FDB	$607
+	FDB	$3900
+	FDB	$30
+	FDB	$30
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	$7FFF
+	FDB	$7FFF
+	FDB	$7FFF
+	FDB	$FFFE
+	FDB	$3FFF
+; 199 	16383, -8, 4095, 4095, -256, 127, 127, -32768, 0, 0, -32768, -32768,
+	FDB	$3FFF
+	FDB	$FFF8
+	FDB	$FFF
+	FDB	$FFF
+	FDB	$FF00
+	FDB	$7F
+	FDB	$7F
+	FDB	$8000
+	FDB	0
+	FDB	0
+	FDB	$8000
+	FDB	$8000
+; 200 	-32768, 0, -16384, 16384, 0, -4096, 4096, 0, -128, 128, 0, -1, 1,
+	FDB	$8000
+	FDB	0
+	FDB	$C000
+	FDB	$4000
+	FDB	0
+	FDB	$F000
+	FDB	$1000
+	FDB	0
+	FDB	$FF80
+	FDB	$80
+	FDB	0
+	FDB	$FFFF
+	FDB	1
+; 201 	21845, 21845, 21845, -21846, 10922, 10922, -21848, 2730, 2730, 21760,
+	FDB	$5555
+	FDB	$5555
+	FDB	$5555
+	FDB	$AAAA
+	FDB	$2AAA
+	FDB	$2AAA
+	FDB	$AAA8
+	FDB	$AAA
+	FDB	$AAA
+	FDB	$5500
+; 202 	85, 85, -32768, 0, 0,
+	FDB	$55
+	FDB	$55
+	FDB	$8000
+	FDB	0
+	FDB	0
+; 203 };
+;BCC_EOS
+; 204 # 9 "ops.c"
+; 9 extern void putchar(), putnum();
+;BCC_EOS
+; 10 extern char *memcpy();
+;BCC_EOS
+; 11 
+; 12 int *ep;			 
+;BCC_EOS
+; 13 int group;			 
+;BCC_EOS
+; 14 int index;			 
+;BCC_EOS
+; 15 int checks, failures;
+;BCC_EOS
+; 16 
+; 17 void puts1(s)
+; 18 char *s;
+	LOC	0
+	EXPORT	_puts1
+_puts1:
+;BCC_EOS
+; 19 {
+; 20 	while (*s)
+	PSHS	X
+; 21 		putchar(*s++);
+	BRA	.2
+.3:
+; Debug: postinc * char s = [S+2-2] (used reg = )
+	LDX	0,S
+	LEAU	1,X
+	STU	0,S
+; Debug: rootlist char = [X+0] (used reg = )
+	LDB	0,X
+	CLRA
+	TFR	D,X
+; Debug: func () void = putchar+0 (used reg = )
+	JSR	>_putchar
+;BCC_EOS
+; 22 }
+.2:
+	LDB	[0,S]
+	BNE	.3
+.4:
+.1:
+	PULS	Y,PC
+; 23 
+; 24 
+; 25  
+; 26 void expect(got)
+; 27 int got;
+	EXPORT	_expect
+_expect:
+;BCC_EOS
+; 28 {
+; 29 	++checks;
+	PSHS	X
+; Debug: preinc int = [checks+0] (used reg = )
+	LDD	>_checks
+	ADDD	#1
+	STD	>_checks
+;BCC_EOS
+; 30 	if (got != *ep) {
+; Debug: ne int = [[ep+0]] to int got = [S+2-2] (used reg = )
+	LDD	0,S
+	SUBD	[>_ep]
+	LBEQ	.5
+.6:
+; 31 		++failures;
+; Debug: preinc int = [failures+0] (used reg = )
+	LDD	>_failures
+	ADDD	#1
+	STD	>_failures
+;BCC_EOS
+; 32 		puts1("FAIL ");
+	LOC	1
+.7:
+	FCC	"FAIL "
+	FCB	0
+	LOC	0
+; Debug: rootlist * char = .7+0 (used reg = )
+	LDX	#.7
+; Debug: func () void = puts1+0 (used reg = )
+	JSR	>_puts1
+;BCC_EOS
+; 33 		putnum(group);
+; Debug: rootlist int = [group+0] (used reg = )
+	LDX	>_group
+; Debug: func () void = putnum+0 (used reg = )
+	JSR	>_putnum
+;BCC_EOS
+; 34 		putnum(index);
+; Debug: rootlist int = [index+0] (used reg = )
+	LDX	>_index
+; Debug: func () void = putnum+0 (used reg = )
+	JSR	>_putnum
+;BCC_EOS
+; 35 		putnum(got);
+; Debug: rootlist int got = [S+2-2] (used reg = )
+	LDX	0,S
+; Debug: func () void = putnum+0 (used reg = )
+	JSR	>_putnum
+;BCC_EOS
+; 36 		putnum(*ep);
+; Debug: rootlist int = [[ep+0]] (used reg = )
+	LDX	[>_ep]
+; Debug: func () void = putnum+0 (used reg = )
+	JSR	>_putnum
+;BCC_EOS
+; 37 	}
+; 38 	++ep;
+.5:
+; Debug: preinc * int = [ep+0] (used reg = )
+	LDX	>_ep
+	LEAX	2,X
+	STX	>_ep
+;BCC_EOS
+; 39 	++index;
+; Debug: preinc int = [index+0] (used reg = )
+	LDD	>_index
+	ADDD	#1
+	STD	>_index
+;BCC_EOS
+; 40 }
+	PULS	Y,PC
+; 41 
+; 42 void start(g,table)
+; 43 int g;
+	EXPORT	_start
+_start:
+;BCC_EOS
+; 44 int *table;
+;BCC_EOS
+; 45 {
+; 46 	group = g;
+	PSHS	X
+; Debug: eq int g = [S+2-2] to int = [group+0] (used reg = )
+	LDD	0,S
+	STD	>_group
+;BCC_EOS
+; 47 	index = 0;
+; Debug: eq int = const 0 to int = [index+0] (used reg = )
+	LDD	#0
+	STD	>_index
+;BCC_EOS
+; 48 	ep = table;
+; Debug: eq * int table = [S+2+2] to * int = [ep+0] (used reg = )
+	LDX	4,S
+	STX	>_ep
+;BCC_EOS
+; 49 }
+	PULS	Y,PC
+; 50 
+; 51  
+; 52 void pairs()
+; 53 {
+	EXPORT	_pairs
+_pairs:
+; 54 	int i, j, a, b;
+;BCC_EOS
+; 55 	unsigned ua, ub;
+;BCC_EOS
+; 56 
+; 57 	start(1,smul);
+	LEAS	-$C,S
+; Debug: list * int = smul+0 (used reg = )
+	LDX	#_smul
+	PSHS	X
+; Debug: rootlist int = const 1 (used reg = )
+	LDX	#1
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 58 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
+	LDD	#0
+	STD	$A,S
+;BCC_EOS
+;BCC_EOS
+; 59 		for (j = 0; j < 14 ; j++) {
+	BRA	.A
+.B:
+; Debug: eq int = const 0 to int j = [S+$C-4] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.E
+.F:
+; 60 			a = vals[i];
+; Debug: ptradd int i = [S+$C-2] to [$E] int = vals+0 (used reg = )
+	LDD	$A,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int a = [S+$C-6] (used reg = )
+	LDX	0,X
+	STX	6,S
+;BCC_EOS
+; 61 			b = vals[j];
+; Debug: ptradd int j = [S+$C-4] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int b = [S+$C-8] (used reg = )
+	LDX	0,X
+	STX	4,S
+;BCC_EOS
+; 62 			expect(a * b);
+; Debug: mul int b = [S+$C-8] to int a = [S+$C-6] (used reg = )
+	LDD	6,S
+	LDX	4,S
+	JSR	>imul
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 63 		}
+; 64 	start(2,smul);
+.D:
+; Debug: postinc int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.E:
+; Debug: lt int = const $E to int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.F
+.10:
+.C:
+.9:
+; Debug: postinc int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	ADDD	#1
+	STD	$A,S
+.A:
+; Debug: lt int = const $E to int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	SUBD	#$E
+	BLT	.B
+.11:
+.8:
+; Debug: list * int = smul+0 (used reg = )
+	LDX	#_smul
+	PSHS	X
+; Debug: rootlist int = const 2 (used reg = )
+	LDX	#2
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 65 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
+	LDD	#0
+	STD	$A,S
+;BCC_EOS
+;BCC_EOS
+; 66 		for (j = 0; j < 14 ; j++) {
+	BRA	.14
+.15:
+; Debug: eq int = const 0 to int j = [S+$C-4] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.18
+.19:
+; 67 			ua = vals[i];
+; Debug: ptradd int i = [S+$C-2] to [$E] int = vals+0 (used reg = )
+	LDD	$A,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ua = [S+$C-$A] (used reg = )
+	LDX	0,X
+	STX	2,S
+;BCC_EOS
+; 68 			ub = vals[j];
+; Debug: ptradd int j = [S+$C-4] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ub = [S+$C-$C] (used reg = )
+	LDX	0,X
+	STX	0,S
+;BCC_EOS
+; 69 			expect(ua * ub);
+; Debug: mul unsigned int ub = [S+$C-$C] to unsigned int ua = [S+$C-$A] (used reg = )
+	LDD	2,S
+	LDX	0,S
+	JSR	>imulu
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 70 		}
+; 71 	start(3,sdiv);
+.17:
+; Debug: postinc int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.18:
+; Debug: lt int = const $E to int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.19
+.1A:
+.16:
+.13:
+; Debug: postinc int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	ADDD	#1
+	STD	$A,S
+.14:
+; Debug: lt int = const $E to int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	SUBD	#$E
+	BLT	.15
+.1B:
+.12:
+; Debug: list * int = sdiv+0 (used reg = )
+	LDX	#_sdiv
+	PSHS	X
+; Debug: rootlist int = const 3 (used reg = )
+	LDX	#3
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 72 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
+	LDD	#0
+	STD	$A,S
+;BCC_EOS
+;BCC_EOS
+; 73 		for (j = 0; j < 14 ; j++) {
+	BRA	.1E
+.1F:
+; Debug: eq int = const 0 to int j = [S+$C-4] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.22
+.23:
+; 74 			a = vals[i];
+; Debug: ptradd int i = [S+$C-2] to [$E] int = vals+0 (used reg = )
+	LDD	$A,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int a = [S+$C-6] (used reg = )
+	LDX	0,X
+	STX	6,S
+;BCC_EOS
+; 75 			b = vals[j];
+; Debug: ptradd int j = [S+$C-4] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int b = [S+$C-8] (used reg = )
+	LDX	0,X
+	STX	4,S
+;BCC_EOS
+; 76 			expect(a / b);
+; Debug: div int b = [S+$C-8] to int a = [S+$C-6] (used reg = )
+	LDD	6,S
+	LDX	4,S
+	JSR	>idiv
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 77 		}
+; 78 	start(4,smod);
+.21:
+; Debug: postinc int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.22:
+; Debug: lt int = const $E to int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.23
+.24:
+.20:
+.1D:
+; Debug: postinc int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	ADDD	#1
+	STD	$A,S
+.1E:
+; Debug: lt int = const $E to int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	SUBD	#$E
+	BLT	.1F
+.25:
+.1C:
+; Debug: list * int = smod+0 (used reg = )
+	LDX	#_smod
+	PSHS	X
+; Debug: rootlist int = const 4 (used reg = )
+	LDX	#4
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 79 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
+	LDD	#0
+	STD	$A,S
+;BCC_EOS
+;BCC_EOS
+; 80 		for (j = 0; 
+	BRA	.28
+.29:
+; Debug: eq int = const 0 to int j = [S+$C-4] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+; 80 j < 14 ; j++) {
+;BCC_EOS
+	BRA	.2C
+.2D:
+; 81 			a = vals[i];
+; Debug: ptradd int i = [S+$C-2] to [$E] int = vals+0 (used reg = )
+	LDD	$A,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int a = [S+$C-6] (used reg = )
+	LDX	0,X
+	STX	6,S
+;BCC_EOS
+; 82 			b = vals[j];
+; Debug: ptradd int j = [S+$C-4] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int b = [S+$C-8] (used reg = )
+	LDX	0,X
+	STX	4,S
+;BCC_EOS
+; 83 			expect(a % b);
+; Debug: mod int b = [S+$C-8] to int a = [S+$C-6] (used reg = )
+	LDD	6,S
+	LDX	4,S
+	JSR	>imod
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 84 		}
+; 85 	start(5,udiv);
+.2B:
+; Debug: postinc int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.2C:
+; Debug: lt int = const $E to int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.2D
+.2E:
+.2A:
+.27:
+; Debug: postinc int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	ADDD	#1
+	STD	$A,S
+.28:
+; Debug: lt int = const $E to int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	SUBD	#$E
+	BLT	.29
+.2F:
+.26:
+; Debug: list * int = udiv+0 (used reg = )
+	LDX	#_udiv
+	PSHS	X
+; Debug: rootlist int = const 5 (used reg = )
+	LDX	#5
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 86 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
+	LDD	#0
+	STD	$A,S
+;BCC_EOS
+;BCC_EOS
+; 87 		for (j = 0; j < 14 ; j++) {
+	BRA	.32
+.33:
+; Debug: eq int = const 0 to int j = [S+$C-4] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.36
+.37:
+; 88 			ua = vals[i];
+; Debug: ptradd int i = [S+$C-2] to [$E] int = vals+0 (used reg = )
+	LDD	$A,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ua = [S+$C-$A] (used reg = )
+	LDX	0,X
+	STX	2,S
+;BCC_EOS
+; 89 			ub = vals[j];
+; Debug: ptradd int j = [S+$C-4] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ub = [S+$C-$C] (used reg = )
+	LDX	0,X
+	STX	0,S
+;BCC_EOS
+; 90 			expect(ua / ub);
+; Debug: div unsigned int ub = [S+$C-$C] to unsigned int ua = [S+$C-$A] (used reg = )
+	LDD	2,S
+	LDX	0,S
+	JSR	>idivu
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 91 		}
+; 92 	start(6,umod);
+.35:
+; Debug: postinc int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.36:
+; Debug: lt int = const $E to int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.37
+.38:
+.34:
+.31:
+; Debug: postinc int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	ADDD	#1
+	STD	$A,S
+.32:
+; Debug: lt int = const $E to int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	SUBD	#$E
+	BLT	.33
+.39:
+.30:
+; Debug: list * int = umod+0 (used reg = )
+	LDX	#_umod
+	PSHS	X
+; Debug: rootlist int = const 6 (used reg = )
+	LDX	#6
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 93 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$C-2] (used reg = )
+	LDD	#0
+	STD	$A,S
+;BCC_EOS
+;BCC_EOS
+; 94 		for (j = 0; j < 14 ; j++) {
+	BRA	.3C
+.3D:
+; Debug: eq int = const 0 to int j = [S+$C-4] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.40
+.41:
+; 95 			ua = vals[i];
+; Debug: ptradd int i = [S+$C-2] to [$E] int = vals+0 (used reg = )
+	LDD	$A,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ua = [S+$C-$A] (used reg = )
+	LDX	0,X
+	STX	2,S
+;BCC_EOS
+; 96 			ub = vals[j];
+; Debug: ptradd int j = [S+$C-4] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ub = [S+$C-$C] (used reg = )
+	LDX	0,X
+	STX	0,S
+;BCC_EOS
+; 97 			expect(ua % ub);
+; Debug: mod unsigned int ub = [S+$C-$C] to unsigned int ua = [S+$C-$A] (used reg = )
+	LDD	2,S
+	LDX	0,S
+	JSR	>imodu
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 98 		}
+; 99 }
+.3F:
+; Debug: postinc int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.40:
+; Debug: lt int = const $E to int j = [S+$C-4] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.41
+.42:
+.3E:
+.3B:
+; Debug: postinc int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	ADDD	#1
+	STD	$A,S
+.3C:
+; Debug: lt int = const $E to int i = [S+$C-2] (used reg = )
+	LDD	$A,S
+	SUBD	#$E
+	BLT	.3D
+.43:
+.3A:
+	LEAS	$C,S
+	RTS
+; 100 
+; 101 void shifts()
+; 102 {
+	EXPORT	_shifts
+_shifts:
+; 103 	int i, j, a, n;
+;BCC_EOS
+; 104 	unsigned ua;
+;BCC_EOS
+; 105 
+; 106 	start(7,sshl);
+	LEAS	-$A,S
+; Debug: list * int = sshl+0 (used reg = )
+	LDX	#_sshl
+	PSHS	X
+; Debug: rootlist int = const 7 (used reg = )
+	LDX	#7
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 107 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$A-2] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+; 108 		for (j = 0; j < 19 ; j++) {
+	BRA	.46
+.47:
+; Debug: eq int = const 0 to int j = [S+$A-4] (used reg = )
+	LDD	#0
+	STD	6,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.4A
+.4B:
+; 109 			a = vals[i];
+; Debug: ptradd int i = [S+$A-2] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int a = [S+$A-6] (used reg = )
+	LDX	0,X
+	STX	4,S
+;BCC_EOS
+; 110 			n = counts[j];
+; Debug: ptradd int j = [S+$A-4] to [$13] int = counts+0 (used reg = )
+	LDD	6,S
+	LSLB
+	ROLA
+	LDX	#_counts
+	LEAX	D,X
+; Debug: eq int = [X+0] to int n = [S+$A-8] (used reg = )
+	LDX	0,X
+	STX	2,S
+;BCC_EOS
+; 111 			expect(a << n);
+; Debug: sl int n = [S+$A-8] to int a = [S+$A-6] (used reg = )
+	LDD	4,S
+	LDX	2,S
+	JSR	>isl
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 112 		}
+; 113 	start(8,sshl);
+.49:
+; Debug: postinc int j = [S+$A-4] (used reg = )
+	LDD	6,S
+	ADDD	#1
+	STD	6,S
+.4A:
+; Debug: lt int = const $13 to int j = [S+$A-4] (used reg = )
+	LDD	6,S
+	SUBD	#$13
+	BLT	.4B
+.4C:
+.48:
+.45:
+; Debug: postinc int i = [S+$A-2] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.46:
+; Debug: lt int = const $E to int i = [S+$A-2] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.47
+.4D:
+.44:
+; Debug: list * int = sshl+0 (used reg = )
+	LDX	#_sshl
+	PSHS	X
+; Debug: rootlist int = const 8 (used reg = )
+	LDX	#8
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 114 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$A-2] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+; 115 		for (j = 0; j < 19 ; j++) {
+	BRA	.50
+.51:
+; Debug: eq int = const 0 to int j = [S+$A-4] (used reg = )
+	LDD	#0
+	STD	6,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.54
+.55:
+; 116 			ua = vals[i];
+; Debug: ptradd int i = [S+$A-2] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ua = [S+$A-$A] (used reg = )
+	LDX	0,X
+	STX	0,S
+;BCC_EOS
+; 117 			n = counts[j];
+; Debug: ptradd int j = [S+$A-4] to [$13] int = counts+0 (used reg = )
+	LDD	6,S
+	LSLB
+	ROLA
+	LDX	#_counts
+	LEAX	D,X
+; Debug: eq int = [X+0] to int n = [S+$A-8] (used reg = )
+	LDX	0,X
+	STX	2,S
+;BCC_EOS
+; 118 			expect(ua << n);
+; Debug: sl int n = [S+$A-8] to unsigned int ua = [S+$A-$A] (used reg = )
+	LDD	0,S
+	LDX	2,S
+	JSR	>islu
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 119 		}
+; 120 	start(9,sshr);
+.53:
+; Debug: postinc int j = [S+$A-4] (used reg = )
+	LDD	6,S
+	ADDD	#1
+	STD	6,S
+.54:
+; Debug: lt int = const $13 to int j = [S+$A-4] (used reg = )
+	LDD	6,S
+	SUBD	#$13
+	BLT	.55
+.56:
+.52:
+.4F:
+; Debug: postinc int i = [S+$A-2] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.50:
+; Debug: lt int = const $E to int i = [S+$A-2] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.51
+.57:
+.4E:
+; Debug: list * int = sshr+0 (used reg = )
+	LDX	#_sshr
+	PSHS	X
+; Debug: rootlist int = const 9 (used reg = )
+	LDX	#9
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 121 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$A-2] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+; 122 		for (j = 0; j < 19 ; j++) {
+	BRA	.5A
+.5B:
+; Debug: eq int = const 0 to int j = [S+$A-4] (used reg = )
+	LDD	#0
+	STD	6,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.5E
+.5F:
+; 123 			a = vals[i];
+; Debug: ptradd int i = [S+$A-2] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int a = [S+$A-6] (used reg = )
+	LDX	0,X
+	STX	4,S
+;BCC_EOS
+; 124 			n = counts[j];
+; Debug: ptradd int j = [S+$A-4] to [$13] int = counts+0 (used reg = )
+	LDD	6,S
+	LSLB
+	ROLA
+	LDX	#_counts
+	LEAX	D,X
+; Debug: eq int = [X+0] to int n = [S+$A-8] (used reg = )
+	LDX	0,X
+	STX	2,S
+;BCC_EOS
+; 125 			expect(a >> n);
+; Debug: sr int n = [S+$A-8] to int a = [S+$A-6] (used reg = )
+	LDD	4,S
+	LDX	2,S
+	JSR	>isr
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 126 		}
+; 127 	start(10,ushr);
+.5D:
+; Debug: postinc int j = [S+$A-4] (used reg = )
+	LDD	6,S
+	ADDD	#1
+	STD	6,S
+.5E:
+; Debug: lt int = const $13 to int j = [S+$A-4] (used reg = )
+	LDD	6,S
+	SUBD	#$13
+	BLT	.5F
+.60:
+.5C:
+.59:
+; Debug: postinc int i = [S+$A-2] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.5A:
+; Debug: lt int = const $E to int i = [S+$A-2] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.5B
+.61:
+.58:
+; Debug: list * int = ushr+0 (used reg = )
+	LDX	#_ushr
+	PSHS	X
+; Debug: rootlist int = const $A (used reg = )
+	LDX	#$A
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 128 	for (i = 0; i < 14 ; i++)
+; Debug: eq int = const 0 to int i = [S+$A-2] (used reg = )
+	LDD	#0
+	STD	8,S
+;BCC_EOS
+;BCC_EOS
+; 129 		for (j = 0; j < 19 ; j++) {
+	BRA	.64
+.65:
+; Debug: eq int = const 0 to int j = [S+$A-4] (used reg = )
+	LDD	#0
+	STD	6,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.68
+.69:
+; 130 			ua = vals[i];
+; Debug: ptradd int i = [S+$A-2] to [$E] int = vals+0 (used reg = )
+	LDD	8,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ua = [S+$A-$A] (used reg = )
+	LDX	0,X
+	STX	0,S
+;BCC_EOS
+; 131 			n = counts[j];
+; Debug: ptradd int j = [S+$A-4] to [$13] int = counts+0 (used reg = )
+	LDD	6,S
+	LSLB
+	ROLA
+	LDX	#_counts
+	LEAX	D,X
+; Debug: eq int = [X+0] to int n = [S+$A-8] (used reg = )
+	LDX	0,X
+	STX	2,S
+;BCC_EOS
+; 132 			expect(ua >> n);
+; Debug: sr int n = [S+$A-8] to unsigned int ua = [S+$A-$A] (used reg = )
+	LDD	0,S
+	LDX	2,S
+	JSR	>isru
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 133 		}
+; 134 }
+.67:
+; Debug: postinc int j = [S+$A-4] (used reg = )
+	LDD	6,S
+	ADDD	#1
+	STD	6,S
+.68:
+; Debug: lt int = const $13 to int j = [S+$A-4] (used reg = )
+	LDD	6,S
+	SUBD	#$13
+	BLT	.69
+.6A:
+.66:
+.63:
+; Debug: postinc int i = [S+$A-2] (used reg = )
+	LDD	8,S
+	ADDD	#1
+	STD	8,S
+.64:
+; Debug: lt int = const $E to int i = [S+$A-2] (used reg = )
+	LDD	8,S
+	SUBD	#$E
+	BLT	.65
+.6B:
+.62:
+	LEAS	$A,S
+	RTS
+; 135 
+; 136  
+; 137 
+; 138 
+; 139 
+; 140 void constants()
+; 141 {
+	EXPORT	_constants
+_constants:
+; 142 	int i, a;
+;BCC_EOS
+; 143 	unsigned ua;
+;BCC_EOS
+; 144 
+; 145 	start(11,cdivmod);
+	LEAS	-6,S
+; Debug: list * int = cdivmod+0 (used reg = )
+	LDX	#_cdivmod
+	PSHS	X
+; Debug: rootlist int = const $B (used reg = )
+	LDX	#$B
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 146 	for (i = 0; i < 14 ; i++) {
+; Debug: eq int = const 0 to int i = [S+6-2] (used reg = )
+	LDD	#0
+	STD	4,S
+;BCC_EOS
+;BCC_EOS
+	JMP	.6E
+.6F:
+; 147 		a = ua = vals[i];
+; Debug: ptradd int i = [S+6-2] to [$E] int = vals+0 (used reg = )
+	LDD	4,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ua = [S+6-6] (used reg = )
+	LDX	0,X
+	STX	0,S
+; Debug: eq unsigned int = X+0 to int a = [S+6-4] (used reg = )
+	STX	2,S
+;BCC_EOS
+; 148 		expect(a / 1); expect(a % 1); expect(ua / 1); expect(ua % 1) ; expect(a / 2); expect(a % 2); expect(ua / 2); expect(ua % 2) ; expect(a / 4); expect(a % 4); expect(ua / 4); expect(ua % 4) ; expect(a / 8); expect(a % 8); expect(ua / 8); expect(ua % 8) ; expect(a / 256); expect(a % 256); expect(ua / 256); expect(ua % 256) ; expect(a / 3); expect(a % 3); expect(ua / 3); expect(ua % 3) ; expect(a / 10); expect(a % 10); expect(ua / 10); expect(ua % 10) ;
+; Debug: div int = const 1 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 1 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	CLRB
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 1 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 1 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	CLRB
+; Debug: rootlist unsigned char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 2 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	ASRA
+	RORB
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 2 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	ANDB	#1
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 2 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LSRA
+	RORB
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 2 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	ANDB	#1
+; Debug: rootlist unsigned char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 4 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	ASRA
+	RORB
+	ASRA
+	RORB
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 4 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	ANDB	#3
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 4 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LSRA
+	RORB
+	LSRA
+	RORB
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 4 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	ANDB	#3
+; Debug: rootlist unsigned char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 8 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	ASRA
+	RORB
+	ASRA
+	RORB
+	ASRA
+	RORB
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 8 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	ANDB	#7
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 8 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LSRA
+	RORB
+	LSRA
+	RORB
+	LSRA
+	RORB
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 8 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	ANDB	#7
+; Debug: rootlist unsigned char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const $100 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	TFR	A,B
+	SEX
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const $100 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const $100 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	TFR	A,B
+	CLRA
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const $100 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+; Debug: rootlist unsigned char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 3 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LDX	#3
+	JSR	>idiv
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 3 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LDX	#3
+	JSR	>imod
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const 3 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LDX	#3
+	JSR	>idivu
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const 3 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LDX	#3
+	JSR	>imodu
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const $A to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LDX	#$A
+	JSR	>idiv
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const $A to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LDX	#$A
+	JSR	>imod
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: div int = const $A to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LDX	#$A
+	JSR	>idivu
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mod int = const $A to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LDX	#$A
+	JSR	>imodu
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 149 	}
+; 150 	start(12,cmul);
+.6D:
+; Debug: postinc int i = [S+6-2] (used reg = )
+	LDD	4,S
+	ADDD	#1
+	STD	4,S
+.6E:
+; Debug: lt int = const $E to int i = [S+6-2] (used reg = )
+	LDD	4,S
+	SUBD	#$E
+	LBLT	.6F
+.70:
+.6C:
+; Debug: list * int = cmul+0 (used reg = )
+	LDX	#_cmul
+	PSHS	X
+; Debug: rootlist int = const $C (used reg = )
+	LDX	#$C
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 151 	for (i = 0; i < 14 ; i++) {
+; Debug: eq int = const 0 to int i = [S+6-2] (used reg = )
+	LDD	#0
+	STD	4,S
+;BCC_EOS
+;BCC_EOS
+	BRA	.73
+.74:
+; 152 		a = vals[i];
+; Debug: ptradd int i = [S+6-2] to [$E] int = vals+0 (used reg = )
+	LDD	4,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to int a = [S+6-4] (used reg = )
+	LDX	0,X
+	STX	2,S
+;BCC_EOS
+; 153 		expect(a * 0); expect(a * 1); expect(a * 2); expect(a * 3);
+; Debug: mul int = const 0 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LDD	#0
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mul int = const 1 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mul int = const 2 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LSLB
+	ROLA
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mul int = const 3 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	PSHS	D
+	LSLB
+	ROLA
+	ADDD	,S++
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 154 		expect(a * 4); expect(a * 10); expect(a * 256); expect(a * 257);
+; Debug: mul int = const 4 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mul int = const $A to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	PSHS	D
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+	ADDD	,S++
+	LSLB
+	ROLA
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mul int = const $100 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	TFR	B,A
+	CLRB
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: mul int = const $101 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	PSHS	D
+	TFR	B,A
+	CLRB
+	ADDD	,S++
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 155 	}
+; 156 	start(13,cshift);
+.72:
+; Debug: postinc int i = [S+6-2] (used reg = )
+	LDD	4,S
+	ADDD	#1
+	STD	4,S
+.73:
+; Debug: lt int = const $E to int i = [S+6-2] (used reg = )
+	LDD	4,S
+	SUBD	#$E
+	BLT	.74
+.75:
+.71:
+; Debug: list * int = cshift+0 (used reg = )
+	LDX	#_cshift
+	PSHS	X
+; Debug: rootlist int = const $D (used reg = )
+	LDX	#$D
+; Debug: func () void = start+0 (used reg = )
+	JSR	>_start
+	LEAS	2,S
+;BCC_EOS
+; 157 	for (i = 0; i < 14 ; i++) {
+; Debug: eq int = const 0 to int i = [S+6-2] (used reg = )
+	LDD	#0
+	STD	4,S
+;BCC_EOS
+;BCC_EOS
+	JMP	.78
+.79:
+; 158 		a = ua = vals[i];
+; Debug: ptradd int i = [S+6-2] to [$E] int = vals+0 (used reg = )
+	LDD	4,S
+	LSLB
+	ROLA
+	LDX	#_vals
+	LEAX	D,X
+; Debug: eq int = [X+0] to unsigned int ua = [S+6-6] (used reg = )
+	LDX	0,X
+	STX	0,S
+; Debug: eq unsigned int = X+0 to int a = [S+6-4] (used reg = )
+	STX	2,S
+;BCC_EOS
+; 159 		expect(a << 0); expect(a >> 0); expect(ua >> 0) ; expect(a << 1); expect(a >> 1); expect(ua >> 1) ; expect(a << 3); expect(a >> 3); expect(ua >> 3) ; expect(a << 8); expect(a >> 8); expect(ua >> 8) ; expect(a << 15); expect(a >> 15); expect(ua >> 15) ;
+; Debug: sl int = const 0 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const 0 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const 0 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sl int = const 1 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LSLB
+	ROLA
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const 1 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	ASRA
+	RORB
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const 1 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LSRA
+	RORB
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sl int = const 3 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const 3 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	ASRA
+	RORB
+	ASRA
+	RORB
+	ASRA
+	RORB
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const 3 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	LSRA
+	RORB
+	LSRA
+	RORB
+	LSRA
+	RORB
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sl int = const 8 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	TFR	B,A
+	CLRB
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const 8 to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	TFR	A,B
+	SEX
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const 8 to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	TFR	A,B
+	CLRA
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sl int = const $F to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	TFR	B,A
+	CLRB
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+	LSLB
+	ROLA
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const $F to int a = [S+6-4] (used reg = )
+	LDD	2,S
+	TFR	A,B
+	SEX
+	ASRA
+	RORB
+	ASRA
+	RORB
+	ASRA
+	RORB
+	ASRA
+	RORB
+	ASRA
+	RORB
+	ASRA
+	RORB
+	ASRA
+	RORB
+; Debug: rootlist int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; Debug: sr int = const $F to unsigned int ua = [S+6-6] (used reg = )
+	LDD	0,S
+	TFR	A,B
+	CLRA
+	LSRA
+	RORB
+	LSRA
+	RORB
+	LSRA
+	RORB
+	LSRA
+	RORB
+	LSRA
+	RORB
+	LSRA
+	RORB
+	LSRA
+	RORB
+; Debug: rootlist unsigned int = D+0 (used reg = )
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 160 	}
+; 161 }
+.77:
+; Debug: postinc int i = [S+6-2] (used reg = )
+	LDD	4,S
+	ADDD	#1
+	STD	4,S
+.78:
+; Debug: lt int = const $E to int i = [S+6-2] (used reg = )
+	LDD	4,S
+	SUBD	#$E
+	LBLT	.79
+.7A:
+.76:
+	LEAS	6,S
+	RTS
+; 162 
+; 163  
+; 164 struct odd {
+; 165 	char c[7];
+;BCC_EOS
+; 166 };
+;BCC_EOS
+; 167 
+; 168 struct 
+; 168 odd s1 = { { 1, 0, 3, 4, 5, 6, 9 } }, s2;	 
+	LOC	3
+	EXPORT	_s1
+_s1:
+	FCB	1
+	FCB	0
+	FCB	3
+	FCB	4
+	FCB	5
+	FCB	6
+	FCB	9
+;BCC_EOS
+; 169 char big[300], copy[300];
+;BCC_EOS
+; 170 int one = 1;
+	EXPORT	_one
+_one:
+	FDB	1
+;BCC_EOS
+; 171 
+; 172 void copies()
+; 173 {
+	LOC	0
+	EXPORT	_copies
+_copies:
+; 174 	int i, sum;
+;BCC_EOS
+; 175 
+; 176 	group = 14;
+	LEAS	-4,S
+; Debug: eq int = const $E to int = [group+0] (used reg = )
+	LDD	#$E
+	STD	>_group
+;BCC_EOS
+; 177 	index = 0;
+; Debug: eq int = const 0 to int = [index+0] (used reg = )
+	LDD	#0
+	STD	>_index
+;BCC_EOS
+; 178 	s2 = s1;
+; Debug: eq struct odd = [s1+0] to struct odd = [s2+0] (used reg = )
+	LDD	>_s1
+	STD	>_s2
+	LDD	>_s1+2
+	STD	>_s2+2
+	LDD	>_s1+4
+	STD	>_s2+4
+	LDB	>_s1+6
+	STB	>_s2+6
+;BCC_EOS
+; 179 	sum = 0;
+; Debug: eq int = const 0 to int sum = [S+4-4] (used reg = )
+	LDD	#0
+	STD	0,S
+;BCC_EOS
+; 180 	for (i = 0; i < 7; i++)
+; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
+	LDD	#0
+	STD	2,S
+;BCC_EOS
+;BCC_EOS
+; 181 		sum += s2.c[i];
+	BRA	.7D
+.7E:
+; Debug: ptradd int i = [S+4-2] to [7] char = s2+0 (used reg = )
+	LDD	2,S
+	LDX	#_s2
+	LEAX	D,X
+; Debug: addab char = [X+0] to int sum = [S+4-4] (used reg = )
+	LDD	0,S
+	ADDB	0,X
+	ADCA	#0
+	STD	0,S
+;BCC_EOS
+; 182 	ep = &one;		 
+.7C:
+; Debug: postinc int i = [S+4-2] (used reg = )
+	LDD	2,S
+	ADDD	#1
+	STD	2,S
+.7D:
+; Debug: lt int = const 7 to int i = [S+4-2] (used reg = )
+	LDD	2,S
+	SUBD	#7
+	BLT	.7E
+.7F:
+.7B:
+; Debug: eq * int = one+0 to * int = [ep+0] (used reg = )
+	LDX	#_one
+	STX	>_ep
+;BCC_EOS
+; 183 	expect(sum == 28);
+; Debug: logeq int = const $1C to int sum = [S+4-4] (used reg = )
+	LDX	0,S
+	LEAX	-$1C,X
+	BNE	.80
+	LDB	#1
+	BRA	.81
+.80:
+	CLRB
+.81:
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 184 	for (i = 0; i < 300; i++)
+; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
+	LDD	#0
+	STD	2,S
+;BCC_EOS
+;BCC_EOS
+; 185 		big[i] = i;
+	BRA	.84
+.85:
+; Debug: ptradd int i = [S+4-2] to [$12C] char = big+0 (used reg = )
+	LDD	2,S
+	LDX	#_big
+	LEAX	D,X
+; Debug: eq int i = [S+4-2] to char = [X+0] (used reg = )
+	LDB	3,S
+	STB	0,X
+;BCC_EOS
+; 186 	ep = &one;
+.83:
+; Debug: postinc int i = [S+4-2] (used reg = )
+	LDD	2,S
+	ADDD	#1
+	STD	2,S
+.84:
+; Debug: lt int = const $12C to int i = [S+4-2] (used reg = )
+	LDD	2,S
+	SUBD	#$12C
+	BLT	.85
+.86:
+.82:
+; Debug: eq * int = one+0 to * int = [ep+0] (used reg = )
+	LDX	#_one
+	STX	>_ep
+;BCC_EOS
+; 187 	expect(memcpy(copy,big,300)== copy);
+; Debug: list int = const $12C (used reg = )
+	LDD	#$12C
+	PSHS	D
+; Debug: list * char = big+0 (used reg = )
+	LDX	#_big
+	PSHS	X
+; Debug: rootlist * char = copy+0 (used reg = )
+	LDX	#_copy
+; Debug: func () * char = memcpy+0 (used reg = )
+	JSR	>_memcpy
+	LEAS	4,S
+; Debug: logeq * char = copy+0 to * char = X+0 (used reg = )
+	CMPX	#_copy
+	BNE	.87
+	LDB	#1
+	BRA	.88
+.87:
+	CLRB
+.88:
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 188 	sum = 0;
+; Debug: eq int = const 0 to int sum = [S+4-4] (used reg = )
+	LDD	#0
+	STD	0,S
+;BCC_EOS
+; 189 	for (i = 0; i < 300; i++)
+; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
+	LDD	#0
+	STD	2,S
+;BCC_EOS
+;BCC_EOS
+; 190 		if (copy[i] == big[i])
+	BRA	.8B
+.8C:
+; Debug: ptradd int i = [S+4-2] to [$12C] char = big+0 (used reg = )
+	LDD	2,S
+	LDX	#_big
+	LEAX	D,X
+; Debug: ptradd int i = [S+4-2] to [$12C] char = copy+0 (used reg = X)
+	LDD	2,S
+	LDU	#_copy
+	LEAU	D,U
+; Debug: logeq char = [X+0] to char = [U+0] (used reg = )
+	LDB	0,U
+	SUBB	0,X
+	LBNE	.8D
+.8E:
+; 191 			sum++;
+; Debug: postinc int sum = [S+4-4] (used reg = )
+	LDD	0,S
+	ADDD	#1
+	STD	0,S
+;BCC_EOS
+; 192 	ep = &one;
+.8D:
+.8A:
+; Debug: postinc int i = [S+4-2] (used reg = )
+	LDD	2,S
+	ADDD	#1
+	STD	2,S
+.8B:
+; Debug: lt int = const $12C to int i = [S+4-2] (used reg = )
+	LDD	2,S
+	SUBD	#$12C
+	BLT	.8C
+.8F:
+.89:
+; Debug: eq * int = one+0 to * int = [ep+0] (used reg = )
+	LDX	#_one
+	STX	>_ep
+;BCC_EOS
+; 193 	expect(sum == 300);
+; Debug: logeq int = const $12C to int sum = [S+4-4] (used reg = )
+	LDD	0,S
+	SUBD	#$12C
+	BNE	.90
+	LDB	#1
+	BRA	.91
+.90:
+	CLRB
+.91:
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 194 	copy[0] = 99;
+; Debug: eq int = const $63 to char = [copy+0] (used reg = )
+	LDB	#$63
+	STB	>_copy
+;BCC_EOS
+; 195 	memcpy(copy,big,0);
+; Debug: list int = const 0 (used reg = )
+	LDD	#0
+	PSHS	D
+; Debug: list * char = big+0 (used reg = )
+	LDX	#_big
+	PSHS	X
+; Debug: rootlist * char = copy+0 (used reg = )
+	LDX	#_copy
+; Debug: func () * char = memcpy+0 (used reg = )
+	JSR	>_memcpy
+	LEAS	4,S
+;BCC_EOS
+; 196 	ep = &one;
+; Debug: eq * int = one+0 to * int = [ep+0] (used reg = )
+	LDX	#_one
+	STX	>_ep
+;BCC_EOS
+; 197 	expect(copy[0] == 99);
+; Debug: logeq int = const $63 to char = [copy+0] (used reg = )
+	LDB	>_copy
+	SUBB	#$63
+	BNE	.92
+	LDB	#1
+	BRA	.93
+.92:
+	CLRB
+.93:
+; Debug: rootlist char = B+0 (used reg = )
+	CLRA
+	TFR	D,X
+; Debug: func () void = expect+0 (used reg = )
+	JSR	>_expect
+;BCC_EOS
+; 198 }
+	PULS	U,Y,PC
+; 199 
+; 200 int main()
+; 201 {
+	EXPORT	_main
+_main:
+; 202 	pairs();
+; Debug: func () void = pairs+0 (used reg = )
+	JSR	>_pairs
+;BCC_EOS
+; 203 	shifts();
+; Debug: func () void = shifts+0 (used reg = )
+	JSR	>_shifts
+;BCC_EOS
+; 204 	constants();
+; Debug: func () void = constants+0 (used reg = )
+	JSR	>_constants
+;BCC_EOS
+; 205 	copies();
+; Debug: func () void = copies+0 (used reg = )
+	JSR	>_copies
+;BCC_EOS
+; 206 	puts1("checks ");
+	LOC	1
+.94:
+	FCC	"checks "
+	FCB	0
+	LOC	0
+; Debug: rootlist * char = .94+0 (used reg = )
+	LDX	#.94
+; Debug: func () void = puts1+0 (used reg = )
+	JSR	>_puts1
+;BCC_EOS
+; 207 	putnum(checks);
+; Debug: rootlist int = [checks+0] (used reg = )
+	LDX	>_checks
+; Debug: func () void = putnum+0 (used reg = )
+	JSR	>_putnum
+;BCC_EOS
+; 208 	puts1("failures ");
+	LOC	1
+.95:
+	FCC	"failures "
+	FCB	0
+	LOC	0
+; Debug: rootlist * char = .95+0 (used reg = )
+	LDX	#.95
+; Debug: func () void = puts1+0 (used reg = )
+	JSR	>_puts1
+;BCC_EOS
+; 209 	putnum(failures);
+; Debug: rootlist int = [failures+0] (used reg = )
+	LDX	>_failures
+; Debug: func () void = putnum+0 (used reg = )
+	JSR	>_putnum
+;BCC_EOS
+; 210 	return failures;
+	LDX	>_failures
+	RTS
+;BCC_EOS
+; 211 }
+; 212 
+	LOC	3
+_big		COMM	$12C
+_group		COMM	2
+_checks		COMM	2
+_ep		COMM	2
+_copy		COMM	$12C
+_s2		COMM	7
+_failures		COMM	2
+_index		COMM	2
+
+; 0 errors detected

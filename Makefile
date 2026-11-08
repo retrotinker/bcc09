@@ -1,6 +1,6 @@
 PREFIX=/usr/local/bcc09
 
-DIRS=ar as bcc copt cpp ld unproto
+DIRS=ar as bcc copt cpp ld unproto libc
 
 .PHONY: all check clean install
 

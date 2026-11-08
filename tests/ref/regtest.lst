@@ -1,0 +1,60 @@
+00001                   ; run on sim6809: each run-time helper in libc must leave Y and U as
+00002                   ; they were (the compiler keeps values in them across the call); exits
+00003                   ; with the number of helpers that changed one of them
+00004                   
+00005 0000              	.text
+00006                   	entry	start
+00007                   	import	imul
+00008                   	import	imulu
+00009                   	import	idiv
+00010                   	import	imod
+00011                   	import	idivu
+00012                   	import	imodu
+00013                   	import	isl
+00014                   	import	islu
+00015                   	import	isr
+00016                   	import	isru
+00017                   
+00018 0000 10CE   7F00  start:	lds	#$7f00
+00019 0004   7F   0002> 	clr	fails
+00020 0007 108E   0040> 	ldy	#table
+00021 000B   AE     A1  next:	ldx	,y++		; the next helper, or 0 at the end
+00022 000D   27     29  	beq	done
+00023 000F   34     20  	pshs	y
+00024 0011 108E   A55A  	ldy	#$a55a		; values to look for afterwards
+00025 0015   CE   5AA5  	ldu	#$5aa5
+00026 0018   BF   0000> 	stx	helper
+00027 001B   CC   FC18  	ldd	#-1000		; operands that make each helper loop
+00028 001E   8E   0007  	ldx	#7
+00029 0021   AD9F 0000> 	jsr	[helper]
+00030 0025 108C   A55A  	cmpy	#$a55a
+00031 0029   26     06  	bne	bad
+00032 002B 1183   5AA5  	cmpu	#$5aa5
+00033 002F   27     03  	beq	good
+00034 0031   7C   0002> bad:	inc	fails
+00035 0034   35     20  good:	puls	y
+00036 0036   20     D3  	bra	next
+00037 0038   F6   0002> done:	ldb	fails
+00038 003B   F7   FF02  	stb	$ff02		; exit with that number
+00039 003E   20     FE  stop:	bra	stop
+00040                   
+00041 0040        0000> table:	fdb	imul,imulu,idiv,imod,idivu,imodu,isl,islu,isr,isru,0
+00042                   
+00043 0000              	.bss
+00044 0000        0002  helper:	.blkb	2
+00045 0002        0001  fails:	.blkb	1
+
+Symbols:
+bad                         0 0031 R   done                        0 0038 R   
+fails                       3 0002 R   good                        0 0034 R   
+helper                      3 0000 R   idiv                        0 0000 R I 
+idivu                       0 0000 R I imod                        0 0000 R I 
+imodu                       0 0000 R I imul                        0 0000 R I 
+imulu                       0 0000 R I isl                         0 0000 R I 
+islu                        0 0000 R I isr                         0 0000 R I 
+isru                        0 0000 R I next                        0 000B R   
+start                       0 0000 R N stop                        0 003E R   
+table                       0 0040 R   
+
+00000 errors
+00000 warnings

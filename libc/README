@@ -1,0 +1,40 @@
+libc for bcc09
+
+This will become the port of the dev86 C library.  So far it has:
+
+  bcc/      run-time helpers that the compiler calls for operations the
+            6809 can't do in a few instructions
+  string/   memcpy (which the compiler also calls to copy structures)
+
+"make" builds libc.a with this tree's as09 and ar09; "make install"
+puts it in $(PREFIX)/lib/bcc09, where bcc09 tells ld09 to look for it
+(bcc09 links with -lc).  Each routine that a program may need on its
+own is in its own module, since ld09 only loads the members of a
+library that something refers to.
+
+Calling conventions
+-------------------
+
+The run-time helpers for 16-bit int and unsigned operations (cc1's
+softop.c) take the left operand in D and the right one in X, and leave
+the result in D.  The name ends in "u" for unsigned operands.  They may
+change D, X and CC, and must leave every other register as it was:
+the compiler keeps values in Y and U across the call.
+
+  imul, imulu     D * X (the low 16 bits are the same either way)
+  idiv, idivu     D / X
+  imod, imodu     D % X
+  isl, islu       D << X
+  isr             D >> X, arithmetic
+  isru            D >> X, logical
+
+Ordinary C functions such as memcpy take their first argument in X and
+the others on the stack, in order, above the return address; the caller
+removes them.  An int or pointer result is returned in X.
+
+Behavior C leaves undefined: signed division truncates toward zero and
+the remainder has the sign of the dividend (as C99 requires); division
+by zero doesn't trap (see bcc/idiv.s); shift counts of 16 or more, taken
+as unsigned, give 0, or copies of the sign bit for isr.
+
+The tests in tests/ (ops.c, regtest.s) check all of this on sim6809.
