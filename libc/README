@@ -2,15 +2,33 @@ libc for bcc09
 
 This will become the port of the dev86 C library.  So far it has:
 
+  crt0.s    start-up code (see below)
   bcc/      run-time helpers that the compiler calls for int and long
             operations the 6809 can't do in a few instructions
+  stdlib/   exit
   string/   memcpy (which the compiler also calls to copy structures)
 
-"make" builds libc.a with this tree's as09 and ar09; "make install"
-puts it in $(PREFIX)/lib/bcc09, where bcc09 tells ld09 to look for it
-(bcc09 links with -lc).  Each routine that a program may need on its
+"make" builds crt0.o and libc.a with this tree's as09 and ar09; "make
+install" puts them in $(PREFIX)/lib/bcc09, where bcc09 tells ld09 to
+look for them (bcc09 links with -C0, which is crt0.o, and -lc).  Each routine that a program may need on its
 own is in its own module, since ld09 only loads the members of a
 library that something refers to.
+
+Start-up code
+-------------
+
+crt0.o is for the default target (bcc09 -Ms): a program loaded and
+called by something it can return to, such as Color BASIC's EXEC, a
+monitor or a debugger.  It runs on the stack its loader gave it: start
+(the program's entry point) clears the BSS, saves S and calls main.
+When main returns, or the program calls exit() or _exit(), the status
+goes in D, S is restored, and an RTS returns to the loader.  Programs
+that have no loader to return to, such as ROMs, will need start-up code
+of their own.  There is nothing in exit() yet to flush stdio or call
+atexit() functions, since libc doesn't have them.
+
+bcc09 links programs at address 0 unless told otherwise, so give it a
+load address for ld09, for example: bcc09 -o prog -X-T0x3000 prog.c
 
 Calling conventions
 -------------------
@@ -65,5 +83,5 @@ by zero doesn't trap (see bcc/idiv.s and bcc/ldiv.s); shift counts of
 the operand's size or more (16 or 32), taken as unsigned, give 0, or
 copies of the sign bit for a signed right shift.
 
-The tests in tests/ (ops.c, longops.c, regtest.s) check all of this on
-sim6809.
+The tests in tests/ (ops.c, longops.c, regtest.s, and crtret.c and
+crtexit.c for crt0 and exit) check all of this on sim6809.

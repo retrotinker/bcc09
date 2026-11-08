@@ -47,7 +47,7 @@ ln -s "$top/as/as09" "$top/ld/ld09" "$top/ar/ar09" "$top/bcc/bcc09" \
 ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" "$prefix/libexec/bcc09/"
 mkdir -p "$prefix/lib/bcc09"
-ln -s "$top/libc/libc.a" "$prefix/lib/bcc09/"
+ln -s "$top/libc/crt0.o" "$top/libc/libc.a" "$prefix/lib/bcc09/"
 LIBDIR=$prefix/lib/bcc09
 export BCC_PREFIX=$prefix
 unset BCC_EXEC_PREFIX
@@ -230,6 +230,20 @@ link regtest	-T0x1000 regtest.o -L"$LIBDIR" -lc
 "$SIM" -n 1000000 regtest.srec > regtest.run 2>&1
 echo $? > regtest.run.rc
 rm -f ops.srec longops.srec regtest.srec
+
+# whole programs built by bcc09 alone, which links them with crt0 and
+# libc, and run as a loader (loader.s) would run them: crtret.c checks
+# that the BSS is cleared and returns 42; crtexit.c calls exit(7) from
+# nested calls; loader.s checks that the stack pointer comes back, and
+# exits with the status
+for f in crtret crtexit; do
+	run $f.bcc "$BCC" -o $f.out -X-T0x1000 loader.s $f.c
+	"$OC" -O srec $f.out $f.srec
+	entry=$("$OD" -n $f.out | awk '$3 == "loader" { print $1 }')
+	"$SIM" -n 1000000 --entry "0x$entry" $f.srec > $f.run 2>&1
+	echo $? > $f.run.rc
+	rm -f $f.srec
+done
 
 # the copied sources aren't results
 for f in "$tests"/src/*; do

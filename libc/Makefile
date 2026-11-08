@@ -7,14 +7,17 @@ LIBDIR	=$(PREFIX)/lib/bcc09
 AS09	=../as/as09
 AR09	=../ar/ar09
 
+# crt0.o: start-up code, linked first (not part of libc.a)
 # bcc: the run-time helpers the compiler calls
+# stdlib: exit
 # string: string and memory functions
 OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/laddsub.o bcc/llogic.o bcc/lcmp.o bcc/lunary.o \
 	  bcc/lincdec.o bcc/lshift.o bcc/lmul.o bcc/ldiv.o \
+	  stdlib/exit.o \
 	  string/memcpy.o
 
-all: libc.a
+all: crt0.o libc.a
 
 libc.a: $(OBJS)
 	rm -f $@
@@ -24,11 +27,11 @@ libc.a: $(OBJS)
 .s.o:
 	$(AS09) -w -o $@ $<
 
-install: libc.a
+install: crt0.o libc.a
 	install -d $(LIBDIR)
-	install -m 644 libc.a $(LIBDIR)
+	install -m 644 crt0.o libc.a $(LIBDIR)
 
 clean realclean clobber:
-	rm -f libc.a $(OBJS)
+	rm -f crt0.o libc.a $(OBJS)
 
 .PHONY: all install clean realclean clobber

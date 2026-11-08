@@ -1,6 +1,7 @@
 ; start-up code for programs run on sim6809: set the stack, clear the
 ; BSS, call main, and exit with the low byte of its result; and routines
-; for C that use the simulator's I/O block at $FF00
+; for C that use the simulator's I/O block at $FF00 (libc's crt0 and
+; exit() are for programs with a loader to return to)
 
 io_out	equ	$ff00		; write a character
 io_exit	equ	$ff02		; stop, with this exit status
@@ -21,10 +22,9 @@ clear:	cmpx	#__end
 	clr	,x+
 	bra	clear
 go:	jsr	_main
-	export	_exit
-_exit:	tfr	x,d		; the first argument, or main's result,
-	stb	io_exit		; is in X
-	bra	_exit
+stop:	tfr	x,d		; main's result is in X
+	stb	io_exit
+	bra	stop
 
 ; putchar(c): write c
 	export	_putchar

@@ -4,7 +4,7 @@ control         +control.o
 switch          +switch.o
 ptr             +ptr.o
              simcrt0               _putnum  0  00001020  R
-             simcrt0                 _exit  0  00001013  R
+             simcrt0                  stop  0  00001013  r
              simcrt0                io_out  0  0000ff00  a
              simcrt0                 __end  3  000015ec  R
              simcrt0                    go  0  00001010  r

@@ -32,15 +32,17 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `.tok` file, run `make -C cpp tokens` (needs gperf 3.1 or later, which uses `size_t`
   lengths).
 
-- `libc/` builds `libc.a` (installed in `$(PREFIX)/lib/bcc09`, where `bcc09` links it
-  with `-lc`). So far it has the 16-bit and 32-bit (`long`) run-time helpers
-  (`libc/bcc/`) and `memcpy`; `libc/README` gives the calling conventions. Next:
-  floating point, then start-up code (`crt0`) and the rest of the dev86 libc.
+- `libc/` builds `crt0.o` and `libc.a` (installed in `$(PREFIX)/lib/bcc09`, where `bcc09`
+  links them with `-C0` and `-lc`), so `bcc09 -o prog -X-T0x3000 prog.c` builds a whole
+  program. So far libc has the 16-bit and 32-bit (`long`) run-time helpers (`libc/bcc/`),
+  `exit` and `memcpy`; `libc/README` gives the calling conventions. The default `crt0`
+  returns to the loader (such as Color BASIC's `EXEC`) with the status in D. Next: the
+  rest of the dev86 libc, then floating point, and start-up code for other `-M` targets.
 
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 296 reference
+  `tests/src/` with this tree's tools and compare every result with the 306 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -58,7 +60,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   which `tests/gen-opsdata.py` generates from a model of 16-bit C (rerun it after changing
   the operands or the model); `tests/src/longops.c` does the same for `long` with
   `tests/src/longdata.h` and `tests/gen-longdata.py`. `tests/src/regtest.s` checks
-  that the helpers keep the registers the compiler relies on.
+  that the helpers keep the registers the compiler relies on. `crtret.c` and `crtexit.c`
+  are built by `bcc09` alone (with `crt0` and `libc`) and run under `loader.s`, which
+  calls `start` as a loader would and checks that the stack comes back.
+- `tests/src/simcrt0.s` is start-up code for test programs that report through the
+  simulator's I/O block; it isn't libc's `crt0`.
 
 ## Known issues
 
