@@ -2,7 +2,7 @@ PREFIX=/usr/local/bcc09
 
 DIRS=ar as bcc copt cpp ld unproto libc
 
-.PHONY: all check clean install
+.PHONY: all check check-xroar clean install
 
 all: $(DIRS)
 	for i in $^ ;\
@@ -16,6 +16,10 @@ SIM=tests/sim/sim6809
 
 check: all $(SIM)
 	tests/run.sh
+
+# optional: the Color BASIC target on real ROMs, in the XRoar emulator
+check-xroar: all
+	tests/xroar/run.sh
 
 $(SIM): tests/sim/*.c tests/sim/*.h
 	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.2"' -o $@ tests/sim/*.c

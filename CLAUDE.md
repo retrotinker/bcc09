@@ -50,8 +50,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   where it has I/O) that the driver links:
   - `-Ms` → `crt0.o` + `libsa.a`: returns to its loader; no I/O.
   - `-Me` → `crt0.o` + `libcb.a`: Color BASIC `EXEC` programs, with I/O through the
-    ROM's POLCAT/CHROUT vectors; tested with a stand-in ROM (`tests/src/cbrom.s`), not
-    on hardware; no files yet.
+    ROM's POLCAT/CHROUT vectors (the Dragon's are the same); tested with a stand-in ROM
+    (`tests/src/cbrom.s`) by `make check`, and on real ROMs in XRoar by
+    `make check-xroar`; no files yet; the CoCo 3 is untried (no ROM here).
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
   - The others can't link yet.
 - Next: Disk BASIC files for `-Me`, OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code
@@ -105,6 +106,13 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - `tests/src/pftest.c` (built with `-Mi`) prints a grid of `printf` formats, which must
   be byte-for-byte what the host's `printf` prints; `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
+- `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
+  ROMs, in `~/.xroar/roms`) builds `tests/xroar/xcb.c` with `-Me`, puts it on a cassette
+  with `objcopy09`, and runs it in XRoar on the CoCo, CoCo 2, Dragon 32 and Dragon 64:
+  `CLOADM:EXEC` and the input are typed with `-type`, a trap at `__exit` takes a
+  snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
+  it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
+  `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
 

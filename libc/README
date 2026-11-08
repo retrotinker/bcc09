@@ -125,9 +125,11 @@ rub out and ENTER to end the line; BREAK at the start of a line is the
 end of the input.  There are no files yet (Disk BASIC's will come).
 Load the program low, at $2800 or $3000 say (bcc09 -X-T0x3000), below
 BASIC's stack and strings at the top of memory: the heap is the memory
-between the end of the program and the stack.  It is tested with a
-stand-in for the ROM (tests/src/cbrom.s), not on a CoCo, and the
-Dragon's ROM, whose vectors may differ, hasn't been tried.
+between the end of the program and the stack.  "make check" tests it
+with a stand-in for the ROM (tests/src/cbrom.s); "make check-xroar"
+tests it on the real ROMs of the CoCo, CoCo 2, Dragon 32 and Dragon 64,
+in the XRoar emulator (tests/xroar), where the Dragon's vectors turn out
+to be the same.  The CoCo 3 hasn't been tried.
 
 sim is for sim6809, the simulator the tests use (tests/sim).  crtsim
 puts the stack just below the simulator's I/O block at $FF00, and
