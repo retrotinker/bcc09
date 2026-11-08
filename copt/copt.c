@@ -349,6 +349,10 @@ static void doretval(void)
 	base = 10;
 }
 
+/* set by eval() when the expression isn't one it understands (such as
+   a symbol), for which it returns 0 */
+static int evalerr;
+
 /*
  * Eval an expression into an integer number
  */
@@ -358,6 +362,7 @@ static long eval(char *str, int len)
 	int state = 0;
 	int i, varnum;
 
+	evalerr = 0;
 	retval = 0;
 	num = 0;
 	sign = 1;
@@ -375,11 +380,24 @@ static long eval(char *str, int len)
 			sign = 1;
 		} else if (c == '%' && isdigit(*(cp + 1))
 			   && (state < 2 || state == 5)) {
+			/* (eval() keeps its state in globals, which the nested
+			   call would overwrite: keep this expression's) */
+			long saveretval = retval;
+			int saveop = op, savesign = sign;
+
 			state = 4;
 			varnum = *(cp + 1) - '0';
-			if (vars[varnum] == NULL || i >= len)
+			if (vars[varnum] == NULL || i >= len) {
+				evalerr = 1;
 				return (0);
+			}
 			num = eval(vars[varnum], strlen(vars[varnum]));
+			if (evalerr)
+				return (0);
+			retval = saveretval;
+			op = saveop;
+			sign = savesign;
+			base = 10;
 			doretval();
 			cp++;
 			i++;
@@ -425,13 +443,17 @@ static long eval(char *str, int len)
 				op = SHR_OP;
 				break;
 			}
-		} else
+		} else {
+			evalerr = 1;
 			return (0);
+		}
 	}
 
 	/* Check if the string has been terminated correctly */
-	if (state != 3 && state != 4)
+	if (state != 3 && state != 4) {
+		evalerr = 1;
 		return (0);
+	}
 	if (state == 3)
 		doretval();
 	return (retval);
@@ -538,9 +560,11 @@ static int match(char *ins, char *pat)
 			pat = cp + 1;
 			len = cp - oldpat;
 			val = eval(oldpat, len);
+			if (evalerr)
+				return (0);
 			for (cp = ins; *ins && !match(ins, pat); ins++) ;
 			len = ins - cp;
-			if (val != eval(cp, len))
+			if (val != eval(cp, len) || evalerr)
 				return (0);
 		} else		/* Bad % format cannot match */
 			return (0);
@@ -664,6 +688,26 @@ static char *subst(char *pat)
 }
 
 /*
+ * Check that every expression in a rule's replacement has a value
+ */
+static int evalsok(struct line_s *pat)
+{
+	char *cp, *end;
+
+	for (; pat != NULL; pat = pat->next)
+		for (cp = pat->text; (cp = strstr(cp, "%(")) != NULL;
+		     cp = end) {
+			cp += 2;
+			if ((end = strchr(cp, ')')) == NULL)
+				break;
+			eval(cp, end - cp);
+			if (evalerr)
+				return (0);
+		}
+	return (1);
+}
+
+/*
  * Optimize one line of the input file
  */
 static struct line_s *optline(struct line_s *cur)
@@ -698,8 +742,10 @@ static struct line_s *optline(struct line_s *cur)
 			ins = ins->next;
 		}
 
-		/* Current pattern matched input line, so replace input with new */
-		if (pat == NULL) {
+		/* Current pattern matched input line, so replace input with new
+		   (unless an expression in it isn't a number, such as a
+		   symbol's offset: eval() would make it 0) */
+		if (pat == NULL && evalsok(rp->new)) {
 			/* Clear all lines in the source file for this pattern */
 			lp1 = cur;
 			cur = cur->prev;
@@ -745,7 +791,9 @@ static struct line_s *optline(struct line_s *cur)
 				lp1->next = NULL;
 			else
 				infile = NULL;
-			return (cur);
+			/* (from the start of the file, if the match was there:
+			   NULL would end the optimization) */
+			return (cur != NULL ? cur : infile);
 		}
 	}
 	return (cur->next);
