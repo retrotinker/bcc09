@@ -35,19 +35,23 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - `libc/` builds `crt0.o` and `libc.a` (installed in `$(PREFIX)/lib/bcc09`, where `bcc09`
   links them with `-C0` and `-lc`), so `bcc09 -o prog -X-T0x3000 prog.c` builds a whole
   program. So far libc has the 16-bit and 32-bit (`long`) run-time helpers (`libc/bcc/`),
-  `exit` and `memcpy`; `libc/README` gives the calling conventions. The default `crt0`
-  returns to the loader (such as Color BASIC's `EXEC`) with the status in D. Next: the
-  rest of the dev86 libc, then floating point, and start-up code for other `-M` targets.
-
+  `exit`, and `string.h` (`libc/string/`, mostly dev86's C compiled by `bcc09` itself,
+  with headers in `libc/include/`); `libc/README` gives the calling conventions and the
+  changes from dev86. The default `crt0` returns to the loader (such as Color BASIC's
+  `EXEC`) with the status in D. Next: `malloc`, `ctype.h`, more of the dev86 libc, then
+  floating point, and start-up code for other `-M` targets.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
   as dev86's old `strcspn.c`) shouldn't be copied in.
+- `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
+  macro for the `-M` target. `cc1` doesn't understand `const` or `volatile`;
+  `libc/include/features.h` defines them away. `char` is unsigned.
 
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 306 reference
+  `tests/src/` with this tree's tools and compare every result with the 322 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -68,6 +72,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   that the helpers keep the registers the compiler relies on. `crtret.c` and `crtexit.c`
   are built by `bcc09` alone (with `crt0` and `libc`) and run under `loader.s`, which
   calls `start` as a loader would and checks that the stack comes back.
+- `tests/src/strtest.c` checks libc's string functions; `run.sh` also builds it with the
+  host's compiler and C library (`tests/host/strtest-host.c` supplies `putnum`), and the
+  two must print the same, which checks the expected results.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
 

@@ -3,20 +3,39 @@ libc for bcc09
 This will become the port of the dev86 C library.  So far it has:
 
   crt0.s    start-up code (see below)
+  include/  headers: string.h, stddef.h, sys/types.h, features.h
   bcc/      run-time helpers that the compiler calls for int and long
             operations the 6809 can't do in a few instructions
   stdlib/   exit
-  string/   memcpy (which the compiler also calls to copy structures)
+  string/   string.h's functions; memcpy (which the compiler also calls
+            to copy structures) is in assembly, and the rest are dev86's
+            C, compiled by bcc09
 
-"make" builds crt0.o and libc.a with this tree's as09 and ar09; "make
-install" puts them in $(PREFIX)/lib/bcc09, where bcc09 tells ld09 to
-look for them (bcc09 links with -C0, which is crt0.o, and -lc).  Each routine that a program may need on its
-own is in its own module, since ld09 only loads the members of a
-library that something refers to.
+"make" builds crt0.o and libc.a with this tree's bcc09, as09 and ar09
+(libc/.bcc holds links that bcc09 uses to find this tree's passes);
+"make install" puts them in $(PREFIX)/lib/bcc09, where bcc09 tells ld09
+to look for them (bcc09 links with -C0, which is crt0.o, and -lc), and
+the headers in $(PREFIX)/lib/bcc09/include, where bcc09 looks for them.
 
 All of libc is under the GNU Library General Public License, version 2
 (see COPYING.LIB), rather than the GPL that covers the rest of bcc09,
-since it is linked into the programs bcc09 builds.
+since it is linked into the programs bcc09 builds.  The C sources come
+from dev86's libc (some of them from the GNU C Library), apart from
+strcspn.c, which was written for bcc09 since dev86's had no license; the
+assembly sources were written for bcc09.  string.c holds one function
+for each object file, which the Makefile compiles with -DL_name, so that
+a program links only what it uses.  Changes from dev86: strncat called
+memchr with its arguments in the wrong order, so it copied n bytes
+whatever the source's length; memcmp gave results of the wrong sign;
+strchr, strrchr, memchr and memccpy now convert c to a char; size_t is
+unsigned (memmove relies on that); and string.h no longer defines
+strxfrm as strncpy, which returns the wrong type.  strdup will come with
+malloc, and strcasecmp and strncasecmp with ctype.h.
+
+bcc09 doesn't understand const or volatile: features.h defines them
+away when __BCC__ is defined, as bcc09 does.  Each routine that a program may need on its
+own is in its own module, since ld09 only loads the members of a
+library that something refers to.
 
 Start-up code
 -------------
@@ -87,5 +106,5 @@ by zero doesn't trap (see bcc/idiv.s and bcc/ldiv.s); shift counts of
 the operand's size or more (16 or 32), taken as unsigned, give 0, or
 copies of the sign bit for a signed right shift.
 
-The tests in tests/ (ops.c, longops.c, regtest.s, and crtret.c and
-crtexit.c for crt0 and exit) check all of this on sim6809.
+The tests in tests/ (ops.c, longops.c, regtest.s, strtest.c, and
+crtret.c and crtexit.c for crt0 and exit) check all of this on sim6809.

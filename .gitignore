@@ -21,3 +21,4 @@ tests/prefix.tmp/
 tests/sim/sim6809
 !tests/ref/*.o
 libc/libc.a
+libc/.bcc/

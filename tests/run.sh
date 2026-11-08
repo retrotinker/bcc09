@@ -47,7 +47,8 @@ ln -s "$top/as/as09" "$top/ld/ld09" "$top/ar/ar09" "$top/bcc/bcc09" \
 ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" "$prefix/libexec/bcc09/"
 mkdir -p "$prefix/lib/bcc09"
-ln -s "$top/libc/crt0.o" "$top/libc/libc.a" "$prefix/lib/bcc09/"
+ln -s "$top/libc/crt0.o" "$top/libc/libc.a" "$top/libc/include" \
+	"$prefix/lib/bcc09/"
 LIBDIR=$prefix/lib/bcc09
 export BCC_PREFIX=$prefix
 unset BCC_EXEC_PREFIX
@@ -102,7 +103,7 @@ echo $? > cpp-E.rc
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
 csrc="arith calls control float helpmain long longops main ops proto ptr
-      selftest struct switch"
+      selftest strtest struct switch"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -230,6 +231,25 @@ link regtest	-T0x1000 regtest.o -L"$LIBDIR" -lc
 "$SIM" -n 1000000 regtest.srec > regtest.run 2>&1
 echo $? > regtest.run.rc
 rm -f ops.srec longops.srec regtest.srec
+
+# libc's string functions, which bcc09 compiled from dev86's C:
+# strtest.c checks them and exits with the number of failures; it is
+# also built for the host, with the host's C library, where it must
+# give the same output, which checks the expected results
+link strtest	-T0x1000 simcrt0.o strtest.o -L"$LIBDIR" -lc
+"$OC" -O srec strtest.out strtest.srec
+"$SIM" -n 10000000 strtest.srec > strtest.run 2>&1
+echo $? > strtest.run.rc
+rm -f strtest.srec
+if ${CC:-cc} -std=gnu89 -w -o strtest-host strtest.c \
+	"$tests/host/strtest-host.c" > /dev/null 2>&1 &&
+   ./strtest-host > strtest-host.run 2>&1 &&
+   cmp -s strtest.run strtest-host.run; then
+	echo "ok   strtest gives the same results on the host"
+else
+	echo "DIFF strtest on the host (see strtest-host.run)"
+fi > strtest-host.result
+rm -f strtest-host strtest-host.run
 
 # whole programs built by bcc09 alone, which links them with crt0 and
 # libc, and run as a loader (loader.s) would run them: crtret.c checks
