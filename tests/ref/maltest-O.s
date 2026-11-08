@@ -174,22 +174,28 @@
 ; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/unistd.h"
-; 10 # 16
-; 16  
-; 17 extern ssize_t read ();
+; 10 # 22
+; 22  
+; 23 extern ssize_t read ();
 ;BCC_EOS
-; 18 extern ssize_t write ();
+; 24 extern ssize_t write ();
 ;BCC_EOS
-; 19 
-; 20 
-; 21  
-; 22 extern int brk ();
+; 25 extern int close ();
 ;BCC_EOS
-; 23 extern void * sbrk ();
+; 26 extern off_t lseek ();
 ;BCC_EOS
-; 24 extern unsigned int __heap_margin;
+; 27 extern int isatty ();
 ;BCC_EOS
-; 25 # 15 "maltest.c"
+; 28 
+; 29 
+; 30  
+; 31 extern int brk ();
+;BCC_EOS
+; 32 extern void * sbrk ();
+;BCC_EOS
+; 33 extern unsigned int __heap_margin;
+;BCC_EOS
+; 34 # 15 "maltest.c"
 ; 15 extern int putchar();
 ;BCC_EOS
 ; 16 extern void putnum();
@@ -1019,7 +1025,8 @@ LEAS	8,S
 STD	>_seed
 STX	>_seed+2
 ;BCC_EOS
-; 124 	return (int) ((seed >> 16)& 0x7fff) % n;
+; 124 	return (int) ((seed >> 16)& 0x7f
+; 124 ff) % n;
 ; Debug: sr int = const $10 to unsigned long = [seed+0] (used reg = )
 LDD	>_seed
 LDX	>_seed+2
@@ -1053,14 +1060,13 @@ _overlaps:
 ; 129 	int i, j;
 ;BCC_EOS
 ; 130 
-; 131 	for (i = 0; i < 40 ; i++
+; 131 	for (i = 0; i < 40 ; i++)
 LEAS	-4,S
 ; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
 LDD	#0
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
-; 131 )
 ; 132 		for (j = i + 1; j < 40 ; j++)
 JMP	.45
 .46:
@@ -1072,7 +1078,7 @@ STD	0,S
 ;BCC_EOS
 ;BCC_EOS
 ; 133 			if (slot[i] && slot[j]
-JMP	.49
+BRA	.49
 .4A:
 ; 134 			    && slot[i] < slot[j] + size[j]
 ; 135 			    && slot[j] < slot[i] + size[i])
@@ -2142,7 +2148,8 @@ LEAS	2,S
 LDD	#0
 STD	>_errno
 ;BCC_EOS
-; 245 	ok(45,sbrk(-30000)== (char *)-1 && errno == 12		  );	 
+; 245 	ok(45,sbrk(-30000)== (char *)-1 && errno == 12	
+; 245 	  );	 
 ; Debug: rootlist int = const -$7530 (used reg = )
 LDX	#-$7530
 ; Debug: func () * void = sbrk+0 (used reg = )
@@ -2201,8 +2208,7 @@ LDX	#$2E
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 247 	ok(47,brk(
-; 247 start + 50)== 0 && sbrk(0)== start + 50);
+; 247 	ok(47,brk(start + 50)== 0 && sbrk(0)== start + 50);
 ; Debug: ptradd int = const $32 to * char start = [S+6-2] (used reg = )
 LDX	4,S
 ; Debug: rootlist * char = X+$32 (used reg = )

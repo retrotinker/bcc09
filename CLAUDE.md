@@ -41,8 +41,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `main` returns, and `_exit()` returns to the loader (such as Color BASIC's `EXEC`)
   with the status in D. The heap grows from `__end` up to the stack pointer minus
   `__heap_margin` (256 bytes; a decision of 2026-11-08), enforced by `sbrk()`/`brk()`.
-  `stdarg.h` works (see below). Targets (2026-11-08): `libc.a` is target-independent; each `-M` target has a start-up
-  file and a library (`_exit`, `read`, `write`) that the driver links: `-Ms`/`-Me` →
+  `stdarg.h` and `stdio.h` work (`stdio`: dev86's `FILE` layer, and a new `printf`
+  family that matches glibc's output; no `scanf` or floating point yet). Targets (2026-11-08): `libc.a` is target-independent; each `-M` target has a start-up
+  file and a library (`_exit`, `read`, `write`, and for `stdio` `close`, `lseek`, `isatty`, `open`) that the
+  driver links: `-Ms`/`-Me` →
   `crt0.o` + `libsa.a` (returns to the loader, no I/O), `-Mi` → `crtsim.o` + `libsim.a`
   (sim6809, with I/O). Other targets can't link yet. Next: stdio on top of `read`/`write`,
   then OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code has a known bug), Color BASIC
@@ -66,7 +68,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 387 reference
+  `tests/src/` with this tree's tools and compare every result with the 416 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -93,6 +95,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   (`tests/host/putnum.c` supplies `putnum`), and each must print the same on both,
   which checks the expected results. Checks that depend on bcc09's type sizes or on
   functions only libc has are under `#ifdef __BCC__` or `sizeof` tests.
+- `tests/src/pftest.c` (built with `-Mi`) prints a grid of `printf` formats, which must
+  be byte-for-byte what the host's `printf` prints; `siotest.c` checks the `FILE`
+  functions and buffering against its expected output (`siotest.in` is its input).
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
 

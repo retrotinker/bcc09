@@ -1,0 +1,11 @@
+puts
+fputs, pc
+fwrite
+(stderr)[line buffered]
+[un+buffered]
+(before the flush)
+[full]
++[line again ]
+[fp1]
+checks 26 failures 0
+[stdout, written at exit][fp2, written at exit]

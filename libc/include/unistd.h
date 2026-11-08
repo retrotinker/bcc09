@@ -13,9 +13,18 @@
 #define STDOUT_FILENO	1
 #define STDERR_FILENO	2
 
+#ifndef SEEK_SET
+#define SEEK_SET	0
+#define SEEK_CUR	1
+#define SEEK_END	2
+#endif
+
 /* each target's library has these (see libc/README) */
 extern ssize_t read __P ((int, void *, size_t));
 extern ssize_t write __P ((int, __const void *, size_t));
+extern int close __P ((int));
+extern off_t lseek __P ((int, off_t, int));
+extern int isatty __P ((int));
 
 /* move the end of the heap (see sbrk.s); the heap stays __heap_margin
    bytes below the stack pointer */

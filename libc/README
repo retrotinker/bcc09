@@ -2,13 +2,15 @@ libc for bcc09
 
 This will become the port of the dev86 C library.  So far it has:
 
-  include/  headers: ctype.h, errno.h, limits.h, malloc.h, stdarg.h,
-            stdlib.h, string.h, stddef.h, unistd.h, sys/types.h,
-            features.h
+  include/  headers: ctype.h, errno.h, fcntl.h, limits.h, malloc.h,
+            stdarg.h, stdio.h, stdlib.h, string.h, stddef.h, unistd.h,
+            sys/types.h, features.h
   bcc/      run-time helpers that the compiler calls for int and long
             operations the 6809 can't do in a few instructions
   ctype/    ctype.h's table and toupper and tolower
   malloc/   malloc, free, calloc and realloc (dev86's)
+  stdio/    stdio.h: the FILE functions (stdio.c, dev86's) and the
+            printf family (printf.c, written for bcc09)
   stdlib/   stdlib.h's other functions: atoi, atol, strtol, strtoul,
             abs, labs, qsort, bsearch, rand, srand, atexit, exit and
             _exit, and dev86's itoa, ltoa, ultoa, ltostr and ultostr;
@@ -57,7 +59,16 @@ Changes from dev86:
     be considered GPL code)
   - size_t is unsigned (memmove relies on that); string.h no longer
     defines strxfrm as strncpy, which returns the wrong type
-div and ldiv are still to come.
+  - stdio: fclose unlinked a FILE from the list of open ones badly,
+    losing the ones before it (so they weren't flushed at exit);
+    ungetc(EOF) pushed back a byte, and ungetc didn't clear the end of
+    file indicator; fgets with a count of 0 overran its buffer; BUFSIZ
+    is 256
+  - the printf family is new: dev86's printf.c (and scanf.c) had no
+    license, and its printf departed from the C standard (precision on
+    integers, %X, # and %p); see stdio/printf.c
+div and ldiv, scanf, and floating point in printf are still to come.
+putchar and getchar are only macros (as in dev86).
 
 The heap
 --------
@@ -93,8 +104,9 @@ won't link for them (bcc09 -x leaves out the start-up code, for a
 program that brings its own).  Each target's start-up code clears the
 BSS and calls main; when main returns, its result goes to exit(), which
 calls the atexit() functions, last registered first, and then _exit(),
-which is the target's.  A target's library has _exit, and read and write
-if the target has a way to do I/O.
+which is the target's.  A target's library has _exit; and read,
+write, close, lseek, isatty and open if the target has a way to do I/O,
+which is what stdio needs.
 
 sa is for a program loaded and called by something it can return to,
 such as Color BASIC's EXEC, a monitor or a debugger.  It runs on the
@@ -106,7 +118,10 @@ puts the stack just below the simulator's I/O block at $FF00, and
 _exit() stops the simulator with the low byte of the status as its exit
 status.  write() to fd 1 or 2 goes to the simulator's output, and read()
 from fd 0 reads its input a line at a time, giving 0 at the end (and at
-a 0 byte, which is how the simulator marks the end).
+a 0 byte, which is how the simulator marks the end).  isatty() is true
+for fds 0 to 2, so stdout is line buffered as on a terminal; lseek()
+fails with ESPIPE; and open() fails with ENOENT, since there are no
+files, so fopen() returns NULL.
 
 bcc09 links programs at address 0 unless told otherwise, so give it a
 load address for ld09, for example: bcc09 -o prog -X-T0x3000 prog.c
@@ -176,4 +191,5 @@ copies of the sign bit for a signed right shift.
 
 The tests in tests/ (ops.c, longops.c, regtest.s, strtest.c, stdtest.c,
 maltest.c, vatest.c; crtret.c, crtexit.c and crtatexit.c for the default target;
-hello.c and echo.c for the sim target) check all of this on sim6809.
+hello.c, echo.c, pftest.c and siotest.c for the sim target) check all of
+this on sim6809.

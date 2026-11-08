@@ -10,9 +10,13 @@
 
 extern int errno;
 
+#define ENOENT	2		/* no such file or directory */
+#define EINTR	4		/* interrupted system call */
 #define EBADF	9		/* bad file descriptor */
 #define ENOMEM	12		/* out of memory */
 #define EINVAL	22		/* invalid argument */
+#define ENOTTY	25		/* not a terminal */
+#define ESPIPE	29		/* can't seek */
 #define EDOM	33		/* argument out of a math function's domain */
 #define ERANGE	34		/* result out of range */
 

@@ -39,7 +39,8 @@ cc1 (code generation)
   The size of the code can then depend on how much text came before it,
   such as comments copied from headers, and -S and -c can give slightly
   different code.
-  References: maltest.s (JMP .49, where maltest.o has a BRA)
+  References: none stable (maltest.s's JMP .49 has come and gone as
+  headers it includes changed size)
 
 - In PIC mode, global (bss?) pointers and arrays use PC-relative
   addressing rather than direct addressing.  (Not covered by the tests.)

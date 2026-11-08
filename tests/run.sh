@@ -106,8 +106,8 @@ echo $? > cpp-E.rc
 
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
-csrc="arith calls control float helpmain long longops main maltest ops proto
-      ptr selftest stdtest strtest struct switch vatest"
+csrc="arith calls control float helpmain long longops main maltest ops pftest
+      proto ptr selftest siotest stdtest strtest struct switch vatest"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -281,17 +281,29 @@ for f in crtret crtexit crtatexit; do
 done
 
 # programs for the sim6809 target (bcc09 -Mi), built by bcc09 alone and
-# run as the simulator runs them: hello.c prints a line and returns 3;
-# echo.c echoes its input (echo.in) in upper case, checks bad file
-# descriptors and atexit(), and returns the number of lines; and a
-# target with no start-up code yet can't be linked
-for f in hello echo; do
+# run as the simulator runs them, with f.in as the input if there is
+# one: hello.c prints a line and returns 3; echo.c echoes its input in
+# upper case, checks bad file descriptors and atexit(), and returns the
+# number of lines; pftest.c prints a grid of printf formats, which must
+# be the same with the host's printf; siotest.c checks stdio's FILE
+# functions; and a target with no start-up code yet can't be linked
+for f in hello echo pftest siotest; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
-	"$SIM" -n 10000000 $f.srec < echo.in > $f.run 2>&1
+	input=/dev/null
+	[ -f $f.in ] && input=$f.in
+	"$SIM" -n 500000000 $f.srec < $input > $f.run 2>&1
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
+if ${CC:-cc} -std=gnu89 -w -o pftest-host pftest.c > /dev/null 2>&1 &&
+   ./pftest-host > pftest-host.run 2>&1 && cmp -s pftest.run pftest-host.run
+then
+	echo "ok   pftest prints the same as with the host's printf"
+else
+	echo "DIFF pftest with the host's printf (see pftest-host.run)"
+fi > pftest-host.result
+rm -f pftest-host pftest-host.run
 run notarget.bcc "$BCC" -Mo -o notarget.out hello.c
 rm -f notarget.out
 
