@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "x86_aout.h"
 
 #ifndef __OUT_OK
