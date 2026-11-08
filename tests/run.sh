@@ -106,7 +106,7 @@ echo $? > cpp-E.rc
 # the compiler: assembly from each C source, without and with the
 # peephole optimizer (-O); then object files
 csrc="arith calls control float helpmain long longops main ops proto ptr
-      selftest strtest struct switch"
+      selftest stdtest strtest struct switch"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -235,31 +235,40 @@ link regtest	-T0x1000 regtest.o -L"$LIBDIR" -lc
 echo $? > regtest.run.rc
 rm -f ops.srec longops.srec regtest.srec
 
-# libc's string functions, which bcc09 compiled from dev86's C:
-# strtest.c checks them and exits with the number of failures; it is
-# also built for the host, with the host's C library, where it must
-# give the same output, which checks the expected results
-link strtest	-T0x1000 simcrt0.o strtest.o -L"$LIBDIR" -lc
-"$OC" -O srec strtest.out strtest.srec
-"$SIM" -n 10000000 strtest.srec > strtest.run 2>&1
-echo $? > strtest.run.rc
-rm -f strtest.srec
-if ${CC:-cc} -std=gnu89 -w -o strtest-host strtest.c \
-	"$tests/host/strtest-host.c" > /dev/null 2>&1 &&
-   ./strtest-host > strtest-host.run 2>&1 &&
-   cmp -s strtest.run strtest-host.run; then
-	echo "ok   strtest gives the same results on the host"
-else
-	echo "DIFF strtest on the host (see strtest-host.run)"
-fi > strtest-host.result
-rm -f strtest-host strtest-host.run
+# libc's C functions, mostly compiled by bcc09 from dev86's C: strtest.c
+# checks string.h's, and stdtest.c ctype.h's and stdlib.h's; each exits
+# with the number of failures; each is also built for the host, with the
+# host's C library, where it must print the same, which checks the
+# expected results
+hostcheck() {
+	if ${CC:-cc} -std=gnu89 -w -o $1-host $1.c "$tests/host/putnum.c" \
+		> /dev/null 2>&1 &&
+	   ./$1-host > $1-host.run 2>&1 &&
+	   sed '/^checks /,$d' $1.run > $1.cmp &&
+	   sed '/^checks /,$d' $1-host.run > $1-host.cmp &&
+	   cmp -s $1.cmp $1-host.cmp; then
+		echo "ok   $1 prints the same results on the host"
+	else
+		echo "DIFF $1 on the host (see $1-host.run)"
+	fi > $1-host.result
+	rm -f $1-host $1-host.run $1.cmp $1-host.cmp
+}
+for f in strtest stdtest; do
+	link $f	-T0x1000 simcrt0.o $f.o -L"$LIBDIR" -lc
+	"$OC" -O srec $f.out $f.srec
+	"$SIM" -n 50000000 $f.srec > $f.run 2>&1
+	echo $? > $f.run.rc
+	rm -f $f.srec
+	hostcheck $f
+done
 
 # whole programs built by bcc09 alone, which links them with crt0 and
 # libc, and run as a loader (loader.s) would run them: crtret.c checks
 # that the BSS is cleared and returns 42; crtexit.c calls exit(7) from
-# nested calls; loader.s checks that the stack pointer comes back, and
-# exits with the status
-for f in crtret crtexit; do
+# nested calls; crtatexit.c checks that returning from main calls the
+# atexit() functions in the right order (21); loader.s checks that the
+# stack pointer comes back, and exits with the status
+for f in crtret crtexit crtatexit; do
 	run $f.bcc "$BCC" -o $f.out -X-T0x1000 loader.s $f.c
 	"$OC" -O srec $f.out $f.srec
 	entry=$("$OD" -n $f.out | awk '$3 == "loader" { print $1 }')

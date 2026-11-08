@@ -3,13 +3,17 @@ libc for bcc09
 This will become the port of the dev86 C library.  So far it has:
 
   crt0.s    start-up code (see below)
-  include/  headers: string.h, stddef.h, sys/types.h, features.h
+  include/  headers: ctype.h, errno.h, limits.h, stdlib.h, string.h,
+            stddef.h, sys/types.h, features.h
   bcc/      run-time helpers that the compiler calls for int and long
             operations the 6809 can't do in a few instructions
-  stdlib/   exit
+  ctype/    ctype.h's table and toupper and tolower
+  stdlib/   stdlib.h's functions: atoi, atol, strtol, strtoul, abs,
+            labs, qsort, bsearch, rand, srand, atexit, exit and _exit,
+            and dev86's itoa, ltoa, ultoa, ltostr and ultostr; and errno
   string/   string.h's functions; memcpy (which the compiler also calls
-            to copy structures) is in assembly, and the rest are dev86's
-            C, compiled by bcc09
+            to copy structures) is in assembly, and the rest are C,
+            compiled by bcc09
 
 "make" builds crt0.o and libc.a with this tree's bcc09, as09 and ar09
 (libc/.bcc holds links that bcc09 uses to find this tree's passes);
@@ -19,18 +23,34 @@ the headers in $(PREFIX)/lib/bcc09/include, where bcc09 looks for them.
 
 All of libc is under the GNU Library General Public License, version 2
 (see COPYING.LIB), rather than the GPL that covers the rest of bcc09,
-since it is linked into the programs bcc09 builds.  The C sources come
-from dev86's libc (some of them from the GNU C Library), apart from
-strcspn.c, which was written for bcc09 since dev86's had no license; the
-assembly sources were written for bcc09.  string.c holds one function
-for each object file, which the Makefile compiles with -DL_name, so that
-a program links only what it uses.  Changes from dev86: strncat called
-memchr with its arguments in the wrong order, so it copied n bytes
-whatever the source's length; memcmp gave results of the wrong sign;
-strchr, strrchr, memchr and memccpy now convert c to a char; size_t is
-unsigned (memmove relies on that); and string.h no longer defines
-strxfrm as strncpy, which returns the wrong type.  strdup will come with
-malloc, and strcasecmp and strncasecmp with ctype.h.
+since it is linked into the programs bcc09 builds.  Most of the C sources
+come from dev86's libc (some of them from the GNU C Library); the files
+that say so were written for bcc09, either because dev86's had no
+license (strcspn, qsort, bsearch, itoa) or to fix them (strtol, rand,
+exit, atexit), as were the assembly sources.  Some sources hold several
+functions, which the Makefile compiles one at a time with -DL_name, so
+that a program links only what it uses.
+
+Changes from dev86:
+  - strncat called memchr with its arguments in the wrong order, so it
+    copied n bytes whatever the source's length; memcmp gave results of
+    the wrong sign; strcasecmp and strncasecmp returned the difference of
+    the original characters, which can have the wrong sign ("a", "B")
+  - strchr, strrchr, memchr and memccpy convert c to a char
+  - strtol and strtoul accepted a digit equal to the base, didn't set
+    endptr back to the start when there were no digits, read "0x" as a
+    prefix with no hex digit after it, and ignored overflow: they now
+    return LONG_MAX, LONG_MIN or ULONG_MAX and set errno to ERANGE
+  - itoa got INT_MIN wrong; atoi and atol skip white space as isspace()
+    defines it
+  - isprint and isgraph were true for EOF and characters over 0x7F, and
+    the toupper and tolower macros evaluated their argument twice (they
+    are functions now)
+  - rand is the C standard's example generator
+  - size_t is unsigned (memmove relies on that); string.h no longer
+    defines strxfrm as strncpy, which returns the wrong type
+strdup and the rest of stdlib.h (malloc and friends, div and ldiv) are
+still to come.
 
 bcc09 doesn't understand const or volatile: features.h defines them
 away when __BCC__ is defined, as bcc09 does.  Each routine that a program may need on its
@@ -44,11 +64,11 @@ crt0.o is for the default target (bcc09 -Ms): a program loaded and
 called by something it can return to, such as Color BASIC's EXEC, a
 monitor or a debugger.  It runs on the stack its loader gave it: start
 (the program's entry point) clears the BSS, saves S and calls main.
-When main returns, or the program calls exit() or _exit(), the status
-goes in D, S is restored, and an RTS returns to the loader.  Programs
-that have no loader to return to, such as ROMs, will need start-up code
-of their own.  There is nothing in exit() yet to flush stdio or call
-atexit() functions, since libc doesn't have them.
+When main returns, its result goes to exit(), which calls the atexit()
+functions, last registered first; then _exit() (also called directly)
+puts the status in D, restores S, and an RTS returns to the loader.
+Programs that have no loader to return to, such as ROMs, will need
+start-up code of their own.
 
 bcc09 links programs at address 0 unless told otherwise, so give it a
 load address for ld09, for example: bcc09 -o prog -X-T0x3000 prog.c
@@ -106,5 +126,6 @@ by zero doesn't trap (see bcc/idiv.s and bcc/ldiv.s); shift counts of
 the operand's size or more (16 or 32), taken as unsigned, give 0, or
 copies of the sign bit for a signed right shift.
 
-The tests in tests/ (ops.c, longops.c, regtest.s, strtest.c, and
-crtret.c and crtexit.c for crt0 and exit) check all of this on sim6809.
+The tests in tests/ (ops.c, longops.c, regtest.s, strtest.c, stdtest.c,
+and crtret.c, crtexit.c and crtatexit.c for crt0, exit and atexit) check
+all of this on sim6809.
