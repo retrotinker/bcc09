@@ -43,12 +43,3 @@ cc1 (code generation)
     TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X
     TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X
   (Not covered by the tests.)
-
-ld09 and objcopy09
-------------------
-
-- ld09 only writes __btext, __etext and __bdata to the executable if
-  the program refers to them, so objcopy09 usually can't find the load
-  addresses itself: it warns that the load address is zero and writes
-  the program at address 0, unless -T (and -D) are given.
-  References: prog-noT.srec, prog-noT.oc.err

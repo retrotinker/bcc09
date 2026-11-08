@@ -18,3 +18,6 @@
 00001270 C _buf
 000011a4 T _ptrs
 00001244 D _msg
+00001000 T __btext
+00001234 T __etext
+00001234 D __bdata

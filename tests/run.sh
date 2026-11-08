@@ -154,9 +154,8 @@ done
 "$OD" -n prog.out > prog.nm 2>&1
 "$OD" -n main.o > main.o.nm 2>&1
 
-# objcopy09: each output format, and separate data (-D); the load
-# addresses are given, since ld09 only writes __btext and __bdata to the
-# executable if the program refers to them (see BUGS)
+# objcopy09: each output format, and separate data (-D), with the load
+# addresses given
 for f in binary srec ihex decb ddos cas wav; do
 	run prog-$f.oc "$OC" -O $f -n PROG -T 0x1000 prog.out prog.$f
 done
@@ -165,7 +164,8 @@ run prog-p.oc "$OC" -O binary -p -T 0x1000 -D 0x4000 prog-D.out \
 run prog-D.oc "$OC" -O decb -T 0x1000 -D 0x4000 prog-D.out prog-D.decb
 run prog-Dsrec.oc "$OC" -O srec -n PROG -T 0x1000 -D 0x4000 prog-D.out \
 	prog-D.srec
-# without the addresses: what that bug gives today
+# without them, objcopy09 finds them from __btext and __bdata, which
+# ld09 always writes: this must be the same as prog.srec
 run prog-noT.oc "$OC" -O srec -n PROG prog.out prog-noT.srec
 run prog-os9.oc "$OC" -O os9 -n Prog -d 0x200 -v 1 prog-0.out prog.os9
 run prog-os9r.oc "$OC" -O os9 -n Prog -d 0x200 -r prog-0.out prog-r.os9

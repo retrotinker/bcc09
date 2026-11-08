@@ -4,7 +4,7 @@ CPU  m6809 BIG_ENDIAN
 FLAGS: A_SEP
 a_entry  = 0x00001000
 a_total  = 0x0000028c
-a_syms   = 0x00000140
+a_syms   = 0x00000170
 
 text	data	bss	dec	hex	filename
 576	28	48	652	28c	prog-D.out
@@ -30,6 +30,9 @@ SYMBOLS
 0000403c C _buf
 000011a4 T _ptrs
 00004010 D _msg
+00001000 T __btext
+00001234 T __etext
+00004000 D __bdata
 
 TEXTSEG
 : 10 ce 7f 00 8e 40 1c 8c  40 4c 24 04 6f 80 20 f7  .....@..@L$.o...

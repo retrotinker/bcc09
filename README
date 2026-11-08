@@ -8,7 +8,7 @@ the following:
 	as09 -o start.o start.s
 	bcc09 -o prog.o -c prog.c
 	ld09 -o prog.out -T0x1000 start.o prog.o
-	objcopy09 -O srec -T0x1000 prog.out prog.s19
+	objcopy09 -O srec prog.out prog.s19
 
 objcopy09 can also write raw binaries (-O binary), Intel hex (-O ihex),
 Disk Extended Color BASIC LOADM files (-O decb), Dragon DOS binaries
