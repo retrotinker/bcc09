@@ -282,7 +282,15 @@ struct nodestruct *exp;
 				address(source);
 				tookaddress = TRUE;
 			}
-			pres2(target, source);
+			if (exp->tag == FUNCOP && source->indcount == 0)
+				/* a call's first argument, which must stay
+				   in its registers: keep it there (pres2()
+				   would push a long, and nothing would load
+				   it again), and load the function's address
+				   into another */
+				reguse |= source->storage;
+			else
+				pres2(target, source);
 		}
 		makelessindirect(target);
 		if (tookaddress)

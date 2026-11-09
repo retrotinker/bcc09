@@ -32,6 +32,25 @@ char c;
 	return 100000L + k;
 }
 
+/* a long first argument (in D:X) to a function reached through a
+   structure pointer, whose address needs an index register (cc1 once
+   pushed the argument to free X, and called with X holding the address) */
+long ldiff(a, b)
+long a, b;
+{
+	return a - b;
+}
+
+struct lops {
+	long (*f)();
+} lops = { ldiff };
+
+long lviaptr(p)
+struct lops *p;
+{
+	return p->f(70000L, 5L) + p->f(1L, 2L);
+}
+
 void puts1(s)
 char *s;
 {
@@ -121,6 +140,7 @@ int main()
 	check(41, lsecond(0, one ? 1L : 1) == 1L, 1);
 	check(42, lsecond(0, one ? -1L : 1) == -1L, 1);
 	check(43, lodd(2) == 100002L, 1);
+	check(44, lviaptr(&lops) == 69994L, 1);
 
 	/* doubles passed (on the stack) and returned (in D, X, Y and U),
 	   and float and double globals */
