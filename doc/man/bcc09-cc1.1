@@ -1,0 +1,144 @@
+.TH BCC09-CC1 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+bcc09\-cc1 \- the compiler proper of bcc09 (cc1)
+.SH SYNOPSIS
+.I prefix\c
+.B /libexec/bcc09/cc1
+.RB [ \-ptuwdOP [ \- ]]
+.RB [ \-E
+.RB [ \-D\c
+.IR name ]
+.RB [ \-U\c
+.IR name ]
+.RB [ \-I\c
+.IR dir ]]
+.RB [ \-o
+.IR output ]
+.RI [ file ]
+.SH DESCRIPTION
+.B cc1
+compiles preprocessed C (as
+.BR bcc09\-cpp (1)
+and
+.BR bcc09\-unproto (1)
+leave it) to 6809 assembly for
+.BR as09 (1),
+from
+.I file
+(or standard input) to
+.I output
+(or standard output).
+It is dev86's bcc compiler, for the 6809;
+.BR bcc09 (1)
+runs it, and its
+.B \-C
+option passes options to it.
+.PP
+A function's first argument is passed in X (a long's in D and X), and
+the others on the stack, above the return address, which the caller
+removes; a float is passed as a double, and a double always on the
+stack.
+An int or pointer result is in X, a long's or a float's in D and X (the
+high word in D), and a double's in D, X, Y and U.
+The caller saves the registers it needs: a function may change them
+all (but U under
+.BR \-u ,
+the data's).
+The C library's README describes the conventions in full.
+.PP
+Its own preprocessor
+.RB ( \-E )
+is what
+.B "bcc09 \-e"
+uses in place of
+.BR bcc09\-cpp (1).
+.SH OPTIONS
+A flag option is turned off by following it with
+.BR \- .
+.TP
+.B \-p
+Position-independent code: functions and string constants reached
+relative to the program counter, calls with
+.BR LBSR .
+.TP
+.B \-u
+That, and the data reached through U, linked at 0 (OS-9's way;
+.B "bcc09 \-Mo"
+gives it): U is then not used for values, and a static variable that
+holds an address is set by code that runs before main.
+.TP
+.B \-t
+Put each line of the C source in the assembly, as a comment.
+.TP
+.B \-d
+Put the compiler's expression trees in the assembly, as comments.
+.TP
+.B \-w
+Print the location counter after each line (and don't make branches
+short).
+.TP
+.B \-O
+Define
+.BR __OPTIMISED__ ;
+it doesn't change the code for the 6809 (the driver's
+.B \-O
+runs
+.BR bcc09\-copt (1)).
+.TP
+.BR \-c ", " \-f
+Callers save registers, and the first argument goes in a register:
+always so for the 6809.
+.TP
+.B \-E
+Preprocess only.
+.TP
+.BI \-D name
+.TQ
+.BI \-U name
+.TQ
+.BI \-I dir
+With
+.BR \-E ,
+as
+.BR bcc09\-cpp (1)
+takes them.
+.TP
+.B \-P
+With
+.BR \-E ,
+no line numbers.
+.TP
+.BI \-o " output"
+The output file.
+.SH MACROS
+With
+.BR \-E ,
+cc1 defines
+.B __BCC__
+and
+.BR __AS09__ ,
+and
+.B __CALLER_SAVES__
+with
+.BR \-c ,
+.B __FIRST_ARG_IN_X__
+with
+.B \-f
+and
+.B __POS_INDEPENDENT__
+with
+.BR \-p ;
+.B __FILE__
+and
+.B __LINE__
+are built in.
+.SH EXIT STATUS
+0, or 1 if there were errors (given in the output, as a
+.B fail
+line and a comment, and on standard error).
+.SH SEE ALSO
+.BR bcc09 (1),
+.BR bcc09\-cpp (1),
+.BR bcc09\-unproto (1),
+.BR bcc09\-copt (1),
+.BR as09 (1)

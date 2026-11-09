@@ -77,7 +77,7 @@ HFILES	= error.h token.h vstring.h symbol.h
 SCRIPTS	= cpp.sh acc.sh
 SAMPLES	= stdarg.h stddef.h stdlib.h varargs.c example.c example.out
 SOURCES	= README $(CFILES) $(HFILES) Makefile $(SCRIPTS) $(SAMPLES)
-FILES	= $(SOURCES) unproto.1
+FILES	= $(SOURCES) ../doc/man/unproto.1
 OBJECTS	= tok_io.o tok_class.o tok_pool.o unproto.o vstring.o symbol.o error.o \
 	hash.o strsave.o
 

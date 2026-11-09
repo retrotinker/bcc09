@@ -24,7 +24,9 @@ Disk Extended Color BASIC LOADM files (-O decb), Dragon DOS binaries
 and Color BASIC cassette images (-O cas or -O wav).
 
 The man pages in doc/man describe each program: bcc09(1), as09(1),
-ld09(1), ar09(1), objdump09(1) (also nm09 and size09) and objcopy09(1);
+ld09(1), ar09(1), objdump09(1) (also nm09 and size09) and objcopy09(1),
+and bcc09's passes, bcc09-cpp(1), bcc09-unproto(1), bcc09-cc1(1) and
+bcc09-copt(1);
 "make install" puts them in $(PREFIX)/share/man ("man -l doc/man/bcc09.1"
 reads one in place).
 

@@ -1,0 +1,100 @@
+.TH BCC09-CPP 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+bcc09\-cpp \- the C preprocessor of bcc09 (cpp)
+.SH SYNOPSIS
+.I prefix\c
+.B /libexec/bcc09/cpp
+.RB [ \-A | \-K ]
+.RB [ \-P ]
+.RB [ \-D\c
+.IR name [= value ]]
+.RB [ \-U\c
+.IR name ]
+.RB [ \-I\c
+.IR dir ]
+.RB [ \-o
+.IR output ]
+.I file
+.SH DESCRIPTION
+.B cpp
+is the C preprocessor that
+.BR bcc09 (1)
+runs first on each C file (and on .S and .x assembly files): it includes
+files, defines and expands macros, and keeps or drops lines by
+.BR #if ,
+.B #ifdef
+and the rest, as C89 says, writing the result to
+.I output
+(or standard output) with
+.B #
+lines that give each line's file and number, as
+.B #line
+can too.
+It is dev86's cpp; one normally runs it through
+.BR "bcc09 \-E" ,
+which gives it the include directories and macros for its target.
+.PP
+A directive that it can't make sense of is an error, naming the file,
+the line and the directive.
+.SH OPTIONS
+.TP
+.B \-A
+ANSI C (the driver gives it unless
+.BR \-kr ).
+.TP
+.B \-K
+K&R C: no
+.B __DATE__
+and
+.BR __TIME__ .
+.TP
+.B \-P
+Leave out the
+.B #
+lines that give the line numbers.
+.TP
+.BI \-D name\c
+.RI [= value ]
+Define a macro (as 1 if there is no value).
+.TP
+.BI \-U name
+Undefine a macro.
+.TP
+.BI \-I dir
+Look for #include files in
+.I dir
+too.
+.TP
+.BI \-o " output"
+The output file.
+.TP
+.B \-O
+Define
+.BR __OPTIMISED__ .
+.TP
+.B \-c
+Define
+.BR __CALLER_SAVES__ .
+.TP
+.B \-f
+Define
+.BR __FIRST_ARG_IN_AX__ .
+.TP
+.BR \-0 ", " \-3
+Define the macros of dev86's 8086 and 80386 compilers (no use for the
+6809).
+.TP
+.B \-d
+Print the tokens, for debugging.
+.TP
+.B \-T
+Pass on only some of the tokens (dev86's; not used).
+.TP
+.B \-C
+Not done (comments are always removed).
+.SH EXIT STATUS
+0, or 1 if there were errors.
+.SH SEE ALSO
+.BR bcc09 (1),
+.BR bcc09\-unproto (1),
+.BR bcc09\-cc1 (1)

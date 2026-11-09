@@ -1,10 +1,10 @@
-.TH UNPROTO 1 
+.TH BCC09-UNPROTO 1 2026-11-09 bcc09 "bcc09 Manual"
 .ad
 .fi
 .SH NAME
-unproto
+bcc09\-unproto
 \-
-compile ANSI C with traditional UNIX C compiler
+compile ANSI C with traditional UNIX C compiler (bcc09's unproto)
 .SH PACKAGE
 .na
 .nf
@@ -135,6 +135,47 @@ and/or pointer argument types should not be a problem in environments
 where sizeof(int) == sizeof(long) == sizeof(pointer).  A more serious
 problem is the lack of automatic type conversions between integral and
 floating-point argument types.  Let lint(1) be your friend.
+.SH BCC09
+In bcc09,
+.B unproto
+runs between
+.BR bcc09\-cpp (1)
+and
+.BR bcc09\-cc1 (1)
+(the driver runs it, as
+.B unproto
+.I input output\c
+, unless
+.BR \-kr ;
+it has no options), built with two of its own options (see its
+Makefile):
+.TP
+.B _PROTO_
+After every () that it writes for a prototype (in declarations,
+function pointer types, casts, typedefs and parameters), and after the
+argument names of a function heading that has a prototype's form, it
+writes
+.BR "__proto(" "\fItype name\fR, ...)"
+, from which
+.B cc1
+knows the parameters' types: a call converts each argument to its
+parameter's type, as C89 says, and a call with the wrong number of
+arguments is an error.
+.TP
+.B _VA_ALIST_
+In the heading of a function with a variable argument list, an
+.B int
+parameter named
+.B __va_alist
+takes the place of the ..., for
+.BR stdarg.h 's
+.B va_start
+to take the address of (the first argument is passed in a register, so
+the last named one can't lead to the others).
+.PP
+The BUGS above are dev86's: with
+.B _PROTO_
+arguments are converted, between floating point types too.
 .SH AUTHOR(S)
 .na
 .nf

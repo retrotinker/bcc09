@@ -149,9 +149,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `$(MANDIR)` (`$(PREFIX)/share/man`). `tests/man.sh` (run by `make check`) checks that
   each formats without `groff -ww` warnings and names every option, from lists it keeps
   of each program's options: change a program's options, and change both. The passes
-  (`cpp`, `cc1`, `copt`, `unproto`; `unproto/unproto.1` is dev86's) have none yet.
-- `bcc/bcc.doc` is out of date (it describes `-M` as a linker option); auditing it is a
-  TODO item.
+  have pages named `bcc09-cpp.1`, `bcc09-unproto.1` (dev86's, moved from `unproto/`, with
+  a section on bcc09's `_PROTO_` and `_VA_ALIST_`), `bcc09-cc1.1` and `bcc09-copt.1`, so
+  as not to clash with GCC's `cpp(1)` in a system's man directory. `bcc/bcc.doc`, which
+  they replace, is gone.
 - `stdint.h` has the 8-, 16- and 32-bit types (no 64-bit: `intmax_t` is `long`, `intptr_t`
   is `int`); `stdbool.h`'s `bool` is `cc1`'s `_Bool` (added 2026-11-08): an `unsigned char`
   type (`btype`) that every conversion makes 0 or 1 (`boolnode()` in `exptree.c` for

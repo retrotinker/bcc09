@@ -840,7 +840,7 @@ static void writeoutf(char *filename, char *headstr)
 		exit(1);
 	}
 	if (headstr != NULL) {
-		fprintf(fp, headstr);
+		fputs(headstr, fp);
 		fprintf(fp, "\n");
 	}
 	for (lp = infile; lp != NULL; lp = lp->next)
@@ -891,7 +891,7 @@ int main(int argc, char **argv)
 		if (!strncmp(argv[i], "-c", 2))
 			comment = argv[i][2];
 		else if (!strncmp(argv[i], "-b", 2))
-			backup = atoi(&(argv[i][3]));
+			backup = atoi(&(argv[i][2]));
 		else if (!strncmp(argv[i], "-f", 2))
 			srcfile = &(argv[i][2]);
 		else if (!strncmp(argv[i], "-o", 2)) {

@@ -50,6 +50,14 @@ Write an object file, for the linker.
 Write a binary image: the assembled bytes, at the addresses
 .B ORG
 gives them, with no symbols to link.
+Without
+.BR \-s ,
+the image starts at address 0 (zeros up to the first byte); with it, at
+the first byte, and the symbol file starts with the image's start and
+end
+.RB ( $start
+and
+.BR $end ).
 .TP
 .BR \-l " [\fIlisting\fR]"
 Write a listing (to standard output if no file is named).

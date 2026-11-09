@@ -1,0 +1,125 @@
+.TH BCC09-COPT 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+bcc09\-copt \- the peephole optimizer of bcc09 (copt)
+.SH SYNOPSIS
+.I prefix\c
+.B /libexec/bcc09/copt
+.RB [ \-c\c
+.IR char ]
+.RB [ \-f\c
+.IR input ]
+.RB [ \-o
+.IR output ]
+.RB [ \-b\c
+.IR n ]
+.RB [ \-h\c
+.IR text ]
+.RB [ \-d\c
+.IR dir ]
+.IR rules ...
+.SH DESCRIPTION
+.B copt
+reads assembly (the output of
+.BR bcc09\-cc1 (1))
+and replaces sequences of lines that a rule describes with that rule's
+replacement, file of rules after file of rules, writing the result.
+.B "bcc09 \-O"
+runs it with the 6809's rules, rules.6809, which make code smaller.
+It is Gero Kuhlmann's copt, from dev86.
+.SH OPTIONS
+.TP
+.BI \-f input
+Read
+.I input
+(standard input by default).
+.TP
+.BI \-o " output"
+Write
+.I output
+(standard output by default).
+.TP
+.BI \-c char
+Lines starting with
+.I char
+are comments: they don't break a sequence of lines a rule matches
+(and are dropped from a match).
+.B bcc09
+gives
+.BR \-c; .
+.TP
+.BI \-d dir
+Read the rules files from
+.IR dir .
+.TP
+.BI \-b n
+After a replacement, go back
+.I n
+lines before trying the rules again.
+.TP
+.BI \-h text
+Write
+.I text
+as the output's first line.
+.SH RULES
+A rules file holds rules, each the lines to match, a line
+.BR = ,
+and the lines to replace them with, up to an empty line; a line
+starting with
+.B #
+is a comment.
+The rules are tried in order at each line of the input.
+A rule's lines must match consecutive lines (a label, a line not
+indented, ends a sequence); in them:
+.TP
+.BI % n
+(a digit) matches any text, which the same
+.BI % n
+must match again in the rule, and which
+.BI % n
+in the replacement stands for;
+.B %*
+matches any text, to be forgotten.
+.TP
+.BI %[ a | b | ... ] n
+matches one of the texts, as
+.BI % n\c
+\&.
+.TP
+.BI %![ a | b | ... ]
+matches if none of the texts is there.
+.TP
+.BI %( expression )
+matches a number equal to the expression, in which
+.BI % n
+is a variable's value; in a replacement it is the expression's value,
+in hexadecimal.
+A rule whose expression isn't a number (an address, such as a symbol's
+offset) doesn't apply.
+.TP
+.BI %=[ a | b ][ c | d ] n
+in a replacement, the text of the second list at the place where the
+variable's text is in the first.
+.TP
+.B %%
+is
+.BR % .
+.PP
+A replacement can't be empty: an empty line there ends the rules.
+.SH EXAMPLES
+A store and a load of the same place leave the value in the register,
+so the load goes (unless the address increments or decrements a
+register):
+.PP
+.RS
+.nf
+ST%1	%2,%[X|Y|U|S]3
+LD%1	%2,%[X|Y|U|S]3
+=
+ST%1	%2,%3
+.fi
+.RE
+.SH EXIT STATUS
+0, or 1 if a file can't be read or written.
+.SH SEE ALSO
+.BR bcc09 (1),
+.BR bcc09\-cc1 (1)
