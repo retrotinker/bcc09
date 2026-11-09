@@ -88,9 +88,11 @@ LDFLAGS =
 # libc's stdarg.h takes the address of (the first argument is passed in
 # a register, so the last named one can't be used)
 VA_ALIST = -D_VA_ALIST_=\"__va_alist\"
+# bcc09: give cc1 prototypes' argument types (see show_proto)
+PROTO	= -D_PROTO_=\"__proto\"
 
 CCFLAGS = $(CFLAGS) -w $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -DREOPEN \
-	  $(VA_ALIST)
+	  $(VA_ALIST) $(PROTO)
 
 #CFLAGS	= -O $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -p -Dstatic=
 #CFLAGS	= -g $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -DDEBUG

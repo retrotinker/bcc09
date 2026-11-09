@@ -30,13 +30,11 @@ cc1 (code generation)
   References: none stable (maltest.s's JMP .49 has come and gone as
   headers it includes changed size)
 
-- Arguments aren't converted to the types of a prototype's parameters:
-  unproto takes prototypes out before cc1 sees them, so with "long
-  f(long);" f(3) passes an int where f wants a long, and with "double
-  g(double);" g(3) passes an int for a double.  (Chars and shorts are
-  widened to ints anyway, and floats passed as doubles, so those
-  work; but a bool parameter given an int keeps its low byte, so 256
-  is false.)  References: none (the tests pass each parameter's type)
+- A call through a function pointer doesn't convert its arguments to
+  the types of the pointer's prototype: unproto gives cc1 the types of
+  a function's prototype (__proto), but not of a pointer's, so with
+  "long (*fp)(long);" fp(3) passes an int where a long is wanted.
+  (Calls of functions by name are converted.)  References: none
 
 - In PIC mode, global (bss?) pointers and arrays use PC-relative
   addressing rather than direct addressing.  (Not covered by the tests.)

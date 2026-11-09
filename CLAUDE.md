@@ -78,6 +78,13 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
   as dev86's old `strcspn.c`) shouldn't be copied in.
+- `unproto` is built with `_PROTO_` too (added 2026-11-08): after the `()` it writes for a
+  prototype, and after a prototyped heading's argument names, it writes
+  `__proto(type name, ...)`, which `cc1` parses (`declproto()`, into the symbol's `proto`);
+  a call of a function by name converts each argument to its parameter's type and then
+  promotes it as usual, so the old-style definitions `unproto` makes get what they
+  expect, and a wrong number of arguments is an error. Calls through function pointers
+  aren't converted (`BUGS`).
 - `unproto` is built with `_VA_ALIST_` (`unproto/Makefile`), so the definition of a
   function with `...` gets an `int __va_alist` parameter in its place, whose address
   `libc/include/stdarg.h`'s `va_start` uses (the first argument is in a register, so the
@@ -105,7 +112,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 516 reference
+  `tests/src/` with this tree's tools and compare every result with the 522 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -143,7 +150,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `sftest.in`, `fltcc.c`, floats and doubles in many places in C, and `fpio.c`, `printf`'s
   floating formats, `strtod` and `scanf`'s `%f`, but for their counts of checks; and
   `mtest.c`, `math.h`'s functions, whose results must equal bit for bit those of
-  `libc/math` built on the host; `inttest.c`, `stdint.h` and `_Bool`);
+  `libc/math` built on the host; `inttest.c`, `stdint.h` and `_Bool`; `protoarg.c`,
+  arguments converted to prototypes' types);
   `fpoptional.result` checks that `pftest` and `sftest` link none of that code; `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
 - `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
@@ -153,7 +161,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
   it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
   `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
-- Eighteen test programs are built again with `-O` and must run the same
+- Nineteen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.

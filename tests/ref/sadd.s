@@ -77,84 +77,85 @@
 ; 94 
 ; 95  
 ; 96 
-; 97 extern int setvbuf ();
+; 97 extern int setvbuf () __proto(FILE*,char*,int,size_t);
 ;BCC_EOS
 ; 98 
 ; 99  
 ; 100 
-; 101 extern void setbuffer ();
+; 101 extern void setbuffer () __proto(FILE*,char*,int);
 ;BCC_EOS
 ; 102 
-; 103 extern int fgetc ();
+; 103 extern int fgetc () __proto(FILE*);
 ;BCC_EOS
-; 104 extern int fputc ();
+; 104 extern int fputc () __proto(int,FILE*);
 ;BCC_EOS
-; 105 extern int ungetc ();
+; 105 extern int ungetc () __proto(int,FILE*);
 ;BCC_EOS
 ; 106 
-; 107 extern int fclose ();
+; 107 extern int fclose () __proto(FILE*);
 ;BCC_EOS
-; 108 extern int fflush ();
+; 108 extern int fflush () __proto(FILE*);
 ;BCC_EOS
-; 109 extern char *fgets ();
+; 109 extern char *fgets () __proto(char*,int,FILE*);
 ;BCC_EOS
-; 110 extern char *gets ();		 
+; 110 extern char *gets () __proto(char*);		 
 ;BCC_EOS
-; 111 extern size_t fread ();
+; 111 extern size_t fread () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
-; 112 extern size_t fwrite ();
+; 112 extern size_t fwrite () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
 ; 113 
-; 114 extern FILE *fopen ();
+; 114 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 115 extern FILE *fdopen ();
+; 115 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 116 extern FILE *freopen  ();
+; 116 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 117 extern FILE *__fopen ();
+; 117 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
 ; 118 
-; 119 extern int fseek ();
+; 119 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 120 extern long ftell ();
+; 120 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 121 extern void rewind ();
+; 121 extern void rewind () __proto(FILE*);
 ;BCC_EOS
 ; 122 
-; 123 extern int fputs ();
+; 123 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 124 extern int puts ();
+; 124 extern int puts () __proto(char*);
 ;BCC_EOS
 ; 125 
-; 126 extern int printf ();
+; 126 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 127 extern int fprintf ();
+; 127 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 128 extern int sprintf ();
+; 128 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 129 extern int snprintf ();
+; 129 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
 ; 130  
-; 131 extern int vprintf ();
+; 131 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 132 extern int vfprintf ();
+; 132 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 133 extern int vsprintf ();
+; 133 extern int vsprintf
+; 133  () __proto(char*,char*,char*);
 ;BCC_EOS
-; 134 extern int vsnprintf ();
+; 134 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
 ; 135 
-; 136 extern int scanf ();
+; 136 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 137 extern int fscanf ();
+; 137 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 138 extern int sscanf ();
+; 138 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 139 extern int vscanf ();
+; 139 extern int vscanf () __proto(char*,char*);
 ;BCC_EOS
-; 140 extern int vfscanf ();
+; 140 extern int vfscanf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 141 extern int vsscanf ();
+; 141 extern int vsscanf () __proto(char*,char*,char*);
 ;BCC_EOS
 ; 142 # 8 "sadd.c"
 ; 8 signed char gc = -1;
@@ -169,7 +170,7 @@ _guc:
 	FCB	$FF
 ;BCC_EOS
 ; 10 
-; 11 unsigned char ucf(v)
+; 11 unsigned char ucf(v) __proto(unsigned char v)
 ; 12 # 11 "sadd.c"
 ; 11 unsigned char v;
 	LOC	0
@@ -186,7 +187,7 @@ _ucf:
 ;BCC_EOS
 ; 14 }
 ; 15 
-; 16 signed char scf(v)
+; 16 signed char scf(v) __proto(signed char v)
 ; 17 # 16 "sadd.c"
 ; 16 signed char v;
 	EXPORT	_scf
@@ -313,8 +314,7 @@ _main:
 	JSR	>_printf
 	LEAS	2,S
 ;BCC_EOS
-; 31 	printf("a + gc 
-; 31 %d\n",a + gc);
+; 31 	printf("a + gc %d\n",a + gc);
 	LOC	1
 .5:
 	FCC	"a + gc %d"
@@ -638,7 +638,7 @@ _main:
 	FCB	$A
 	FCB	0
 	LOC	0
-; Debug: rootlist int = const $C8 (used reg = )
+; Debug: rootlist unsigned char = const $C8 (used reg = )
 	LDX	#$C8
 ; Debug: func () unsigned char = ucf+0 (used reg = )
 	JSR	>_ucf
@@ -662,7 +662,7 @@ _main:
 	FCB	$A
 	FCB	0
 	LOC	0
-; Debug: rootlist int = const $C8 (used reg = )
+; Debug: rootlist unsigned char = const $C8 (used reg = )
 	LDX	#$C8
 ; Debug: func () unsigned char = ucf+0 (used reg = )
 	JSR	>_ucf
@@ -685,7 +685,7 @@ _main:
 	FCB	$A
 	FCB	0
 	LOC	0
-; Debug: rootlist int = const -5 (used reg = )
+; Debug: rootlist char = const -5 (used reg = )
 	LDX	#-5
 ; Debug: func () char = scf+0 (used reg = )
 	JSR	>_scf
@@ -709,7 +709,7 @@ _main:
 	FCB	$A
 	FCB	0
 	LOC	0
-; Debug: rootlist int = const -5 (used reg = )
+; Debug: rootlist char = const -5 (used reg = )
 	LDX	#-5
 ; Debug: func () char = scf+0 (used reg = )
 	JSR	>_scf
@@ -736,7 +736,7 @@ _main:
 	FCB	$A
 	FCB	0
 	LOC	0
-; Debug: rootlist int = const -5 (used reg = )
+; Debug: rootlist char = const -5 (used reg = )
 	LDX	#-5
 ; Debug: func () char = scf+0 (used reg = )
 	JSR	>_scf

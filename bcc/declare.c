@@ -19,6 +19,8 @@
 #include "parse.h"
 
 PRIVATE bool_t argsallowed;	/* nonzero to allow args in declarator */
+#define MAXPARAMS 32
+PRIVATE struct proto *gvarproto;	/* prototype of last identifier declared */
 PRIVATE sym_t gvarsc;		/* sc flags of last identifier declared */
 PRIVATE char gvar2name[2 + NAMESIZE];	/* space for structure keys and .. */
 
@@ -30,6 +32,7 @@ FORWARD struct typestruct *chainprefix P((struct typestruct * pretype,
 					  struct typestruct * sufftype));
 FORWARD void declaf P((void));
 FORWARD void declarator P((void));
+FORWARD void declproto P((void));
 FORWARD void declarg P((void));
 FORWARD struct typestruct *declenum P((void));
 FORWARD void declfunc P((void));
@@ -166,6 +169,8 @@ PRIVATE void declaf()
 		gvartype = ogvartype;
 #endif /* TESTING_PROTOTYPES */
 		rparen();
+		if (sym == IDENT && strcmp(gsname, "__proto") == 0)
+			declproto();
 		declaf();
 		switch (gvartype->constructor) {
 		case ARRAY:
@@ -200,8 +205,72 @@ PRIVATE void declaf()
 	}
 }
 
+/* __proto(type name, ...): the parameters' types, which unproto writes
+   after the () of a function declaration or the names of a heading that
+   had a prototype; a parameter's array or function type is a pointer */
+PRIVATE void declproto()
+{
+	char ogvarname[NAMESIZE];
+	sym_t ogvarsc;
+	struct symstruct *ogvarsymptr;
+	struct typestruct *ogvartype;
+	bool_t oargsallowed;
+	struct typestruct *types[MAXPARAMS];
+	int n = 0, i;
+	bool_t varargs = FALSE;
+	struct proto *proto;
+
+	strcpy(ogvarname, gvarname);
+	ogvarsc = gvarsc;
+	ogvarsymptr = gvarsymptr;
+	ogvartype = gvartype;
+	oargsallowed = argsallowed;
+	argsallowed = FALSE;
+	nextsym();
+	lparen();
+	while (sym != RPAREN) {
+		if (sym == STRUCELTOP) {	/* ... */
+			nextsym();
+			nextsym();
+			nextsym();
+			varargs = TRUE;
+			break;
+		}
+		if (!declspec()) {
+			error("bad prototype");
+			break;
+		}
+		declarator();
+		if (gvartype->constructor == ARRAY)
+			gvartype = pointype(gvartype->nexttype);
+		else if (gvartype->constructor == FUNCTION)
+			gvartype = pointype(gvartype);
+		if (n < MAXPARAMS)
+			types[n++] = gvartype;
+		else
+			limiterror("too many parameters in a prototype");
+		if (sym != COMMA)
+			break;
+		nextsym();
+	}
+	rparen();
+	proto = qmalloc(sizeof(struct proto) +
+			(n ? n - 1 : 0) * sizeof(struct typestruct *));
+	proto->nparams = n;
+	proto->varargs = varargs;
+	for (i = 0; i < n; i++)
+		proto->ptypes[i] = types[i];
+	strcpy(gvarname, ogvarname);
+	gvarsc = ogvarsc;
+	gvarsymptr = ogvarsymptr;
+	gvartype = ogvartype;
+	argsallowed = oargsallowed;
+	gvarproto = proto;
+}
+
 PRIVATE void declarator()
 {
+	gvarproto = NULL;
 	rdeclarator();
 	if (gvartype->constructor == STRUCTU && gvartype->typesize == 0 &&
 	    gvarsc != TYPEDEFDECL && gvarsc != EXTERNDECL)
@@ -589,6 +658,8 @@ PRIVATE void declfunc()
 		 (gvarsymptr->flags & INITIALIZED))
 		multidecl(gvarname);	/* different type or full declare */
 	gvarsymptr->flags = INITIALIZED;	/* show full declare */
+	if (gvarproto != NULL)
+		gvarsymptr->proto = gvarproto;
 	cseg();
 	if (gvarsc == STATICDECL)
 		private(gvarname);	/* don't need to put STATIC in flags */
@@ -751,6 +822,8 @@ PRIVATE void idecllist()
 				    (softsp & gvartype->alignmask) -
 				    gvartype->typesize;
 		}
+		if (gvartype->constructor == FUNCTION && gvarproto != NULL)
+			gvarsymptr->proto = gvarproto;
 		if (gvarsc == STATICDECL) {
 			gvarsymptr->flags &= ~EXTERNAL;
 			gvarsymptr->flags |= STATIC;

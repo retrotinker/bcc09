@@ -3,10 +3,9 @@
    in each position, with and without prototypes, results, conditions,
    compound assignments, conversions); prints integers made from the
    results, which must be the same with the host's compiler (but for the
-   count of checks), and exits with the number of failed checks.  (bcc09
-   doesn't convert arguments to a prototype's types: unproto takes the
-   prototypes out, so each argument here has the parameter's type, or
-   float for double.) */
+   count of checks), and exits with the number of failed checks.  (Each
+   argument here has its parameter's type, or is a float for a double:
+   protoarg.c checks the conversion of other types.) */
 
 #include <stdio.h>
 

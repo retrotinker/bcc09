@@ -4,3 +4,6 @@ syntax.c:5.13: error: undeclared undeclared
 syntax.c:7.1: error: need ';'
 syntax.c:9.14: error: need ';'
 syntax.c:9.14: error: bad expression
+syntax.c:14.17: error: too few arguments
+syntax.c:14.30: error: too many arguments
+syntax.c:14.37: error: too few arguments

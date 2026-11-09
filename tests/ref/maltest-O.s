@@ -34,64 +34,67 @@
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 10 # 17 "../prefix.tmp/lib/bcc09/include/stdlib.h"
-; 17 extern int atoi ();
+; 17 extern int atoi () __proto(char *);
 ;BCC_EOS
-; 18 extern long atol ();
+; 18 extern long atol () __proto(char *);
 ;BCC_EOS
-; 19 extern long strtol ();
+; 19 extern long strtol () __proto(char *,char **,int);
 ;BCC_EOS
-; 20 extern unsigned long strtoul ();
+; 20 extern unsigned long strtoul () __proto(char *,char **,int);
 ;BCC_EOS
-; 21 extern double strtod ();
+; 21 extern double strtod () __proto(char *,char **);
 ;BCC_EOS
-; 22 extern double atof ();
+; 22 extern double atof () __proto(char *);
 ;BCC_EOS
 ; 23 
-; 24 extern int abs ();
+; 24 extern int abs () __proto(int);
 ;BCC_EOS
-; 25 extern long labs ();
+; 25 extern long labs () __proto(long);
 ;BCC_EOS
 ; 26 
-; 27 extern int rand ();
+; 27 extern int rand () __proto();
 ;BCC_EOS
-; 28 extern void srand ();
+; 28 extern void srand () __proto(unsigned int);
 ;BCC_EOS
 ; 29 
-; 30 extern void qsort ();
+; 30 extern void qsort () __proto(void *,size_t,size_t,int (*)());
 ;BCC_EOS
 ; 31 extern void * bsearch 
 ; 32 
 ; 33 # 31
 ; 31 
-; 32 ();
+; 32 () __proto(void *,void *,size_t,size_t
+; 33 # 31 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 31 ,
+; 32 int (*)());
 ;BCC_EOS
 ; 33 
-; 34 extern void * malloc ();
+; 34 extern void * malloc () __proto(size_t);
 ;BCC_EOS
-; 35 extern void * calloc ();
+; 35 extern void * calloc () __proto(size_t,size_t);
 ;BCC_EOS
-; 36 extern void * realloc ();
+; 36 extern void * realloc () __proto(void *,size_t);
 ;BCC_EOS
-; 37 extern void free ();
+; 37 extern void free () __proto(void *);
 ;BCC_EOS
 ; 38 
-; 39 extern int atexit ();
+; 39 extern int atexit () __proto(void (*)());
 ;BCC_EOS
-; 40 extern void exit ();
+; 40 extern void exit () __proto(int);
 ;BCC_EOS
-; 41 extern void _exit ();
+; 41 extern void _exit () __proto(int);
 ;BCC_EOS
 ; 42 
 ; 43  
-; 44 extern char * itoa ();
+; 44 extern char * itoa () __proto(int);
 ;BCC_EOS
-; 45 extern char * ltoa ();
+; 45 extern char * ltoa () __proto(long);
 ;BCC_EOS
-; 46 extern char * ultoa ();
+; 46 extern char * ultoa () __proto(unsigned long);
 ;BCC_EOS
-; 47 extern char * ltostr ();
+; 47 extern char * ltostr () __proto(long,int);
 ;BCC_EOS
-; 48 extern char * ultostr ();
+; 48 extern char * ultostr () __proto(unsigned long,int);
 ;BCC_EOS
 ; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
@@ -103,45 +106,46 @@
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 10 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 5  
-; 6 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 13 "../prefix.tmp/lib/b
+; 12 cc09/include/string.h"
 ; 13  
-; 14 extern size_t strlen ();
+; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
 ; 15 
-; 16 extern char * strcat ();
+; 16 extern char * strcat () __proto(char*,char*);
 ;BCC_EOS
-; 17 extern char * strcpy ();
+; 17 extern char * strcpy () __proto(char*,char*);
 ;BCC_EOS
-; 18 extern int strcmp ();
+; 18 extern int strcmp () __proto(char*,char*);
 ;BCC_EOS
 ; 19 
-; 20 extern char * strncat ();
+; 20 extern char * strncat () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 21 extern char * strncpy ();
+; 21 extern char * strncpy () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 22 extern int strncmp ();
+; 22 extern int strncmp () __proto(char*,char*,size_t);
 ;BCC_EOS
 ; 23 
-; 24 extern char * strchr ();
+; 24 extern char * strchr () __proto(char*,int);
 ;BCC_EOS
-; 25 extern char * strrchr ();
+; 25 extern char * strrchr () __proto(char*,int);
 ;BCC_EOS
-; 26 extern char * strdup ();
+; 26 extern char * strdup () __proto(char*);
 ;BCC_EOS
 ; 27 
 ; 28  
-; 29 extern void * memcpy ();
+; 29 extern void * memcpy () __proto(void*,void*,size_t);
 ;BCC_EOS
-; 30 extern void * memccpy ();
+; 30 extern void * memccpy () __proto(void*,void*,int,size_t);
 ;BCC_EOS
-; 31 extern void * memchr ();
+; 31 extern void * memchr () __proto(void*,int,size_t);
 ;BCC_EOS
-; 32 extern void * memset ();
+; 32 extern void * memset () __proto(void*,int,size_t);
 ;BCC_EOS
-; 33 extern int memcmp ();
+; 33 extern int memcmp () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 34 
-; 35 extern void * memmove ();
+; 35 extern void * memmove () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 36 
 ; 37  
@@ -152,18 +156,17 @@
 ; 42 
 ; 43 
 ; 44  
-; 45 extern char * strpbrk ();
+; 45 extern char * strpbrk () __proto(char *,char *);
 ;BCC_EOS
-; 46 extern char * strsep ();
+; 46 extern char * strsep () __proto(char **,char *);
 ;BCC_EOS
-; 47 extern char * strstr ();
+; 47 extern char * strstr () __proto(char *,char *);
 ;BCC_EOS
-; 48 extern char * strtok ();
+; 48 extern char * strtok () __proto(char *,char *);
 ;BCC_EOS
-; 49 e
-; 49 xtern size_t strcspn ();
+; 49 extern size_t strcspn () __proto(char *,char *);
 ;BCC_EOS
-; 50 extern size_t strspn ();
+; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
 ; 51 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
 ; 6  
@@ -180,22 +183,22 @@
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/unistd.h"
 ; 10 # 22
 ; 22  
-; 23 extern ssize_t read ();
+; 23 extern ssize_t read () __proto(int,void *,size_t);
 ;BCC_EOS
-; 24 extern ssize_t write ();
+; 24 extern ssize_t write () __proto(int,void *,size_t);
 ;BCC_EOS
-; 25 extern int close ();
+; 25 extern int close () __proto(int);
 ;BCC_EOS
-; 26 extern off_t lseek ();
+; 26 extern off_t lseek () __proto(int,off_t,int);
 ;BCC_EOS
-; 27 extern int isatty ();
+; 27 extern int isatty () __proto(int);
 ;BCC_EOS
 ; 28 
 ; 29 
 ; 30  
-; 31 extern int brk ();
+; 31 extern int brk () __proto(void *);
 ;BCC_EOS
-; 32 extern void * sbrk ();
+; 32 extern void * sbrk () __proto(int);
 ;BCC_EOS
 ; 33 extern unsigned int __heap_margin;
 ;BCC_EOS
@@ -288,6 +291,7 @@ PULS	Y,PC
 ; 40 
 ; 41 
 ; 42 void fill(p,slot,size)
+; 43 
 ; 43 char *p;
 EXPORT	_fill
 _fill:
@@ -430,7 +434,7 @@ _basics:
 ; 69 
 ; 70 	p = malloc(10);
 LEAS	-8,S
-; Debug: rootlist int = const $A (used reg = )
+; Debug: rootlist unsigned int = const $A (used reg = )
 LDX	#$A
 ; Debug: func () * void = malloc+0 (used reg = )
 JSR	>_malloc
@@ -469,7 +473,7 @@ JSR	>_fill
 LEAS	4,S
 ;BCC_EOS
 ; 73 	q = malloc(20);
-; Debug: rootlist int = const $14 (used reg = )
+; Debug: rootlist unsigned int = const $14 (used reg = )
 LDX	#$14
 ; Debug: func () * void = malloc+0 (used reg = )
 JSR	>_malloc
@@ -572,29 +576,29 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 77 	free(p);
-; Debug: rootlist * char p = [S+8-2] (used reg = )
+; Debug: rootlist * void p = [S+8-2] (used reg = )
 LDX	6,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
 ;BCC_EOS
 ; 78 	free(q);
-; Debug: rootlist * char q = [S+8-4] (used reg = )
+; Debug: rootlist * void q = [S+8-4] (used reg = )
 LDX	4,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
 ;BCC_EOS
 ; 79 	free((char *)0);			 
-; Debug: rootlist * char = const 0 (used reg = )
+; Debug: rootlist * void = const 0 (used reg = )
 LDX	#0
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
 ;BCC_EOS
 ; 80 
 ; 81 	p = calloc(20,3);
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
-; Debug: rootlist int = const $14 (used reg = )
+; Debug: rootlist unsigned int = const $14 (used reg = )
 LDX	#$14
 ; Debug: func () * void = calloc+0 (used reg = )
 JSR	>_calloc
@@ -666,7 +670,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 87 	free(p);
-; Debug: rootlist * char p = [S+8-2] (used reg = )
+; Debug: rootlist * void p = [S+8-2] (used reg = )
 LDX	6,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -674,10 +678,10 @@ JSR	>_free
 ; 88 
 ; 89 	 
 ; 90 	p = realloc((char *)0,16);		 
-; Debug: list int = const $10 (used reg = )
+; Debug: list unsigned int = const $10 (used reg = )
 LDD	#$10
 PSHS	D
-; Debug: rootlist * char = const 0 (used reg = )
+; Debug: rootlist * void = const 0 (used reg = )
 LDX	#0
 ; Debug: func () * void = realloc+0 (used reg = )
 JSR	>_realloc
@@ -717,10 +721,10 @@ JSR	>_fill
 LEAS	4,S
 ;BCC_EOS
 ; 93 	p = realloc(p,200);
-; Debug: list int = const $C8 (used reg = )
+; Debug: list unsigned int = const $C8 (used reg = )
 LDD	#$C8
 PSHS	D
-; Debug: rootlist * char p = [S+$A-2] (used reg = )
+; Debug: rootlist * void p = [S+$A-2] (used reg = )
 LDX	8,S
 ; Debug: func () * void = realloc+0 (used reg = )
 JSR	>_realloc
@@ -765,7 +769,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 95 	q = malloc(5);				 
-; Debug: rootlist int = const 5 (used reg = )
+; Debug: rootlist unsigned int = const 5 (used reg = )
 LDX	#5
 ; Debug: func () * void = malloc+0 (used reg = )
 JSR	>_malloc
@@ -773,10 +777,10 @@ JSR	>_malloc
 STX	4,S
 ;BCC_EOS
 ; 96 	p = realloc(p,1000);
-; Debug: list int = const $3E8 (used reg = )
+; Debug: list unsigned int = const $3E8 (used reg = )
 LDD	#$3E8
 PSHS	D
-; Debug: rootlist * char p = [S+$A-2] (used reg = )
+; Debug: rootlist * void p = [S+$A-2] (used reg = )
 LDX	8,S
 ; Debug: func () * void = realloc+0 (used reg = )
 JSR	>_realloc
@@ -821,10 +825,10 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 98 	p = realloc(p,8);
-; Debug: list int = const 8 (used reg = )
+; Debug: list unsigned int = const 8 (used reg = )
 LDD	#8
 PSHS	D
-; Debug: rootlist * char p = [S+$A-2] (used reg = )
+; Debug: rootlist * void p = [S+$A-2] (used reg = )
 LDX	8,S
 ; Debug: func () * void = realloc+0 (used reg = )
 JSR	>_realloc
@@ -869,13 +873,13 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 100 	free(p);
-; Debug: rootlist * char p = [S+8-2] (used reg = )
+; Debug: rootlist * void p = [S+8-2] (used reg = )
 LDX	6,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
 ;BCC_EOS
 ; 101 	free(q);
-; Debug: rootlist * char q = [S+8-4] (used reg = )
+; Debug: rootlist * void q = [S+8-4] (used reg = )
 LDX	4,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -972,13 +976,13 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 107 	free(p);
-; Debug: rootlist * char p = [S+8-2] (used reg = )
+; Debug: rootlist * void p = [S+8-2] (used reg = )
 LDX	6,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
 ;BCC_EOS
 ; 108 	free(q);
-; Debug: rootlist * char q = [S+8-4] (used reg = )
+; Debug: rootlist * void q = [S+8-4] (used reg = )
 LDX	4,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -1011,9 +1015,8 @@ EXPORT	_rnd
 _rnd:
 ;BCC_EOS
 ; 122 {
-; 123 	seed = seed * 110351
+; 123 	seed = seed * 1103515245L + 12345;
 PSHS	X
-; 123 5245L + 12345;
 ; Debug: mul long = const $41C64E6D to unsigned long = [seed+0] (used reg = )
 ; Debug: expression subtree swapping
 LDD	#$41C6
@@ -1312,7 +1315,7 @@ LEAX	1,X
 STX	2,S
 ;BCC_EOS
 ; 154 				p = realloc(slot[s],sz);
-; Debug: list int sz = [S+$C-$A] (used reg = )
+; Debug: list unsigned int sz = [S+$C-$A] (used reg = )
 LDD	2,S
 PSHS	D
 ; Debug: ptradd int s = [S+$E-4] to [$28] * char = slot+0 (used reg = )
@@ -1321,7 +1324,8 @@ LSLB
 ROLA
 LDX	#_slot
 LEAX	D,X
-; Debug: rootlist * char = [X+0] (used reg = )
+; Debug: cast * void = const 0 to * char = [X+0] (used reg = )
+; Debug: rootlist * void = [X+0] (used reg = )
 LDX	0,X
 ; Debug: func () * void = realloc+0 (used reg = )
 JSR	>_realloc
@@ -1443,7 +1447,8 @@ LSLB
 ROLA
 LDX	#_slot
 LEAX	D,X
-; Debug: rootlist * char = [X+0] (used reg = )
+; Debug: cast * void = const 0 to * char = [X+0] (used reg = )
+; Debug: rootlist * void = [X+0] (used reg = )
 LDX	0,X
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -1480,7 +1485,8 @@ JSR	>_malloc
 ; Debug: eq * void = X+0 to * char p = [S+$C-$C] (used reg = )
 STX	0,S
 ;BCC_EOS
-; 172 			if (p == 0) {
+; 172 			if (p
+; 172  == 0) {
 ; Debug: logeq int = const 0 to * char p = [S+$C-$C] (used reg = )
 LDD	0,S
 BNE	.65
@@ -1684,7 +1690,8 @@ LSLB
 ROLA
 LDX	#_slot
 LEAX	D,X
-; Debug: rootlist * char = [X+0] (used reg = )
+; Debug: cast * void = const 0 to * char = [X+0] (used reg = )
+; Debug: rootlist * void = [X+0] (used reg = )
 LDX	0,X
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -1792,7 +1799,7 @@ STD	0,S
 ; 213 	}
 ; 214 	ok(30,errno == 12		  );
 .7A:
-; Debug: rootlist int = const $64 (used reg = )
+; Debug: rootlist unsigned int = const $64 (used reg = )
 LDX	#$64
 ; Debug: func () * void = malloc+0 (used reg = )
 JSR	>_malloc
@@ -1880,7 +1887,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 218 	ok(33,malloc(100)== 0);	 
-; Debug: rootlist int = const $64 (used reg = )
+; Debug: rootlist unsigned int = const $64 (used reg = )
 LDX	#$64
 ; Debug: func () * void = malloc+0 (used reg = )
 JSR	>_malloc
@@ -1910,7 +1917,7 @@ LDX	[9,S]
 STX	7,S
 ;BCC_EOS
 ; 221 		free(list);
-; Debug: rootlist * char list = [S+$B-2] (used reg = )
+; Debug: rootlist * void list = [S+$B-2] (used reg = )
 LDX	9,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -1956,7 +1963,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 226 	free(p);
-; Debug: rootlist * char p = [S+$B-4] (used reg = )
+; Debug: rootlist * void p = [S+$B-4] (used reg = )
 LDX	7,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -1992,7 +1999,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 229 	free(p);
-; Debug: rootlist * char p = [S+$B-4] (used reg = )
+; Debug: rootlist * void p = [S+$B-4] (used reg = )
 LDX	7,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -2172,7 +2179,6 @@ CLRA
 CLRB
 STD	>_errno
 ;BCC_EOS
-; 245 
 ; 245 	ok(45,sbrk(-30000)== (char *)-1 && errno == 12		  );	 
 ; Debug: rootlist int = const -$7530 (used reg = )
 LDX	#-$7530
@@ -2235,7 +2241,8 @@ LEAS	2,S
 ; 247 	ok(47,brk(start + 50)== 0 && sbrk(0)== start + 50);
 ; Debug: ptradd int = const $32 to * char start = [S+6-2] (used reg = )
 LDX	4,S
-; Debug: rootlist * char = X+$32 (used reg = )
+; Debug: cast * void = const 0 to * char = X+$32 (used reg = )
+; Debug: rootlist * void = X+$32 (used reg = )
 LEAX	$32,X
 ; Debug: func () int = brk+0 (used reg = )
 JSR	>_brk
@@ -2271,7 +2278,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 248 	ok(48,brk(start)== 0);
-; Debug: rootlist * char start = [S+6-2] (used reg = )
+; Debug: rootlist * void start = [S+6-2] (used reg = )
 LDX	4,S
 ; Debug: func () int = brk+0 (used reg = )
 JSR	>_brk
@@ -2305,7 +2312,7 @@ LDD	#$7000
 STD	>___heap_margin
 ;BCC_EOS
 ; 253 	ok(49,malloc(1000)== 0);
-; Debug: rootlist int = const $3E8 (used reg = )
+; Debug: rootlist unsigned int = const $3E8 (used reg = )
 LDX	#$3E8
 ; Debug: func () * void = malloc+0 (used reg = )
 JSR	>_malloc
@@ -2332,7 +2339,7 @@ LDD	0,S
 STD	>___heap_margin
 ;BCC_EOS
 ; 255 	p = malloc(1000);
-; Debug: rootlist int = const $3E8 (used reg = )
+; Debug: rootlist unsigned int = const $3E8 (used reg = )
 LDX	#$3E8
 ; Debug: func () * void = malloc+0 (used reg = )
 JSR	>_malloc
@@ -2358,7 +2365,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 257 	free(p);
-; Debug: rootlist * char p = [S+6-4] (used reg = )
+; Debug: rootlist * void p = [S+6-4] (used reg = )
 LDX	2,S
 ; Debug: func () void = free+0 (used reg = )
 JSR	>_free
@@ -2372,10 +2379,10 @@ CLRB
 STD	>_errno
 ;BCC_EOS
 ; 261 	ok(51,calloc(300,300)== 0 && errno == 12		  );
-; Debug: list int = const $12C (used reg = )
+; Debug: list unsigned int = const $12C (used reg = )
 LDD	#$12C
 PSHS	D
-; Debug: rootlist int = const $12C (used reg = )
+; Debug: rootlist unsigned int = const $12C (used reg = )
 LDX	#$12C
 ; Debug: func () * void = calloc+0 (used reg = )
 JSR	>_calloc

@@ -168,6 +168,7 @@ static void show_type();
 static void pair_flush();
 static void check_cast();
 static void show_empty_list();
+static void show_proto();
 
 #define	check_cast_flush(t)	(check_cast(t), tok_free(t))
 
@@ -407,12 +408,55 @@ register struct token *t;
 	}
 }
 
+#ifdef _PROTO_
+
+/* show_proto - for bcc09's cc1, which has no prototypes: after a function
+   declaration's (), or a rewritten heading's argument names, the types
+   of a new-style argument list, as _PROTO_(type name, ...); cc1 converts
+   each argument of a call to its type (then promotes it as usual).  In
+   a heading (defn), only if every argument has a type, so that not
+   for f(a, b) { ...; nothing for (). */
+
+static void show_proto(t, defn)
+register struct token *t;
+int defn;
+{
+	register struct token *s;
+
+	if (t->head == 0 || t->head->next == 0)
+		return;			/* (not a list) */
+	if (LAST_ARG_AND_EQUAL(t->head, VOID_ARG)) {
+		put_str(" ");
+		put_str(_PROTO_);
+		put_str("()");
+		return;
+	}
+	if (t->head->head == 0)
+		return;			/* () */
+	if (defn)
+		for (s = t->head; s->next; s = s->next)
+			if (s->head == 0 || (s->head == s->tail &&
+			    !STREQ(s->head->vstr->str, "...")))
+				return;	/* an old-style name */
+	put_str(" ");
+	put_str(_PROTO_);
+	for (s = t->head; s; s = s->next) {
+		tok_show_ch(s);	/* '(' or ',' or ')' */
+		show_type(s);
+	}
+}
+
+#else
+#define show_proto(t, defn)
+#endif
+
 /* header_flush - rewrite new-style function heading to old style */
 
 static void header_flush(t)
 register struct token *t;
 {
 	show_arg_names(t);	/* show argument names */
+	show_proto(t, 1);
 	put_nl();		/* make output look nicer */
 	show_arg_types(t);	/* show argument types */
 	tok_free(t);		/* discard token */
@@ -923,6 +967,7 @@ register struct token *list;
 		case ';':
 			/* Function type declaration: word (list) -> word () */
 			show_empty_list(list);
+			show_proto(list, 0);
 			tok_free(list);
 			tok_unget(t);
 			return (0);

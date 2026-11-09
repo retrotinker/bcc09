@@ -30,10 +30,10 @@ The changes:
   on bcc09, int on a host), but for the C interfaces (frexp's int *,
   ldexp's and scalbn's int, finite's result) and a few small parameters
   of fdlibm's own (__kernel_sin's and __kernel_tan's iy,
-  __kernel_rem_pio2's prec).  bcc09 doesn't convert arguments to a
-  prototype's types (see BUGS), so a call that passes an __i32 to one of
-  those casts it to int; and cc1 can't switch on a long, so those switches
-  cast to int.
+  __kernel_rem_pio2's prec).  A call that passes an __i32 to one of
+  those casts it to int (bcc09 didn't convert arguments to a prototype's
+  types when this was written); and cc1 can't switch on a long, so those
+  switches cast to int.
 
 - __HI(x) and __LO(x), the high and low words of the double x, are the
   first and second on the 6809, which is big-endian (fdlibm.h).

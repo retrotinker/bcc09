@@ -77,84 +77,85 @@
 ; 94 
 ; 95  
 ; 96 
-; 97 extern int setvbuf ();
+; 97 extern int setvbuf () __proto(FILE*,char*,int,size_t);
 ;BCC_EOS
 ; 98 
 ; 99  
 ; 100 
-; 101 extern void setbuffer ();
+; 101 extern void setbuffer () __proto(FILE*,char*,int);
 ;BCC_EOS
 ; 102 
-; 103 extern int fgetc ();
+; 103 extern int fgetc () __proto(FILE*);
 ;BCC_EOS
-; 104 extern int fputc ();
+; 104 extern int fputc () __proto(int,FILE*);
 ;BCC_EOS
-; 105 extern int ungetc ();
+; 105 extern int ungetc () __proto(int,FILE*);
 ;BCC_EOS
 ; 106 
-; 107 extern int fclose ();
+; 107 extern int fclose () __proto(FILE*);
 ;BCC_EOS
-; 108 extern int fflush ();
+; 108 extern int fflush () __proto(FILE*);
 ;BCC_EOS
-; 109 extern char *fgets ();
+; 109 extern char *fgets () __proto(char*,int,FILE*);
 ;BCC_EOS
-; 110 extern char *gets ();		 
+; 110 extern char *gets () __proto(char*);		 
 ;BCC_EOS
-; 111 extern size_t fread ();
+; 111 extern size_t fread () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
-; 112 extern size_t fwrite ();
+; 112 extern size_t fwrite () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
 ; 113 
-; 114 extern FILE *fopen ();
+; 114 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 115 extern FILE *fdopen ();
+; 115 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 116 extern FILE *freopen  ();
+; 116 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 117 extern FILE *__fopen ();
+; 117 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
 ; 118 
-; 119 extern int fseek ();
+; 119 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 120 extern long ftell ();
+; 120 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 121 extern void rewind ();
+; 121 extern void rewind () __proto(FILE*);
 ;BCC_EOS
 ; 122 
-; 123 extern int fputs ();
+; 123 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 124 extern int puts ();
+; 124 extern int puts () __proto(char*);
 ;BCC_EOS
 ; 125 
-; 126 extern int printf ();
+; 126 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 127 extern int fprintf ();
+; 127 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 128 extern int sprintf ();
+; 128 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 129 extern int snprintf ();
+; 129 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
 ; 130  
-; 131 extern int vprintf ();
+; 131 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 132 extern int vfprintf ();
+; 132 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 133 extern int vsprintf ();
+; 133 extern int vsprin
+; 133 tf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 134 extern int vsnprintf ();
+; 134 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
 ; 135 
-; 136 extern int scanf ();
+; 136 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 137 extern int fscanf ();
+; 137 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 138 extern int sscanf ();
+; 138 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 139 extern int vscanf ();
+; 139 extern int vscanf () __proto(char*,char*);
 ;BCC_EOS
-; 140 extern int vfscanf ();
+; 140 extern int vfscanf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 141 extern int vsscanf ();
+; 141 extern int vsscanf () __proto(char*,char*,char*);
 ;BCC_EOS
 ; 142 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
 ; 5  
@@ -169,72 +170,75 @@
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 17 "../prefix.tmp/lib/b
-; 16 cc09/include/stdlib.h"
-; 17 extern int atoi ();
+; 10 # 17 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 17 extern int atoi () __proto(char *);
 ;BCC_EOS
-; 18 extern long atol ();
+; 18 extern long atol () __proto(char *);
 ;BCC_EOS
-; 19 extern long strtol ();
+; 19 extern long strtol () __proto(char *,char **,int);
 ;BCC_EOS
-; 20 extern unsigned long strtoul ();
+; 20 extern unsigned long strtoul () __proto(char *,char **,int);
 ;BCC_EOS
-; 21 extern double strtod ();
+; 21 extern double strtod () __proto(char *,char **);
 ;BCC_EOS
-; 22 extern double atof ();
+; 22 extern double atof () __proto(char *);
 ;BCC_EOS
 ; 23 
-; 24 extern int abs ();
+; 24 extern int abs () __proto(int);
 ;BCC_EOS
-; 25 extern long labs ();
+; 25 extern long labs () __proto(long);
 ;BCC_EOS
 ; 26 
-; 27 extern int rand ();
+; 27 extern int rand () __proto();
 ;BCC_EOS
-; 28 extern void srand ();
+; 28 extern void srand () __proto(unsigned int);
 ;BCC_EOS
 ; 29 
-; 30 extern void qsort ();
+; 30 extern void qsort () __proto(void *,size_t,size_t,int (*)());
 ;BCC_EOS
 ; 31 extern void * bsearch 
 ; 32 
 ; 33 # 31
 ; 31 
-; 32 ();
+; 32 () __proto(void *,void *,size_t,size_t
+; 33 # 31 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 31 ,
+; 32 int (*)());
 ;BCC_EOS
 ; 33 
-; 34 extern void * malloc ();
+; 34 extern void * malloc () __proto(size_t);
 ;BCC_EOS
-; 35 extern void * calloc ();
+; 35 extern void * calloc () __proto(size_t,size_t);
 ;BCC_EOS
-; 36 extern void * realloc ();
+; 36 extern void * realloc () __proto(void *,size_t);
 ;BCC_EOS
-; 37 extern void free ();
+; 37 extern void free () __proto(void *);
 ;BCC_EOS
 ; 38 
-; 39 extern int atexit ();
+; 39 extern int atexit () __proto(void (*)());
 ;BCC_EOS
-; 40 extern void exit ();
+; 40 extern void exit () __proto(int);
 ;BCC_EOS
-; 41 extern void _exit ();
+; 41 extern void _exit () __proto(int);
 ;BCC_EOS
 ; 42 
 ; 43  
-; 44 extern char * itoa ();
+; 44 extern char * itoa () __proto(int);
 ;BCC_EOS
-; 45 extern char * ltoa ();
+; 45 extern char * ltoa () __proto(long);
 ;BCC_EOS
-; 46 extern char * ultoa ();
+; 46 extern char * ultoa () __proto(unsigned long);
 ;BCC_EOS
-; 47 extern char * ltostr ();
+; 47 extern char * ltostr () __proto(long,int);
 ;BCC_EOS
-; 48 extern char * ultostr ();
+; 48 extern char * ultostr () __proto(unsigned long,int);
 ;BCC_EOS
 ; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/string.h"
+; 7 # 9 "../prefix.t
+; 8 mp/lib/bcc09/include/string.h"
 ; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/string.h"
@@ -242,43 +246,43 @@
 ; 5  
 ; 6 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 13  
-; 14 extern size_t strlen ();
+; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
 ; 15 
-; 16 extern char * strcat ();
+; 16 extern char * strcat () __proto(char*,char*);
 ;BCC_EOS
-; 17 extern char * strcpy ();
+; 17 extern char * strcpy () __proto(char*,char*);
 ;BCC_EOS
-; 18 extern int strcmp ();
+; 18 extern int strcmp () __proto(char*,char*);
 ;BCC_EOS
 ; 19 
-; 20 extern char * strncat ();
+; 20 extern char * strncat () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 21 extern char * strncpy ();
+; 21 extern char * strncpy () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 22 extern int strncmp ();
+; 22 extern int strncmp () __proto(char*,char*,size_t);
 ;BCC_EOS
 ; 23 
-; 24 extern char * strchr ();
+; 24 extern char * strchr () __proto(char*,int);
 ;BCC_EOS
-; 25 extern char * strrchr ();
+; 25 extern char * strrchr () __proto(char*,int);
 ;BCC_EOS
-; 26 extern char * strdup ();
+; 26 extern char * strdup () __proto(char*);
 ;BCC_EOS
 ; 27 
 ; 28  
-; 29 extern void * memcpy ();
+; 29 extern void * memcpy () __proto(void*,void*,size_t);
 ;BCC_EOS
-; 30 extern void * memccpy ();
+; 30 extern void * memccpy () __proto(void*,void*,int,size_t);
 ;BCC_EOS
-; 31 extern void * memchr ();
+; 31 extern void * memchr () __proto(void*,int,size_t);
 ;BCC_EOS
-; 32 extern void * memset ();
+; 32 extern void * memset () __proto(void*,int,size_t);
 ;BCC_EOS
-; 33 extern int memcmp ();
+; 33 extern int memcmp () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 34 
-; 35 extern void * memmove ();
+; 35 extern void * memmove () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 36 
 ; 37  
@@ -289,17 +293,17 @@
 ; 42 
 ; 43 
 ; 44  
-; 45 extern char * strpbrk ();
+; 45 extern char * strpbrk () __proto(char *,char *);
 ;BCC_EOS
-; 46 extern char * strsep ();
+; 46 extern char * strsep () __proto(char **,char *);
 ;BCC_EOS
-; 47 extern char * strstr ();
+; 47 extern char * strstr () __proto(char *,char *);
 ;BCC_EOS
-; 48 extern char * strtok ();
+; 48 extern char * strtok () __proto(char *,char *);
 ;BCC_EOS
-; 49 extern size_t strcspn ();
+; 49 extern size_t strcspn () __proto(char *,char *);
 ;BCC_EOS
-; 50 extern size_t strspn ();
+; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
 ; 51 # 10 "cbtest.c"
 ; 10 int main()
@@ -388,7 +392,7 @@ _main:
 	BNE	.4
 .6:
 .2:
-; Debug: rootlist int = const $3E8 (used reg = )
+; Debug: rootlist unsigned int = const $3E8 (used reg = )
 	LDX	#$3E8
 ; Debug: func () * void = malloc+0 (used reg = )
 	JSR	>_malloc

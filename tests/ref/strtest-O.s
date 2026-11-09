@@ -35,43 +35,43 @@
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 10 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 13  
-; 14 extern size_t strlen ();
+; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
 ; 15 
-; 16 extern char * strcat ();
+; 16 extern char * strcat () __proto(char*,char*);
 ;BCC_EOS
-; 17 extern char * strcpy ();
+; 17 extern char * strcpy () __proto(char*,char*);
 ;BCC_EOS
-; 18 extern int strcmp ();
+; 18 extern int strcmp () __proto(char*,char*);
 ;BCC_EOS
 ; 19 
-; 20 extern char * strncat ();
+; 20 extern char * strncat () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 21 extern char * strncpy ();
+; 21 extern char * strncpy () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 22 extern int strncmp ();
+; 22 extern int strncmp () __proto(char*,char*,size_t);
 ;BCC_EOS
 ; 23 
-; 24 extern char * strchr ();
+; 24 extern char * strchr () __proto(char*,int);
 ;BCC_EOS
-; 25 extern char * strrchr ();
+; 25 extern char * strrchr () __proto(char*,int);
 ;BCC_EOS
-; 26 extern char * strdup ();
+; 26 extern char * strdup () __proto(char*);
 ;BCC_EOS
 ; 27 
 ; 28  
-; 29 extern void * memcpy ();
+; 29 extern void * memcpy () __proto(void*,void*,size_t);
 ;BCC_EOS
-; 30 extern void * memccpy ();
+; 30 extern void * memccpy () __proto(void*,void*,int,size_t);
 ;BCC_EOS
-; 31 extern void * memchr ();
+; 31 extern void * memchr () __proto(void*,int,size_t);
 ;BCC_EOS
-; 32 extern void * memset ();
+; 32 extern void * memset () __proto(void*,int,size_t);
 ;BCC_EOS
-; 33 extern int memcmp ();
+; 33 extern int memcmp () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 34 
-; 35 extern void * memmove ();
+; 35 extern void * memmove () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 36 
 ; 37  
@@ -82,17 +82,17 @@
 ; 42 
 ; 43 
 ; 44  
-; 45 extern char * strpbrk ();
+; 45 extern char * strpbrk () __proto(char *,char *);
 ;BCC_EOS
-; 46 extern char * strsep ();
+; 46 extern char * strsep () __proto(char **,char *);
 ;BCC_EOS
-; 47 extern char * strstr ();
+; 47 extern char * strstr () __proto(char *,char *);
 ;BCC_EOS
-; 48 extern char * strtok ();
+; 48 extern char * strtok () __proto(char *,char *);
 ;BCC_EOS
-; 49 extern size_t strcspn ();
+; 49 extern size_t strcspn () __proto(char *,char *);
 ;BCC_EOS
-; 50 extern size_t strspn ();
+; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
 ; 51 # 9 "strtest.c"
 ; 9 extern int putchar();
@@ -218,6 +218,7 @@ PULS	Y,PC
 ; 42 {
 EXPORT	_lengths
 _lengths:
+; 43 
 ; 43 	int i;
 ;BCC_EOS
 ; 44 
@@ -594,7 +595,7 @@ LEAS	2,S
 ; 65 
 ; 66 	 
 ; 67 	memset(buf,'z',10);
-; Debug: list int = const $A (used reg = )
+; Debug: list unsigned int = const $A (used reg = )
 LDD	#$A
 PSHS	D
 ; Debug: list int = const $7A (used reg = )
@@ -612,7 +613,7 @@ LOC	1
 FCC	"ab"
 FCB	0
 LOC	0
-; Debug: list int = const 5 (used reg = )
+; Debug: list unsigned int = const 5 (used reg = )
 LDD	#5
 PSHS	D
 ; Debug: list * char = .35+0 (used reg = )
@@ -640,8 +641,7 @@ LDX	#$10
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 69 	ok(17,buf[0] == 'a
-; 69 ' && buf[1] == 'b' && buf[2] == 0
+; 69 	ok(17,buf[0] == 'a' && buf[1] == 'b' && buf[2] == 0
 ; 70 	   && buf[4] == 0 && buf[5] == 'z');
 ; Debug: logeq int = const $61 to char = [buf+0] (used reg = )
 LDB	>_buf
@@ -681,7 +681,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 71 	memset(buf,'z',10);
-; Debug: list int = const $A (used reg = )
+; Debug: list unsigned int = const $A (used reg = )
 LDD	#$A
 PSHS	D
 ; Debug: list int = const $7A (used reg = )
@@ -699,7 +699,7 @@ LOC	1
 FCC	"abcdef"
 FCB	0
 LOC	0
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list * char = .3F+0 (used reg = )
@@ -740,7 +740,7 @@ LEAS	2,S
 ; 75 
 ; 76 	 
 ; 77 	memset(buf,'z',20);
-; Debug: list int = const $14 (used reg = )
+; Debug: list unsigned int = const $14 (used reg = )
 LDD	#$14
 PSHS	D
 ; Debug: list int = const $7A (used reg = )
@@ -773,7 +773,7 @@ LOC	1
 FCC	"cdef"
 FCB	0
 LOC	0
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
 ; Debug: list * char = .45+0 (used reg = )
@@ -839,7 +839,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 81 	memset(buf,'z',20);
-; Debug: list int = const $14 (used reg = )
+; Debug: list unsigned int = const $14 (used reg = )
 LDD	#$14
 PSHS	D
 ; Debug: list int = const $7A (used reg = )
@@ -872,7 +872,7 @@ LOC	1
 FCC	"cd"
 FCB	0
 LOC	0
-; Debug: list int = const $A (used reg = )
+; Debug: list unsigned int = const $A (used reg = )
 LDD	#$A
 PSHS	D
 ; Debug: list * char = .4E+0 (used reg = )
@@ -1214,7 +1214,7 @@ LOC	1
 FCC	"abce"
 FCB	0
 LOC	0
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list * char = .72+0 (used reg = )
@@ -1253,7 +1253,7 @@ LOC	1
 FCC	"abce"
 FCB	0
 LOC	0
-; Debug: list int = const 4 (used reg = )
+; Debug: list unsigned int = const 4 (used reg = )
 LDD	#4
 PSHS	D
 ; Debug: list * char = .76+0 (used reg = )
@@ -1295,7 +1295,7 @@ LOC	1
 FCC	"xyz"
 FCB	0
 LOC	0
-; Debug: list int = const 0 (used reg = )
+; Debug: list unsigned int = const 0 (used reg = )
 CLRA
 CLRB
 PSHS	D
@@ -1335,7 +1335,7 @@ LOC	1
 FCC	"ab"
 FCB	0
 LOC	0
-; Debug: list int = const $A (used reg = )
+; Debug: list unsigned int = const $A (used reg = )
 LDD	#$A
 PSHS	D
 ; Debug: list * char = .7E+0 (used reg = )
@@ -1374,7 +1374,7 @@ LOC	1
 FCC	"abc"
 FCB	0
 LOC	0
-; Debug: list int = const $A (used reg = )
+; Debug: list unsigned int = const $A (used reg = )
 LDD	#$A
 PSHS	D
 ; Debug: list * char = .82+0 (used reg = )
@@ -1417,7 +1417,7 @@ LOC	1
 FCC	"abc"
 FCB	0
 LOC	0
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list * char = .86+0 (used reg = )
@@ -1456,7 +1456,7 @@ LOC	1
 FCC	"abd"
 FCB	0
 LOC	0
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list * char = .8A+0 (used reg = )
@@ -1498,7 +1498,7 @@ LOC	1
 FCC	"abc"
 FCB	0
 LOC	0
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list * char = .8E+0 (used reg = )
@@ -1540,7 +1540,7 @@ LOC	1
 FCC	"xyz"
 FCB	0
 LOC	0
-; Debug: list int = const 0 (used reg = )
+; Debug: list unsigned int = const 0 (used reg = )
 CLRA
 CLRB
 PSHS	D
@@ -1580,7 +1580,7 @@ LOC	1
 FCC	"a"
 FCB	0
 LOC	0
-; Debug: list int = const 1 (used reg = )
+; Debug: list unsigned int = const 1 (used reg = )
 LDD	#1
 PSHS	D
 ; Debug: list * char = .96+0 (used reg = )
@@ -1626,7 +1626,7 @@ FCB	0
 FCC	"b"
 FCB	0
 LOC	0
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list * char = .9A+0 (used reg = )
@@ -1669,7 +1669,7 @@ FCB	0
 FCC	"c"
 FCB	0
 LOC	0
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list * char = .9E+0 (used reg = )
@@ -1955,15 +1955,16 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 124 
-; 125 	ok(58,memchr(s,'w',12)== s + 7);
+; 125 	ok(58,memchr(s,'w',12)== s + 
+; 125 7);
 ; Debug: expression subtree swapping
-; Debug: list int = const $C (used reg = )
+; Debug: list unsigned int = const $C (used reg = )
 LDD	#$C
 PSHS	D
 ; Debug: list int = const $77 (used reg = )
 LDD	#$77
 PSHS	D
-; Debug: rootlist * char s = [S+6-2] (used reg = )
+; Debug: rootlist * void s = [S+6-2] (used reg = )
 LDX	4,S
 ; Debug: func () * void = memchr+0 (used reg = )
 JSR	>_memchr
@@ -1990,13 +1991,13 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 126 	ok(59,memchr(s,'w',7)== 0);
-; Debug: list int = const 7 (used reg = )
+; Debug: list unsigned int = const 7 (used reg = )
 LDD	#7
 PSHS	D
 ; Debug: list int = const $77 (used reg = )
 LDD	#$77
 PSHS	D
-; Debug: rootlist * char s = [S+6-2] (used reg = )
+; Debug: rootlist * void s = [S+6-2] (used reg = )
 LDX	4,S
 ; Debug: func () * void = memchr+0 (used reg = )
 JSR	>_memchr
@@ -2020,14 +2021,14 @@ LEAS	2,S
 ;BCC_EOS
 ; 127 	ok(60,memchr(s,0,13)== s + 12);
 ; Debug: expression subtree swapping
-; Debug: list int = const $D (used reg = )
+; Debug: list unsigned int = const $D (used reg = )
 LDD	#$D
 PSHS	D
 ; Debug: list int = const 0 (used reg = )
 CLRA
 CLRB
 PSHS	D
-; Debug: rootlist * char s = [S+6-2] (used reg = )
+; Debug: rootlist * void s = [S+6-2] (used reg = )
 LDX	4,S
 ; Debug: func () * void = memchr+0 (used reg = )
 JSR	>_memchr
@@ -2054,13 +2055,13 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 128 	ok(61,memchr(s,'h' + 256,1)== s);
-; Debug: list int = const 1 (used reg = )
+; Debug: list unsigned int = const 1 (used reg = )
 LDD	#1
 PSHS	D
 ; Debug: list int = const $168 (used reg = )
 LDD	#$168
 PSHS	D
-; Debug: rootlist * char s = [S+6-2] (used reg = )
+; Debug: rootlist * void s = [S+6-2] (used reg = )
 LDX	4,S
 ; Debug: func () * void = memchr+0 (used reg = )
 JSR	>_memchr
@@ -2083,14 +2084,14 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 129 	ok(62,memchr(s,'h',0)== 0);
-; Debug: list int = const 0 (used reg = )
+; Debug: list unsigned int = const 0 (used reg = )
 CLRA
 CLRB
 PSHS	D
 ; Debug: list int = const $68 (used reg = )
 LDD	#$68
 PSHS	D
-; Debug: rootlist * char s = [S+6-2] (used reg = )
+; Debug: rootlist * void s = [S+6-2] (used reg = )
 LDX	4,S
 ; Debug: func () * void = memchr+0 (used reg = )
 JSR	>_memchr
@@ -2503,8 +2504,7 @@ LDX	#$49
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 144 	ok
-; 144 (74,strcspn("abcde","")== 5);
+; 144 	ok(74,strcspn("abcde","")== 5);
 LOC	1
 .E3:
 FCC	"abcde"
@@ -3083,7 +3083,7 @@ _memories:
 ; 178 
 ; 179 	ok(90,memset(buf,'q',10)== buf);
 LEAS	-4,S
-; Debug: list int = const $A (used reg = )
+; Debug: list unsigned int = const $A (used reg = )
 LDD	#$A
 PSHS	D
 ; Debug: list int = const $71 (used reg = )
@@ -3165,7 +3165,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 185 	memset(buf,0x1ff,3);			 
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list int = const $1FF (used reg = )
@@ -3211,7 +3211,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 188 	memset(buf,'r',0);
-; Debug: list int = const 0 (used reg = )
+; Debug: list unsigned int = const 0 (used reg = )
 CLRA
 CLRB
 PSHS	D
@@ -3266,7 +3266,7 @@ LOC	1
 FCC	"abcdef"
 FCB	0
 LOC	0
-; Debug: list int = const 7 (used reg = )
+; Debug: list unsigned int = const 7 (used reg = )
 LDD	#7
 PSHS	D
 ; Debug: list * char = buf+0 (used reg = )
@@ -3325,7 +3325,7 @@ JSR	>_strcpy
 LEAS	2,S
 ;BCC_EOS
 ; 196 	ok(95,memmove(buf + 2,buf,4)== buf + 2);
-; Debug: list int = const 4 (used reg = )
+; Debug: list unsigned int = const 4 (used reg = )
 LDD	#4
 PSHS	D
 ; Debug: list * char = buf+0 (used reg = )
@@ -3400,7 +3400,7 @@ JSR	>_strcpy
 LEAS	2,S
 ;BCC_EOS
 ; 199 	memmove(buf,buf + 2,4);
-; Debug: list int = const 4 (used reg = )
+; Debug: list unsigned int = const 4 (used reg = )
 LDD	#4
 PSHS	D
 ; Debug: list * char = buf+2 (used reg = )
@@ -3459,7 +3459,7 @@ JSR	>_strcpy
 LEAS	2,S
 ;BCC_EOS
 ; 202 	memmove(buf2,buf,9);
-; Debug: list int = const 9 (used reg = )
+; Debug: list unsigned int = const 9 (used reg = )
 LDD	#9
 PSHS	D
 ; Debug: list * char = buf+0 (used reg = )
@@ -3503,7 +3503,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 204 	memmove(buf,buf,9);
-; Debug: list int = const 9 (used reg = )
+; Debug: list unsigned int = const 9 (used reg = )
 LDD	#9
 PSHS	D
 ; Debug: list * char = buf+0 (used reg = )
@@ -3549,7 +3549,7 @@ LEAS	2,S
 ; 206 
 ; 207 	 
 ; 208 	memset(buf2,'z',10);
-; Debug: list int = const $A (used reg = )
+; Debug: list unsigned int = const $A (used reg = )
 LDD	#$A
 PSHS	D
 ; Debug: list int = const $7A (used reg = )
@@ -3567,7 +3567,7 @@ LOC	1
 FCC	"abcdef"
 FCB	0
 LOC	0
-; Debug: list int = const 6 (used reg = )
+; Debug: list unsigned int = const 6 (used reg = )
 LDD	#6
 PSHS	D
 ; Debug: list int = const $63 (used reg = )
@@ -3623,13 +3623,14 @@ LDX	#$65
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 211 	ok(102,memccpy(buf2,"abcdef",'x',6)== 0 && buf2[5] == 'f');
+; 211 	ok(102,memcc
+; 211 py(buf2,"abcdef",'x',6)== 0 && buf2[5] == 'f');
 LOC	1
 .147:
 FCC	"abcdef"
 FCB	0
 LOC	0
-; Debug: list int = const 6 (used reg = )
+; Debug: list unsigned int = const 6 (used reg = )
 LDD	#6
 PSHS	D
 ; Debug: list int = const $78 (used reg = )
@@ -3672,7 +3673,7 @@ LOC	1
 FCC	"abc"
 FCB	0
 LOC	0
-; Debug: list int = const 3 (used reg = )
+; Debug: list unsigned int = const 3 (used reg = )
 LDD	#3
 PSHS	D
 ; Debug: list int = const $161 (used reg = )

@@ -22,7 +22,7 @@ PRIVATE unsigned insizeof;	/* nest level for getsizeof */
 FORWARD struct nodestruct *cast_exp P((void));
 FORWARD struct nodestruct *exp2 P((void));
 FORWARD struct nodestruct *exp3to12 P((fastin_pt lprecedence));
-FORWARD struct nodestruct *listargs P((void));
+FORWARD struct nodestruct *listargs P((struct proto *proto));
 FORWARD struct nodestruct *postfix_exp P((bool_pt seenlp));
 FORWARD struct nodestruct *primary_exp P((void));
 FORWARD struct nodestruct *unary_exp P((void));
@@ -170,16 +170,43 @@ fastin_pt lprecedence;
 	return lhs;
 }
 
-PRIVATE struct nodestruct *listargs()
+/* an argument, converted to its parameter's type if the function has a
+   prototype; then promoted as usual (as LISTOP does), as the function,
+   which unproto made old-style, expects */
+PRIVATE struct nodestruct *protoarg(proto, n, exp)
+struct proto *proto;
+int n;
+struct nodestruct *exp;
+{
+	struct typestruct *type;
+
+	if (proto == NULL || n >= proto->nparams)
+		return exp;
+	type = proto->ptypes[n];
+	if (type == exp->nodetype || type->constructor & (STRUCTU | VOID) ||
+	    exp->nodetype->constructor & (STRUCTU | FUNCTION | VOID))
+		return exp;
+	if (exp->nodetype->constructor & ARRAY &&
+	    type->constructor & POINTER)
+		return exp;	/* (an array is passed as a pointer anyway) */
+	return castnode(type, exp);
+}
+
+PRIVATE struct nodestruct *listargs(proto)
+struct proto *proto;
 {
 	struct nodestruct *parent;
 	struct nodestruct *nextright;
+	int n = 0;
 
 	if (sym == RPAREN) {
 		nextsym();
+		if (proto != NULL && proto->nparams != 0)
+			error("too few arguments");
 		return NULLNODE;
 	}
-	parent = node(arg1op, assignment_exp(), NULLNODE);
+	parent = node(arg1op, protoarg(proto, n++, assignment_exp()),
+		      NULLNODE);
 	/* a double (a float is one, as an argument) is always passed on
 	   the stack: it doesn't fit in the registers for the first one */
 	if (parent->nodetype->scalar & RSCALAR)
@@ -188,9 +215,14 @@ PRIVATE struct nodestruct *listargs()
 	while (sym == COMMA) {
 		nextsym();
 		nextright = nextright->right
-		    = node(LISTOP, assignment_exp(), NULLNODE);
+		    = node(LISTOP, protoarg(proto, n++, assignment_exp()),
+			   NULLNODE);
 	}
 	rparen();
+	if (proto != NULL && (n < proto->nparams ||
+			      (n > proto->nparams && !proto->varargs)))
+		error(n < proto->nparams ? "too few arguments" :
+		      "too many arguments");
 	return parent;
 }
 
@@ -224,7 +256,10 @@ bool_pt seenlp;
 			continue;
 		case LPAREN:
 			nextsym();
-			nodeptr = node(FUNCOP, nodeptr, listargs());
+			nodeptr = node(FUNCOP, nodeptr,
+				       listargs(nodeptr->tag == LEAF ?
+						nodeptr->left.symptr->proto :
+						(struct proto *) NULL));
 			{
 				register struct nodestruct *np;
 

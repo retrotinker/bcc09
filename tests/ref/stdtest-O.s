@@ -14,9 +14,9 @@
 ; 16 extern	unsigned char	__ctype[];
 ;BCC_EOS
 ; 17 # 27
-; 27 extern int toupper ();
+; 27 extern int toupper () __proto(int);
 ;BCC_EOS
-; 28 extern int tolower ();
+; 28 extern int tolower () __proto(int);
 ;BCC_EOS
 ; 29 
 ; 30  
@@ -58,64 +58,68 @@
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 10 # 17 "../prefix.tmp/lib/bcc09/include/stdlib.h"
-; 17 extern int atoi ();
+; 17 extern int atoi () __proto(char *);
 ;BCC_EOS
-; 18 extern long atol ();
+; 18 extern long atol () __proto(char *);
 ;BCC_EOS
-; 19 extern long strtol ();
+; 19 extern long strtol () __proto(char *,char **,int);
 ;BCC_EOS
-; 20 extern unsigned long strtoul ();
+; 20 extern unsigned long strtoul () __proto(char *,char **,int);
 ;BCC_EOS
-; 21 extern double strtod ();
+; 21 extern double strtod () __proto(char *,char **);
 ;BCC_EOS
-; 22 extern double atof ();
+; 22 extern double atof () __proto(char *);
 ;BCC_EOS
 ; 23 
-; 24 extern int abs ();
+; 24 extern int abs () __proto(int);
 ;BCC_EOS
-; 25 extern long labs ();
+; 25 extern long labs () __proto(long);
 ;BCC_EOS
 ; 26 
-; 27 extern int rand ();
+; 27 extern int rand () __proto();
 ;BCC_EOS
-; 28 extern void srand ();
+; 28 extern void srand () __proto(unsigned int);
 ;BCC_EOS
 ; 29 
-; 30 extern void qsort ();
+; 30 extern void qsort () __proto(void *,size_t,size_t,int (*)());
 ;BCC_EOS
 ; 31 extern void * bsearch 
 ; 32 
 ; 33 # 31
 ; 31 
-; 32 ();
+; 32 () __proto(void *,void *,size_t,size_t
+; 33 # 31 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 31 ,
+; 32 int (*)());
 ;BCC_EOS
 ; 33 
-; 34 extern void * malloc ();
+; 34 extern void * malloc () __proto(size_t);
 ;BCC_EOS
-; 35 extern void * calloc ();
+; 35 extern void * calloc () __proto(size_t,size_t);
 ;BCC_EOS
-; 36 extern void * realloc ();
+; 36 extern void * realloc () __proto(void *,size_t);
 ;BCC_EOS
-; 37 extern void free ();
+; 37 extern void free () __proto(void *);
 ;BCC_EOS
 ; 38 
-; 39 extern int atexit ();
+; 39 extern int atexit () __proto(void (*)());
 ;BCC_EOS
-; 40 extern void exit ();
+; 40 extern void exit () __proto(int);
 ;BCC_EOS
-; 41 extern void _exit ();
+; 41 extern void _exit () __proto(int);
 ;BCC_EOS
 ; 42 
 ; 43  
-; 44 extern char * itoa ();
+; 44 extern char * itoa () __proto(int);
 ;BCC_EOS
-; 45 extern char * ltoa ();
+; 45 extern char * ltoa () __proto(long);
 ;BCC_EOS
-; 46 extern char * ultoa ();
+; 46 extern char * ultoa () __proto(u
+; 46 nsigned long);
 ;BCC_EOS
-; 47 extern char * ltostr ();
+; 47 extern char * ltostr () __proto(long,int);
 ;BCC_EOS
-; 48 extern char * ultostr ();
+; 48 extern char * ultostr () __proto(unsigned long,int);
 ;BCC_EOS
 ; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
@@ -129,44 +133,43 @@
 ; 5  
 ; 6 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 13  
-; 14 extern size_t strlen ();
+; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
 ; 15 
-; 16 extern char * strcat ();
+; 16 extern char * strcat () __proto(char*,char*);
 ;BCC_EOS
-; 17 extern char * strcpy ();
+; 17 extern char * strcpy () __proto(char*,char*);
 ;BCC_EOS
-; 18 extern int strcmp ();
+; 18 extern int strcmp () __proto(char*,char*);
 ;BCC_EOS
 ; 19 
-; 20 extern char *
-; 20  strncat ();
+; 20 extern char * strncat () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 21 extern char * strncpy ();
+; 21 extern char * strncpy () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 22 extern int strncmp ();
+; 22 extern int strncmp () __proto(char*,char*,size_t);
 ;BCC_EOS
 ; 23 
-; 24 extern char * strchr ();
+; 24 extern char * strchr () __proto(char*,int);
 ;BCC_EOS
-; 25 extern char * strrchr ();
+; 25 extern char * strrchr () __proto(char*,int);
 ;BCC_EOS
-; 26 extern char * strdup ();
+; 26 extern char * strdup () __proto(char*);
 ;BCC_EOS
 ; 27 
 ; 28  
-; 29 extern void * memcpy ();
+; 29 extern void * memcpy () __proto(void*,void*,size_t);
 ;BCC_EOS
-; 30 extern void * memccpy ();
+; 30 extern void * memccpy () __proto(void*,void*,int,size_t);
 ;BCC_EOS
-; 31 extern void * memchr ();
+; 31 extern void * memchr () __proto(void*,int,size_t);
 ;BCC_EOS
-; 32 extern void * memset ();
+; 32 extern void * memset () __proto(void*,int,size_t);
 ;BCC_EOS
-; 33 extern int memcmp ();
+; 33 extern int memcmp () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 34 
-; 35 extern void * memmove ();
+; 35 extern void * memmove () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 36 
 ; 37  
@@ -177,17 +180,17 @@
 ; 42 
 ; 43 
 ; 44  
-; 45 extern char * strpbrk ();
+; 45 extern char * strpbrk () __proto(char *,char *);
 ;BCC_EOS
-; 46 extern char * strsep ();
+; 46 extern char * strsep () __proto(char **,char *);
 ;BCC_EOS
-; 47 extern char * strstr ();
+; 47 extern char * strstr () __proto(char *,char *);
 ;BCC_EOS
-; 48 extern char * strtok ();
+; 48 extern char * strtok () __proto(char *,char *);
 ;BCC_EOS
-; 49 extern size_t strcspn ();
+; 49 extern size_t strcspn () __proto(char *,char *);
 ;BCC_EOS
-; 50 extern size_t strspn ();
+; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
 ; 51 # 15 "stdtest.c"
 ; 15 extern int putchar();
@@ -408,8 +411,9 @@ JSR	>ltst_b
 BNE	.11
 .12:
 ;BCC_EOS
-; 60 	if (l < 0)
+; 60 	if (
 .F:
+; 60 l < 0)
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
 CLRA
 CLRB
@@ -810,9 +814,8 @@ STD	0,S
 ;BCC_EOS
 BRA	.29
 ;BCC_EOS
-; 90 			case 9: r = (!!((__ctype[1+(unsigned char)c]
+; 90 			case 9: r = (!!((__ctype[1+(unsigned char)c])&0x02		  )) ; break;
 .50:
-; 90 )&0x02		  )) ; break;
 ; Debug: add unsigned char c = [S+6-3] to int = const 1 (used reg = )
 ; Debug: expression subtree swapping
 LDB	3,S
@@ -1484,6 +1487,7 @@ JSR	>_putnum
 PULS	U,Y,PC
 ; 135 
 ; 136 void numbers()
+; 136 
 ; 137 {
 EXPORT	_numbers
 _numbers:
@@ -2254,13 +2258,12 @@ LDX	#$18
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 188 		ok(25,strtol("-2147483649",&end,10)
+; 188 		ok(25,strtol("-2147483649",&end,10)== (-2147483647L-1)
 LOC	1
 .CD:
 FCC	"-2147483649"
 FCB	0
 LOC	0
-; 188 == (-2147483647L-1)
 ; 189 && errno == 34		  );
 ; Debug: list int = const $A (used reg = )
 LDD	#$A
@@ -2808,9 +2811,8 @@ LOC	0
 ; Debug: list * char = .105+0 (used reg = )
 LDX	#.105
 PSHS	X
-; Debug: rootlist long = const -$8000 (used reg = )
-LDD	#$FFFF
-LDX	#$8000
+; Debug: rootlist int = const -$8000 (used reg = )
+LDX	#-$8000
 ; Debug: func () * char = itoa+0 (used reg = )
 JSR	>_itoa
 ; Debug: rootlist * char = X+0 (used reg = )
@@ -2911,6 +2913,7 @@ LOC	1
 FCC	"2147483647"
 FCB	0
 LOC	0
+; 221 
 ; Debug: list * char = .10E+0 (used reg = )
 LDX	#.10E
 PSHS	X
@@ -3380,10 +3383,10 @@ LEAS	-$72,S
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int n = [S+$78-2] (used reg = )
+; Debug: list unsigned int n = [S+$78-2] (used reg = )
 LDD	$76,S
 PSHS	D
 ; Debug: rootlist * int = .130+0 (used reg = )
@@ -3447,10 +3450,10 @@ BLT	.136
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int = const 1 (used reg = )
+; Debug: list unsigned int = const 1 (used reg = )
 LDD	#1
 PSHS	D
 ; Debug: rootlist * int = .131+0 (used reg = )
@@ -3483,10 +3486,10 @@ LEAS	2,S
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int = const 0 (used reg = )
+; Debug: list unsigned int = const 0 (used reg = )
 CLRA
 CLRB
 PSHS	D
@@ -3496,8 +3499,7 @@ LDX	#.131
 JSR	>_qsort
 LEAS	6,S
 ;BCC_EOS
-; 279 	ok
-; 279 (62,b[0] == 1);
+; 279 	ok(62,b[0] == 1);
 ; Debug: logeq int = const 1 to int = [.131+0] (used reg = )
 LDX	>.131
 LEAX	-1,X
@@ -3554,10 +3556,10 @@ BLT	.13F
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int = const $32 (used reg = )
+; Debug: list unsigned int = const $32 (used reg = )
 LDD	#$32
 PSHS	D
 ; Debug: rootlist * int c = S+$7A-$6C (used reg = )
@@ -3641,10 +3643,10 @@ BLT	.149
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int = const $32 (used reg = )
+; Debug: list unsigned int = const $32 (used reg = )
 LDD	#$32
 PSHS	D
 ; Debug: rootlist * int c = S+$7A-$6C (used reg = )
@@ -3725,10 +3727,10 @@ BLT	.153
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int = const $32 (used reg = )
+; Debug: list unsigned int = const $32 (used reg = )
 LDD	#$32
 PSHS	D
 ; Debug: rootlist * int c = S+$7A-$6C (used reg = )
@@ -3769,10 +3771,10 @@ LEAS	2,S
 ; Debug: list * () int = rcmp+0 (used reg = )
 LDX	#_rcmp
 PSHS	X
-; Debug: list int = const 6 (used reg = )
+; Debug: list unsigned int = const 6 (used reg = )
 LDD	#6
 PSHS	D
-; Debug: list int = const 7 (used reg = )
+; Debug: list unsigned int = const 7 (used reg = )
 LDD	#7
 PSHS	D
 ; Debug: rootlist * struct rec = .132+0 (used reg = )
@@ -3906,16 +3908,16 @@ STX	$6E,S
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int n = [S+$78-2] (used reg = )
+; Debug: list unsigned int n = [S+$78-2] (used reg = )
 LDD	$76,S
 PSHS	D
 ; Debug: list * int = .130+0 (used reg = )
 LDX	#.130
 PSHS	X
-; Debug: rootlist * int key = S+$7C-6 (used reg = )
+; Debug: rootlist * void key = S+$7C-6 (used reg = )
 LEAX	$76,S
 ; Debug: func () * void = bsearch+0 (used reg = )
 JSR	>_bsearch
@@ -3975,16 +3977,16 @@ STD	$6E,S
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int n = [S+$78-2] (used reg = )
+; Debug: list unsigned int n = [S+$78-2] (used reg = )
 LDD	$76,S
 PSHS	D
 ; Debug: list * int = .130+0 (used reg = )
 LDX	#.130
 PSHS	X
-; Debug: rootlist * int key = S+$7C-6 (used reg = )
+; Debug: rootlist * void key = S+$7C-6 (used reg = )
 LEAX	$76,S
 ; Debug: func () * void = bsearch+0 (used reg = )
 JSR	>_bsearch
@@ -4016,16 +4018,16 @@ STD	$6E,S
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int n = [S+$78-2] (used reg = )
+; Debug: list unsigned int n = [S+$78-2] (used reg = )
 LDD	$76,S
 PSHS	D
 ; Debug: list * int = .130+0 (used reg = )
 LDX	#.130
 PSHS	X
-; Debug: rootlist * int key = S+$7C-6 (used reg = )
+; Debug: rootlist * void key = S+$7C-6 (used reg = )
 LEAX	$76,S
 ; Debug: func () * void = bsearch+0 (used reg = )
 JSR	>_bsearch
@@ -4057,17 +4059,17 @@ STD	$6E,S
 ; Debug: list * () int = icmp+0 (used reg = )
 LDX	#_icmp
 PSHS	X
-; Debug: list int = const 2 (used reg = )
+; Debug: list unsigned int = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: list int = const 0 (used reg = )
+; Debug: list unsigned int = const 0 (used reg = )
 CLRA
 CLRB
 PSHS	D
 ; Debug: list * int = .130+0 (used reg = )
 LDX	#.130
 PSHS	X
-; Debug: rootlist * int key = S+$7C-6 (used reg = )
+; Debug: rootlist * void key = S+$7C-6 (used reg = )
 LEAX	$76,S
 ; Debug: func () * void = bsearch+0 (used reg = )
 JSR	>_bsearch
@@ -4099,16 +4101,16 @@ STB	2,S
 ; Debug: list * () int = rcmp+0 (used reg = )
 LDX	#_rcmp
 PSHS	X
-; Debug: list int = const 6 (used reg = )
+; Debug: list unsigned int = const 6 (used reg = )
 LDD	#6
 PSHS	D
-; Debug: list int = const 7 (used reg = )
+; Debug: list unsigned int = const 7 (used reg = )
 LDD	#7
 PSHS	D
 ; Debug: list * struct rec = .132+0 (used reg = )
 LDX	#.132
 PSHS	X
-; Debug: rootlist * struct rec k = S+$7C-$72 (used reg = )
+; Debug: rootlist * void k = S+$7C-$72 (used reg = )
 LEAX	$A,S
 ; Debug: func () * void = bsearch+0 (used reg = )
 JSR	>_bsearch
@@ -4151,7 +4153,8 @@ JSR	>_ok
 LEAS	$76,S
 RTS
 ; 317 
-; 318 void randoms()
+; 318 void rand
+; 318 oms()
 ; 319 {
 EXPORT	_randoms
 _randoms:
@@ -4160,7 +4163,7 @@ _randoms:
 ; 321 
 ; 322 	srand(1);
 LEAS	-$10,S
-; Debug: rootlist int = const 1 (used reg = )
+; Debug: rootlist unsigned int = const 1 (used reg = )
 LDX	#1
 ; Debug: func () void = srand+0 (used reg = )
 JSR	>_srand
@@ -4241,7 +4244,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 330 	srand(1);
-; Debug: rootlist int = const 1 (used reg = )
+; Debug: rootlist unsigned int = const 1 (used reg = )
 LDX	#1
 ; Debug: func () void = srand+0 (used reg = )
 JSR	>_srand
@@ -4331,7 +4334,7 @@ LEAS	2,S
 ;BCC_EOS
 ; 338 
 ; 339 	srand(2);
-; Debug: rootlist int = const 2 (used reg = )
+; Debug: rootlist unsigned int = const 2 (used reg = )
 LDX	#2
 ; Debug: func () void = srand+0 (used reg = )
 JSR	>_srand

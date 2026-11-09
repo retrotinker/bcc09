@@ -120,6 +120,14 @@ struct nodestruct
   symbol table entry format
 */
 
+/* a function's prototype (from unproto's __proto): its parameters' types */
+struct proto
+{
+    int nparams;
+    bool_t varargs;		/* ... after them */
+    struct typestruct *ptypes[1];	/* nparams of them */
+};
+
 struct symstruct
 {
     store_t storage;
@@ -129,6 +137,7 @@ struct symstruct
     struct symstruct *next;
     struct symstruct **prev;
     struct typestruct *type;
+    struct proto *proto;	/* a function's prototype, or NULL */
     union
     {
 	double *offd;		/* value for double constants */

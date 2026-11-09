@@ -75,90 +75,91 @@
 ; 94 
 ; 95  
 ; 96 
-; 97 extern int setvbuf ();
+; 97 extern int setvbuf () __proto(FILE*,char*,int,size_t);
 ;BCC_EOS
 ; 98 
 ; 99  
 ; 100 
-; 101 extern void setbuffer ();
+; 101 extern void setbuffer () __proto(FILE*,char*,int);
 ;BCC_EOS
 ; 102 
-; 103 extern int fgetc ();
+; 103 extern int fgetc () __proto(FILE*);
 ;BCC_EOS
-; 104 extern int fputc ();
+; 104 extern int fputc () __proto(int,FILE*);
 ;BCC_EOS
-; 105 extern int ungetc ();
+; 105 extern int ungetc () __proto(int,FILE*);
 ;BCC_EOS
 ; 106 
-; 107 extern int fclose ();
+; 107 extern int fclose () __proto(FILE*);
 ;BCC_EOS
-; 108 extern int fflush ();
+; 108 extern int fflush () __proto(FILE*);
 ;BCC_EOS
-; 109 extern char *fgets ();
+; 109 extern char *fgets () __proto(char*,int,FILE*);
 ;BCC_EOS
-; 110 extern char *gets ();		 
+; 110 extern char *gets () __proto(char*);		 
 ;BCC_EOS
-; 111 extern size_t fread ();
+; 111 extern size_t fread () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
-; 112 extern size_t fwrite ();
+; 112 extern size_t fwrite () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
 ; 113 
-; 114 extern FILE *fopen ();
+; 114 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 115 extern FILE *fdopen ();
+; 115 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 116 extern FILE *freopen  ();
+; 116 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 117 extern FILE *__fopen ();
+; 117 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
 ; 118 
-; 119 extern int fseek ();
+; 119 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 120 extern long ftell ();
+; 120 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 121 extern void rewind ();
+; 121 extern void rewind () __proto(FILE*);
 ;BCC_EOS
 ; 122 
-; 123 extern int fputs ();
+; 123 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 124 extern int puts ();
+; 124 extern int puts () __proto(char*);
 ;BCC_EOS
 ; 125 
-; 126 extern int printf ();
+; 126 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 127 extern int fprintf ();
+; 127 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 128 extern int sprintf ();
+; 128 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 129 extern int snprintf ();
+; 129 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
 ; 130  
-; 131 extern int vprintf ();
+; 131 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 132 extern int vfprintf ();
+; 132 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 133 extern int vsprintf ();
+; 133 extern int vsp
+; 133 rintf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 134 extern int vsnprintf ();
+; 134 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
 ; 135 
-; 136 extern int scanf ();
+; 136 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 137 extern int fscanf ();
+; 137 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 138 extern int sscanf ();
+; 138 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 139 extern int vscanf ();
+; 139 extern int vscanf () __proto(char*,char*);
 ;BCC_EOS
-; 140 extern int vfscanf ();
+; 140 extern int vfscanf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 141 extern int vsscanf ();
+; 141 extern int vsscanf () __proto(char*,char*,char*);
 ;BCC_EOS
 ; 142 # 11 "chartest.c"
 ; 11 int checks, failures;
 ;BCC_EOS
 ; 12 
-; 13 void ok(n,cond)
+; 13 void ok(n,cond) __proto(int n,int cond)
 ; 14 # 13 "chartest.c"
 ; 13 int n;
 EXPORT	_ok
@@ -206,7 +207,7 @@ LEAS	2,S
 .1:
 PULS	Y,PC
 ; 21 
-; 22 unsigned char uc_low(v)
+; 22 unsigned char uc_low(v) __proto(unsigned int v)
 ; 23 # 22 "chartest.c"
 ; 22 unsigned int v;
 EXPORT	_uc_low
@@ -222,7 +223,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 25 }
 ; 26 
-; 27 signed char sc_low(v)
+; 27 signed char sc_low(v) __proto(int v)
 ; 28 # 27 "chartest.c"
 ; 27 int v;
 EXPORT	_sc_low
@@ -238,16 +239,15 @@ PULS	Y,PC
 ;BCC_EOS
 ; 30 }
 ; 31 
-; 32 unsigned char uc_clip(v)
+; 32 unsigned char uc_clip(v) __proto(unsigned int v)
 ; 33 # 32 "chartest.c"
 ; 32 unsigned int v;
 EXPORT	_uc_clip
 _uc_clip:
 ;BCC_EOS
 ; 33 {
-; 34 	return 
+; 34 	return v > 255 ? 255 : (unsigned char) v;
 PSHS	X
-; 34 v > 255 ? 255 : (unsigned char) v;
 ; Debug: gt int = const $FF to unsigned int v = [S+2-2] (used reg = )
 LDD	0,S
 SUBD	#$FF
@@ -267,7 +267,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 35 }
 ; 36 
-; 37 unsigned char uc_add(a,b)
+; 37 unsigned char uc_add(a,b) __proto(unsigned char a,unsigned char b)
 ; 38 # 37 "chartest.c"
 ; 37 unsigned char a;
 EXPORT	_uc_add
@@ -291,7 +291,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 40 }
 ; 41 
-; 42 signed char sc_neg(c)
+; 42 signed char sc_neg(c) __proto(signed char c)
 ; 43 # 42 "chartest.c"
 ; 42 signed char c;
 EXPORT	_sc_neg
@@ -314,7 +314,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 45 }
 ; 46 
-; 47 int widen(a,b)
+; 47 int widen(a,b) __proto(unsigned char a,signed char b)
 ; 48 # 47 "chartest.c"
 ; 47 unsigned char a;
 EXPORT	_widen
@@ -359,7 +359,7 @@ PULS	Y,PC
 ; 50 }
 ; 51 
 ; 52  
-; 53 int second(a,b,c)
+; 53 int second(a,b,c) __proto(int a,unsigned char b,signed char c)
 ; 54 # 53 "chartest.c"
 ; 53 int a;
 EXPORT	_second
@@ -396,7 +396,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 56 }
 ; 57 
-; 58 unsigned char uc_rec(n)
+; 58 unsigned char uc_rec(n) __proto(unsigned char n)
 ; 59 # 58 "chartest.c"
 ; 58 unsigned char n;
 EXPORT	_uc_rec
@@ -415,8 +415,10 @@ BRA	.9
 ; Debug: sub int = const 1 to unsigned char n = [S+2-1] (used reg = )
 LDB	1,S
 CLRA
-; Debug: rootlist unsigned int = D-1 (used reg = )
+; Debug: cast unsigned char = const 0 to unsigned int = D-1 (used reg = )
 ADDD	#-1
+; Debug: rootlist unsigned char = B+0 (used reg = )
+CLRA
 TFR	D,X
 ; Debug: func () unsigned char = uc_rec+0 (used reg = )
 JSR	>_uc_rec
@@ -440,7 +442,7 @@ FDB	_uc_low
 ;BCC_EOS
 ; 64 
 ; 65 
-; 66 char c_low(v)
+; 66 char c_low(v) __proto(int v)
 ; 67 # 66 "chartest.c"
 ; 66 int v;
 LOC	0
@@ -476,7 +478,7 @@ FCB	$A
 FCB	0
 LOC	0
 ; 78 uc_low(0));
-; Debug: rootlist int = const 0 (used reg = )
+; Debug: rootlist unsigned int = const 0 (used reg = )
 LDX	#0
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -484,7 +486,7 @@ TFR	X,D
 ; Debug: list unsigned char = B+0 (used reg = )
 CLRA
 PSHS	D
-; Debug: rootlist int = const $FF (used reg = )
+; Debug: rootlist unsigned int = const $FF (used reg = )
 LDX	#$FF
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -492,7 +494,7 @@ TFR	X,D
 ; Debug: list unsigned char = B+0 (used reg = )
 CLRA
 PSHS	D
-; Debug: rootlist int = const $12C (used reg = )
+; Debug: rootlist unsigned int = const $12C (used reg = )
 LDX	#$12C
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -500,7 +502,7 @@ TFR	X,D
 ; Debug: list unsigned char = B+0 (used reg = )
 CLRA
 PSHS	D
-; Debug: rootlist int = const $1234 (used reg = )
+; Debug: rootlist unsigned int = const $1234 (used reg = )
 LDX	#$1234
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -567,7 +569,7 @@ FCC	"%d %d %d"
 FCB	$A
 FCB	0
 LOC	0
-; Debug: rootlist int = const $100 (used reg = )
+; Debug: rootlist unsigned int = const $100 (used reg = )
 LDX	#$100
 ; Debug: func () unsigned char = uc_clip+0 (used reg = )
 JSR	>_uc_clip
@@ -575,7 +577,7 @@ TFR	X,D
 ; Debug: list unsigned char = B+0 (used reg = )
 CLRA
 PSHS	D
-; Debug: rootlist int = const $4D (used reg = )
+; Debug: rootlist unsigned int = const $4D (used reg = )
 LDX	#$4D
 ; Debug: func () unsigned char = uc_clip+0 (used reg = )
 JSR	>_uc_clip
@@ -583,7 +585,7 @@ TFR	X,D
 ; Debug: list unsigned char = B+0 (used reg = )
 CLRA
 PSHS	D
-; Debug: rootlist int = const $12C (used reg = )
+; Debug: rootlist unsigned int = const $12C (used reg = )
 LDX	#$12C
 ; Debug: func () unsigned char = uc_clip+0 (used reg = )
 JSR	>_uc_clip
@@ -597,17 +599,18 @@ LDX	#.C
 JSR	>_printf
 LEAS	6,S
 ;BCC_EOS
-; 82 	printf("%d %d\n",uc_add(200,100),uc_add(1,2));
+; 82 	printf("%d %d\n",uc_add(200,100),uc_a
 LOC	1
 .D:
 FCC	"%d %d"
 FCB	$A
 FCB	0
 LOC	0
-; Debug: list int = const 2 (used reg = )
+; 82 dd(1,2));
+; Debug: list unsigned char = const 2 (used reg = )
 LDD	#2
 PSHS	D
-; Debug: rootlist int = const 1 (used reg = )
+; Debug: rootlist unsigned char = const 1 (used reg = )
 LDX	#1
 ; Debug: func () unsigned char = uc_add+0 (used reg = )
 JSR	>_uc_add
@@ -616,10 +619,10 @@ LEAS	2,S
 ; Debug: list unsigned char = B+0 (used reg = )
 CLRA
 PSHS	D
-; Debug: list int = const $64 (used reg = )
+; Debug: list unsigned char = const $64 (used reg = )
 LDD	#$64
 PSHS	D
-; Debug: rootlist int = const $C8 (used reg = )
+; Debug: rootlist unsigned char = const $C8 (used reg = )
 LDX	#$C8
 ; Debug: func () unsigned char = uc_add+0 (used reg = )
 JSR	>_uc_add
@@ -641,7 +644,7 @@ FCC	"%d %d %d"
 FCB	$A
 FCB	0
 LOC	0
-; Debug: rootlist int = const 0 (used reg = )
+; Debug: rootlist char = const 0 (used reg = )
 LDX	#0
 ; Debug: func () char = sc_neg+0 (used reg = )
 JSR	>_sc_neg
@@ -649,7 +652,7 @@ TFR	X,D
 ; Debug: list char = B+0 (used reg = )
 SEX
 PSHS	D
-; Debug: rootlist int = const -$80 (used reg = )
+; Debug: rootlist char = const -$80 (used reg = )
 LDX	#-$80
 ; Debug: func () char = sc_neg+0 (used reg = )
 JSR	>_sc_neg
@@ -657,7 +660,7 @@ TFR	X,D
 ; Debug: list char = B+0 (used reg = )
 SEX
 PSHS	D
-; Debug: rootlist int = const 5 (used reg = )
+; Debug: rootlist char = const 5 (used reg = )
 LDX	#5
 ; Debug: func () char = sc_neg+0 (used reg = )
 JSR	>_sc_neg
@@ -679,7 +682,7 @@ FCB	$A
 FCB	0
 LOC	0
 ; 85 widen(uc_add(255,1),sc_neg(7)));
-; Debug: rootlist int = const 7 (used reg = )
+; Debug: rootlist char = const 7 (used reg = )
 LDX	#7
 ; Debug: func () char = sc_neg+0 (used reg = )
 JSR	>_sc_neg
@@ -687,10 +690,10 @@ TFR	X,D
 ; Debug: list char = B+0 (used reg = )
 SEX
 PSHS	D
-; Debug: list int = const 1 (used reg = )
+; Debug: list unsigned char = const 1 (used reg = )
 LDD	#1
 PSHS	D
-; Debug: rootlist int = const $FF (used reg = )
+; Debug: rootlist unsigned char = const $FF (used reg = )
 LDX	#$FF
 ; Debug: func () unsigned char = uc_add+0 (used reg = )
 JSR	>_uc_add
@@ -712,7 +715,7 @@ TFR	X,D
 ; Debug: list char = B+0 (used reg = )
 SEX
 PSHS	D
-; Debug: rootlist int = const $FA (used reg = )
+; Debug: rootlist unsigned int = const $FA (used reg = )
 LDX	#$FA
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -739,19 +742,20 @@ FCB	$A
 FCB	0
 LOC	0
 ; 87 second(uc_clip(9),200,-100));
-; Debug: list int = const -$64 (used reg = )
+; Debug: list char = const -$64 (used reg = )
 LDD	#-$64
 PSHS	D
-; Debug: list int = const $C8 (used reg = )
+; Debug: list unsigned char = const $C8 (used reg = )
 LDD	#$C8
 PSHS	D
-; Debug: rootlist int = const 9 (used reg = )
+; Debug: rootlist unsigned int = const 9 (used reg = )
 LDX	#9
 ; Debug: func () unsigned char = uc_clip+0 (used reg = )
 JSR	>_uc_clip
 TFR	X,D
-; Debug: rootlist unsigned char = B+0 (used reg = )
+; Debug: cast int = const 0 to unsigned char = B+0 (used reg = )
 CLRA
+; Debug: rootlist int = D+0 (used reg = )
 TFR	D,X
 ; Debug: func () int = second+0 (used reg = )
 JSR	>_second
@@ -766,7 +770,7 @@ TFR	X,D
 ; Debug: list char = B+0 (used reg = )
 SEX
 PSHS	D
-; Debug: rootlist int = const $1FF (used reg = )
+; Debug: rootlist unsigned int = const $1FF (used reg = )
 LDX	#$1FF
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -794,7 +798,7 @@ FCC	"%d %d"
 FCB	$A
 FCB	0
 LOC	0
-; Debug: rootlist int = const $C8 (used reg = )
+; Debug: rootlist unsigned char = const $C8 (used reg = )
 LDX	#$C8
 ; Debug: func () unsigned char = uc_rec+0 (used reg = )
 JSR	>_uc_rec
@@ -802,7 +806,7 @@ TFR	X,D
 ; Debug: list unsigned char = B+0 (used reg = )
 CLRA
 PSHS	D
-; Debug: rootlist int = const $A (used reg = )
+; Debug: rootlist unsigned char = const $A (used reg = )
 LDX	#$A
 ; Debug: func () unsigned char = uc_rec+0 (used reg = )
 JSR	>_uc_rec
@@ -840,7 +844,7 @@ LEAS	2,S
 ; 90 
 ; 91 	 
 ; 92 	u = uc_low(0x81);
-; Debug: rootlist int = const $81 (used reg = )
+; Debug: rootlist unsigned int = const $81 (used reg = )
 LDX	#$81
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -874,7 +878,7 @@ SEX
 LSLB
 ROLA
 PSHS	D
-; Debug: rootlist int = const 3 (used reg = )
+; Debug: rootlist unsigned int = const 3 (used reg = )
 LDX	#3
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -915,8 +919,9 @@ BRA	.17
 .14:
 CLRB
 .17:
-; Debug: list char = B+0 (used reg = )
+; Debug: cast int = const 0 to char = B+0 (used reg = )
 CLRA
+; Debug: list int = D+0 (used reg = )
 PSHS	D
 ; Debug: rootlist int = const 1 (used reg = )
 LDX	#1
@@ -925,7 +930,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 96 	ok(2,uc_low(0x1234)== 0x34 && sc_low(0xff)== -1);
-; Debug: rootlist int = const $1234 (used reg = )
+; Debug: rootlist unsigned int = const $1234 (used reg = )
 LDX	#$1234
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -949,8 +954,9 @@ BRA	.1B
 .18:
 CLRB
 .1B:
-; Debug: list char = B+0 (used reg = )
+; Debug: cast int = const 0 to char = B+0 (used reg = )
 CLRA
+; Debug: list int = D+0 (used reg = )
 PSHS	D
 ; Debug: rootlist int = const 2 (used reg = )
 LDX	#2
@@ -959,7 +965,7 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 97 	ok(3,uc_add(uc_low(250),uc_low(10))== 4);
-; Debug: rootlist int = const $A (used reg = )
+; Debug: rootlist unsigned int = const $A (used reg = )
 LDX	#$A
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -967,7 +973,7 @@ TFR	X,D
 ; Debug: list unsigned char = B+0 (used reg = )
 CLRA
 PSHS	D
-; Debug: rootlist int = const $FA (used reg = )
+; Debug: rootlist unsigned int = const $FA (used reg = )
 LDX	#$FA
 ; Debug: func () unsigned char = uc_low+0 (used reg = )
 JSR	>_uc_low
@@ -987,8 +993,9 @@ BRA	.1D
 .1C:
 CLRB
 .1D:
-; Debug: list char = B+0 (used reg = )
+; Debug: cast int = const 0 to char = B+0 (used reg = )
 CLRA
+; Debug: list int = D+0 (used reg = )
 PSHS	D
 ; Debug: rootlist int = const 3 (used reg = )
 LDX	#3
@@ -1011,8 +1018,9 @@ BRA	.1F
 .1E:
 CLRB
 .1F:
-; Debug: list char = B+0 (used reg = )
+; Debug: cast int = const 0 to char = B+0 (used reg = )
 CLRA
+; Debug: list int = D+0 (used reg = )
 PSHS	D
 ; Debug: rootlist int = const 4 (used reg = )
 LDX	#4

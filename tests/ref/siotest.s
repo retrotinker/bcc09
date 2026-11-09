@@ -77,84 +77,85 @@
 ; 94 
 ; 95  
 ; 96 
-; 97 extern int setvbuf ();
+; 97 extern int setvbuf () __proto(FILE*,char*,int,size_t);
 ;BCC_EOS
 ; 98 
 ; 99  
 ; 100 
-; 101 extern void setbuffer ();
+; 101 extern void setbuffer () __proto(FILE*,char*,int);
 ;BCC_EOS
 ; 102 
-; 103 extern int fgetc ();
+; 103 extern int fgetc () __proto(FILE*);
 ;BCC_EOS
-; 104 extern int fputc ();
+; 104 extern int fputc () __proto(int,FILE*);
 ;BCC_EOS
-; 105 extern int ungetc ();
+; 105 extern int ungetc () __proto(int,FILE*);
 ;BCC_EOS
 ; 106 
-; 107 extern int fclose ();
+; 107 extern int fclose () __proto(FILE*);
 ;BCC_EOS
-; 108 extern int fflush ();
+; 108 extern int fflush () __proto(FILE*);
 ;BCC_EOS
-; 109 extern char *fgets ();
+; 109 extern char *fgets () __proto(char*,int,FILE*);
 ;BCC_EOS
-; 110 extern char *gets ();		 
+; 110 extern char *gets () __proto(char*);		 
 ;BCC_EOS
-; 111 extern size_t fread ();
+; 111 extern size_t fread () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
-; 112 extern size_t fwrite ();
+; 112 extern size_t fwrite () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
 ; 113 
-; 114 extern FILE *fopen ();
+; 114 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 115 extern FILE *fdopen ();
+; 115 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 116 extern FILE *freopen  ();
+; 116 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 117 extern FILE *__fopen ();
+; 117 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
 ; 118 
-; 119 extern int fseek ();
+; 119 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 120 extern long ftell ();
+; 120 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 121 extern void rewind ();
+; 121 extern void rewind () __proto(FILE*);
 ;BCC_EOS
 ; 122 
-; 123 extern int fputs ();
+; 123 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 124 extern int puts ();
+; 124 extern int puts () __proto(char*);
 ;BCC_EOS
 ; 125 
-; 126 extern int printf ();
+; 126 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 127 extern int fprintf ();
+; 127 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 128 extern int sprintf ();
+; 128 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 129 extern int snprintf ();
+; 129 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
 ; 130  
-; 131 extern int vprintf ();
+; 131 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 132 extern int vfprintf ();
+; 132 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 133 extern int vsprintf ();
+; 133 extern int vspri
+; 133 ntf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 134 extern int vsnprintf ();
+; 134 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
 ; 135 
-; 136 extern int scanf ();
+; 136 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 137 extern int fscanf ();
+; 137 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 138 extern int sscanf ();
+; 138 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 139 extern int vscanf ();
+; 139 extern int vscanf () __proto(char*,char*);
 ;BCC_EOS
-; 140 extern int vfscanf ();
+; 140 extern int vfscanf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 141 extern int vsscanf ();
+; 141 extern int vsscanf () __proto(char*,char*,char*);
 ;BCC_EOS
 ; 142 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
 ; 6  
@@ -173,47 +174,46 @@
 ; 5  
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
-; 6 #
-; 6  10 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 10 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 13  
-; 14 extern size_t strlen ();
+; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
 ; 15 
-; 16 extern char * strcat ();
+; 16 extern char * strcat () __proto(char*,char*);
 ;BCC_EOS
-; 17 extern char * strcpy ();
+; 17 extern char * strcpy () __proto(char*,char*);
 ;BCC_EOS
-; 18 extern int strcmp ();
+; 18 extern int strcmp () __proto(char*,char*);
 ;BCC_EOS
 ; 19 
-; 20 extern char * strncat ();
+; 20 extern char * strncat () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 21 extern char * strncpy ();
+; 21 extern char * strncpy () __proto(char*,char*,size_t);
 ;BCC_EOS
-; 22 extern int strncmp ();
+; 22 extern int strncmp () __proto(char*,char*,size_t);
 ;BCC_EOS
 ; 23 
-; 24 extern char * strchr ();
+; 24 extern char * strchr () __proto(char*,int);
 ;BCC_EOS
-; 25 extern char * strrchr ();
+; 25 extern char * strrchr () __proto(char*,int);
 ;BCC_EOS
-; 26 extern char * strdup ();
+; 26 extern char * strdup () __proto(char*);
 ;BCC_EOS
 ; 27 
 ; 28  
-; 29 extern void * memcpy ();
+; 29 extern void * memcpy () __proto(void*,void*,size_t);
 ;BCC_EOS
-; 30 extern void * memccpy ();
+; 30 extern void * memccpy () __proto(void*,void*,int,size_t);
 ;BCC_EOS
-; 31 extern void * memchr ();
+; 31 extern void * memchr () __proto(void*,int,size_t);
 ;BCC_EOS
-; 32 extern void * memset ();
+; 32 extern void * memset () __proto(void*,int,size_t);
 ;BCC_EOS
-; 33 extern int memcmp ();
+; 33 extern int memcmp () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 34 
-; 35 extern void * memmove ();
+; 35 extern void * memmove () __proto(void*,void*,size_t);
 ;BCC_EOS
 ; 36 
 ; 37  
@@ -224,21 +224,22 @@
 ; 42 
 ; 43 
 ; 44  
-; 45 extern char * strpbrk ();
+; 45 extern char * strpbrk () __proto(char *,char *);
 ;BCC_EOS
-; 46 extern char * strsep ();
+; 46 extern char * strsep () __proto(char **,char *);
 ;BCC_EOS
-; 47 extern char * strstr ();
+; 47 extern char * strstr () __proto(char *,char *);
 ;BCC_EOS
-; 48 extern char * strtok ();
+; 48 extern char * strtok () __proto(char *,char *);
 ;BCC_EOS
-; 49 extern size_t strcspn ();
+; 49 extern size_t strcspn () __proto(char *,char *);
 ;BCC_EOS
-; 50 extern size_t strspn ();
+; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
 ; 51 # 5 "../prefix.tmp/lib/bcc09/include/unistd.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix
+; 5 .tmp/lib/bcc09/include/features.h"
 ; 6  
 ; 7 # 9 "../prefix.tmp/lib/bcc09/include/unistd.h"
 ; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
@@ -246,22 +247,22 @@
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/unistd.h"
 ; 10 # 22
 ; 22  
-; 23 extern ssize_t read ();
+; 23 extern ssize_t read () __proto(int,void *,size_t);
 ;BCC_EOS
-; 24 extern ssize_t write ();
+; 24 extern ssize_t write () __proto(int,void *,size_t);
 ;BCC_EOS
-; 25 extern int close ();
+; 25 extern int close () __proto(int);
 ;BCC_EOS
-; 26 extern off_t lseek ();
+; 26 extern off_t lseek () __proto(int,off_t,int);
 ;BCC_EOS
-; 27 extern int isatty ();
+; 27 extern int isatty () __proto(int);
 ;BCC_EOS
 ; 28 
 ; 29 
 ; 30  
-; 31 extern int brk ();
+; 31 extern int brk () __proto(void *);
 ;BCC_EOS
-; 32 extern void * sbrk ();
+; 32 extern void * sbrk () __proto(int);
 ;BCC_EOS
 ; 33 extern unsigned int __heap_margin;
 ;BCC_EOS
@@ -471,10 +472,10 @@ _output:
 ; Debug: list * struct __stdio_file = stdout+0 (used reg = )
 	LDX	#_stdout
 	PSHS	X
-; Debug: list int = const 7 (used reg = )
+; Debug: list unsigned int = const 7 (used reg = )
 	LDD	#7
 	PSHS	D
-; Debug: list int = const 1 (used reg = )
+; Debug: list unsigned int = const 1 (used reg = )
 	LDD	#1
 	PSHS	D
 ; Debug: rootlist * char = .12+0 (used reg = )
@@ -542,7 +543,7 @@ _output:
 ; 38 
 ; 39 	 
 ; 40 	ok(5,setvbuf(stdout,(char *)0,0x02	  ,0)== 0);
-; Debug: list int = const 0 (used reg = )
+; Debug: list unsigned int = const 0 (used reg = )
 	LDD	#0
 	PSHS	D
 ; Debug: list int = const 2 (used reg = )
@@ -590,7 +591,7 @@ _output:
 	FCC	"+"
 	FCB	0
 	LOC	0
-; Debug: list int = const 1 (used reg = )
+; Debug: list unsigned int = const 1 (used reg = )
 	LDD	#1
 	PSHS	D
 ; Debug: list * char = .1B+0 (used reg = )
@@ -617,7 +618,7 @@ _output:
 ; 44 
 ; 45 	 
 ; 46 	ok(6,setvbuf(stdout,buf,0x00	  ,sizeof(buf))== 0);
-; Debug: list int = const $100 (used reg = )
+; Debug: list unsigned int = const $100 (used reg = )
 	LDD	#$100
 	PSHS	D
 ; Debug: list int = const 0 (used reg = )
@@ -667,7 +668,7 @@ _output:
 	FCB	$A
 	FCB	0
 	LOC	0
-; Debug: list int = const $13 (used reg = )
+; Debug: list unsigned int = const $13 (used reg = )
 	LDD	#$13
 	PSHS	D
 ; Debug: list * char = .20+0 (used reg = )
@@ -704,7 +705,7 @@ _output:
 ; 50 
 ; 51 	 
 ; 52 	ok(8,setvbuf(stdout,(char *)0,0x01	  ,(256))== 0);
-; Debug: list int = const $100 (used reg = )
+; Debug: list unsigned int = const $100 (used reg = )
 	LDD	#$100
 	PSHS	D
 ; Debug: list int = const 1 (used reg = )
@@ -735,7 +736,6 @@ _output:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 53 
 ; 53 	printf("[line again ");
 	LOC	1
 .25:
@@ -753,7 +753,7 @@ _output:
 	FCC	"+"
 	FCB	0
 	LOC	0
-; Debug: list int = const 1 (used reg = )
+; Debug: list unsigned int = const 1 (used reg = )
 	LDD	#1
 	PSHS	D
 ; Debug: list * char = .26+0 (used reg = )
@@ -1081,7 +1081,8 @@ _input:
 	LDD	#0
 	STD	0,S
 ;BCC_EOS
-; 74 	while ((c = (((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++)))!= '\n' && c != (-1))
+; 74 	whi
+; 74 le ((c = (((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++)))!= '\n' && c != (-1))
 ; 75 		buf[n++] = c;
 	BRA	.46
 .47:
@@ -1171,10 +1172,10 @@ _input:
 ; Debug: list * struct __stdio_file = stdin+0 (used reg = )
 	LDX	#_stdin
 	PSHS	X
-; Debug: list int = const $1F (used reg = )
+; Debug: list unsigned int = const $1F (used reg = )
 	LDD	#$1F
 	PSHS	D
-; Debug: list int = const 1 (used reg = )
+; Debug: list unsigned int = const 1 (used reg = )
 	LDD	#1
 	PSHS	D
 ; Debug: rootlist * char buf = S+$2A-$20 (used reg = )
@@ -1436,7 +1437,7 @@ _input:
 	CLRB
 ; Debug: ne int = const 0 to int = D+0 (used reg = )
 	SUBD	#0
-	LBNE	.72
+		BNE	.72
 .73:
 	LDB	#1
 	BRA	.74

@@ -2,12 +2,12 @@
 ; 1 # 1 "proto.c"
 ; 1  
 ; 2 
-; 3 int add();
+; 3 int add() __proto(int a,int b);
 ;BCC_EOS
-; 4 static long widen();
+; 4 static long widen() __proto(int x);
 ;BCC_EOS
 ; 5 
-; 6 int add(a,b)
+; 6 int add(a,b) __proto(int a,int b)
 ; 7 # 6 "proto.c"
 ; 6 int a;
 EXPORT	_add
@@ -28,7 +28,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 9 }
 ; 10 
-; 11 static long widen(x)
+; 11 static long widen(x) __proto(int x)
 ; 12 # 11 "proto.c"
 ; 11 int x;
 _widen:
@@ -51,7 +51,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 14 }
 ; 15 
-; 16 unsigned char clip(v)
+; 16 unsigned char clip(v) __proto(unsigned int v)
 ; 17 # 16 "proto.c"
 ; 16 unsigned int v;
 EXPORT	_clip
@@ -79,7 +79,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 19 }
 ; 20 
-; 21 int use()
+; 21 int use() __proto()
 ; 22 {
 EXPORT	_use
 _use:
@@ -92,13 +92,14 @@ JSR	>_widen
 TFR	X,D
 ; Debug: list int = D+0 (used reg = )
 PSHS	D
-; Debug: rootlist int = const $12C (used reg = )
+; Debug: rootlist unsigned int = const $12C (used reg = )
 LDX	#$12C
 ; Debug: func () unsigned char = clip+0 (used reg = )
 JSR	>_clip
 TFR	X,D
-; Debug: rootlist unsigned char = B+0 (used reg = )
+; Debug: cast int = const 0 to unsigned char = B+0 (used reg = )
 CLRA
+; Debug: rootlist int = D+0 (used reg = )
 TFR	D,X
 ; Debug: func () int = add+0 (used reg = )
 JSR	>_add

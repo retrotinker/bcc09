@@ -230,7 +230,7 @@ LEAS	$16,S
 RTS
 ; 49 
 ; 50  
-; 51 int sum(n,__va_alist)
+; 51 int sum(n,__va_alist) __proto(int n,...)
 ; 52 # 51 "vatest.c"
 ; 51 int n;
 EXPORT	_sum
@@ -287,7 +287,7 @@ RTS
 ;BCC_EOS
 ; 61 }
 ; 62 
-; 63 long lsum(n,__va_alist)
+; 63 long lsum(n,__va_alist) __proto(int n,...)
 ; 64 # 63 "vatest.c"
 ; 63 int n;
 EXPORT	_lsum
@@ -356,7 +356,7 @@ RTS
 ; 73 }
 ; 74 
 ; 75  
-; 76 int two(a,b,__va_alist)
+; 76 int two(a,b,__va_alist) __proto(int a,int b,...)
 ; 77 # 76 "vatest.c"
 ; 76 int a;
 EXPORT	_two
@@ -459,7 +459,7 @@ RTS
 ; 86 }
 ; 87 
 ; 88  
-; 89 long lfirst(base,__va_alist)
+; 89 long lfirst(base,__va_alist) __proto(long base,...)
 ; 90 # 89 "vatest.c"
 ; 89 long base;
 EXPORT	_lfirst
@@ -520,7 +520,7 @@ RTS
 ;BCC_EOS
 ; 99 }
 ; 100 
-; 101 int cfirst(c,__va_alist)
+; 101 int cfirst(c,__va_alist) __proto(char c,...)
 ; 102 # 101 "vatest.c"
 ; 101 char c;
 EXPORT	_cfirst
@@ -582,7 +582,7 @@ RTS
 ; 112 
 ; 113 
 ; 114  
-; 115 void show(f,__va_alist)
+; 115 void show(f,__va_alist) __proto(char *f,...)
 ; 116 # 115 "vatest.c"
 ; 115 char *f;
 EXPORT	_show
@@ -644,8 +644,9 @@ JSR	>_putnum
 BRA	.29
 ;BCC_EOS
 ; 129 		case 'l':
-; 130 			putlong((((long *)((ap)+= sizeof(long)))[-1]));
+; 130 			putlong((((l
 .2E:
+; 130 ong *)((ap)+= sizeof(long)))[-1]));
 ; Debug: ptraddab int = const 4 to * char ap = [S+6-4] (used reg = )
 LDX	2,S
 LEAX	4,X
@@ -676,8 +677,7 @@ STX	0,S
 ; Debug: func () void = say+0 (used reg = )
 JSR	>_say
 ;BCC_EOS
-; 135 			putc
-; 135 har('\n');
+; 135 			putchar('\n');
 ; Debug: rootlist int = const $A (used reg = )
 LDX	#$A
 ; Debug: func () int = putchar+0 (used reg = )
@@ -741,7 +741,7 @@ LEAS	6,S
 RTS
 ; 144 
 ; 145  
-; 146 int vsum(n,ap)
+; 146 int vsum(n,ap) __proto(int n,va_list ap)
 ; 147 # 146 "vatest.c"
 ; 146 int n;
 EXPORT	_vsum
@@ -791,7 +791,7 @@ PULS	U,Y,PC
 ;BCC_EOS
 ; 153 }
 ; 154 
-; 155 int handon(n,__va_alist)
+; 155 int handon(n,__va_alist) __proto(int n,...)
 ; 156 # 155 "vatest.c"
 ; 155 int n;
 EXPORT	_handon
@@ -822,7 +822,7 @@ RTS
 ; 164 }
 ; 165 
 ; 166  
-; 167 int twice(n,__va_alist)
+; 167 int twice(n,__va_alist) __proto(int n,...)
 ; 168 # 167 "vatest.c"
 ; 167 int n;
 EXPORT	_twice
@@ -935,7 +935,7 @@ RTS
 ; 181 }
 ; 182 
 ; 183  
-; 184 int depth(n,__va_alist)
+; 184 int depth(n,__va_alist) __proto(int n,...)
 ; 185 # 184 "vatest.c"
 ; 184 int n;
 EXPORT	_depth
@@ -1222,7 +1222,7 @@ PSHS	D
 ; Debug: list int = const 1 (used reg = )
 LDD	#1
 PSHS	D
-; Debug: rootlist int = const $41 (used reg = )
+; Debug: rootlist char = const $41 (used reg = )
 LDX	#$41
 ; Debug: func () int = cfirst+0 (used reg = )
 JSR	>_cfirst
