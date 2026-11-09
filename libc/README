@@ -13,7 +13,9 @@ This will become the port of the dev86 C library.  So far it has:
   malloc/   malloc, free, calloc and realloc (dev86's)
   stdio/    stdio.h: the FILE functions (stdio.c, dev86's) and the
             printf and scanf families (printf.c and scanf.c, written
-            for bcc09), with floating point in fpfmt.c and scanfp.c
+            for bcc09), with floating point in fpfmt.c and scanfp.c;
+            and POSIX's getline and getdelim (getdelim.c), which read
+            a line of any length into a buffer from malloc
   stdlib/   stdlib.h's other functions: atoi, atol, strtol, strtoul,
             strtod, atof, abs, labs, qsort, bsearch, rand, srand,
             atexit, exit and _exit, and dev86's itoa, ltoa, ultoa,
@@ -156,7 +158,8 @@ showing the keys, with the left arrow to rub out and ENTER to end the
 line; BREAK at the start of a line is the end of the input.  Neither
 changes the bytes: a line ends with a carriage return ('\r'), on the
 screen and from the keyboard, so a program prints "\r" to end a line,
-and reads lines up to a '\r' (fgets() reads to a '\n').
+and reads lines up to a '\r': getdelim(&line, &size, '\r', stdin) does
+(fgets() reads to a '\n').
 
 With Disk BASIC (on a CoCo, not a Dragon: DragonDOS's disks are
 another format), open() and unlink() work on its files (cb/disk.c), and
@@ -220,7 +223,7 @@ and I$WritLn, which a terminal edits, echoes and ends with a line feed a
 line at a time, so read() gives at most a line (up to a CR, OS-9's end
 of line), from a file too; neither changes the bytes, so a program
 writes '\r' (or "\r\n") to end a line on OS-9, and reads lines that end
-with '\r'; open()
+with '\r' (getdelim(&line, &size, '\r', fp)); open()
 uses I$Open and I$Create (O_CREAT, O_EXCL, O_TRUNC through SS.Size,
 O_APPEND), lseek() I$Seek and I$GetStt's SS.Pos and SS.Size, isatty()
 SS.Opt's device type (SCF), and unlink() and remove() I$Delete.

@@ -100,68 +100,74 @@
 ;BCC_EOS
 ; 109 extern char *fgets () __proto(char*,int,FILE*);
 ;BCC_EOS
-; 110 extern char *gets () __proto(char*);		 
+; 110 
+; 111  
+; 112 extern ssize_t getdelim () __proto(char**,size_t*,int,FILE*);
 ;BCC_EOS
-; 111 extern size_t fread () __proto(void*,size_t,size_t,FILE*);
+; 113 extern ssize_t getline () __proto(char**,size_t*,FILE*);
 ;BCC_EOS
-; 112 extern size_t fwrite () __proto(void*,size_t,size_t,FILE*);
+; 114 extern char *gets () __proto(char*);		 
 ;BCC_EOS
-; 113 
-; 114 extern FILE *fopen () __proto(char*,char*);
+; 115 extern size_t fread () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
-; 115 extern int remove () __proto(char*);
+; 116 extern size_t fwrite () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
-; 116 extern FILE *fdopen () __proto(int,char*);
+; 117 
+; 118 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 117 extern FILE *freopen  () __proto(char*,char*,FILE*);
+; 119 extern int remove () __proto(char*);
 ;BCC_EOS
-; 118 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
+; 120 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 119 
-; 120 extern int fseek () __proto(FILE*,long,int);
+; 121 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 121 extern long ftell () __proto(FILE*);
-;BCC_EOS
-; 122 extern void rewind () __proto(FILE*);
+; 122 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
 ; 123 
-; 124 extern int fputs () __proto(char*,FILE*);
+; 124 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 125 extern int puts () __proto(char*);
+; 125 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 126 
-; 127 extern int printf () __proto(char*,...);
+; 126 extern void rewind () __proto(FILE*);
 ;BCC_EOS
-; 128 extern int fprintf () __proto(FILE*,char*,...);
+; 127 
+; 128 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 129 extern int sprintf () __proto(char*,char*,...);
+; 129 extern int puts () __proto(char*);
 ;BCC_EOS
-; 130 extern int snprintf () __proto(char*,size_t,char*,...);
+; 130 
+; 131 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 131  
-; 132 extern int vprintf () __p
-; 132 roto(char*,char*);
+; 132 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 133 extern int vfprintf () __proto(FILE*,char*,char*);
+; 133 extern in
+; 133 t sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 134 extern int vsprintf () __proto(char*,char*,char*);
+; 134 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
-; 135 extern int vsnprintf () __proto(char*,size_t,char*,char*);
+; 135  
+; 136 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 136 
-; 137 extern int scanf () __proto(char*,...);
+; 137 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 138 extern int fscanf () __proto(FILE*,char*,...);
+; 138 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 139 extern int sscanf () __proto(char*,char*,...);
+; 139 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
-; 140 extern int vscanf () __proto(char*,char*);
+; 140 
+; 141 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 141 extern int vfscanf () __proto(FILE*,char*,char*);
+; 142 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 142 extern int vsscanf () __proto(char*,char*,char*);
+; 143 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 143 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 144 extern int vscanf () __proto(char*,char*);
+;BCC_EOS
+; 145 extern int vfscanf () __proto(FILE*,char*,char*);
+;BCC_EOS
+; 146 extern int vsscanf () __proto(char*,char*,char*);
+;BCC_EOS
+; 147 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -231,7 +237,8 @@
 ;BCC_EOS
 ; 48 extern char * strtok () __proto(char *,char *);
 ;BCC_EOS
-; 49 extern size_t strcspn () __proto(char *,char *);
+; 49 extern size_t strcspn (
+; 49 ) __proto(char *,char *);
 ;BCC_EOS
 ; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
@@ -239,8 +246,7 @@
 ; 10 int checks, failures;
 ;BCC_EOS
 ; 11 
-; 12 void ok(n
-; 12 ,cond)
+; 12 void ok(n,cond)
 ; 13 int n, cond;
 EXPORT	_ok
 _ok:
@@ -1146,7 +1152,8 @@ LDX	#.5C
 JSR	>_printf
 LEAS	$E,S
 ;BCC_EOS
-; 92 	printf("[%.*s][%*s]\n",3,"abcdef",-4,"x");
+; 92 	printf("[%.*s][%*s]
+; 92 \n",3,"abcdef",-4,"x");
 LOC	1
 .5D:
 FCC	"[%.*s][%*s]"
@@ -1227,8 +1234,7 @@ LDX	#.61
 JSR	>_printf
 LEAS	6,S
 ;BCC_EOS
-; 97 	printf("[%l
-; 97 d][%li][%lu][%lx][%lX][%lo]\n",-1L,123456L,3000000000UL,
+; 97 	printf("[%ld][%li][%lu][%lx][%lX][%lo]\n",-1L,123456L,3000000000UL,
 LOC	1
 .62:
 FCC	"[%ld][%li][%lu][%lx][%lX][%lo]"

@@ -37,7 +37,7 @@ BCCFLAGS=-O -I$(TOP)/include
 #        families (their floating point in fpfmt.c and scanfp.c, linked
 #        through xfpcvt.s and xfptvc.s only where it is used)
 # Some sources hold several functions, each compiled separately with
-# -DL_name: string.c (STRING_OBJS), malloc.c, stdio.c, printf.c, scanf.c, abs.c,
+# -DL_name: string.c (STRING_OBJS), malloc.c, stdio.c, getdelim.c, printf.c, scanf.c, abs.c,
 # strtol.c and rand.c, and sim/sys.c
 STRING_OBJS = string/strlen.o string/strcat.o string/strcpy.o \
 	  string/strcmp.o string/strncat.o string/strncpy.o \
@@ -68,13 +68,15 @@ MATH_OBJS = math/e_acos.o math/e_asin.o math/s_atan.o math/e_atan2.o \
 ABS_OBJS = stdlib/abs.o stdlib/labs.o
 STRTOL_OBJS = stdlib/strtol.o stdlib/strtoul.o
 RAND_OBJS = stdlib/rand.o stdlib/srand.o
+GETDELIM_OBJS = stdio/getdelim.o stdio/getline.o
 OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/laddsub.o bcc/llogic.o bcc/lcmp.o bcc/lunary.o \
 	  bcc/lincdec.o bcc/lshift.o bcc/lmul.o bcc/ldiv.o \
 	  bcc/fpcore.o bcc/fpops.o bcc/fparith.o bcc/fpcmp.o bcc/fppush.o \
 	  bcc/fpconv.o bcc/fpincdec.o \
 	  ctype/ctype.o ctype/ctypefn.o \
-	  $(MALLOC_OBJS) $(STDIO_OBJS) $(PRINTF_OBJS) stdio/fpfmt.o stdio/xfpcvt.o \
+	  $(MALLOC_OBJS) $(STDIO_OBJS) $(GETDELIM_OBJS) \
+	  $(PRINTF_OBJS) stdio/fpfmt.o stdio/xfpcvt.o \
 	  $(SCANF_OBJS) stdio/scanfp.o stdio/xfptvc.o stdio/remove.o \
 	  stdlib/exit.o stdlib/atexit.o stdlib/errno.o stdlib/bignum.o \
 	  stdlib/strtod.o stdlib/atof.o \
@@ -187,6 +189,8 @@ $(ABS_OBJS): stdlib/%.o: stdlib/abs.c $(HEADERS) .bcc/stamp
 $(STRTOL_OBJS): stdlib/%.o: stdlib/strtol.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(RAND_OBJS): stdlib/%.o: stdlib/rand.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(GETDELIM_OBJS): stdio/%.o: stdio/getdelim.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 
 .SUFFIXES: .s .c .o

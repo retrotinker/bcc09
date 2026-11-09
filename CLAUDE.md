@@ -146,7 +146,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 543 reference
+  `tests/src/` with this tree's tools and compare every result with the 549 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -187,7 +187,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   floating formats, `strtod` and `scanf`'s `%f`, but for their counts of checks; and
   `mtest.c`, `math.h`'s functions, whose results must equal bit for bit those of
   `libc/math` built on the host; `inttest.c`, `stdint.h` and `_Bool`; `protoarg.c`,
-  arguments converted to prototypes' types);
+  arguments converted to prototypes' types; `gltest.c`, `getline()` and `getdelim()`,
+  POSIX's, added 2026-11-09 for `-Mo`'s and `-Me`'s CR-ended lines);
   `fpoptional.result` checks that `pftest` and `sftest` link none of that code; `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
 - `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
@@ -216,7 +217,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   reads `$FF6A`, which XRoar traps on to stop. Each output and status must equal
   `tests/ref/NAME.run` and `NAME.run.rc`. `NITROS9_KEEP=1` keeps the disks, and
   `NITROS9_PROGS` picks the programs. About a minute and a half.
-- Nineteen test programs are built again with `-O` and must run the same
+- Twenty test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `pathlen.result`: fltcc.c and pftest.c compiled through prefixes of 20 to 240 characters
   must give the same code. cc1 writes a forward branch long and makes it short when its

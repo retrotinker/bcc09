@@ -107,6 +107,10 @@ extern int ungetc __P((int, FILE*));
 extern int fclose __P((FILE*));
 extern int fflush __P((FILE*));
 extern char *fgets __P((char*, int, FILE*));
+/* POSIX's: a line of any length, in a buffer from malloc (getdelim.c);
+   OS-9's and Color BASIC's lines end with '\r' */
+extern ssize_t getdelim __P((char**, size_t*, int, FILE*));
+extern ssize_t getline __P((char**, size_t*, FILE*));
 extern char *gets __P((char*));		/* don't use it */
 extern size_t fread __P((void*, size_t, size_t, FILE*));
 extern size_t fwrite __P((__const void*, size_t, size_t, FILE*));

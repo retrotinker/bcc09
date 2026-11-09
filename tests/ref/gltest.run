@@ -1,0 +1,15 @@
+getline: 11 [first line\n]
+getline: 1 [\n]
+getline: 73 [the third line is longer than sixty-four characters, so the buffer grows\n]
+length 73, size enough 1
+getdelim CR: 5 [OS-9\r]
+getdelim CR: 12 [COLOR BASIC\r]
+getdelim CR: 1 [\r]
+small: 32 [now a line for the small buffer\n]
+getdelim :: 5 [name:]
+getdelim :: 6 [value:]
+rest: 5 [rest\n]
+last: 21 [no newline at the end]
+end: -1 []
+end again: -1 []
+errors 1

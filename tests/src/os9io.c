@@ -1,12 +1,14 @@
 /* built by bcc09 -Mo and run as an OS-9 module by sim6809 --os9 and on
-   NitrOS-9 (tests/nitros9), with the parameters "one two": the arguments; files through open, read,
-   write, lseek, close and unlink (O_CREAT, O_EXCL, O_TRUNC, O_APPEND) and
-   through stdio (fopen, fprintf, fgets, fseek, ftell, remove), which
-   pass every byte as it is; isatty; prints the results, and exits with
-   the number of failed checks */
+   NitrOS-9 (tests/nitros9), with the parameters "one two": the
+   arguments; files through open, read, write, lseek, close and unlink
+   (O_CREAT, O_EXCL, O_TRUNC, O_APPEND) and through stdio (fopen,
+   fprintf, fgets, fseek, ftell, remove, and getdelim for lines ending
+   with CR), which pass every byte as it is; isatty; prints the results,
+   and exits with the number of failed checks */
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -106,6 +108,25 @@ void stdio()
 	fclose(fp);
 	ok(29, remove(NAME) == 0);
 	ok(30, fopen(NAME, "r") == 0);
+
+	/* OS-9's lines, ending with CR, read with getdelim() */
+	fp = fopen(NAME, "w");
+	fputs("one\rtwo\r", fp);
+	fclose(fp);
+	fp = fopen(NAME, "r");
+	{
+		char *line = 0;
+		size_t size = 0;
+
+		ok(33, getdelim(&line, &size, '\r', fp) == 4 &&
+		   strcmp(line, "one\r") == 0);
+		ok(34, getdelim(&line, &size, '\r', fp) == 4 &&
+		   strcmp(line, "two\r") == 0 &&
+		   getdelim(&line, &size, '\r', fp) == -1);
+		free(line);
+	}
+	fclose(fp);
+	remove(NAME);
 }
 
 int main(argc, argv)

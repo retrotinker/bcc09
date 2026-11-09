@@ -1,0 +1,6 @@
+first line
+
+the third line is longer than sixty-four characters, so the buffer grows
+OS-9COLOR BASICnow a line for the small buffer
+name:value:rest
+no newline at the end

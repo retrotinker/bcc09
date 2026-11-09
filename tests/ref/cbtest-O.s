@@ -1,8 +1,8 @@
 ; 1 
 ; 1 # 1 "cbtest.c"
-; 1 # 5
-; 5  
-; 6 # 8 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 1 # 6
+; 6  
+; 7 # 8 "../prefix.tmp/lib/bcc09/include/stdio.h"
 ; 8  
 ; 9 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -100,68 +100,74 @@
 ;BCC_EOS
 ; 109 extern char *fgets () __proto(char*,int,FILE*);
 ;BCC_EOS
-; 110 extern char *gets () __proto(char*);		 
+; 110 
+; 111  
+; 112 extern ssize_t getdelim () __proto(char**,size_t*,int,FILE*);
 ;BCC_EOS
-; 111 extern size_t fread () __proto(void*,size_t,size_t,FILE*);
+; 113 extern ssize_t getline () __proto(char**,size_t*,FILE*);
 ;BCC_EOS
-; 112 extern size_t fwrite () __proto(void*,size_t,size_t,FILE*);
+; 114 extern char *gets () __proto(char*);		 
 ;BCC_EOS
-; 113 
-; 114 extern FILE *fopen () __proto(char*,char*);
+; 115 extern size_t fread () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
-; 115 extern int remove () __proto(char*);
+; 116 extern size_t fwrite () __proto(void*,size_t,size_t,FILE*);
 ;BCC_EOS
-; 116 extern FILE *fdopen () __proto(int,char*);
+; 117 
+; 118 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 117 extern FILE *freopen  () __proto(char*,char*,FILE*);
+; 119 extern int remove () __proto(char*);
 ;BCC_EOS
-; 118 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
+; 120 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 119 
-; 120 extern int fseek () __proto(FILE*,long,int);
+; 121 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 121 extern long ftell () __proto(FILE*);
-;BCC_EOS
-; 122 extern void rewind () __proto(FILE*);
+; 122 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
 ; 123 
-; 124 extern int fputs () __proto(char*,FILE*);
+; 124 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 125 extern int puts () __proto(char*);
+; 125 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 126 
-; 127 extern int printf () __proto(char*,...);
+; 126 extern void rewind () __proto(FILE*);
 ;BCC_EOS
-; 128 extern int fprintf () __proto(FILE*,char*,...);
+; 127 
+; 128 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 129 extern int sprintf () __proto(char*,char*,...);
+; 129 extern int puts () __proto(char*);
 ;BCC_EOS
-; 130 extern int snprintf () __proto(char*,size_t,char*,...);
+; 130 
+; 131 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 131  
-; 132 extern int vprintf () __p
-; 132 roto(char*,char*);
+; 132 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 133 extern int vfprintf () __proto(FILE*,char*,char*);
+; 133 extern in
+; 133 t sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 134 extern int vsprintf () __proto(char*,char*,char*);
+; 134 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
-; 135 extern int vsnprintf () __proto(char*,size_t,char*,char*);
+; 135  
+; 136 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 136 
-; 137 extern int scanf () __proto(char*,...);
+; 137 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 138 extern int fscanf () __proto(FILE*,char*,...);
+; 138 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 139 extern int sscanf () __proto(char*,char*,...);
+; 139 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
-; 140 extern int vscanf () __proto(char*,char*);
+; 140 
+; 141 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 141 extern int vfscanf () __proto(FILE*,char*,char*);
+; 142 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 142 extern int vsscanf () __proto(char*,char*,char*);
+; 143 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 143 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 144 extern int vscanf () __proto(char*,char*);
+;BCC_EOS
+; 145 extern int vfscanf () __proto(FILE*,char*,char*);
+;BCC_EOS
+; 146 extern int vsscanf () __proto(char*,char*,char*);
+;BCC_EOS
+; 147 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -233,12 +239,12 @@
 ;BCC_EOS
 ; 46 extern char * ultoa () __proto(unsigned long);
 ;BCC_EOS
-; 47 extern char * ltostr () __proto(long,int);
+; 47 ext
+; 47 ern char * ltostr () __proto(long,int);
 ;BCC_EOS
 ; 48 extern char * ultostr () __proto(unsigned long,int);
 ;BCC_EOS
-; 49 # 5 "../prefix.tmp/lib/bcc09/
-; 4 include/string.h"
+; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -309,254 +315,163 @@
 ;BCC_EOS
 ; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
-; 51 # 11 "cbtest.c"
-; 11  
-; 12 char *getline(buf,n)
-; 13 char *buf;
-EXPORT	_getline
-_getline:
+; 51 # 12 "cbtest.c"
+; 12 int main()
+; 13 {
+EXPORT	_main
+_main:
+; 14 	char *line = 0, *p;
+LEAS	-2,S
+; Debug: eq int = const 0 to * char line = [S+2-2] (used reg = )
+CLRA
+CLRB
+STD	0,S
 ;BCC_EOS
-; 14 int n;
+; 15 	size_t size = 0;
+LEAS	-4,S
+; Debug: eq int = const 0 to unsigned int size = [S+6-6] (used reg = )
+CLRA
+CLRB
+STD	0,S
 ;BCC_EOS
-; 15 {
-; 16 	int c, i = 0;
-PSHS	CC,D,X,DP
-; Debug: eq int = const 0 to int i = [S+6-6] (used reg = )
+; 16 	int n, lines = 0;
+LEAS	-4,S
+; Debug: eq int = const 0 to int lines = [S+$A-$A] (used reg = )
 CLRA
 CLRB
 STD	0,S
 ;BCC_EOS
 ; 17 
-; 18 	while (i < n - 1 && (c = (((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++)))!= (-1)) {
-BRA	.2
-.3:
-; 19 		buf[i++] = c;
-; Debug: postinc int i = [S+6-6] (used reg = )
-LDD	0,S
-ADDD	#1
-STD	0,S
-; Debug: ptradd int = D-1 to * char buf = [S+6-2] (used reg = )
-ADDD	#-1
-ADDD	4,S
-TFR	D,X
-; Debug: eq int c = [S+6-4] to char = [X+0] (used reg = )
-LDB	3,S
-STB	0,X
-;BCC_EOS
-; 20 		if (c == '\r')
-; Debug: logeq int = const $D to int c = [S+6-4] (used reg = )
-LDX	2,S
-LEAX	-$D,X
-BNE	.4
-.5:
-; 21 			break;
-BRA	.1
-;BCC_EOS
-; 22 	}
-.4:
-; 23 	buf[i] = 0;
-.2:
-; Debug: sub int = const 1 to int n = [S+6+2] (used reg = )
-LDD	8,S
-; Debug: lt int = D-1 to int i = [S+6-6] (used reg = )
-ADDD	#-1
-SUBD	0,S
-BLE	.6
-.7:
-; Debug: ge * unsigned char = [stdin+2] to * unsigned char = [stdin+0] (used reg = )
-LDX	>_stdin
-CMPX	>_stdin+2
-BLO	.8
-.9:
-; Debug: rootlist * struct __stdio_file = stdin+0 (used reg = )
-LDX	#_stdin
-; Debug: func () int = fgetc+0 (used reg = )
-JSR	>_fgetc
-BRA	.A
-.8:
-; Debug: postinc * unsigned char = [stdin+0] (used reg = )
-LDX	>_stdin
-LEAU	1,X
-STU	>_stdin
-LDB	0,X
-CLRA
-TFR	D,X
-.A:
-; Debug: eq unsigned int = X+0 to int c = [S+6-4] (used reg = )
-STX	2,S
-; Debug: ne int = const -1 to int = X+0 (used reg = )
-LEAX	1,X
-BNE	.3
-.6:
-.1:
-; Debug: ptradd int i = [S+6-6] to * char buf = [S+6-2] (used reg = )
-LDD	0,S
-ADDD	4,S
-TFR	D,X
-; Debug: eq int = const 0 to char = [X+0] (used reg = )
-CLRB
-STB	0,X
-;BCC_EOS
-; 24 	return i ? buf : 0;
-LDD	0,S
-BEQ	.B
-.C:
-LDX	4,S
-BRA	.D
-.B:
-LDX	#0
-.D:
-; Debug: cast * char = const 0 to * char = X+0 (used reg = )
-LEAS	6,S
-RTS
-;BCC_EOS
-; 25 }
-; 26 
-; 27 int main()
-; 28 {
-EXPORT	_main
-_main:
-; 29 	char buf[40], *p;
-;BCC_EOS
-; 30 	int lines = 0;
-LEAS	-$2C,S
-; Debug: eq int = const 0 to int lines = [S+$2C-$2C] (used reg = )
-CLRA
-CLRB
-STD	0,S
-;BCC_EOS
-; 31 
-; 32 	printf("hello from Color BASIC\r");
+; 18 	printf("hello from Color BASIC\r");
 LOC	1
-.E:
+.1:
 FCC	"hello from Color BASIC"
 FCB	$D
 FCB	0
 LOC	0
-; Debug: rootlist * char = .E+0 (used reg = )
-LDX	#.E
+; Debug: rootlist * char = .1+0 (used reg = )
+LDX	#.1
 ; Debug: func () int = printf+0 (used reg = )
 JSR	>_printf
 ;BCC_EOS
-; 33 	while (getline(buf,sizeof(buf))!= 0) {
-BRA	.10
-.11:
-; 34 		lines++;
-; Debug: postinc int lines = [S+$2C-$2C] (used reg = )
+; 19 	while ((n = getdelim(&line,&size,'\r',stdin))> 0) {
+BRA	.3
+.4:
+; 20 		lines++;
+; Debug: postinc int lines = [S+$A-$A] (used reg = )
 LDD	0,S
 ADDD	#1
 STD	0,S
 ;BCC_EOS
-; 35 		printf("got %d: [%.*s]\r",(int)strlen(buf),(int)strlen(buf)- 1,
+; 21 		printf("got %d: [%.*s]\r",n,n - 1,line);
 LOC	1
-.12:
+.5:
 FCC	"got %d: [%.*s]"
 FCB	$D
 FCB	0
 LOC	0
-; 36 buf);
-; Debug: list * char buf = S+$2C-$28 (used reg = )
-LEAX	4,S
+; Debug: list * char line = [S+$A-2] (used reg = )
+LDX	8,S
 PSHS	X
-; Debug: rootlist * char buf = S+$2E-$28 (used reg = )
-LEAX	6,S
-; Debug: func () unsigned int = strlen+0 (used reg = )
-JSR	>_strlen
-; Debug: cast int = const 0 to unsigned int = X+0 (used reg = )
-; Debug: sub int = const 1 to int = X+0 (used reg = )
-; Debug: list int = X-1 (used reg = )
-LEAX	-1,X
-PSHS	X
-; Debug: rootlist * char buf = S+$30-$28 (used reg = )
-LEAX	8,S
-; Debug: func () unsigned int = strlen+0 (used reg = )
-JSR	>_strlen
-; Debug: cast int = const 0 to unsigned int = X+0 (used reg = )
-; Debug: list int = X+0 (used reg = )
-PSHS	X
-; Debug: rootlist * char = .12+0 (used reg = )
-LDX	#.12
+; Debug: sub int = const 1 to int n = [S+$C-8] (used reg = )
+LDD	4,S
+; Debug: list int = D-1 (used reg = )
+ADDD	#-1
+PSHS	D
+; Debug: list int n = [S+$E-8] (used reg = )
+LDD	6,S
+PSHS	D
+; Debug: rootlist * char = .5+0 (used reg = )
+LDX	#.5
 ; Debug: func () int = printf+0 (used reg = )
 JSR	>_printf
 LEAS	6,S
 ;BCC_EOS
-; 37 	}
-; 38 	p = malloc(1000);
-.10:
-; Debug: list int = const $28 (used reg = )
-LDD	#$28
+; 22 	}
+; 23 	p = malloc(1000);
+.3:
+; Debug: list * struct __stdio_file = stdin+0 (used reg = )
+LDX	#_stdin
+PSHS	X
+; Debug: list int = const $D (used reg = )
+LDD	#$D
 PSHS	D
-; Debug: rootlist * char buf = S+$2E-$28 (used reg = )
-LEAX	6,S
-; Debug: func () * char = getline+0 (used reg = )
-JSR	>_getline
-LEAS	2,S
-; Debug: ne int = const 0 to * char = X+0 (used reg = )
-LEAX	0,X
-BNE	.11
-.13:
-.F:
+; Debug: list * unsigned int size = S+$E-6 (used reg = )
+LEAX	8,S
+PSHS	X
+; Debug: rootlist * * char line = S+$10-2 (used reg = )
+LEAX	$E,S
+; Debug: func () int = getdelim+0 (used reg = )
+JSR	>_getdelim
+LEAS	6,S
+; Debug: eq int = X+0 to int n = [S+$A-8] (used reg = )
+STX	2,S
+; Debug: gt int = const 0 to int = X+0 (used reg = )
+CMPX	#0
+BGT	.4
+.6:
+.2:
 ; Debug: rootlist unsigned int = const $3E8 (used reg = )
 LDX	#$3E8
 ; Debug: func () * void = malloc+0 (used reg = )
 JSR	>_malloc
-; Debug: eq * void = X+0 to * char p = [S+$2C-$2A] (used reg = )
-STX	2,S
+; Debug: eq * void = X+0 to * char p = [S+$A-4] (used reg = )
+STX	6,S
 ;BCC_EOS
-; 39 	printf("malloc %s\r",p ? "ok": "failed");
+; 24 	printf("malloc %s\r",p ? "ok": "failed");
 LOC	1
-.14:
+.7:
 FCC	"malloc %s"
 FCB	$D
 FCB	0
 LOC	0
 LOC	1
-.15:
+.8:
 FCC	"ok"
 FCB	0
 LOC	0
 LOC	1
-.16:
+.9:
 FCC	"failed"
 FCB	0
 LOC	0
-LDD	2,S
-BEQ	.17
-.18:
-LDX	#.15
-BRA	.19
-.17:
-LDX	#.16
-.19:
+LDD	6,S
+BEQ	.A
+.B:
+LDX	#.8
+BRA	.C
+.A:
+LDX	#.9
+.C:
 ; Debug: list * char = X+0 (used reg = )
 PSHS	X
-; Debug: rootlist * char = .14+0 (used reg = )
-LDX	#.14
+; Debug: rootlist * char = .7+0 (used reg = )
+LDX	#.7
 ; Debug: func () int = printf+0 (used reg = )
 JSR	>_printf
 LEAS	2,S
 ;BCC_EOS
-; 40 	printf("%d lines\r",lines);
+; 25 	printf("%d lines\r",lines);
 LOC	1
-.1A:
+.D:
 FCC	"%d lines"
 FCB	$D
 FCB	0
 LOC	0
-; Debug: list int lines = [S+$2C-$2C] (used reg = )
+; Debug: list int lines = [S+$A-$A] (used reg = )
 LDD	0,S
 PSHS	D
-; Debug: rootlist * char = .1A+0 (used reg = )
-LDX	#.1A
+; Debug: rootlist * char = .D+0 (used reg = )
+LDX	#.D
 ; Debug: func () int = printf+0 (used reg = )
 JSR	>_printf
 LEAS	2,S
 ;BCC_EOS
-; 41 	return lines;
+; 26 	return lines;
 LDX	0,S
-LEAS	$2C,S
+LEAS	$A,S
 RTS
 ;BCC_EOS
-; 42 }
-; 43 
+; 27 }
+; 28 
 ; 0 errors detected

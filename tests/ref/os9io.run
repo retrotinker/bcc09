@@ -4,4 +4,4 @@ argv[2] two
 read: line 1 of 3
 read: line 2 of 3
 read: line 3 of 3
-checks 32 failures 0
+checks 34 failures 0
