@@ -256,13 +256,11 @@ label_no label;
 	register struct labdatstruct *labptr;
 	struct labdatstruct *labtop;
 
+	/* (the label's own entry: those of branches to it are passed over) */
 	for (labptr = &vislab[0], labtop = &vislab[MAXVISLAB];
 	     labptr < labtop; ++labptr)
-		if (labptr->labnum == label) {
-			if (labptr->labpatch != 0)
-				break;
+		if (labptr->labnum == label && labptr->labpatch == NULL)
 			return labptr;
-		}
 	return (struct labdatstruct *)NULL;
 }
 

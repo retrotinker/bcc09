@@ -51,3 +51,18 @@ out:
 		t = t ? t + 1 : 1;
 	return t;
 }
+
+/* a label reached by a goto before it and one after it: the second is a
+   short branch back (cc1 once made it a JMP) */
+int gotoloop(n)
+int n;
+{
+	int i = 0, t = 0;
+
+	goto again;
+again:
+	t += i;
+	if (++i < n)
+		goto again;
+	return t;
+}

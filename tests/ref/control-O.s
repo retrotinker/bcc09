@@ -268,4 +268,59 @@ RTS
 ;BCC_EOS
 ; 53 }
 ; 54 
+; 55 
+; 56  
+; 57 int gotoloop(n)
+; 58 int n;
+EXPORT	_gotoloop
+_gotoloop:
+;BCC_EOS
+; 59 {
+; 60 	int i = 0, t = 0;
+PSHS	D,X
+; Debug: eq int = const 0 to int i = [S+4-4] (used reg = )
+CLRA
+CLRB
+STD	0,S
+LEAS	-2,S
+; Debug: eq int = const 0 to int t = [S+6-6] (used reg = )
+CLRA
+CLRB
+STD	0,S
+;BCC_EOS
+; 61 
+; 62 	goto again;
+LEAS	..FFFD+6,S
+BRA	.FFFD
+;BCC_EOS
+; 63 again:
+.FFFD:
+..FFFD		=	-6
+; 64 	t += i;
+; Debug: addab int i = [S+6-4] to int t = [S+6-6] (used reg = )
+LDD	0,S
+ADDD	2,S
+STD	0,S
+;BCC_EOS
+; 65 	if (++i < n)
+; Debug: preinc int i = [S+6-4] (used reg = )
+LDD	2,S
+ADDD	#1
+STD	2,S
+; Debug: lt int n = [S+6-2] to int = D+0 (used reg = )
+SUBD	4,S
+BGE	.29
+.2A:
+; 66 		goto again;
+LEAS	..FFFD+6,S
+BRA	.FFFD
+;BCC_EOS
+; 67 	return t;
+.29:
+LDX	0,S
+LEAS	6,S
+RTS
+;BCC_EOS
+; 68 }
+; 69 
 ; 0 errors detected

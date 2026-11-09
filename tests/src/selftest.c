@@ -2,7 +2,7 @@
    each result against the value the host compiler gives for the same
    source, and exit with the number of failures */
 
-extern int select(), dense(), loops(), strlen1(), sum(), ptrs();
+extern int select(), dense(), loops(), gotoloop(), strlen1(), sum(), ptrs();
 extern void copy(), putchar(), putnum();
 extern int tab[];
 extern char buf[];
@@ -104,6 +104,8 @@ int main()
 	check(24, loops(5), 10);
 	check(25, loops(12), 58);
 	check(26, loops(20), 62);
+	check(27, gotoloop(10), 45);
+	check(28, gotoloop(1), 0);
 
 	/* pointers, arrays and strings */
 	check(30, strlen1("hello, world"), 12);

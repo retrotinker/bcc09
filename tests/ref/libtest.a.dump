@@ -1,18 +1,19 @@
 ARCHIVEFILE 'libtest.a'
 OBJECTFILE 'control.o'
 MODULE  'control'
-BYTEPOS 0000003d
-BINLEN  000000f1
-STRINGS 006a +0017
+BYTEPOS 0000004c
+BINLEN  00000121
+STRINGS 006f +0021
 VERSION 0.0
-SEG0 000000f1
+SEG0 00000121
 
-SYMS 2
-SYM 0    00000053 ..E.T _loops
-SYM 1    00000000 ..E.T _select
+SYMS 3
+SYM 0    000000f1 ..E.T _gotoloop
+SYM 1    00000053 ..E.T _loops
+SYM 2    00000000 ..E.T _select
 
 text	data	bss	dec	hex	filename
-241	0	0	241	f1	libtest.a(control.o)
+289	0	0	289	121	libtest.a(control.o)
 
 BYTECODE
 SEG 0
@@ -31,6 +32,9 @@ SEG 0
 : ed 64 ec 66 ed 62 20 1e  ec e4 27 07 ec e4 c3 00  .d.f.b....'.....
 : 01 20 03 cc 00 01 ed e4  ec 64 c3 00 01 ed 64 ec  .........d....d.
 : 62 c3 ff ff ed 62 ec 64  a3 62 2d dc ae e4 32 68  b....b.d.b-...2h
+: 39 34 16 cc 00 00 ed e4  32 7e cc 00 00 ed e4 32  94......2~.....2
+: e9 00 00 20 00 ec e4 e3  62 ed e4 ec 62 c3 00 01  ........b...b...
+: ed 62 a3 64 2c 06 32 e9  00 00 20 e9 ae e4 32 66  .b.d,.2.......2f
 : 39                                                9               
 
 ARCHIVEFILE 'libtest.a'
@@ -38,7 +42,7 @@ OBJECTFILE 'ptr.o'
 MODULE  'ptr'
 BYTEPOS 0000008e
 BINLEN  00000103
-STRINGS 0205 +003d
+STRINGS 0245 +003d
 VERSION 0.0
 SEG0 000000ce
 SEG1 0000001b
