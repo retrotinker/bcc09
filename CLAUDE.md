@@ -23,6 +23,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   - meet or exceed the linker script functionality in the mc6801-tools project
 - verify copt/rules.6809 and expand appropriately
 - target CoCo BASIC, OS-9, FLEX, and Vectrex
+- floating point support should be optional
 - add stdint.h and stdbool.h to libc
 
 ## Layout
