@@ -151,10 +151,12 @@ cb is for a program loaded with LOADM (or CLOADM) and run with EXEC
 under Color BASIC: like sa, it runs on BASIC's stack and returns to
 BASIC, with main's result in D, but it has I/O, through the ROM's POLCAT
 ($A000) and CHROUT ($A002) vectors (cb/rom.s).  write() prints on the
-screen, with '\n' as a carriage return; read() reads a line from the
-keyboard as a terminal does, showing the keys, with the left arrow to
-rub out and ENTER to end the line; BREAK at the start of a line is the
-end of the input.  There are no files yet (Disk BASIC's will come).
+screen; read() reads a line from the keyboard as a terminal does,
+showing the keys, with the left arrow to rub out and ENTER to end the
+line; BREAK at the start of a line is the end of the input.  Neither
+changes the bytes: a line ends with a carriage return ('\r'), on the
+screen and from the keyboard, so a program prints "\r" to end a line,
+and reads lines up to a '\r' (fgets() reads to a '\n').  There are no files yet (Disk BASIC's will come).
 Load the program low, at $2800 or $3000 say (bcc09 -X-T0x3000), below
 BASIC's stack and strings at the top of memory: the heap is the memory
 between the end of the program and the stack.  "make check" tests it

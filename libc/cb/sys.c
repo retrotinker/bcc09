@@ -2,7 +2,8 @@
  * ROM's POLCAT and CHROUT (see rom.s); each compiled separately
  * (-DL_name).  Standard input is the keyboard, read a line at a time as a
  * terminal would, and standard output and standard error are the screen.
- * There are no files yet.
+ * The bytes pass as they are: a line ends with a carriage return (CR,
+ * '\r'), on the screen and from the keyboard.  There are no files yet.
  *
  * Written for bcc09.  Like the rest of libc, it is distributed under the
  * GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -21,7 +22,6 @@ extern int __cb_polcat();
 extern void __cb_chrout();
 
 #ifdef L_write
-/* each '\n' is printed as a carriage return, as the screen expects */
 ssize_t
 write(fd, buf, n)
 int fd;
@@ -37,7 +37,7 @@ size_t n;
       return -1;
    }
    for (i = 0; i < n; i++)
-      __cb_chrout(p[i] == '\n' ? CR : p[i]);
+      __cb_chrout(p[i]);
    return n;
 }
 #endif
@@ -45,7 +45,7 @@ size_t n;
 #ifdef L_read
 /* A line from the keyboard, as a terminal gives it: the keys are shown as
    they are typed, the left arrow rubs out the last, and ENTER ends the
-   line, which ends with a '\n'.  BREAK at the start of a line is the end
+   line, which ends with a CR.  BREAK at the start of a line is the end
    of the input (read() gives 0).  A line longer than n comes in pieces. */
 #define LINEMAX 128
 
@@ -92,10 +92,10 @@ size_t n;
 	 if (c == KEY_ENTER)
 	 {
 	    __cb_chrout(CR);
-	    line[have++] = '\n';
+	    line[have++] = CR;
 	    break;
 	 }
-	 if (have < LINEMAX - 1)	/* (keep room for the '\n') */
+	 if (have < LINEMAX - 1)	/* (keep room for the CR) */
 	 {
 	    line[have++] = c;
 	    __cb_chrout(c);

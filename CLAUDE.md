@@ -70,7 +70,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   where it has I/O) that the driver links:
   - `-Ms` → `crt0.o` + `libsa.a`: returns to its loader; no I/O.
   - `-Me` → `crt0.o` + `libcb.a`: Color BASIC `EXEC` programs, with I/O through the
-    ROM's POLCAT/CHROUT vectors (the Dragon's are the same); tested with a stand-in ROM
+    ROM's POLCAT/CHROUT vectors (the Dragon's are the same), with no newline
+    translation (decided 2026-11-09: a line ends with `'\r'`, both ways); tested with a stand-in ROM
     (`tests/src/cbrom.s`) by `make check`, and on real ROMs in XRoar by
     `make check-xroar`; no files yet; the CoCo 3 is untried (no ROM here).
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
