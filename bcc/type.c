@@ -82,6 +82,7 @@ PUBLIC struct typestruct *newtype()
 	    type->structkey[0] = 0;
 	type->nexttype = type->prevtype = type->sidetype = NULL;
 	type->listtype = NULL;
+	type->proto = NULL;
 	type->tname = "";
 	return type;
 }
@@ -108,7 +109,8 @@ struct typestruct *type;
 	for (searchtype = type->prevtype; searchtype != NULL;
 	     searchtype = searchtype->sidetype)
 		if (searchtype->constructor == (constr_t) constructor &&
-		    searchtype->typesize == size)
+		    searchtype->typesize == size &&
+		    searchtype->proto == NULL)	/* (functype() does those) */
 			return searchtype;
 	switch ((searchtype = newtype())->constructor = constructor) {
 	case ARRAY:
@@ -129,6 +131,79 @@ struct typestruct *type;
 	searchtype->nexttype = type;
 	searchtype->sidetype = type->prevtype;
 	return type->prevtype = searchtype;
+}
+
+/* nonzero if the prototypes are the same: types are canonical */
+PRIVATE bool_pt protoeq(p1, p2)
+struct proto *p1;
+struct proto *p2;
+{
+	int i;
+
+	if (p1 == p2)
+		return TRUE;
+	if (p1 == NULL || p2 == NULL || p1->nparams != p2->nparams ||
+	    p1->varargs != p2->varargs)
+		return FALSE;
+	for (i = 0; i < p1->nparams; i++)
+		if (p1->ptypes[i] != p2->ptypes[i])
+			return FALSE;
+	return TRUE;
+}
+
+/* a function returning type, with the prototype proto (or none): one
+   type for each different prototype, so that a call through a pointer
+   to it can find its parameters' types */
+PUBLIC struct typestruct *functype(type, proto)
+struct typestruct *type;
+struct proto *proto;
+{
+	register struct typestruct *searchtype;
+
+	if (proto == NULL)
+		return prefix(FUNCTION, ftypesize, type);
+	for (searchtype = type->prevtype; searchtype != NULL;
+	     searchtype = searchtype->sidetype)
+		if (searchtype->constructor == FUNCTION &&
+		    protoeq(searchtype->proto, proto))
+			return searchtype;
+	searchtype = newtype();
+	searchtype->constructor = FUNCTION;
+	searchtype->alignmask = ~(uoffset_T) 0;
+	searchtype->typesize = ftypesize;
+	searchtype->proto = proto;
+	searchtype->nexttype = type;
+	searchtype->sidetype = type->prevtype;
+	return type->prevtype = searchtype;
+}
+
+/* if t1 and t2 are compatible function types (or pointers to them): the
+   same result, and the same prototype or one without (C's rule, but for
+   the promotions that a prototype's types must have to match none),
+   the one with the prototype; else NULL */
+PUBLIC struct typestruct *funcmerge(t1, t2)
+struct typestruct *t1;
+struct typestruct *t2;
+{
+	struct typestruct *f1;
+	struct typestruct *f2;
+
+	if (t1 == t2)
+		return t1;
+	f1 = t1;
+	f2 = t2;
+	if (t1->constructor == POINTER && t2->constructor == POINTER) {
+		f1 = t1->nexttype;
+		f2 = t2->nexttype;
+	}
+	if (f1->constructor != FUNCTION || f2->constructor != FUNCTION ||
+	    f1->nexttype != f2->nexttype)
+		return NULL;
+	if (f1->proto == NULL)
+		return t2;
+	if (f2->proto == NULL || protoeq(f1->proto, f2->proto))
+		return t1;
+	return NULL;
 }
 
 PUBLIC struct typestruct *promote(type)

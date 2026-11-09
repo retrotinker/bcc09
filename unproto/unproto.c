@@ -616,6 +616,7 @@ register struct token *s;
 			    && (r = q->next) && r->tokno == TOK_LIST) {
 				tok_show(q);	/* show name */
 				show_empty_list(p = r);	/* strip args */
+				show_proto(r, 0);	/* (for cc1) */
 			}
 		}
 	}
@@ -640,6 +641,7 @@ struct token *t2;
 		show_type(s);	/* recurse */
 	}
 	show_empty_list(t2);
+	show_proto(t2, 0);	/* (for cc1) */
 	return (t2);
 }
 

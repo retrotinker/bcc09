@@ -78,13 +78,15 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
   as dev86's old `strcspn.c`) shouldn't be copied in.
-- `unproto` is built with `_PROTO_` too (added 2026-11-08): after the `()` it writes for a
-  prototype, and after a prototyped heading's argument names, it writes
-  `__proto(type name, ...)`, which `cc1` parses (`declproto()`, into the symbol's `proto`);
-  a call of a function by name converts each argument to its parameter's type and then
-  promotes it as usual, so the old-style definitions `unproto` makes get what they
-  expect, and a wrong number of arguments is an error. Calls through function pointers
-  aren't converted (`BUGS`).
+- `unproto` is built with `_PROTO_` too (added 2026-11-08): after every `()` it writes for a
+  prototype (declarations, function pointer types, casts, typedefs, parameters), and
+  after a prototyped heading's argument names, it writes `__proto(type name, ...)`, which
+  `cc1` parses (`declproto()`) into the function type (`typestruct.proto`: `functype()`
+  shares a type only between equal prototypes; `funcmerge()` makes a prototype and an
+  old-style declaration compatible); a call, by name or through a pointer, converts each
+  argument to its parameter's type and then promotes it as usual, so the old-style
+  definitions `unproto` makes get what they expect, and a wrong number of arguments is an
+  error.
 - `unproto` is built with `_VA_ALIST_` (`unproto/Makefile`), so the definition of a
   function with `...` gets an `int __va_alist` parameter in its place, whose address
   `libc/include/stdarg.h`'s `va_start` uses (the first argument is in a register, so the

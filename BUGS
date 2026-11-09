@@ -30,12 +30,6 @@ cc1 (code generation)
   References: none stable (maltest.s's JMP .49 has come and gone as
   headers it includes changed size)
 
-- A call through a function pointer doesn't convert its arguments to
-  the types of the pointer's prototype: unproto gives cc1 the types of
-  a function's prototype (__proto), but not of a pointer's, so with
-  "long (*fp)(long);" fp(3) passes an int where a long is wanted.
-  (Calls of functions by name are converted.)  References: none
-
 - In PIC mode, global (bss?) pointers and arrays use PC-relative
   addressing rather than direct addressing.  (Not covered by the tests.)
 

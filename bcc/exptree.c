@@ -967,6 +967,8 @@ struct nodestruct *nodeptr;
 					targtype->nexttype->
 					constructor & VOID)))
 			return right->nodetype;
+		if (funcmerge(targtype, right->nodetype) != NULL)
+			return funcmerge(targtype, right->nodetype);
 		error("mismatched types");
 		fixnode(left);	/* XXX - better to fix the CONDOP */
 		fixnode(right);

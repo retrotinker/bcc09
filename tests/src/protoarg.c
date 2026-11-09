@@ -3,7 +3,9 @@
    unsigned long, double, float, char, signed char, unsigned char, bool
    and pointer parameters given other types, first (in a register) and
    later; a definition that is its own prototype; a prototype in a block;
-   a static function; the arguments after ...; and libc's; prints the
+   a static function; the arguments after ...; libc's; and calls through
+   function pointers (variables, typedefs, structure members, arrays,
+   parameters, results and casts); prints the
    results, which must be the same with the host's compiler (but for the
    count of checks), and exits with the number of failed checks */
 
@@ -104,6 +106,30 @@ int sum(int n, ...)
 	return s;
 }
 
+/* function pointers with prototypes */
+typedef long (*lfn_t)(long);
+struct ops {
+	long (*m)(long a, int b);
+	double (*d)(double);
+} ops = { lfirst, 0 };
+double (*dtab[2])(double d, int i) = { dfirst, 0 };
+
+double halve(double d)
+{
+	return d / 2;
+}
+
+/* calls a callback with an int where it wants a long */
+long callit(long (*cb)(long), int i)
+{
+	return cb(i);
+}
+
+lfn_t gettwice(int which)
+{
+	return which ? twice : (lfn_t) 0;
+}
+
 /* a definition that is its own prototype (nothing declared before it) */
 long own(long a, double b)
 {
@@ -147,6 +173,21 @@ int main()
 		long lfirst(long a, int b);
 
 		printf("%ld\n", lfirst(i + 1, 2));
+	}
+
+	/* through function pointers */
+	{
+		long (*fp)(long, int) = lfirst;
+		lfn_t tw = twice;
+		struct ops *op = &ops;
+
+		ops.d = halve;
+		printf("%ld %ld %ld\n", fp(3, 4), (*fp)(i, 2), tw(30000));
+		printf("%ld %g %g\n", op->m(5, 6), ops.d(7), op->d(l));
+		printf("%g %ld %ld\n", dtab[0](3, 4), callit(twice, 20000),
+		       gettwice(1)(25000));
+		printf("%ld %ld\n", ((long (*)(long)) twice)(16000),
+		       (i ? tw : twice)(17000));
 	}
 
 	/* libc's prototypes */

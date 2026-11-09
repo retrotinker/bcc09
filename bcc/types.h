@@ -120,7 +120,8 @@ struct nodestruct
   symbol table entry format
 */
 
-/* a function's prototype (from unproto's __proto): its parameters' types */
+/* a function type's prototype (from unproto's __proto): its parameters'
+   types (each a canonical type, so equal lists have equal pointers) */
 struct proto
 {
     int nparams;
@@ -137,7 +138,6 @@ struct symstruct
     struct symstruct *next;
     struct symstruct **prev;
     struct typestruct *type;
-    struct proto *proto;	/* a function's prototype, or NULL */
     union
     {
 	double *offd;		/* value for double constants */
@@ -172,6 +172,7 @@ struct typestruct
     uoffset_T typesize;		/* size of this type */
     char *tname;		/* name of scalar type or constructor */
     struct typelist *listtype;	/* list of member types */
+    struct proto *proto;	/* a function type's prototype, or NULL */
     struct typestruct *nexttype;
 				/* next in list */
     struct typestruct *prevtype;

@@ -434,7 +434,7 @@ PULS	Y,PC
 ;BCC_EOS
 ; 61 }
 ; 62 
-; 63 unsigned char (*ucp)()= uc_low;
+; 63 unsigned char (*ucp)() __proto(unsigned int)= uc_low;
 LOC	3
 EXPORT	_ucp
 _ucp:
@@ -599,14 +599,14 @@ LDX	#.C
 JSR	>_printf
 LEAS	6,S
 ;BCC_EOS
-; 82 	printf("%d %d\n",uc_add(200,100),uc_a
+; 82 	printf("%d %d\n
+; 82 ",uc_add(200,100),uc_add(1,2));
 LOC	1
 .D:
 FCC	"%d %d"
 FCB	$A
 FCB	0
 LOC	0
-; 82 dd(1,2));
 ; Debug: list unsigned char = const 2 (used reg = )
 LDD	#2
 PSHS	D
@@ -827,7 +827,7 @@ FCC	"%d"
 FCB	$A
 FCB	0
 LOC	0
-; Debug: rootlist int = const $4142 (used reg = )
+; Debug: rootlist unsigned int = const $4142 (used reg = )
 LDX	#$4142
 ; Debug: func () unsigned char = [ucp+0] (used reg = )
 JSR	[>_ucp]

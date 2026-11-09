@@ -20,7 +20,6 @@
 
 PRIVATE bool_t argsallowed;	/* nonzero to allow args in declarator */
 #define MAXPARAMS 32
-PRIVATE struct proto *gvarproto;	/* prototype of last identifier declared */
 PRIVATE sym_t gvarsc;		/* sc flags of last identifier declared */
 PRIVATE char gvar2name[2 + NAMESIZE];	/* space for structure keys and .. */
 
@@ -32,7 +31,7 @@ FORWARD struct typestruct *chainprefix P((struct typestruct * pretype,
 					  struct typestruct * sufftype));
 FORWARD void declaf P((void));
 FORWARD void declarator P((void));
-FORWARD void declproto P((void));
+FORWARD struct proto *declproto P((void));
 FORWARD void declarg P((void));
 FORWARD struct typestruct *declenum P((void));
 FORWARD void declfunc P((void));
@@ -56,6 +55,8 @@ struct typestruct *sufftype;
 {
 	if (pretype->nexttype != NULL) {
 		sufftype = chainprefix(pretype->nexttype, sufftype);
+		if (pretype->constructor == FUNCTION)
+			return functype(sufftype, pretype->proto);
 		if (pretype->constructor != ARRAY)
 			return prefix(pretype->constructor, pretype->typesize,
 				      sufftype);
@@ -94,6 +95,7 @@ PRIVATE void declaf()
 {
 	uoffset_T asize;
 	bool_t levelnew;
+	struct proto *proto;
 #ifdef TESTING_PROTOTYPES
 	char ogvarname[NAMESIZE];
 	sym_t ogvarsc;
@@ -169,8 +171,9 @@ PRIVATE void declaf()
 		gvartype = ogvartype;
 #endif /* TESTING_PROTOTYPES */
 		rparen();
+		proto = NULL;
 		if (sym == IDENT && strcmp(gsname, "__proto") == 0)
-			declproto();
+			proto = declproto();
 		declaf();
 		switch (gvartype->constructor) {
 		case ARRAY:
@@ -180,7 +183,7 @@ PRIVATE void declaf()
 			error("function returning function is illegal");
 			break;
 		}
-		gvartype = prefix(FUNCTION, ftypesize, gvartype);
+		gvartype = functype(gvartype, proto);
 	} else if (sym == LBRACKET) {
 		nextsym();
 		if (sym == RBRACKET)
@@ -208,7 +211,7 @@ PRIVATE void declaf()
 /* __proto(type name, ...): the parameters' types, which unproto writes
    after the () of a function declaration or the names of a heading that
    had a prototype; a parameter's array or function type is a pointer */
-PRIVATE void declproto()
+PRIVATE struct proto *declproto()
 {
 	char ogvarname[NAMESIZE];
 	sym_t ogvarsc;
@@ -265,12 +268,11 @@ PRIVATE void declproto()
 	gvarsymptr = ogvarsymptr;
 	gvartype = ogvartype;
 	argsallowed = oargsallowed;
-	gvarproto = proto;
+	return proto;
 }
 
 PRIVATE void declarator()
 {
-	gvarproto = NULL;
 	rdeclarator();
 	if (gvartype->constructor == STRUCTU && gvartype->typesize == 0 &&
 	    gvarsc != TYPEDEFDECL && gvarsc != EXTERNDECL)
@@ -654,12 +656,19 @@ PRIVATE void declfunc()
 		main_flag = -1;
 	if (gvarsymptr == NULL)
 		gvarsymptr = addglb(gvarname, gvartype);
-	else if (gvarsymptr->type != gvartype ||
-		 (gvarsymptr->flags & INITIALIZED))
-		multidecl(gvarname);	/* different type or full declare */
+	else if (gvarsymptr->flags & INITIALIZED)
+		multidecl(gvarname);	/* full declare */
+	else if (gvarsymptr->type != gvartype) {
+		/* (a prototype and an old-style heading are compatible:
+		   keep the prototype) */
+		struct typestruct *merged;
+
+		if ((merged = funcmerge(gvarsymptr->type, gvartype)) == NULL)
+			multidecl(gvarname);	/* different type */
+		else
+			gvarsymptr->type = merged;
+	}
 	gvarsymptr->flags = INITIALIZED;	/* show full declare */
-	if (gvarproto != NULL)
-		gvarsymptr->proto = gvarproto;
 	cseg();
 	if (gvarsc == STATICDECL)
 		private(gvarname);	/* don't need to put STATIC in flags */
@@ -788,6 +797,11 @@ PRIVATE void idecllist()
 			if (gvarsymptr->level != GLBLEVEL
 			    || gvarsymptr->flags == KEYWORD)
 				multidecl(gvarname);
+			else if (gvarsymptr->type != gvartype &&
+				 funcmerge(gvarsymptr->type, gvartype)
+				 != NULL)
+				gvarsymptr->type =
+				    funcmerge(gvarsymptr->type, gvartype);
 			else if (gvarsymptr->type != gvartype) {
 				if (gvartype->constructor != ARRAY ||
 				    gvarsymptr->type->constructor != ARRAY ||
@@ -822,8 +836,6 @@ PRIVATE void idecllist()
 				    (softsp & gvartype->alignmask) -
 				    gvartype->typesize;
 		}
-		if (gvartype->constructor == FUNCTION && gvarproto != NULL)
-			gvarsymptr->proto = gvarproto;
 		if (gvarsc == STATICDECL) {
 			gvarsymptr->flags &= ~EXTERNAL;
 			gvarsymptr->flags |= STATIC;

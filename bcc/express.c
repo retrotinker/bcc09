@@ -256,10 +256,19 @@ bool_pt seenlp;
 			continue;
 		case LPAREN:
 			nextsym();
-			nodeptr = node(FUNCOP, nodeptr,
-				       listargs(nodeptr->tag == LEAF ?
-						nodeptr->left.symptr->proto :
-						(struct proto *) NULL));
+			{
+				/* the prototype of the function, or of the
+				   function a pointer points at */
+				struct typestruct *ftype = nodeptr->nodetype;
+
+				if (ftype->constructor & POINTER)
+					ftype = ftype->nexttype;
+				nodeptr = node(FUNCOP, nodeptr,
+					       listargs(ftype->constructor &
+							FUNCTION ? ftype->proto
+							: (struct proto *)
+							NULL));
+			}
 			{
 				register struct nodestruct *np;
 

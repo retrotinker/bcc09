@@ -361,6 +361,8 @@ struct typestruct *iscalartotype P((scalar_pt scalar));
 struct typestruct *newtype P((void));
 void outntypechar P((struct typestruct *type));
 struct typestruct *pointype P((struct typestruct *type));
+struct typestruct *functype P((struct typestruct *type, struct proto *proto));
+struct typestruct *funcmerge P((struct typestruct *t1, struct typestruct *t2));
 struct typestruct *prefix P((constr_pt constructor, uoffset_T size,
 			     struct typestruct *type));
 struct typestruct *promote P((struct typestruct *type));

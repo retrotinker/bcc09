@@ -244,7 +244,6 @@ register struct symstruct *symptr;
 	symptr->flags = 0;
 	symptr->next = NULL;
 	symptr->type = type;
-	symptr->proto = NULL;
 	symptr->offset.offi = 0;
 	strcpy(symptr->name.namea, name);
 }
