@@ -503,6 +503,8 @@ bool_pt dataflag;
 				if ((unsigned char)byte == DEFSTR_DELIMITER)
 #endif
 					outbyte(DEFSTR_QUOTER);
+				else if (byte == '\\')
+					outbyte('\\');	/* (as09 reads escapes) */
 				outbyte(byte);
 				byte = (unsigned char)*sptr++;
 			}
