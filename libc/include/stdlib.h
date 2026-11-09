@@ -18,6 +18,8 @@ extern int atoi __P ((__const char *));
 extern long atol __P ((__const char *));
 extern long strtol __P ((__const char *, char **, int));
 extern unsigned long strtoul __P ((__const char *, char **, int));
+extern double strtod __P ((__const char *, char **));
+extern double atof __P ((__const char *));
 
 extern int abs __P ((int));
 extern long labs __P ((long));

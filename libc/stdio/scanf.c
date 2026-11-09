@@ -5,12 +5,17 @@
  * libc, it is distributed under the GNU Library General Public License,
  * version 2 (see COPYING.LIB).
  *
- * The conversions are d, i, u, o, x, X, c, s, [, p, n and %, with * (no
- * assignment), a width, and the sizes hh, h and l, as the C standard
- * describes them.  There is no floating point yet.  What the standard
- * leaves to the implementation is as in the GNU C library: a range such as
- * a-z in a [ set; %p reads what printf's %p writes (but not (nil)); and a
- * failure to read before anything has been assigned returns EOF.
+ * The conversions are d, i, u, o, x, X, a, A, e, E, f, F, g, G, c, s, [,
+ * p, n and %, with * (no assignment), a width, and the sizes hh, h, l and
+ * L (a double: there is no long double), as the C standard describes
+ * them.  scanfp.c does a, e, f and g, through __scanfp_hook, which
+ * xfptvc.s sets only in a program that passes a pointer to floating point
+ * to a scanf function (bcc09 makes such a module refer to __xfptvc), so
+ * that others don't carry the code; without it, they are matching
+ * failures.  What the standard leaves to the implementation is as in the
+ * GNU C library: a range such as a-z in a [ set; %p reads what printf's %p
+ * writes (but not (nil)); and a failure to read before anything has been
+ * assigned returns EOF.
  */
 
 #include <stdio.h>
@@ -18,13 +23,7 @@
 #include <ctype.h>
 #include <string.h>
 
-/* where the characters come from: a FILE, or a string if fp is 0 */
-struct __scan
-{
-   FILE *fp;
-   const char *s;
-   int count;			/* characters read, for %n */
-};
+#include "scan.h"
 
 extern int __vscan();
 
@@ -32,7 +31,12 @@ extern int __vscan();
 
 #define NONE	(-2)		/* no character: the width was used up */
 
-static int
+int (*__scanfp_hook)();		/* __scanfp, if it is linked */
+
+#define get	__scget
+#define unget	__scunget
+
+int
 get(sc)
 struct __scan *sc;
 {
@@ -50,7 +54,7 @@ struct __scan *sc;
 }
 
 /* put back c, the last character got (if any) */
-static void
+void
 unget(c, sc)
 int c;
 struct __scan *sc;
@@ -195,6 +199,11 @@ va_list ap;
 	 if (*fmt == 'l')	/* (no long long: as long) */
 	    fmt++;
       }
+      else if (*fmt == 'L')	/* (long double is double) */
+      {
+	 size = 1;
+	 fmt++;
+      }
       else if (*fmt == 'h')
       {
 	 size = -1;		/* short */
@@ -295,6 +304,24 @@ va_list ap;
 	 }
 	 if (p)
 	    *p = '\0';
+	 break;
+
+      case 'a':
+      case 'A':
+      case 'e':
+      case 'E':
+      case 'f':
+      case 'F':
+      case 'g':
+      case 'G':
+	 if (__scanfp_hook == 0)
+	    return assigned;
+	 if (skipspace(sc) == EOF)
+	    goto input;
+	 if (!(*__scanfp_hook)(sc, width ? width : 32767,
+			       skip ? (char *) 0 : va_arg(ap, char *),
+			       size > 0))
+	    return assigned;
 	 break;
 
       case 'p':

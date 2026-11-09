@@ -66,54 +66,58 @@
 ;BCC_EOS
 ; 20 extern unsigned long strtoul ();
 ;BCC_EOS
-; 21 
-; 22 extern int abs ();
+; 21 extern double strtod ();
 ;BCC_EOS
-; 23 extern long labs ();
+; 22 extern double atof ();
 ;BCC_EOS
-; 24 
-; 25 extern int rand ();
+; 23 
+; 24 extern int abs ();
 ;BCC_EOS
-; 26 extern void srand ();
+; 25 extern long labs ();
 ;BCC_EOS
-; 27 
-; 28 extern void qsort ();
+; 26 
+; 27 extern int rand ();
 ;BCC_EOS
-; 29 extern void * bsearch 
-; 30 
-; 31 # 29
+; 28 extern void srand ();
+;BCC_EOS
 ; 29 
-; 30 ();
+; 30 extern void qsort ();
 ;BCC_EOS
+; 31 extern void * bsearch 
+; 32 
+; 33 # 31
 ; 31 
-; 32 extern void * malloc ();
+; 32 ();
 ;BCC_EOS
-; 33 extern void * calloc ();
+; 33 
+; 34 extern void * malloc ();
 ;BCC_EOS
-; 34 extern void * realloc ();
+; 35 extern void * calloc ();
 ;BCC_EOS
-; 35 extern void free ();
+; 36 extern void * realloc ();
 ;BCC_EOS
-; 36 
-; 37 extern int atexit ();
+; 37 extern void free ();
 ;BCC_EOS
-; 38 extern void exit ();
+; 38 
+; 39 extern int atexit ();
 ;BCC_EOS
-; 39 extern void _exit ();
+; 40 extern void exit ();
 ;BCC_EOS
-; 40 
-; 41  
-; 42 extern char * itoa ();
+; 41 extern void _exit ();
 ;BCC_EOS
-; 43 extern char * ltoa ();
+; 42 
+; 43  
+; 44 extern char * itoa ();
 ;BCC_EOS
-; 44 extern char * ultoa ();
+; 45 extern char * ltoa ();
 ;BCC_EOS
-; 45 extern char * ltostr ();
+; 46 extern char * ultoa ();
 ;BCC_EOS
-; 46 extern char * ultostr ();
+; 47 extern char * ltostr ();
 ;BCC_EOS
-; 47 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 48 extern char * ultostr ();
+;BCC_EOS
+; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -135,12 +139,12 @@
 ; 18 extern int strcmp ();
 ;BCC_EOS
 ; 19 
-; 20 extern char * strncat ();
+; 20 extern char *
+; 20  strncat ();
 ;BCC_EOS
 ; 21 extern char * strncpy ();
 ;BCC_EOS
-; 22 extern in
-; 22 t strncmp ();
+; 22 extern int strncmp ();
 ;BCC_EOS
 ; 23 
 ; 24 extern char * strchr ();
@@ -806,8 +810,9 @@ STD	0,S
 ;BCC_EOS
 BRA	.29
 ;BCC_EOS
-; 90 			case 9: r = (!!((__ctype[1+(unsigned char)c])&0x02		  )) ; break;
+; 90 			case 9: r = (!!((__ctype[1+(unsigned char)c]
 .50:
+; 90 )&0x02		  )) ; break;
 ; Debug: add unsigned char c = [S+6-3] to int = const 1 (used reg = )
 ; Debug: expression subtree swapping
 LDB	3,S
@@ -833,9 +838,8 @@ STD	0,S
 ;BCC_EOS
 BRA	.29
 ;BCC_EOS
-; 91 			default: r = (!!((__cty
+; 91 			default: r = (!!((__ctype[1+(unsigned char)c])&0x40		  )) ; break;
 .54:
-; 91 pe[1+(unsigned char)c])&0x40		  )) ; break;
 ; Debug: add unsigned char c = [S+6-3] to int = const 1 (used reg = )
 ; Debug: expression subtree swapping
 LDB	3,S
@@ -2250,12 +2254,13 @@ LDX	#$18
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 188 		ok(25,strtol("-2147483649",&end,10)== (-2147483647L-1)
+; 188 		ok(25,strtol("-2147483649",&end,10)
 LOC	1
 .CD:
 FCC	"-2147483649"
 FCB	0
 LOC	0
+; 188 == (-2147483647L-1)
 ; 189 && errno == 34		  );
 ; Debug: list int = const $A (used reg = )
 LDD	#$A
@@ -2299,8 +2304,7 @@ LDX	#$19
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 190 		errno
-; 190  = 0;
+; 190 		errno = 0;
 ; Debug: eq int = const 0 to int = [errno+0] (used reg = )
 CLRA
 CLRB
@@ -3492,7 +3496,8 @@ LDX	#.131
 JSR	>_qsort
 LEAS	6,S
 ;BCC_EOS
-; 279 	ok(62,b[0] == 1);
+; 279 	ok
+; 279 (62,b[0] == 1);
 ; Debug: logeq int = const 1 to int = [.131+0] (used reg = )
 LDX	>.131
 LEAX	-1,X
@@ -3520,8 +3525,7 @@ CLRB
 STD	$70,S
 ;BCC_EOS
 ;BCC_EOS
-; 283 		
-; 283 c[i] = i;
+; 283 		c[i] = i;
 BRA	.13E
 .13F:
 ; Debug: ptradd int i = [S+$74-4] to [$32] int c = S+$74-$6C (used reg = )

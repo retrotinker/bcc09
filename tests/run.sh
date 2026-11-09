@@ -299,8 +299,9 @@ done
 # adds and subtracts ints and signed chars; sftest.c prints a grid of
 # sscanf formats and inputs, and reads sftest.in with scanf, which must
 # be the same with the host's scanf; fltcc.c uses floats and doubles in
-# many ways; and a target with no start-up code yet can't be linked
-for f in hello echo pftest siotest chartest sadd sftest fltcc; do
+# many ways; fpio.c prints and reads them (printf, strtod, scanf); and a
+# target with no start-up code yet can't be linked
+for f in hello echo pftest siotest chartest sadd sftest fltcc fpio; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -309,10 +310,10 @@ for f in hello echo pftest siotest chartest sadd sftest fltcc; do
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
-# pftest.c, chartest.c, sadd.c, sftest.c and fltcc.c must print the same
-# with the host's compiler and C library (but for the count of checks,
-# which differs)
-for f in pftest chartest sadd sftest fltcc; do
+# pftest.c, chartest.c, sadd.c, sftest.c, fltcc.c and fpio.c must print
+# the same with the host's compiler and C library (but for the count of
+# checks, which differs)
+for f in pftest chartest sadd sftest fltcc fpio; do
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
 	if ${CC:-cc} -std=gnu89 -w -o $f-host $f.c > /dev/null 2>&1 &&
@@ -326,6 +327,20 @@ for f in pftest chartest sadd sftest fltcc; do
 	fi > $f-host.result
 	rm -f $f-host $f-host.run $f.cmp $f-host.cmp
 done
+# floating point is optional: printf and scanf without it (pftest.out,
+# sftest.out) carry none of its code, and fpio.out has it all: __fmtfp
+# and __scanfp (objdump09 shows 8 characters of a name: T ___scanf is
+# __scanfp's code), strtod and the helpers
+for f in pftest sftest fpio; do
+	"$BCC" -Mi -o $f-opt.out -X-T0x1000 $f.c > /dev/null 2>&1
+	printf "%s:" $f
+	for s in ___fmtfp ___scanf _strtod Fpushd; do
+		"$OD" -n $f-opt.out | grep -q " T $s\$" && printf " %s" $s
+	done
+	echo
+	rm -f $f-opt.out
+done > fpoptional.result
+
 # the Color BASIC target (bcc09 -Me): cbrom.s stands in for the ROM's
 # POLCAT and CHROUT at $A000, and loader.s for EXEC; cbtest.c prints,
 # reads lines from cbtest.in (with a rub-out) until BREAK, uses the heap
@@ -360,7 +375,7 @@ for f in ops longops fptest strtest stdtest maltest vatest; do
 	fi
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
-for f in hello echo pftest siotest chartest sadd sftest fltcc; do
+for f in hello echo pftest siotest chartest sadd sftest fltcc fpio; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null

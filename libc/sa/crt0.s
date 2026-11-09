@@ -7,12 +7,20 @@
 ; functions, then _exit() puts the status in D, puts S back as it was,
 ; and returns to the loader.
 ;
+; Before main, start calls each function whose address a module has put
+; in segment 5 (loc 5): its "init" functions (as xfpcvt.s does; a 0 is
+; skipped, as the linker pads the segment).  They
+; may change D, X, Y, U and CC.
+;
 ; Written for bcc09.  Like the rest of libc, it is distributed under the
 ; GNU Library General Public License, version 2 (see COPYING.LIB).
 
 	.data			; the linker defines these in the data segment,
 	import	__edata		; so they must be imported there
 	import	__end
+	loc	5		; (and these in segment 5)
+	import	__seg5DL
+	import	__seg5DH
 
 	.text
 	entry	start
@@ -22,9 +30,19 @@
 
 start:	ldx	#__edata	; clear the BSS
 clear:	cmpx	#__end
-	bhs	go
+	bhs	clear2
 	clr	,x+
 	bra	clear
+clear2:
+	ldx	#__seg5DL	; the init functions
+init:	cmpx	#__seg5DH
+	bhs	go
+	ldd	,x++		; (0: the linker's padding)
+	beq	init
+	pshs	x
+	jsr	[-2,x]
+	puls	x
+	bra	init
 go:	sts	__savesp	; for _exit()
 	jsr	_main
 	jmp	_exit		; main's result is in X, exit()'s argument

@@ -28,7 +28,8 @@ BCCFLAGS=-O -Iinclude
 # string: string and memory functions
 # malloc: malloc, free, calloc and realloc (sbrk and brk are in stdlib)
 # stdio: the FILE functions (stdio.c, dev86's) and the printf and scanf
-#        families
+#        families (their floating point in fpfmt.c and scanfp.c, linked
+#        through xfpcvt.s and xfptvc.s only where it is used)
 # Some sources hold several functions, each compiled separately with
 # -DL_name: string.c (STRING_OBJS), malloc.c, stdio.c, printf.c, scanf.c, abs.c,
 # strtol.c and rand.c, and sim/sys.c
@@ -59,8 +60,10 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/fpcore.o bcc/fpops.o bcc/fparith.o bcc/fpcmp.o bcc/fppush.o \
 	  bcc/fpconv.o bcc/fpincdec.o \
 	  ctype/ctype.o ctype/ctypefn.o \
-	  $(MALLOC_OBJS) $(STDIO_OBJS) $(PRINTF_OBJS) $(SCANF_OBJS) \
-	  stdlib/exit.o stdlib/atexit.o stdlib/errno.o \
+	  $(MALLOC_OBJS) $(STDIO_OBJS) $(PRINTF_OBJS) stdio/fpfmt.o stdio/xfpcvt.o \
+	  $(SCANF_OBJS) stdio/scanfp.o stdio/xfptvc.o \
+	  stdlib/exit.o stdlib/atexit.o stdlib/errno.o stdlib/bignum.o \
+	  stdlib/strtod.o stdlib/atof.o \
 	  stdlib/sbrk.o \
 	  stdlib/atoi.o stdlib/atol.o $(STRTOL_OBJS) $(ABS_OBJS) \
 	  stdlib/itoa.o stdlib/ltoa.o stdlib/ltostr.o \
@@ -144,6 +147,9 @@ $(RAND_OBJS): stdlib/%.o: stdlib/rand.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -c -o $@ $<
 
 $(OBJS): .bcc/stamp $(HEADERS)
+# libc's own headers
+$(SCANF_OBJS) stdio/scanfp.o: stdio/scan.h
+stdio/fpfmt.o stdlib/bignum.o stdlib/strtod.o: stdlib/bignum.h
 
 # everything is built again when the tools change, the optimizer's rules
 # too (libc is built with -O)

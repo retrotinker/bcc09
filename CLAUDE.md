@@ -42,11 +42,18 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   dev86's C, compiled by `bcc09` itself. Floating point (started 2026-11-08) is IEEE 754
   single and double, big-endian, in software: the helpers `cc1` calls are in
   `libc/bcc/fp*.s` (round to nearest even, denormals, infinities, NaNs; results must equal
-  the host's); `printf`/`scanf` don't do `%f`/`%e`/`%g` yet, and there is no `math.h`.
+  the host's). `printf`'s `%e`/`%f`/`%g`, `strtod`/`atof` and `scanf`'s `%a`/`%e`/`%f`/`%g`
+  are exact, like glibc's, from big integers (`libc/stdlib/bignum.c`), and optional:
+  `cc1` makes a module that passes floating point to a `*printf` (a pointer to it to a
+  `*scanf`) refer to `__xfpcvt` (`__xfptvc`), whose modules (`libc/stdio/xfp*.s`) install
+  the code through an init function, so programs without floats don't carry it (decided
+  2026-11-08). No `%a` in `printf` yet, and no `math.h`.
   A double argument is always passed on the stack (even the first); a double result is in
   D, X, Y, U (in that order in memory), a float result in D:X; the helpers keep Y and U.
   `libc/README` gives the calling conventions and the changes from dev86.
-- Start-up: `crt0` clears the BSS and calls `main`; when `main` returns, `exit()` runs the
+- Start-up: `crt0` clears the BSS, calls the init functions (addresses a module puts in
+  segment 5: `loc 5`; zeros, the linker's padding, are skipped), and calls `main`; when
+  `main` returns, `exit()` runs the
   `atexit()` functions and the target's `_exit()`. The heap grows from `__end` up to the
   stack pointer minus `__heap_margin` (256 bytes; decided 2026-11-08), which
   `sbrk()`/`brk()` enforce.
@@ -61,8 +68,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
   - The others can't link yet.
 - Next: Disk BASIC files for `-Me`, OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code
-  has a known bug), FLEX, floating point in `printf`/`scanf` (`strtod`, exact decimal
-  conversion) and `math.h`.
+  has a known bug), FLEX, `math.h`, `%a` in `printf`.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
@@ -90,7 +96,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 497 reference
+  `tests/src/` with this tree's tools and compare every result with the 504 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -125,8 +131,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   be byte-for-byte what the host's `printf` prints (as must `chartest.c`, chars passed
   and returned with prototypes, and `sadd.c`, ints and signed chars added and
   subtracted, `sftest.c`, a grid of `sscanf` formats and inputs and `scanf` reading
-  `sftest.in`, and `fltcc.c`, floats and doubles in many places in C, but for their
-  counts of checks); `siotest.c` checks the `FILE`
+  `sftest.in`, `fltcc.c`, floats and doubles in many places in C, and `fpio.c`, `printf`'s
+  floating formats, `strtod` and `scanf`'s `%f`, but for their counts of checks);
+  `fpoptional.result` checks that `pftest` and `sftest` link none of that code; `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
 - `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
   ROMs, in `~/.xroar/roms`) builds `tests/xroar/xcb.c` with `-Me`, puts it on a cassette
@@ -135,7 +142,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
   it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
   `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
-- Fifteen test programs are built again with `-O` and must run the same
+- Sixteen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.

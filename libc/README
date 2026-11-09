@@ -12,11 +12,12 @@ This will become the port of the dev86 C library.  So far it has:
   malloc/   malloc, free, calloc and realloc (dev86's)
   stdio/    stdio.h: the FILE functions (stdio.c, dev86's) and the
             printf and scanf families (printf.c and scanf.c, written
-            for bcc09)
+            for bcc09), with floating point in fpfmt.c and scanfp.c
   stdlib/   stdlib.h's other functions: atoi, atol, strtol, strtoul,
-            abs, labs, qsort, bsearch, rand, srand, atexit, exit and
-            _exit, and dev86's itoa, ltoa, ultoa, ltostr and ultostr;
-            errno; and sbrk and brk, for malloc
+            strtod, atof, abs, labs, qsort, bsearch, rand, srand,
+            atexit, exit and _exit, and dev86's itoa, ltoa, ultoa,
+            ltostr and ultostr; errno; sbrk and brk, for malloc; and big
+            integers (bignum.c) for strtod and printf's %f
   string/   string.h's functions; memcpy (which the compiler also calls
             to copy structures) is in assembly, and the rest are C,
             compiled by bcc09
@@ -71,8 +72,25 @@ Changes from dev86:
     scanf.c had no license, and its printf departed from the C standard
     (precision on integers, %X, # and %p); see stdio/printf.c and
     stdio/scanf.c
-div and ldiv, floating point in printf and scanf, and math.h are
-still to come.
+div and ldiv, %a in printf, and math.h are still to come.
+
+Floating point in text: printf's %e, %f and %g (and %E, %F, %G), and
+strtod, atof and scanf's %a, %e, %f and %g, are exact, as the GNU C
+library's are: printf prints the exact decimal value of the double,
+rounded to the nearest (to even on a tie), and strtod gives the double
+nearest the number it reads, from big integers rather than floating
+point arithmetic.  printf works out at most 340 digits (more are printed
+as zeros), strtod reads 120 significant digits exactly (and the rest as
+whether any isn't 0), and scanf converts the first 127 characters of a
+number.  They are optional: bcc09 makes a module that calls a printf
+function with a floating point argument refer to __xfpcvt, and one that
+passes a pointer to a float or double to a scanf function refer to
+__xfptvc (as dev86's did).  stdio/xfpcvt.s and xfptvc.s define those
+symbols, and their init functions point printf and scanf at fpfmt.c and
+scanfp.c; a program without them doesn't carry that code, and prints
+%f as it is written, or fails to match it in scanf.  (A program that
+formats a double some other way, through vsprintf in a function of its
+own, say, can refer to __xfpcvt itself.)
 putchar and getchar are only macros (as in dev86).
 
 The heap
@@ -110,7 +128,9 @@ won't link for them (bcc09 -x leaves out the start-up code, for a
 program that brings its own).  Each target's start-up code clears the
 BSS and calls main; when main returns, its result goes to exit(), which
 calls the atexit() functions, last registered first, and then _exit(),
-which is the target's.  A target's library has _exit; and read,
+which is the target's.  Before main, it calls each "init function": a
+module puts the function's address in segment 5 (loc 5; 0s, which the
+linker pads the segment with, are skipped).  A target's library has _exit; and read,
 write, close, lseek, isatty and open if the target has a way to do I/O,
 which is what stdio needs.
 
@@ -259,5 +279,5 @@ when far out of range (or infinite, or a NaN).
 
 The tests in tests/ (ops.c, longops.c, fptest.c, regtest.s, strtest.c, stdtest.c,
 maltest.c, vatest.c; crtret.c, crtexit.c and crtatexit.c for the default target;
-hello.c, echo.c, pftest.c, siotest.c, sftest.c and fltcc.c for the sim target; cbtest.c
+hello.c, echo.c, pftest.c, siotest.c, sftest.c, fltcc.c and fpio.c for the sim target; cbtest.c
 for the Color BASIC target) check all of this on sim6809.

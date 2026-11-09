@@ -6,12 +6,18 @@
  * distributed under the GNU Library General Public License, version 2 (see
  * COPYING.LIB).
  *
- * The conversions are d, i, u, o, x, X, c, s, p, n and %, with the flags
- * -, +, space, # and 0, a width and a precision (either may be *), and
- * the sizes hh, h and l, as the C standard describes them.  There is no
- * floating point yet.  What the standard leaves to the implementation is
- * as in the GNU C library: %p is 0x and the hex digits, or (nil); %s of a
- * null pointer is (null).
+ * The conversions are d, i, u, o, x, X, e, E, f, F, g, G, c, s, p, n and
+ * %, with the flags -, +, space, # and 0, a width and a precision (either
+ * may be *), and the sizes hh, h, l and L (a double: there is no long
+ * double), as the C standard describes them; fpfmt.c does e, f and g,
+ * through __fmtfp_hook, which xfpcvt.s sets only in a program that has a
+ * printf with a floating point argument (bcc09 makes such a module refer
+ * to __xfpcvt), so that others don't carry the code; without it, these
+ * conversions print as they are written.
+ * What the standard leaves to the implementation is as in the GNU C
+ * library: %p is 0x and the hex digits, or (nil); %s of a null pointer is
+ * (null); infinity and NaN are inf and nan (INF and NAN for E, F and G),
+ * with a sign if negative.
  */
 
 #include <stdio.h>
@@ -21,6 +27,7 @@
 extern int __vformat();
 
 #ifdef L___vformat
+int (*__fmtfp_hook)();		/* __fmtfp, if it is linked (xfpcvt.s) */
 
 #define F_MINUS	0x01		/* - */
 #define F_PLUS	0x02		/* + */
@@ -109,6 +116,8 @@ va_list ap;
 	 if (*fmt == 'l')	/* (no long long: as long) */
 	    fmt++;
       }
+      else if (*fmt == 'L')	/* (long double is double) */
+	 fmt++;
       else if (*fmt == 'h')
       {
 	 size = -1;		/* short */
@@ -234,6 +243,20 @@ va_list ap;
 	    (*out)(' ', arg);
 	 continue;
 
+      case 'e':
+      case 'E':
+      case 'f':
+      case 'F':
+      case 'g':
+      case 'G':
+	 /* (the double's bytes: no floating point here) */
+	 s = ap;
+	 ap += sizeof(double);
+	 if (__fmtfp_hook == 0)
+	    goto other;
+	 count += (*__fmtfp_hook)(out, arg, s, *fmt, flags, width, prec);
+	 continue;
+
       case 'c':
 	 digits[0] = va_arg(ap, int);
 	 s = digits;
@@ -276,6 +299,7 @@ va_list ap;
 	 continue;
 
       default:			/* not a conversion: as it is */
+       other:
 	 (*out)('%', arg);
 	 (*out)(*fmt, arg);
 	 count += 2;

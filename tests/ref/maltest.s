@@ -42,54 +42,58 @@
 ;BCC_EOS
 ; 20 extern unsigned long strtoul ();
 ;BCC_EOS
-; 21 
-; 22 extern int abs ();
+; 21 extern double strtod ();
 ;BCC_EOS
-; 23 extern long labs ();
+; 22 extern double atof ();
 ;BCC_EOS
-; 24 
-; 25 extern int rand ();
+; 23 
+; 24 extern int abs ();
 ;BCC_EOS
-; 26 extern void srand ();
+; 25 extern long labs ();
 ;BCC_EOS
-; 27 
-; 28 extern void qsort ();
+; 26 
+; 27 extern int rand ();
 ;BCC_EOS
-; 29 extern void * bsearch 
-; 30 
-; 31 # 29
+; 28 extern void srand ();
+;BCC_EOS
 ; 29 
-; 30 ();
+; 30 extern void qsort ();
 ;BCC_EOS
+; 31 extern void * bsearch 
+; 32 
+; 33 # 31
 ; 31 
-; 32 extern void * malloc ();
+; 32 ();
 ;BCC_EOS
-; 33 extern void * calloc ();
+; 33 
+; 34 extern void * malloc ();
 ;BCC_EOS
-; 34 extern void * realloc ();
+; 35 extern void * calloc ();
 ;BCC_EOS
-; 35 extern void free ();
+; 36 extern void * realloc ();
 ;BCC_EOS
-; 36 
-; 37 extern int atexit ();
+; 37 extern void free ();
 ;BCC_EOS
-; 38 extern void exit ();
+; 38 
+; 39 extern int atexit ();
 ;BCC_EOS
-; 39 extern void _exit ();
+; 40 extern void exit ();
 ;BCC_EOS
-; 40 
-; 41  
-; 42 extern char * itoa ();
+; 41 extern void _exit ();
 ;BCC_EOS
-; 43 extern char * ltoa ();
+; 42 
+; 43  
+; 44 extern char * itoa ();
 ;BCC_EOS
-; 44 extern char * ultoa ();
+; 45 extern char * ltoa ();
 ;BCC_EOS
-; 45 extern char * ltostr ();
+; 46 extern char * ultoa ();
 ;BCC_EOS
-; 46 extern char * ultostr ();
+; 47 extern char * ltostr ();
 ;BCC_EOS
-; 47 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 48 extern char * ultostr ();
+;BCC_EOS
+; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -156,10 +160,10 @@
 ;BCC_EOS
 ; 48 extern char * strtok ();
 ;BCC_EOS
-; 49 extern size_t strcspn ();
+; 49 e
+; 49 xtern size_t strcspn ();
 ;BCC_EOS
-; 50 extern size_t strspn ()
-; 50 ;
+; 50 extern size_t strspn ();
 ;BCC_EOS
 ; 51 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
 ; 6  
@@ -1003,8 +1007,9 @@ _seed:
 _rnd:
 ;BCC_EOS
 ; 122 {
-; 123 	seed = seed * 1103515245L + 12345;
+; 123 	seed = seed * 110351
 	PSHS	X
+; 123 5245L + 12345;
 ; Debug: mul long = const $41C64E6D to unsigned long = [seed+0] (used reg = )
 ; Debug: expression subtree swapping
 	LDD	#$41C6
@@ -1025,8 +1030,7 @@ _rnd:
 	STD	>_seed
 	STX	>_seed+2
 ;BCC_EOS
-; 124 	return (int) ((seed >> 16)& 0x7f
-; 124 ff) % n;
+; 124 	return (int) ((seed >> 16)& 0x7fff) % n;
 ; Debug: sr int = const $10 to unsigned long = [seed+0] (used reg = )
 	LDD	>_seed
 	LDX	>_seed+2
@@ -2152,8 +2156,8 @@ _heap:
 	LDD	#0
 	STD	>_errno
 ;BCC_EOS
-; 245 	ok(45,sbrk(-30000)== (char *)-1 && errno == 12	
-; 245 	  );	 
+; 245 
+; 245 	ok(45,sbrk(-30000)== (char *)-1 && errno == 12		  );	 
 ; Debug: rootlist int = const -$7530 (used reg = )
 	LDX	#-$7530
 ; Debug: func () * void = sbrk+0 (used reg = )
