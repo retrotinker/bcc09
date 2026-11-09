@@ -78,6 +78,16 @@ PY
 	fi
 	echo "ok   man/$p"
 done
+# and each page's header names the version the Makefile builds
+version=$(sed -n 's/^VERSION=//p' "$top/Makefile")
+for page in "$man"/*.1; do
+	case $(head -1 "$page") in
+	".so "*) ;;
+	*"\"bcc09 $version\""*) ;;
+	*)	echo "FAIL man/$(basename "$page" .1): not version $version"
+		failed=$((failed + 1)) ;;
+	esac
+done
 command -v groff > /dev/null 2>&1 ||
 	echo "(groff isn't here: the pages weren't formatted)"
 command -v python3 > /dev/null 2>&1 ||

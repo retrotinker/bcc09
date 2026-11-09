@@ -39,8 +39,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `lib/bcc09` 2026-11-09, for the package: they are no host's code), for every install
   and the tests' prefixes alike, since the compiler's output names the headers' paths. Every install takes `DESTDIR`; every Makefile takes
   `CFLAGS`/`LDFLAGS` from the environment (rpmbuild's) and adds what it needs
-  (`ALL_CFLAGS`), and nothing is stripped at link time (rpmbuild strips). A release
-  bumps `VERSION`, the spec (with a `%changelog` entry) and the manual's tag.
+  (`ALL_CFLAGS`), and nothing is stripped at link time (rpmbuild strips). The top-level Makefile passes
+  `VERSION` to the sub-makes, and `bcc09 -v` (with no files), `as09 -v` and `ld09 -v`
+  print it (added 2026-11-09). A release bumps `VERSION`, the spec (with a `%changelog`
+  entry), README's heading and every man page's `.TH` (`tests/man.sh` checks that they
+  name `VERSION`), runs `make docs`, and tags `vX.Y.Z` (`-m "bcc09 X.Y.Z"`).
 - `ld09` writes whole symbol names into an executable (8 characters in each a.out entry,
   the rest in entries after it): its `-y`, the default since 2026-11-08 (`-y-` for the old
   8-character names); `objdump09 -n` joins them.

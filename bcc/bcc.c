@@ -951,14 +951,6 @@ char **argv;
 	if (do_optim)
 		append_option("-O", 'C');
 
-#ifdef VERSION
-	{
-		char verbuf[64];
-		sprintf(verbuf, "-D__BCC_VERSION__=0x%02x%02x%02xL",
-			VER_MAJ, VER_MIN, VER_PAT);
-		append_option(verbuf, 'p');
-	}
-#endif
 }
 
 void build_prefix(path1, path2, path3)
@@ -1095,7 +1087,7 @@ void Usage()
 {
 #ifdef VERSION
 	if (opt_v)
-		fprintf(stderr, "%s: version %s\n", progname, VERSION);
+		fprintf(stderr, "bcc09 %s\n", VERSION);
 #endif
 	fprintf(stderr,
 		"Usage: %s [-kr] [-options] [-o output] file [files].\n",

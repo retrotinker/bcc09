@@ -607,13 +607,12 @@ PUBLIC void usage()
 
 PUBLIC void version_msg()
 {
-	stderr_out();
 #ifdef VERSION
-	putstr("ld86 version: ");
-	errexit(VERSION);
+	putstrn("ld09 " VERSION);
 #else
-	errexit("ld86 version unknown");
+	putstrn("ld09 (version unknown)");
 #endif
+	exit(0);
 }
 
 PUBLIC void use_error(message)

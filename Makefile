@@ -11,7 +11,7 @@ DIRS=ar as bcc copt cpp ld unproto libc
 all: $(DIRS)
 	for i in $^ ;\
 	do \
-		$(MAKE) PREFIX=$(PREFIX) -C $$i || exit 1 ;\
+		$(MAKE) PREFIX=$(PREFIX) VERSION=$(VERSION) -C $$i || exit 1 ;\
 	done
 
 # regression tests: compare outputs with the references in tests/ref,
@@ -55,7 +55,8 @@ clean: $(DIRS)
 install: $(DIRS)
 	for i in $^ ;\
 	do \
-		$(MAKE) PREFIX=$(PREFIX) LIBEXECDIR=$(PREFIX)/libexec/bcc09 \
+		$(MAKE) PREFIX=$(PREFIX) VERSION=$(VERSION) \
+			LIBEXECDIR=$(PREFIX)/libexec/bcc09 \
 			-C $$i install || exit 1 ;\
 	done
 	install -d $(DESTDIR)$(MANDIR)/man1

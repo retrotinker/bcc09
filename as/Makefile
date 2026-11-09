@@ -1,7 +1,9 @@
 # CFLAGS and LDFLAGS may come from the environment (rpmbuild's)
 CFLAGS?=-O
 LDFLAGS?=
-ALL_CFLAGS=-std=gnu89 $(CFLAGS)
+# the version -v prints (VERSION, from the top-level Makefile)
+VERDEF=$(if $(VERSION),-DVERSION='"$(VERSION)"')
+ALL_CFLAGS=-std=gnu89 $(VERDEF) $(CFLAGS)
 LIBDIR=$(PREFIX)/bin
 BINDIR=$(PREFIX)/bin
 
@@ -52,3 +54,6 @@ pops.o: const.h type.h address.h flag.h globvar.h opcode.h scan.h
 readsrc.o: const.h type.h flag.h file.h globvar.h macro.h scan.h source.h
 scan.o: const.h type.h globvar.h scan.h 
 table.o: const.h type.h globvar.h opcode.h scan.h
+
+# (VERSION is set there)
+as.o: ../Makefile

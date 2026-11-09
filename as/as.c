@@ -184,13 +184,12 @@ char **argv;
 			switch (arg[1]) {
 			case 'v':
 				outfd = STDOUT;
-				writes("as86 version: ");
 #ifdef VERSION
-				writesn(VERSION);
+				writesn("as09 " VERSION);
 #else
-				writesn("Unknown!");
+				writesn("as09 (version unknown)");
 #endif
-				exit(1);
+				exit(0);
 			case 'b':
 				if (!isnextarg || binfil != 0)
 					usage();

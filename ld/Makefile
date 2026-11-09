@@ -3,7 +3,9 @@ LIBDIR	=$(PREFIX)/bin
 # CFLAGS and LDFLAGS may come from the environment (rpmbuild's)
 CFLAGS	?=-O
 LDFLAGS	?=
-ALL_CFLAGS=-std=gnu89 -DDATASEGS $(CFLAGS)
+# the version -v prints (VERSION, from the top-level Makefile)
+VERDEF=$(if $(VERSION),-DVERSION='"$(VERSION)"')
+ALL_CFLAGS=-std=gnu89 -DDATASEGS $(VERDEF) $(CFLAGS)
 
 # Will need some of these if you want native executables on non-Linux/i386
 # -DDETECTAOUT			# Turn on detection.
@@ -55,3 +57,6 @@ $(OBJS): align.h bindef.h byteord.h config.h const.h globvar.h obj.h \
 
 .c.o:
 	$(CC) $(ALL_CFLAGS) $(DEFS) -c $< -o $@
+
+# (VERSION is set there)
+io.o: ../Makefile

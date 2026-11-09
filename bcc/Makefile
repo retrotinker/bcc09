@@ -8,7 +8,9 @@ PREFIX=/usr
 # CFLAGS and LDFLAGS may come from the environment (rpmbuild's)
 CFLAGS	?=-O
 LDFLAGS	?=
-ALL_CFLAGS=-std=gnu89 -fno-builtin-exp2 $(CFLAGS)
+# the version -v prints (VERSION, from the top-level Makefile)
+VERDEF=$(if $(VERSION),-DVERSION='"$(VERSION)"')
+ALL_CFLAGS=-std=gnu89 -fno-builtin-exp2 $(VERDEF) $(CFLAGS)
 BINDIR	=$(PREFIX)/bin
 LIBEXECDIR	=$(PREFIX)/libexec/bcc09
 BCCDEFS	=-DLOCALPREFIX=$(PREFIX) -DBINDIR=$(BINDIR)
@@ -28,7 +30,8 @@ install: all
 	install -d $(DESTDIR)$(LIBEXECDIR)
 	install -m 755 cc1 $(DESTDIR)$(LIBEXECDIR)/cc1
 
-bcc09: bcc.c
+# (../Makefile sets VERSION)
+bcc09: bcc.c ../Makefile
 	$(CC) $(BCFLAGS) $(BCCDEFS) bcc.c -o $@
 
 cc1: $(OBJS)
