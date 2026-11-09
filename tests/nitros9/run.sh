@@ -5,12 +5,12 @@
 # modules under sim6809 --os9 are built by bcc09, made into modules by
 # objcopy09 and put on a blank disk in drive 1 (/d1), and the startup
 # script on a copy of a bootable NitrOS-9 disk in drive 0 runs each,
-# with its output redirected to a file on /d1; then
-# tdone.c reads $FF6A, an unused address in the I/O page, which XRoar
-# traps on to stop.  Each output, copied off the disk, must be the same
-# as the program's reference output (tests/ref/NAME.run), which sim6809
-# gave.  The exit statuses can't be seen this way; the programs print
-# their checks' results.
+# with its output redirected to a file on /d1, through trun.c, which
+# writes its exit status (from F$Wait: the shell doesn't show it) to
+# another; then tdone.c reads $FF6A, an unused address in the I/O page,
+# which XRoar traps on to stop.  Each output and status, copied off the
+# disk, must be the same as the program's reference output and status
+# (tests/ref/NAME.run and NAME.run.rc), which sim6809 gave.
 #
 # Optional (make check-nitros9): it needs xroar, toolshed's os9 tool, a
 # NitrOS-9 Level 2 disk image ($NITROS9_DISK, ~/coco/nitros9.os9 by
@@ -72,12 +72,11 @@ os9 format -q -e -4 -ds -t40 -nbcc09 $img > /dev/null &&
 : > empty
 os9 copy -r empty $img,empty.in > /dev/null || exit 1
 
-# the modules, and the startup script (-x: go on after an error, as a
-# program that returns its number of failures gives)
+# the modules, and the startup script (-x: go on after an error)
 printf -- '-x\rchd /d1\rchx /d1/CMDS\r' > startup
-for f in $progs tdone; do
+for f in $progs tdone trun; do
 	src=$top/tests/src/$f.c
-	[ $f = tdone ] && src=$dir/tdone.c
+	case $f in tdone|trun) src=$dir/$f.c ;; esac
 	if ! BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Mo -o $f.out "$src" ||
 	   ! "$top/ld/objcopy09" -O os9 -n $f $f.out $f.mod ||
 	   ! os9 copy -r $f.mod $img,CMDS/$f > /dev/null ||
@@ -85,10 +84,10 @@ for f in $progs tdone; do
 		echo "FAIL $f: can't build it or put it on the disk"
 		exit 1
 	fi
-	[ $f = tdone ] && continue
+	case $f in tdone|trun) continue ;; esac
 	params=
 	[ $f = os9io ] && params=" one two"
-	printf '%s%s <empty.in >%s.run\r' $f "$params" $f >> startup
+	printf 'trun %s%s <empty.in >%s.run\r' $f "$params" $f >> startup
 done
 printf 'echo done >done.txt\rtdone\r' >> startup
 os9 copy -r -l startup $boot,startup > /dev/null || exit 1
@@ -107,12 +106,17 @@ fi
 failed=0
 for f in $progs; do
 	os9 copy $img,$f.run $f.run > /dev/null 2>&1 || : > $f.run
-	if cmp -s $f.run "$top/tests/ref/$f.run"; then
-		echo "ok   $f"
-	else
+	os9 copy $img,$f.rc $f.rc > /dev/null 2>&1 || : > $f.rc
+	if ! cmp -s $f.run "$top/tests/ref/$f.run"; then
 		echo "FAIL $f: its output isn't tests/ref/$f.run"
 		diff "$top/tests/ref/$f.run" $f.run | head -10
 		failed=$((failed + 1))
+	elif ! cmp -s $f.rc "$top/tests/ref/$f.run.rc"; then
+		echo "FAIL $f: exit status $(cat $f.rc), not" \
+			"$(cat "$top/tests/ref/$f.run.rc")"
+		failed=$((failed + 1))
+	else
+		echo "ok   $f (exit status $(cat $f.rc))"
 	fi
 done
 exit $failed

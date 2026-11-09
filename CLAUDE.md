@@ -100,7 +100,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `mkdir`, `chdir`, `opendir`/`readdir`/`rewinddir`/`closedir` (`sys/stat.h`,
   `dirent.h`; added 2026-11-09). Every call clears the registers it doesn't set
   (`OS9_CLEAR`): garbage in them made `I$MakDir` take nearly a whole disk. Still to do:
-  `rmdir`, `getcwd`, exit statuses on NitrOS-9.
+  `rmdir`, `getcwd`.
 - Next: Disk BASIC files for `-Me`, FLEX, `%a` in `printf`, faster floating
   point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
@@ -200,9 +200,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   XRoar with the `-Mo` modules (`os9io`, `os9dir` and the eight of `os9.result`) on a blank
   disk in
   drive 1 (40 tracks, double sided, as the boot's `D1` is: the boot disk is full); the
-  startup script runs each with its output in a file, and `tdone.c` reads `$FF6A`, which
-  XRoar traps on to stop. Each output must equal `tests/ref/NAME.run`. Exit statuses
-  aren't seen. `NITROS9_KEEP=1` keeps the disks. About a minute and a half.
+  startup script runs each through `trun.c` (`F$Fork` and `F$Wait`; added 2026-11-09),
+  which writes its exit status to `NAME.rc`, with its output in a file, and `tdone.c`
+  reads `$FF6A`, which XRoar traps on to stop. Each output and status must equal
+  `tests/ref/NAME.run` and `NAME.run.rc`. `NITROS9_KEEP=1` keeps the disks, and
+  `NITROS9_PROGS` picks the programs. About a minute and a half.
 - Nineteen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `pathlen.result`: fltcc.c and pftest.c compiled through prefixes of 20 to 240 characters

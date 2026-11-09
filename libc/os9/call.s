@@ -97,3 +97,9 @@ stubs:	swi2
 	swi2
 	fcb	$07		; 13: F$Mem
 	rts
+	swi2
+	fcb	$03		; 14: F$Fork
+	rts
+	swi2
+	fcb	$04		; 15: F$Wait
+	rts
