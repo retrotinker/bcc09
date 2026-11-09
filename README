@@ -1,44 +1,107 @@
-12 May 2014
+bcc09 0.8.0
+===========
 
-The process is still very "hands on" and requires some skill,
-knowledge, and/or experience.  Nevertheless, the current version
-is capable of producing working code with a manual sequence like
-the following:
+bcc09 is a C compiler for the Motorola MC6809, with the preprocessor,
+peephole optimizer, assembler, linker, librarian, binary utilities and
+C library that go with it.  It targets the Tandy Color Computer and the
+Dragon (Color BASIC and Disk BASIC), OS-9 and NitrOS-9, and FLEX, or any
+6809 machine through its own start-up code.  It is derived from the 6809
+configuration of Bruce Evans' C compiler, as the dev86 project has it.
 
-	as09 -o start.o start.s
-	bcc09 -o prog.o -c prog.c
-	ld09 -o prog.out -T0x1000 start.o prog.o
-	objcopy09 -O srec prog.out prog.s19
+	https://github.com/retrotinker/bcc09
 
-(Update, 2026: bcc09 now links with start-up code and a C library by
-itself.  For a Color BASIC program with stdio, run with EXEC:
+The tools
+---------
 
-	bcc09 -Me -o hello -X-T0x3000 hello.c
-	objcopy09 -O decb hello hello.bin
+	bcc09		the compiler driver: runs the passes below, and links
+	as09		the assembler
+	ld09		the linker
+	ar09		the librarian
+	objdump09	dumps object files and executables (also installed
+			as nm09 and size09)
+	objcopy09	makes an executable into what a machine loads: raw
+			binary, S-records, Intel hex, a Disk BASIC (LOADM)
+			file, a DragonDOS binary, a cassette image (.cas or
+			.wav), an OS-9 module, or a FLEX command (.CMD)
 
-then LOADM"HELLO":EXEC on the CoCo.  libc/README has the details.)
+bcc09's passes are cpp (the preprocessor), unproto (which makes ANSI C
+prototypes into the K&R C the compiler reads, keeping their types),
+cc1 (the compiler) and copt (the peephole optimizer, with -O).
 
-objcopy09 can also write raw binaries (-O binary), Intel hex (-O ihex),
-Disk Extended Color BASIC LOADM files (-O decb), Dragon DOS binaries
-(-O ddos), OS-9 modules (-O os9), FLEX commands (-O flex, a .CMD file)
-and Color BASIC cassette images (-O cas or -O wav).
+The C it compiles is C89 with prototypes, less const and volatile (which
+the headers define away), plus _Bool; char is unsigned, int is 16 bits,
+long 32, float and double IEEE single and double precision.  The C
+library has string.h, ctype.h, stdlib.h (with malloc), stdarg.h, stdio.h
+(printf and scanf as glibc's, floating point formats included), math.h
+(Sun's fdlibm), stdint.h, stdbool.h, and the system functions each
+target supports: files on Disk BASIC, OS-9 and FLEX, and directories on
+OS-9.  Floating point is linked only into programs that use it.
 
-The man pages in doc/man describe each program: bcc09(1), as09(1),
-ld09(1), ar09(1), objdump09(1) (also nm09 and size09) and objcopy09(1),
-and bcc09's passes, bcc09-cpp(1), bcc09-unproto(1), bcc09-cc1(1) and
-bcc09-copt(1);
-"make install" puts them in $(PREFIX)/share/man ("man -l doc/man/bcc09.1"
-reads one in place).  doc/manual.pdf is the user's manual: how to build
-and install bcc09, the C it compiles, each target, the C library, the
-calling conventions, and the tools, with the man pages as an appendix
-("make docs" makes it again from doc/manual.md and the man pages).
+Building and installing
+-----------------------
+
+bcc09 builds on any Unix-like system with a C compiler and make:
+
+	make
+	make check
+	make install PREFIX=/usr/local/bcc09
+
+"make check" runs the regression tests: the programs they build run on
+sim6809, a 6809 simulator from the plm09 project (in tests/sim).  The
+optional "make check-xroar", "make check-nitros9" and "make check-flex"
+run test programs on real ROMs and systems in the XRoar emulator (see
+the manual for what each needs).
+
+"make install" puts the programs in PREFIX/bin, the passes in
+PREFIX/libexec/bcc09, the C library and its headers in
+PREFIX/share/bcc09, and the man pages in PREFIX/share/man.
 
 On Fedora, "make rpm" builds an RPM package (bcc09.spec, installed in
 /usr), in rpmbuild/; "make srpm" builds the source package.
 
-The resulting binary can be loaded onto your 6809-based target device
-using whatever tools you have available to you.  Loading that code
-and making it all work remains as an exercise for the reader...
+Getting started
+---------------
+
+A Color BASIC program, on a cassette image for CLOADM:EXEC:
+
+	bcc09 -Me -O -o hello -X-T0x3000 hello.c
+	objcopy09 -O cas -n HELLO hello hello.cas
+
+(or "objcopy09 -O decb hello HELLO.BIN" for LOADM from a disk).  An OS-9
+program module, and a FLEX command:
+
+	bcc09 -Mo -O -o hello.out hello.c
+	objcopy09 -O os9 -n hello hello.out hello
+
+	bcc09 -Mf -O -o hello -X-T0x1000 hello.c
+	objcopy09 -O flex hello HELLO.CMD
+
+For a monitor or a machine of your own (the default target has no I/O:
+main's result is returned to whatever called the program):
+
+	bcc09 -O -o prog -X-T0x4000 prog.c
+	objcopy09 -O srec prog prog.s19
+
+Color BASIC, OS-9 and FLEX end lines with a carriage return, and the C
+library passes characters to them as they are: print "\r" (FLEX's
+terminal wants "\r\n").
+
+Documentation
+-------------
+
+doc/manual.pdf is the user's manual: building and installing, the C
+bcc09 compiles, each target, the C library, the calling conventions and
+how to write assembly for them, the tools and the tests, with the man
+pages as an appendix ("make docs" makes it again from doc/manual.md).
+The man pages are in doc/man: bcc09(1), as09(1), ld09(1), ar09(1),
+objdump09(1), objcopy09(1), and the passes' bcc09-cpp(1),
+bcc09-unproto(1), bcc09-cc1(1) and bcc09-copt(1) ("man -l
+doc/man/bcc09.1" reads one in place).  libc/README describes the C
+library and its changes from dev86's, BUGS the known bugs, and TODO
+what is still to do.
+
+Object formats
+--------------
 
 Syntax for the assembler seems to be inspired by (and may be compatible
 with) that described in section C.5 of "INTROL-C COMPILER REFERENCE
@@ -58,8 +121,16 @@ linker is the "INTROL LINKABLE BINARY FILE FORMAT", documented in
 
 So theoretically, object modules should be compatible with objects
 generated by the Introl-C/6809 toolchain -- YMMV!  The calling
-conventions would still need to match, of course.  Given the
-observations above, those conventions may in fact be the same...
+conventions would still need to match, of course.
+
+License
+-------
+
+The compiler and tools are under the GNU General Public License (see
+COPYING).  The C library, which is linked into the programs bcc09
+builds, is under the GNU Library General Public License, version 2 (see
+libc/COPYING.LIB), so that those programs can be under any license; its
+math functions are Sun's fdlibm, under Sun's notice.
 
 Please feel free to try things out and to let me know about your
 successes or failures.  If you find something that does not compile or

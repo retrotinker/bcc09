@@ -1,4 +1,4 @@
-- Expand README (and add FAQ)
+- Add a FAQ
 - Continue removing unused options and correcting documentation
 - Ditto for any remaining x86isms
 - Consolidate ld/rel_aout.h and ld/x86_aout.h (as bcc_aout.h?)
