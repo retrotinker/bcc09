@@ -29,6 +29,7 @@ enum output_formats {
 	BINARY,		/* raw binary (no header) */
 	DECB_BIN,	/* Disk Extend Color BASIC BIN file */
 	DDOS_BIN,	/* Dragon DOS BIN file */
+	FLEX_BIN,	/* FLEX binary (.CMD) file */
 	OS9_MODULE,	/* OS-9/6809 program module file */
 	SREC,		/* Motorola S-record file */
 	IHEX,		/* Intel Hex file */
@@ -338,6 +339,59 @@ void ddos_output(FILE *ifd, FILE *ofd, struct exec header)
 		fatal("Cannot seek to start of data");
 
 	write_file(ifd, ofd, header.a_data);
+}
+
+/* FLEX's load records: $02, the address, the count (up to 255), the
+   bytes; for size bytes of ifd, to be loaded at addr */
+static void flex_records(FILE *ifd, FILE *ofd, unsigned int addr,
+			 unsigned long size)
+{
+	uint8_t rec[4 + 255];
+	unsigned int n;
+
+	while (size > 0) {
+		n = size > 255 ? 255 : size;
+		rec[0] = 0x02;
+		rec[1] = (addr & 0xff00) >> 8;
+		rec[2] =  addr & 0x00ff;
+		rec[3] = n;
+		if (fread(rec + 4, 1, n, ifd) != n)
+			fatal("Error reading the input file");
+		if (fwrite(rec, 1, 4 + n, ofd) != 4 + n)
+			fatal("Error writing FLEX binary record to outfile");
+		addr += n;
+		size -= n;
+	}
+}
+
+/* a FLEX binary (.CMD) file: the text's and data's load records, then
+   the transfer address ($16, the entry point) */
+void flex_output(FILE *ifd, FILE *ofd, struct exec header)
+{
+	uint8_t xfer[3];
+
+	if (!textaddr)
+		textaddr = textstart;
+	if (!dataaddr) {
+		if ((header.a_flags & A_SEP) && datastart != textend)
+			dataaddr = datastart;
+		else
+			dataaddr = textaddr + header.a_text;
+	}
+
+	if (fseek(ifd, A_TEXTPOS(header), 0) < 0)
+		fatal("Cannot seek to start of text");
+	flex_records(ifd, ofd, textaddr, header.a_text);
+
+	if (fseek(ifd, A_DATAPOS(header), 0) < 0)
+		fatal("Cannot seek to start of data");
+	flex_records(ifd, ofd, dataaddr, header.a_data);
+
+	xfer[0] = 0x16;
+	xfer[1] = (header.a_entry & 0xff00) >> 8;
+	xfer[2] =  header.a_entry & 0x00ff;
+	if (fwrite(xfer, 1, sizeof(xfer), ofd) != sizeof(xfer))
+		fatal("Error writing FLEX transfer address to outfile");
 }
 
 void os9_output(FILE *ifd, FILE *ofd, struct exec header)
@@ -815,6 +869,8 @@ int main(int argc, char *argv[])
 				outform = DECB_BIN;
 			else if (!strncmp(optarg, "ddos", 4))
 				outform = DDOS_BIN;
+			else if (!strncmp(optarg, "flex", 4))
+				outform = FLEX_BIN;
 			else if (!strncmp(optarg, "os9", 3))
 				outform = OS9_MODULE;
 			else if (!strncmp(optarg, "srec", 3))
@@ -893,6 +949,9 @@ int main(int argc, char *argv[])
 		break;
 	case DDOS_BIN:
 		ddos_output(ifd, ofd, header);
+		break;
+	case FLEX_BIN:
+		flex_output(ifd, ofd, header);
 		break;
 	case OS9_MODULE:
 		os9_output(ifd, ofd, header);

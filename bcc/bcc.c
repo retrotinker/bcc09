@@ -930,6 +930,8 @@ char **argv;
 		prepend_option("-D__FLEX__", 'p');
 		prepend_option("-D__FLEX9__", 'p');
 		opt_arch = MC6809_FLEX;
+		crtname = "-Cflex";	/* a FLEX command */
+		targetlib = "-lflex";	/* I/O through FLEX's DOS */
 		break;
 	case 'v':
 		prepend_option("-D__VECTREX__", 'p');

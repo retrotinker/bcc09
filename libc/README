@@ -127,13 +127,14 @@ and links with libc.a (ld09 -C<name> links crt<name>.o):
   -Ms       sa: crt0.o and libsa.a (the default)
   -Me       cb: crt0.o and libcb.a (Color BASIC, run with EXEC)
   -Mi       sim: crtsim.o and libsim.a
+  -Mf       flex: crtflex.o and libflex.a (a FLEX command, a .CMD file)
   -Mo       os9: crtos9.o and libos9.a (an OS-9 program module)
 
 -Mo compiles code differently (position-independent, with the data
 reached through U), so libos9.a is all of libc built again with it (in
 os9obj), which bcc09 links in place of libc.a.
 
-The others (-Mu, -Mr, -Mb, -Mf, -Mv) have none yet, and bcc09
+The others (-Mu, -Mr, -Mb, -Mv) have none yet, and bcc09
 won't link for them (bcc09 -x leaves out the start-up code, for a
 program that brings its own).  Each target's start-up code clears the
 BSS and calls main; when main returns, its result goes to exit(), which
@@ -188,6 +189,28 @@ emulator (tests/xroar), where the Dragon's vectors turn out to be the
 same, and its files on the CoCo with Disk BASIC 1.0, the CoCo 2 with
 1.1 and the CoCo 3, where BASIC reads a file the program wrote and
 writes one, and toolshed's decb and xrdisk.py check the disk.
+
+flex is for a FLEX command: "objcopy09 -O flex prog.out PROG.CMD" makes
+the .CMD file, of load records and a transfer address, for any load
+address in user memory (bcc09 -X-T0x1000, say).  crtflex moves the stack
+from FLEX's own (128 bytes below $C080) to the end of user memory
+(MEMEND, $CC2B), and gives main its arguments from FLEX's line buffer
+(flex/start.c): argv[0] is the word before FLEX's line buffer pointer,
+the command's name as typed, so "P,PROG", which prints PROG's output,
+gives PROG; the rest are the words after it, separated by blanks or
+commas.  The heap is between the end of the program and the stack.
+write() sends the bytes to FLEX's PUTCHR (so P and O redirect them),
+and read() reads a line from INCH, showing the characters through
+PUTCHR, with TTYSET's backspace character (or ^H) to rub out and CR to
+end it (shown as CR LF); a NUL at the start of a line is the end of the
+input (sim6809 --flex gives NULs after its input).  Neither changes the
+bytes, as on -Mo and -Me: FLEX's terminal starts a new line with CR LF
+("\r\n"), and a line read ends with '\r' (getdelim(..., '\r', ...)).
+_exit() goes back to FLEX (WARMS), with the status in B, which FLEX
+ignores and sim6809 --flex takes as its exit status.  There are no files
+yet.  "make check" runs a program under sim6809 --flex (with arguments,
+in its line buffer, and input), and "make check-flex" runs one on
+Compusense FLEX for the Dragon 64 in XRoar (tests/flex).
 
 sim is for sim6809, the simulator the tests use (tests/sim).  crtsim
 puts the stack just below the simulator's I/O block at $FF00, and

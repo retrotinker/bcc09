@@ -50,6 +50,7 @@ mkdir -p "$prefix/lib/bcc09"
 ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
 	"$top/libc/libsa.a" "$top/libc/libcb.a" "$top/libc/crtsim.o" \
 	"$top/libc/libsim.a" "$top/libc/crtos9.o" "$top/libc/libos9.a" \
+	"$top/libc/crtflex.o" "$top/libc/libflex.a" \
 	"$prefix/lib/bcc09/"
 LIBDIR=$prefix/lib/bcc09
 # (relative to $out, where everything runs: the compiler's output names
@@ -177,7 +178,7 @@ done
 
 # objcopy09: each output format, and separate data (-D), with the load
 # addresses given
-for f in binary srec ihex decb ddos cas wav; do
+for f in binary srec ihex decb ddos cas wav flex; do
 	run prog-$f.oc "$OC" -O $f -n PROG -T 0x1000 prog.out prog.$f
 done
 run prog-p.oc "$OC" -O binary -p -T 0x1000 -D 0x4000 prog-D.out \
@@ -448,6 +449,18 @@ echo $? > cbfile.run.rc
 rm -f cbrom.o cbrom.out cbrom.srec cbtest.srec cbtest-rom.srec cbdisk.o \
 	cbdisk.out cbdisk.srec cbfile.srec cbfile-rom.srec
 
+# the FLEX target (bcc09 -Mf): flexio.c, made a .CMD file by objcopy09
+# and run by sim6809 --flex with the parameters "one,two three" (in FLEX's
+# line buffer) and flexio.in as the terminal, prints its arguments,
+# echoes lines in upper case, uses the heap, and returns the number of
+# lines (sim6809's convention: B at WARMS)
+run flexio.bcc "$BCC" -Mf -o flexio.out -X-T0x1000 flexio.c
+"$OC" -O flex flexio.out FLEXIO.CMD
+"$SIM" -n 50000000 --flex --param "one,two three" FLEXIO.CMD < flexio.in \
+	> flexio.run 2>&1
+echo $? > flexio.run.rc
+rm -f FLEXIO.CMD
+
 # copt's rules, checked by running code: each program above that runs
 # on sim6809 is built again with -O (libc is always built with -O), and
 # must give the same output and exit status as without
@@ -507,7 +520,7 @@ for f in fltcc pftest; do
 	rm -f $f-path.s $f-path.code
 done > pathlen.result
 
-run notarget.bcc "$BCC" -Mf -o notarget.out hello.c
+run notarget.bcc "$BCC" -Mv -o notarget.out hello.c
 rm -f notarget.out
 
 # the copied sources aren't results

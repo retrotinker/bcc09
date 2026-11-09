@@ -1,0 +1,8 @@
+Tests of the FLEX target (bcc09 -Mf) on real FLEX, Compusense FLEX for
+the Dragon 64, in the XRoar emulator: "make check-flex" runs run.sh (see
+it for what it needs and does).
+
+flexdisk.py, which reads and writes files on a FLEX disk image, is
+copied unchanged from the tools/ directory of the plm09 project
+(https://github.com/retrotinker/plm09), which is under the MIT license
+(see ../sim/LICENSE); done.s does what its tests/flex/done.asm does.

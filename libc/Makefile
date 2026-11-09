@@ -23,6 +23,8 @@ BCCFLAGS=-O -I$(TOP)/include
 #   cb:  Color BASIC (-Me, a program run with EXEC): crt0.o and libcb.a,
 #        with I/O through the ROM
 #   sim: sim6809 (-Mi): crtsim.o and libsim.a
+#   flex: FLEX (-Mf, a .CMD command): crtflex.o and libflex.a, with I/O
+#        through FLEX's DOS
 #   os9: OS-9 (-Mo): crtos9.o and libos9.a, which is all of libc built
 #        again with -Mo (position-independent, data through U) in os9obj,
 #        with os9/'s sbrk, hooks and system functions
@@ -100,6 +102,9 @@ SA_OBJS	= sa/_exit.o
 CB_SYS_OBJS = cb/write.o cb/read.o cb/isatty.o cb/lseek.o cb/close.o \
 	  cb/__cb_files.o
 CB_OBJS	= sa/_exit.o cb/rom.o cb/disk.o cb/dskcon.o $(CB_SYS_OBJS)
+FLEX_SYS_OBJS = flex/write.o flex/read.o flex/isatty.o flex/lseek.o \
+	  flex/close.o flex/open.o
+FLEX_OBJS = flex/flex.o flex/start.o $(FLEX_SYS_OBJS)
 SIM_SYS_OBJS = sim/isatty.o sim/lseek.o sim/close.o sim/open.o
 SIM_OBJS = sim/_exit.o sim/read.o sim/write.o $(SIM_SYS_OBJS)
 
@@ -112,7 +117,8 @@ OS9_OBJS = $(filter-out stdlib/sbrk.o stdio/xfpcvt.o stdio/xfptvc.o,$(OBJS)) \
 	  $(OS9_SYS_OBJS)
 OS9_DIRS = bcc ctype malloc stdio stdlib string math os9
 
-TARGETS	= crt0.o libsa.a libcb.a crtsim.o libsim.a crtos9.o libos9.a
+TARGETS	= crt0.o libsa.a libcb.a crtsim.o libsim.a crtos9.o libos9.a \
+	  crtflex.o libflex.a
 
 all: libc.a $(TARGETS)
 
@@ -131,6 +137,12 @@ crtsim.o: sim/crtsim.o
 libsim.a: $(SIM_OBJS)
 	rm -f $@
 	$(AR09) rc $@ $(SIM_OBJS)
+
+crtflex.o: flex/crt0.o
+	cp $< $@
+libflex.a: $(FLEX_OBJS)
+	rm -f $@
+	$(AR09) rc $@ $(FLEX_OBJS)
 
 libcb.a: $(CB_OBJS)
 	rm -f $@
@@ -180,6 +192,8 @@ $(SCANF_OBJS): stdio/%.o: stdio/scanf.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(CB_SYS_OBJS): cb/%.o: cb/sys.c cb/cb.h $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(FLEX_SYS_OBJS): flex/%.o: flex/sys.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(SIM_SYS_OBJS): sim/%.o: sim/sys.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(MALLOC_OBJS): malloc/%.o: malloc/malloc.c $(HEADERS) .bcc/stamp
@@ -211,7 +225,8 @@ cb/disk.o: cb/cb.h $(HEADERS) .bcc/stamp
 TOOLS	= $(TOP)/../bcc/bcc09 $(TOP)/../bcc/cc1 $(TOP)/../cpp/cpp \
 	  $(TOP)/../unproto/unproto $(TOP)/../copt/copt \
 	  $(TOP)/../copt/rules.6809 $(AS09)
-$(OBJS) $(SA_OBJS) $(CB_OBJS) $(SIM_OBJS) sa/crt0.o sim/crtsim.o: $(TOOLS)
+$(OBJS) $(SA_OBJS) $(CB_OBJS) $(SIM_OBJS) $(FLEX_OBJS) sa/crt0.o \
+	sim/crtsim.o flex/crt0.o: $(TOOLS)
 
 install: libc.a $(TARGETS)
 	install -d $(LIBDIR) $(LIBDIR)/include/sys
@@ -220,7 +235,8 @@ install: libc.a $(TARGETS)
 	install -m 644 include/sys/*.h $(LIBDIR)/include/sys
 
 clean realclean clobber:
-	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o cb/*.o sim/*.o stdio/*.o
+	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o cb/*.o sim/*.o flex/*.o \
+	      stdio/*.o
 	rm -rf .bcc os9obj
 
 .PHONY: all install clean realclean clobber

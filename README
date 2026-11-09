@@ -20,8 +20,8 @@ then LOADM"HELLO":EXEC on the CoCo.  libc/README has the details.)
 
 objcopy09 can also write raw binaries (-O binary), Intel hex (-O ihex),
 Disk Extended Color BASIC LOADM files (-O decb), Dragon DOS binaries
-(-O ddos), OS-9 modules (-O os9) and Color BASIC cassette images (-O cas
-or -O wav).
+(-O ddos), OS-9 modules (-O os9), FLEX commands (-O flex, a .CMD file)
+and Color BASIC cassette images (-O cas or -O wav).
 
 The resulting binary can be loaded onto your 6809-based target device
 using whatever tools you have available to you.  Loading that code

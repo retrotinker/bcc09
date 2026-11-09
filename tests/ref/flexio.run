@@ -1,0 +1,16 @@
+argv[0] [FLEXIO]
+argv[1] [one]
+argv[2] [two]
+argv[3] [three]
+hello, flex
+12: [HELLO, FLEX]
+second line
+12: [SECOND LINE]
+
+1: []
+last
+5: [LAST]
+malloc ok
+write(3) -1 1
+isatty 1 1
+fopen 1
