@@ -200,7 +200,8 @@ O_APPEND), lseek() I$Seek and I$GetStt's SS.Pos and SS.Size, isatty()
 SS.Opt's device type (SCF), and unlink() and remove() I$Delete.  OS-9's
 errors become errno's ENOENT, EBADF, EACCES, EEXIST, ENOMEM or, for the
 rest, EIO.  "make check" runs such modules on sim6809 --os9, which
-emulates these calls on host files (tests/sim).
+emulates these calls on host files (tests/sim), and "make check-nitros9"
+runs them on NitrOS-9 Level 2, on a CoCo 3 in XRoar (tests/nitros9).
 
 bcc09 links programs at address 0 unless told otherwise, so give it a
 load address for ld09, for example: bcc09 -o prog -X-T0x3000 prog.c

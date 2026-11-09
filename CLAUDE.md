@@ -92,9 +92,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   functions (`read`/`write` through `I$ReadLn`/`I$WritLn`, with no newline translation:
   decided 2026-11-09, OS-9's lines end with CR; files; `unlink`). `run.sh`
   runs `-Mo` code under `simcrt0.s` with U 0, and modules under `sim6809 --os9`
-  (`os9io.c`, and eight programs that must run as with `-Mi`: `os9.result`). Still to do:
-  running on real OS-9 (NitrOS-9 in XRoar), directories, `F$` memory calls.
-- Next: OS-9 on real systems (above), Disk BASIC files for `-Me`, FLEX, `%a` in `printf`, faster floating
+  (`os9io.c`, and eight programs that must run as with `-Mi`: `os9.result`), and
+  `make check-nitros9` runs the same nine on real NitrOS-9 Level 2 (all the same, since
+  2026-11-09). Still to do: directories, `F$` memory calls, exit statuses on NitrOS-9.
+- Next: Disk BASIC files for `-Me`, FLEX, `%a` in `printf`, faster floating
   point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
@@ -186,6 +187,14 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
   it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
   `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
+- `make check-nitros9` (`tests/nitros9/run.sh`, optional: needs `xroar`, toolshed's `os9`,
+  a NitrOS-9 Level 2 boot disk, `$NITROS9_DISK` or `~/coco/nitros9.os9`, and the CoCo 3
+  ROM, `$COCO3_ROM` or `/usr/share/mame/roms/coco3.rom`) boots NitrOS-9 on a CoCo 3 in
+  XRoar with the `-Mo` modules (`os9io` and the eight of `os9.result`) on a blank disk in
+  drive 1 (40 tracks, double sided, as the boot's `D1` is: the boot disk is full); the
+  startup script runs each with its output in a file, and `tdone.c` reads `$FF6A`, which
+  XRoar traps on to stop. Each output must equal `tests/ref/NAME.run`. Exit statuses
+  aren't seen. `NITROS9_KEEP=1` keeps the disks. About a minute and a half.
 - Nineteen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the

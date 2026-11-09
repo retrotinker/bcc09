@@ -1,5 +1,5 @@
-/* built by bcc09 -Mo and run as an OS-9 module by sim6809 --os9 (with
-   the parameters "one two"): the arguments; files through open, read,
+/* built by bcc09 -Mo and run as an OS-9 module by sim6809 --os9 and on
+   NitrOS-9 (tests/nitros9), with the parameters "one two": the arguments; files through open, read,
    write, lseek, close and unlink (O_CREAT, O_EXCL, O_TRUNC, O_APPEND) and
    through stdio (fopen, fprintf, fgets, fseek, ftell, remove), which
    pass every byte as it is; isatty; prints the results, and exits with
@@ -117,7 +117,7 @@ char **argv;
 	for (i = 0; i < argc; i++)
 		printf("argv[%d] %s\n", i, argv[i]);
 	ok(31, argc == 3 && argv[3] == 0);
-	ok(32, isatty(0) && isatty(1) && isatty(2));
+	ok(32, isatty(2));	/* (0 and 1 may be redirected to files) */
 	unixio();
 	stdio();
 	printf("checks %d failures %d\n", checks, failures);

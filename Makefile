@@ -2,7 +2,7 @@ PREFIX=/usr/local/bcc09
 
 DIRS=ar as bcc copt cpp ld unproto libc
 
-.PHONY: all check check-xroar clean install
+.PHONY: all check check-xroar check-nitros9 clean install
 
 all: $(DIRS)
 	for i in $^ ;\
@@ -20,6 +20,9 @@ check: all $(SIM)
 # optional: the Color BASIC target on real ROMs, in the XRoar emulator
 check-xroar: all
 	tests/xroar/run.sh
+
+check-nitros9: all
+	tests/nitros9/run.sh
 
 $(SIM): tests/sim/*.c tests/sim/*.h
 	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.3"' -o $@ tests/sim/*.c
