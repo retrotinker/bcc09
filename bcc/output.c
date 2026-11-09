@@ -24,10 +24,11 @@ PRIVATE unsigned errcount;	/* # errors in compilation */
 				/* depends on zero init */
 PRIVATE char hexdigits[] = "0123456789ABCDEF";
 PRIVATE char *outbuf;
-EXTERN char *outbufend;		/* end of pair of output buffers */
-PRIVATE char *outbufmid;
+PRIVATE unsigned outbufsize;
 PRIVATE fd_t output;
-PRIVATE fastin_t outstage;	/* depends on zero init */
+PRIVATE fastin_t outstage;	/* 0: flushout() writes all the output; 1:
+				   it keeps what may still be patched */
+				/* depends on zero init */
 
 FORWARD void errorsummary P((void));
 FORWARD void errsum1 P((void));
@@ -43,13 +44,6 @@ char *message;
 
 PUBLIC void closeout()
 {
-	char *saveoutptr;
-
-	if (outstage == 3) {
-		saveoutptr = outbufptr;
-		flushout();	/* buffer from last stage */
-		outbufptr = saveoutptr;
-	}
 	outstage = 0;		/* flush from top to current ptr */
 	flushout();
 	close(output);
@@ -173,51 +167,71 @@ PUBLIC void finishup()
 	exit(errcount == 0 ? 0 : 1);
 }
 
-/* flush output file */
+/* flush output file: all of it (outstage 0), or (1) what is before the
+   oldest branch that may still be patched to a short one and before
+   outkeep; the rest is moved to the start of the buffer, which grows if
+   that fills much of it.  So whether a branch is patched depends only on
+   the code, not on how much text (comments, file names) comes between. */
 
 PUBLIC void flushout()
 {
 	unsigned nbytes;
+	unsigned nkept;
+	char *keep;
+	char *newbuf;
 
-	switch (outstage) {
-	case 0:
-		nbytes = (unsigned)(outbufptr - outbuf);
-		outbufptr = outbuf;
-		break;
-	case 2:
-		nbytes = OUTBUFSIZE;
-		outbufptr = outbuf;
-		outbuftop = outbufmid;
-		outstage = 3;
-		break;
-	default:
-		nbytes = OUTBUFSIZE;
-		if (outstage == 1)
-			nbytes = 0;
-		outbufptr = outbufmid;
-		outbuftop = outbufend;
-		outstage = 2;
-		break;
+	keep = outbufptr;
+	if (outstage != 0) {
+		keep = openpatch(keep);
+		if (outkeep != NULL && outkeep < keep)
+			keep = outkeep;
 	}
+	nbytes = (unsigned)(keep - outbuf);
+	nkept = (unsigned)(outbufptr - keep);
 	if (nbytes != 0) {
+		if (outstage == 0) {
 #ifdef BUILTIN_CPP
-		if (!orig_cppmode)
+			if (!orig_cppmode)
 #endif
-			clearlabels(outbufptr, outbufptr + nbytes);
-		if (write(output, outbufptr, nbytes) != nbytes) {
+				clearlabels(outbuf, keep);
+			if (outkeep >= outbuf && outkeep < keep)
+				outkeep = NULL;
+		}
+		if (write(output, outbuf, nbytes) != nbytes) {
 			write(2, "output file error\n", 18);
 			closein();
 			close(output);
 			exit(1);
 		}
 	}
+	if (outstage == 0) {
+		outbufptr = outbuf;
+		return;
+	}
+	if (nkept > outbufsize / 2) {
+		newbuf = ourmalloc(2 * outbufsize);
+		memcpy(newbuf, keep, nkept);
+		movepatches(keep, newbuf);
+		if (outkeep != NULL)
+			outkeep = newbuf + (outkeep - keep);
+		free(outbuf);
+		outbuf = newbuf;
+		outbufsize *= 2;
+		outbuftop = outbuf + outbufsize;
+	} else if (nbytes != 0) {
+		memmove(outbuf, keep, nkept);
+		movepatches(keep, outbuf);
+		if (outkeep != NULL)
+			outkeep = outbuf + (outkeep - keep);
+	}
+	outbufptr = outbuf + nkept;
 }
 
 PUBLIC void initout()
 {
 	static char smallbuf[1];
 
-	outbufend = outbuftop = (outbuf = outbufptr =
+	outbuftop = (outbuf = outbufptr =
 				 smallbuf) + sizeof smallbuf;
 	output = 1;		/* standard output */
 }
@@ -598,12 +612,12 @@ register unsigned num;
 PUBLIC void setoutbufs()
 {
 	if (!isatty(output)) {
-		outbufptr = outbuf = ourmalloc(2 * OUTBUFSIZE);
+		outbufsize = 2 * OUTBUFSIZE;
+		outbufptr = outbuf = ourmalloc(outbufsize);
 #ifdef TS
-		ts_s_outputbuf += 2 * OUTBUFSIZE;
+		ts_s_outputbuf += outbufsize;
 #endif
-		outbufmid = outbuftop = outbufptr + OUTBUFSIZE;
-		outbufend = outbufmid + OUTBUFSIZE;
+		outbuftop = outbuf + outbufsize;
 		outstage = 1;
 	}
 	if (watchlc)

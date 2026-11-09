@@ -342,7 +342,7 @@ _getline:
 ; Debug: logeq int = const $D to int c = [S+6-4] (used reg = )
 	LDX	2,S
 	LEAX	-$D,X
-	LBNE	.4
+		BNE	.4
 .5:
 ; 21 			break;
 	BRA	.1

@@ -137,7 +137,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 533 reference
+  `tests/src/` with this tree's tools and compare every result with the 534 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -197,6 +197,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   aren't seen. `NITROS9_KEEP=1` keeps the disks. About a minute and a half.
 - Nineteen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
+- `pathlen.result`: fltcc.c and pftest.c compiled through prefixes of 20 to 240 characters
+  must give the same code. cc1 writes a forward branch long and makes it short when its
+  label comes within reach; `flushout()` keeps the text from the oldest such branch
+  (`openpatch()`, growing the buffer), so that no longer depends on how much text,
+  such as the headers' names in comments, comes between (fixed 2026-11-09).
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
 

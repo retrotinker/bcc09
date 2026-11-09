@@ -10,5 +10,7 @@ EXTERN bool_t ctext;		/* nonzero to intermix C source */
 				/* depends on zero init */
 EXTERN char *outbufptr;		/* current spot in output buffer */
 EXTERN char *outbuftop;		/* top of current output buffer */
+EXTERN char *outkeep;		/* if not NULL, the output from here is kept
+				   when the buffer fills (and moved with it) */
 EXTERN bool_t watchlc;		/* nonzero to print lc after every line */
 				/* depends on zero init */

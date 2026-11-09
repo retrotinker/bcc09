@@ -225,6 +225,8 @@ void bumplc2 P((void));
 void bumplc3 P((void));
 void clearfunclabels P((void));
 void clearlabels P((char *patchbuf, char *patchtop));
+char *openpatch P((char *top));
+void movepatches P((char *old, char *new));
 void clearswitchlabels P((void));
 uoffset_T getlc P((void));
 void deflabel P((label_no label));

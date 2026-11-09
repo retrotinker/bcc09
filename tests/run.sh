@@ -459,6 +459,31 @@ for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest
 	rm -f $f-O.out $f-O.srec $f-O.run $f-plain.run
 done >> optimize.result
 
+# the code mustn't depend on how long the headers' file names are (which
+# the assembly's comments hold): fltcc.c and pftest.c, which cc1 once
+# compiled with long branches for short ones at some of these lengths,
+# are compiled through prefixes with names of 20 to 240 characters, and
+# must give the same code (comments aside) as with ../prefix.tmp
+for f in fltcc pftest; do
+	"$BCC" -O -S -o $f-path.s $f.c > /dev/null 2>&1
+	grep -v '^;' $f-path.s > $f-path.code
+	differ=
+	for len in 20 40 60 80 100 120 140 160 180 200 220 240; do
+		long=$(printf 'p%.0s' $(seq 1 $len))
+		ln -s ../prefix.tmp $long
+		BCC_PREFIX=$long "$BCC" -O -S -o $f-path.s $f.c > /dev/null 2>&1
+		grep -v '^;' $f-path.s | cmp -s - $f-path.code ||
+			differ="$differ $len"
+		rm -f $long
+	done
+	if [ -z "$differ" ]; then
+		echo "ok   $f's code doesn't depend on the prefix's length"
+	else
+		echo "DIFF $f's code with prefixes of$differ characters"
+	fi
+	rm -f $f-path.s $f-path.code
+done > pathlen.result
+
 run notarget.bcc "$BCC" -Mf -o notarget.out hello.c
 rm -f notarget.out
 

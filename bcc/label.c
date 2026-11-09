@@ -22,6 +22,8 @@ struct labdatstruct {
 	offset_T lablc;		/* location counter for branch or label */
 	char *labpatch;		/* buffer ptr for branch, NULL for label */
 	ccode_t labcond;	/* condition code for branch */
+	bool_t labopen;		/* nonzero for a branch whose label isn't
+				   defined yet (its text is kept to patch) */
 };
 
 PRIVATE char condnames[][2] =	/* names of condition codes */
@@ -58,6 +60,7 @@ char *patch;
 	labptr->labnum = label;
 	labptr->lablc = lc;
 	labptr->labpatch = patch;
+	labptr->labopen = patch != NULL;
 	if (++nextvislab == MAXVISLAB)
 		nextvislab = 0;
 }
@@ -118,6 +121,39 @@ char *patchtop;
 			labptr->labnum = 0;
 }
 
+/* the start of the text of the oldest branch that may still be patched
+   (to a short one), or top if there is none: the output before it can be
+   written */
+
+PUBLIC char *openpatch(top)
+char *top;
+{
+	register struct labdatstruct *labptr;
+	struct labdatstruct *labtop;
+
+	for (labptr = &vislab[0], labtop = &vislab[MAXVISLAB];
+	     labptr < labtop; ++labptr)
+		if (labptr->labnum != 0 && labptr->labopen
+		    && labptr->labpatch < top)
+			top = labptr->labpatch;
+	return top;
+}
+
+/* the output's text from old moved to new: so do the branches to patch */
+
+PUBLIC void movepatches(old, new)
+char *old;
+char *new;
+{
+	register struct labdatstruct *labptr;
+	struct labdatstruct *labtop;
+
+	for (labptr = &vislab[0], labtop = &vislab[MAXVISLAB];
+	     labptr < labtop; ++labptr)
+		if (labptr->labnum != 0 && labptr->labopen)
+			labptr->labpatch = new + (labptr->labpatch - old);
+}
+
 /* clear out labels in switch statement */
 
 PUBLIC void clearswitchlabels()
@@ -165,6 +201,7 @@ label_no label;
 					labptr = &vislab[MAXVISLAB];
 				--labptr;
 				if (labptr->labnum == label) {
+					labptr->labopen = FALSE;
 					if ((labpatch =
 					     labptr->labpatch) != NULL
 					    && isshortbranch(lc -
@@ -267,7 +304,7 @@ label_no label;
 		sbranch(cond, label);
 		return;
 	}
-	oldoutptr = outbufptr;
+	outkeep = outbufptr;	/* (kept, to patch, if the buffer fills) */
 	if (cond == RA)
 		outjumpstring();
 	else {
@@ -277,7 +314,9 @@ label_no label;
 	}
 	outlabel(label);
 	outnl();
-	if (labptr == NULL && oldoutptr < outbufptr)	/* no wrap-around */
+	oldoutptr = outkeep;	/* (NULL if it was written) */
+	outkeep = NULL;
+	if (labptr == NULL && oldoutptr != NULL)
 		addlabel(cond, label, oldoutptr);
 }
 
