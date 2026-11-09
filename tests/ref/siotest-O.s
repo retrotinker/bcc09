@@ -4,19 +4,19 @@
 ; 2 
 ; 3 
 ; 4  
-; 5 # 8 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 5 # 8 "../prefix.tmp/share/bcc09/include/stdio.h"
 ; 8  
-; 9 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 9 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
 ; 7 # 17
 ; 17  
 ; 18 # 32
 ; 32  
-; 33 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 33 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 10 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 10 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 10 # 14
 ; 14 typedef unsigned int size_t;	 
 ;BCC_EOS
@@ -34,7 +34,7 @@
 ;BCC_EOS
 ; 22 typedef long ino_t;
 ;BCC_EOS
-; 23 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 23 # 44 "../prefix.tmp/share/bcc09/include/stdio.h"
 ; 44  
 ; 45 struct __stdio_file {
 ; 46   unsigned char *bufpos;    
@@ -142,8 +142,8 @@
 ; 131 
 ; 132 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 133 extern int f
-; 133 printf () __proto(FILE*,char*,...);
+; 133 
+; 133 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
 ; 134 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
@@ -171,25 +171,25 @@
 ;BCC_EOS
 ; 147 extern int vsscanf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 148 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
+; 148 # 6 "../prefix.tmp/share/bcc09/include/errno.h"
 ; 6  
 ; 7 # 11
 ; 11 extern int errno;
 ;BCC_EOS
-; 12 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 12 # 5 "../prefix.tmp/share/bcc09/include/string.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/string.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/string.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/string.h"
-; 10 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/string.h"
+; 10 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 6 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/stddef.h"
+; 10 # 13 "../prefix.tmp/share/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
@@ -240,10 +240,10 @@
 ; 44  
 ; 45 extern char * strpbrk () __proto(char *,char *);
 ;BCC_EOS
-; 46 extern char * strsep () __proto(char **,char *);
+; 46 extern char * strsep
+; 46  () __proto(char **,char *);
 ;BCC_EOS
-; 47 ext
-; 47 ern char * strstr () __proto(char *,char *);
+; 47 extern char * strstr () __proto(char *,char *);
 ;BCC_EOS
 ; 48 extern char * strtok () __proto(char *,char *);
 ;BCC_EOS
@@ -251,14 +251,14 @@
 ;BCC_EOS
 ; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
-; 51 # 5 "../prefix.tmp/lib/bcc09/include/unistd.h"
+; 51 # 5 "../prefix.tmp/share/bcc09/include/unistd.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/unistd.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/unistd.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/unistd.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/unistd.h"
 ; 10 # 22
 ; 22  
 ; 23 extern ssize_t read () __proto(int,void *,size_t);
@@ -851,7 +851,8 @@ LDX	#$A
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 65 	ok(11,ungetc(c,stdin)== 'f');
+; 65 	ok(11,ungetc(
+; 65 c,stdin)== 'f');
 ; Debug: list * struct __stdio_file = stdin+0 (used reg = )
 LDX	#_stdin
 PSHS	X
@@ -877,8 +878,7 @@ LDX	#$B
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 66 	ok(12,(((stdin)->bufpos 
-; 66 >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++))== 'f');
+; 66 	ok(12,(((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++))== 'f');
 ; Debug: ge * unsigned char = [stdin+2] to * unsigned char = [stdin+0] (used reg = )
 LDX	>_stdin
 CMPX	>_stdin+2

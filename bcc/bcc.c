@@ -203,7 +203,7 @@ char **argv;
 
 			default_include = build_libpath("-I", "/include", "");
 			default_libdir =
-			    build_libpath("-L", "/lib", libdir_suffix);
+			    build_libpath("-L", "/share", libdir_suffix);
 			optim_rules =
 			    build_libpath("-d", "/libexec", libdir_suffix);
 		}
@@ -211,8 +211,8 @@ char **argv;
 	} else {
 		/* Relative paths to normal PREFIX directory */
 		temp = catstr(libdir_suffix, "/include");
-		default_include = build_libpath("-I", "/lib", temp);
-		default_libdir = build_libpath("-L", "/lib", libdir_suffix);
+		default_include = build_libpath("-I", "/share", temp);
+		default_libdir = build_libpath("-L", "/share", libdir_suffix);
 		optim_rules = build_libpath("-d", "/libexec", libdir_suffix);
 
 		build_prefix("/libexec", libdir_suffix, "");

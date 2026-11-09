@@ -50,12 +50,12 @@ fi
 cd "$work" || exit 1
 
 # a prefix of links to this build, for the compiler driver
-mkdir -p prefix/bin prefix/libexec/bcc09 prefix/lib/bcc09
+mkdir -p prefix/bin prefix/libexec/bcc09 prefix/share/bcc09
 ln -s "$top/as/as09" "$top/ld/ld09" prefix/bin/
 ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" prefix/libexec/bcc09/
 ln -s "$top/libc/include" "$top/libc/crtos9.o" "$top/libc/libos9.a" \
-	prefix/lib/bcc09/
+	prefix/share/bcc09/
 
 # the boot disk: images are often cut short after the last sector in
 # use, and XRoar would then see fewer cylinders than the file system

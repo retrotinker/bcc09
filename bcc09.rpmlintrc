@@ -1,7 +1,10 @@
 # bcc09 is a cross toolchain: its libraries, start-up files and headers
 # are for the 6809 (a.out, not ELF), installed where bcc09 looks for them
 # rather than for the host's compiler
-addFilter(r"readelf-failed /usr/lib/bcc09/")
-addFilter(r"devel-file-in-non-devel-package /usr/lib/bcc09/")
+addFilter(r"readelf-failed /usr/share/bcc09/")
+addFilter(r"devel-file-in-non-devel-package /usr/share/bcc09/")
+# (6809 archives, the same whatever the host: rpmlint takes any .a for the
+# host's)
+addFilter(r"arch-dependent-file-in-usr-share /usr/share/bcc09/")
 # the license texts are as upstream (dev86) has them
 addFilter(r"incorrect-fsf-address /usr/share/licenses/bcc09/")

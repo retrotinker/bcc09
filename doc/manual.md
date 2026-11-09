@@ -63,7 +63,7 @@ make install PREFIX=/usr/local/bcc09
 * the compiler's passes (`cpp`, `unproto`, `cc1`, `copt` and its rules) in
   *PREFIX*`/libexec/bcc09`;
 * the C library, the targets' start-up code and libraries in
-  *PREFIX*`/lib/bcc09`, and its headers in *PREFIX*`/lib/bcc09/include`;
+  *PREFIX*`/share/bcc09`, and its headers in *PREFIX*`/share/bcc09/include`;
 * the manual pages in *PREFIX*`/share/man/man1`.
 
 *PREFIX* is `/usr/local/bcc09` by default. bcc09 finds its passes and

@@ -59,7 +59,7 @@ cp -p libc/math/README README.libm
 %{_bindir}/size09
 %{_bindir}/objcopy09
 %{_libexecdir}/%{name}/
-%{_prefix}/lib/%{name}/
+%{_datadir}/%{name}/
 %{_mandir}/man1/bcc09.1*
 %{_mandir}/man1/bcc09-*.1*
 %{_mandir}/man1/as09.1*

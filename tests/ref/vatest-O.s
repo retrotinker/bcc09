@@ -3,7 +3,7 @@
 ; 1 
 ; 2 
 ; 3  
-; 4 # 18 "../prefix.tmp/lib/bcc09/include/stdarg.h"
+; 4 # 18 "../prefix.tmp/share/bcc09/include/stdarg.h"
 ; 18  
 ; 19 # 23
 ; 23 typedef char *va_list;
@@ -644,9 +644,9 @@ JSR	>_putnum
 BRA	.29
 ;BCC_EOS
 ; 129 		case 'l':
-; 130 			putlong((((l
+; 130 			putlong(((
 .2E:
-; 130 ong *)((ap)+= sizeof(long)))[-1]));
+; 130 (long *)((ap)+= sizeof(long)))[-1]));
 ; Debug: ptraddab int = const 4 to * char ap = [S+6-4] (used reg = )
 LDX	2,S
 LEAX	4,X

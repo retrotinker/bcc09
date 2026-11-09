@@ -46,13 +46,13 @@ ln -s "$top/as/as09" "$top/ld/ld09" "$top/ar/ar09" "$top/bcc/bcc09" \
 	"$top/ld/objdump09" "$top/ld/objcopy09" "$prefix/bin/"
 ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" "$prefix/libexec/bcc09/"
-mkdir -p "$prefix/lib/bcc09"
+mkdir -p "$prefix/share/bcc09"
 ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
 	"$top/libc/libsa.a" "$top/libc/libcb.a" "$top/libc/crtsim.o" \
 	"$top/libc/libsim.a" "$top/libc/crtos9.o" "$top/libc/libos9.a" \
 	"$top/libc/crtflex.o" "$top/libc/libflex.a" \
-	"$prefix/lib/bcc09/"
-LIBDIR=$prefix/lib/bcc09
+	"$prefix/share/bcc09/"
+LIBDIR=$prefix/share/bcc09
 # (relative to $out, where everything runs: the compiler's output names
 # the headers it read, so an absolute path would make the results
 # depend on where the source tree is)

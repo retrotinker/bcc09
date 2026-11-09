@@ -300,9 +300,9 @@ and the target's macro (see
 The directory bcc09 is installed in: it runs its passes from
 .IR libexec/bcc09 ,
 and finds the C library's headers in
-.I lib/bcc09/include
+.I share/bcc09/include
 and its libraries in
-.I lib/bcc09
+.I share/bcc09
 under it.
 By default, the directory bcc09 was built to be installed in
 .RB ( "make PREFIX=" ...;
@@ -320,7 +320,7 @@ The passes:
 .B copt
 and its rules (rules.6809).
 .TP
-.IR prefix /lib/bcc09
+.IR prefix /share/bcc09
 The C library (libc.a), and each target's start-up code and library
 (crt0.o and libsa.a for
 .BR \-Ms ;
@@ -333,7 +333,7 @@ crtflex.o and libflex.a for
 crtsim.o and libsim.a for
 .BR \-Mi ).
 .TP
-.IR prefix /lib/bcc09/include
+.IR prefix /share/bcc09/include
 The C library's headers.
 .SH EXIT STATUS
 0 if every file was compiled (and the program linked), 1 otherwise.

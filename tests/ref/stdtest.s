@@ -2,15 +2,15 @@
 ; 1 # 1 "stdtest.c"
 ; 1 # 7
 ; 7  
-; 8 # 9 "../prefix.tmp/lib/bcc09/include/ctype.h"
+; 8 # 9 "../prefix.tmp/share/bcc09/include/ctype.h"
 ; 9  
-; 10 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 10 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
 ; 7 # 17
 ; 17  
 ; 18 # 32
 ; 32  
-; 33 # 16 "../prefix.tmp/lib/bcc09/include/ctype.h"
+; 33 # 16 "../prefix.tmp/share/bcc09/include/ctype.h"
 ; 16 extern	unsigned char	__ctype[];
 ;BCC_EOS
 ; 17 # 27
@@ -22,23 +22,23 @@
 ; 30  
 ; 31 # 37
 ; 37  
-; 38 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
+; 38 # 6 "../prefix.tmp/share/bcc09/include/errno.h"
 ; 6  
 ; 7 # 11
 ; 11 extern int errno;
 ;BCC_EOS
-; 12 # 6 "../prefix.tmp/lib/bcc09/include/limits.h"
+; 12 # 6 "../prefix.tmp/share/bcc09/include/limits.h"
 ; 6  
-; 7 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 7 # 5 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/stdlib.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/stdlib.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 10 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 10 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 10 # 14
 ; 14 typedef unsigned int size_t;	 
 ;BCC_EOS
@@ -56,12 +56,12 @@
 ;BCC_EOS
 ; 22 typedef long ino_t;
 ;BCC_EOS
-; 23 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 23 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 6 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 17 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/stddef.h"
+; 10 # 17 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 17 extern int atoi () __proto(char *);
 ;BCC_EOS
 ; 18 extern long atol () __proto(char *);
@@ -92,7 +92,7 @@
 ; 33 # 31
 ; 31 
 ; 32 () __proto(void *,void *,size_t,size_t
-; 33 # 31 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 33 # 31 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 31 ,
 ; 32 int (*)());
 ;BCC_EOS
@@ -114,10 +114,10 @@
 ;BCC_EOS
 ; 42 
 ; 43  
-; 44 extern char * itoa () __proto(int);
+; 44 extern char * itoa () __
+; 44 proto(int);
 ;BCC_EOS
-; 45 extern char * ltoa (
-; 45 ) __proto(long);
+; 45 extern char * ltoa () __proto(long);
 ;BCC_EOS
 ; 46 extern char * ultoa () __proto(unsigned long);
 ;BCC_EOS
@@ -125,17 +125,17 @@
 ;BCC_EOS
 ; 48 extern char * ultostr () __proto(unsigned long,int);
 ;BCC_EOS
-; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 49 # 5 "../prefix.tmp/share/bcc09/include/string.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/string.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/string.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/string.h"
-; 10 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/string.h"
+; 10 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 13 "../prefix.tmp/share/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
@@ -338,7 +338,8 @@ _putlong:
 	STX	2,S
 ;BCC_EOS
 ; 52 
-; 53 	if (l < 0)
+; 53 	if (
+; 53 l < 0)
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
 	LDD	#0
 	LDX	#0
@@ -367,8 +368,7 @@ _putlong:
 ;BCC_EOS
 ; 56 	do {
 .11:
-; 57 		*--p = '0'
-; 57  + (int) (u % 10);
+; 57 		*--p = '0' + (int) (u % 10);
 ; Debug: mod unsigned long = const $A to unsigned long u = [S+$16-$16] (used reg = )
 	LDD	#0
 	LDX	#$A
@@ -1435,7 +1435,8 @@ _conv:
 ; Debug: func () void = putlong+0 (used reg = )
 	JSR	>_putlong
 ;BCC_EOS
-; 131 	putnum(end - s);
+; 131 	putn
+; 131 um(end - s);
 ; Debug: ptrsub * char s = [S+4-2] to * char end = [S+4-4] (used reg = )
 	LDD	0,S
 	SUBD	2,S
@@ -1444,8 +1445,7 @@ _conv:
 ; Debug: func () void = putnum+0 (used reg = )
 	JSR	>_putnum
 ;BCC_EOS
-; 132 	putlong((long)strtoul(s,&end,bas
-; 132 e)& 0xffffL);
+; 132 	putlong((long)strtoul(s,&end,base)& 0xffffL);
 ; Debug: list int base = [S+4+2] (used reg = )
 	LDD	6,S
 	PSHS	D
@@ -2851,7 +2851,8 @@ _strings:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 220 	ok(45,strcmp(ltoa(-100000L),"-100000")== 0);
+; 220 	ok
+; 220 (45,strcmp(ltoa(-100000L),"-100000")== 0);
 	LOC	1
 .10B:
 	FCC	"-100000"
@@ -2886,8 +2887,7 @@ _strings:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 221 	ok
-; 221 (46,strcmp(ltoa(2147483647L ),"2147483647")== 0);
+; 221 	ok(46,strcmp(ltoa(2147483647L ),"2147483647")== 0);
 	LOC	1
 .10E:
 	FCC	"2147483647"
@@ -4061,8 +4061,8 @@ _sorting:
 	LDB	#$71
 	STB	2,S
 ;BCC_EOS
-; 314 	rp = (struct rec *) bsearch(&k,r,7,sizeof(r[0]),rcmp
-; 314 );
+; 314 	rp = (
+; 314 struct rec *) bsearch(&k,r,7,sizeof(r[0]),rcmp);
 ; Debug: cast * () int = const 0 to () int = rcmp+0 (used reg = )
 ; Debug: list * () int = rcmp+0 (used reg = )
 	LDX	#_rcmp

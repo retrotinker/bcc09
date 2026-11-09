@@ -2,19 +2,19 @@
 ; 1 # 1 "chartest.c"
 ; 1 # 7
 ; 7  
-; 8 # 8 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 8 # 8 "../prefix.tmp/share/bcc09/include/stdio.h"
 ; 8  
-; 9 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 9 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
 ; 7 # 17
 ; 17  
 ; 18 # 32
 ; 32  
-; 33 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 33 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 10 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 10 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 10 # 14
 ; 14 typedef unsigned int size_t;	 
 ;BCC_EOS
@@ -32,7 +32,7 @@
 ;BCC_EOS
 ; 22 typedef long ino_t;
 ;BCC_EOS
-; 23 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 23 # 44 "../prefix.tmp/share/bcc09/include/stdio.h"
 ; 44  
 ; 45 struct __stdio_file {
 ; 46   unsigned char *bufpos;    
@@ -138,10 +138,10 @@
 ; 130 extern int puts () __proto(char*);
 ;BCC_EOS
 ; 131 
-; 132 extern int printf () __proto(char*,...);
+; 132 extern int printf () __proto(char*,...)
+; 132 ;
 ;BCC_EOS
-; 133 extern int
-; 133  fprintf () __proto(FILE*,char*,...);
+; 133 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
 ; 134 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
@@ -477,8 +477,8 @@ _c_low:
 ; 73 {
 	EXPORT	_main
 _main:
-; 74 	unsigned ch
-; 74 ar u;
+; 74 
+; 74 	unsigned char u;
 ;BCC_EOS
 ; 75 	signed char s;
 ;BCC_EOS

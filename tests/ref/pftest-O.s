@@ -2,19 +2,19 @@
 ; 1 # 1 "pftest.c"
 ; 1 # 5
 ; 5  
-; 6 # 8 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 6 # 8 "../prefix.tmp/share/bcc09/include/stdio.h"
 ; 8  
-; 9 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 9 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
 ; 7 # 17
 ; 17  
 ; 18 # 32
 ; 32  
-; 33 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 33 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 10 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 10 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 10 # 14
 ; 14 typedef unsigned int size_t;	 
 ;BCC_EOS
@@ -32,7 +32,7 @@
 ;BCC_EOS
 ; 22 typedef long ino_t;
 ;BCC_EOS
-; 23 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 23 # 44 "../prefix.tmp/share/bcc09/include/stdio.h"
 ; 44  
 ; 45 struct __stdio_file {
 ; 46   unsigned char *bufpos;    
@@ -140,8 +140,8 @@
 ; 131 
 ; 132 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 133 extern int f
-; 133 printf () __proto(FILE*,char*,...);
+; 133 
+; 133 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
 ; 134 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
@@ -169,20 +169,20 @@
 ;BCC_EOS
 ; 147 extern int vsscanf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 148 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 148 # 5 "../prefix.tmp/share/bcc09/include/string.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/string.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/string.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/string.h"
-; 10 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/string.h"
+; 10 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 6 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/stddef.h"
+; 10 # 13 "../prefix.tmp/share/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
@@ -235,10 +235,10 @@
 ;BCC_EOS
 ; 46 extern char * strsep () __proto(char **,char *);
 ;BCC_EOS
-; 47 extern char * strstr () __proto(char *,char *);
+; 47 extern char * strstr () __proto(char *,char 
+; 47 *);
 ;BCC_EOS
-; 48 extern char * strtok () __
-; 48 proto(char *,char *);
+; 48 extern char * strtok () __proto(char *,char *);
 ;BCC_EOS
 ; 49 extern size_t strcspn () __proto(char *,char *);
 ;BCC_EOS
@@ -1089,13 +1089,14 @@ JSR	>_printf
 ;BCC_EOS
 ; 88 
 ; 89 	 
-; 90 	printf("[%*d][%-*d][%*d]\n",5,42,5,42,-5,42);
+; 90 	printf("[%*d][%-*d][%*d]\n",5,42,5,42,-5
 LOC	1
 .5B:
 FCC	"[%*d][%-*d][%*d]"
 FCB	$A
 FCB	0
 LOC	0
+; 90 ,42);
 ; Debug: list int = const $2A (used reg = )
 LDD	#$2A
 PSHS	D
@@ -1120,8 +1121,7 @@ LDX	#.5B
 JSR	>_printf
 LEAS	$C,S
 ;BCC_EOS
-; 91 	printf("[%.*d][%.*d][%*
-; 91 .*d]\n",4,7,-1,7,6,3,9);
+; 91 	printf("[%.*d][%.*d][%*.*d]\n",4,7,-1,7,6,3,9);
 LOC	1
 .5C:
 FCC	"[%.*d][%.*d][%*.*d]"

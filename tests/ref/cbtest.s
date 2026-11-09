@@ -2,19 +2,19 @@
 ; 1 # 1 "cbtest.c"
 ; 1 # 6
 ; 6  
-; 7 # 8 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 7 # 8 "../prefix.tmp/share/bcc09/include/stdio.h"
 ; 8  
-; 9 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 9 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
 ; 7 # 17
 ; 17  
 ; 18 # 32
 ; 32  
-; 33 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 33 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 10 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 10 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 10 # 14
 ; 14 typedef unsigned int size_t;	 
 ;BCC_EOS
@@ -32,7 +32,7 @@
 ;BCC_EOS
 ; 22 typedef long ino_t;
 ;BCC_EOS
-; 23 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 23 # 44 "../prefix.tmp/share/bcc09/include/stdio.h"
 ; 44  
 ; 45 struct __stdio_file {
 ; 46   unsigned char *bufpos;    
@@ -140,8 +140,8 @@
 ; 131 
 ; 132 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 133 extern int f
-; 133 printf () __proto(FILE*,char*,...);
+; 133 
+; 133 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
 ; 134 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
@@ -169,20 +169,20 @@
 ;BCC_EOS
 ; 147 extern int vsscanf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 148 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 148 # 5 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/stdlib.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/stdlib.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/stdlib.h"
-; 10 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/stdlib.h"
+; 10 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 6 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 17 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/stddef.h"
+; 10 # 17 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 17 extern int atoi () __proto(char *);
 ;BCC_EOS
 ; 18 extern long atol () __proto(char *);
@@ -213,7 +213,7 @@
 ; 33 # 31
 ; 31 
 ; 32 () __proto(void *,void *,size_t,size_t
-; 33 # 31 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 33 # 31 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 31 ,
 ; 32 int (*)());
 ;BCC_EOS
@@ -237,26 +237,26 @@
 ; 43  
 ; 44 extern char * itoa () __proto(int);
 ;BCC_EOS
-; 45 extern char * ltoa () __proto(long);
+; 45 extern cha
+; 45 r * ltoa () __proto(long);
 ;BCC_EOS
-; 46 exter
-; 46 n char * ultoa () __proto(unsigned long);
+; 46 extern char * ultoa () __proto(unsigned long);
 ;BCC_EOS
 ; 47 extern char * ltostr () __proto(long,int);
 ;BCC_EOS
 ; 48 extern char * ultostr () __proto(unsigned long,int);
 ;BCC_EOS
-; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 49 # 5 "../prefix.tmp/share/bcc09/include/string.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/string.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/string.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/string.h"
-; 10 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/string.h"
+; 10 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 13 "../prefix.tmp/share/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS

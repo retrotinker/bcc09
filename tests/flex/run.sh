@@ -46,12 +46,12 @@ fi
 cd "$work" || exit 1
 
 # a prefix of links to this build, for the compiler driver
-mkdir -p prefix/bin prefix/libexec/bcc09 prefix/lib/bcc09
+mkdir -p prefix/bin prefix/libexec/bcc09 prefix/share/bcc09
 ln -s "$top/as/as09" "$top/ld/ld09" prefix/bin/
 ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" prefix/libexec/bcc09/
 ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crtflex.o" \
-	"$top/libc/libflex.a" prefix/lib/bcc09/
+	"$top/libc/libflex.a" prefix/share/bcc09/
 
 BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Mf -o xflex -X-T0x1000 \
 	"$dir/xflex.c" || exit 1

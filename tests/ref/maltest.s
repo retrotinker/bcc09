@@ -2,19 +2,19 @@
 ; 1 # 1 "maltest.c"
 ; 1 # 6
 ; 6  
-; 7 # 5 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 7 # 5 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
 ; 7 # 17
 ; 17  
 ; 18 # 32
 ; 32  
-; 33 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 33 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 10 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 10 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 10 # 14
 ; 14 typedef unsigned int size_t;	 
 ;BCC_EOS
@@ -32,12 +32,12 @@
 ;BCC_EOS
 ; 22 typedef long ino_t;
 ;BCC_EOS
-; 23 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 23 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 6 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 17 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/stddef.h"
+; 10 # 17 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 17 extern int atoi () __proto(char *);
 ;BCC_EOS
 ; 18 extern long atol () __proto(char *);
@@ -68,7 +68,7 @@
 ; 33 # 31
 ; 31 
 ; 32 () __proto(void *,void *,size_t,size_t
-; 33 # 31 "../prefix.tmp/lib/bcc09/include/stdlib.h"
+; 33 # 31 "../prefix.tmp/share/bcc09/include/stdlib.h"
 ; 31 ,
 ; 32 int (*)());
 ;BCC_EOS
@@ -100,18 +100,18 @@
 ;BCC_EOS
 ; 48 extern char * ultostr () __proto(unsigned long,int);
 ;BCC_EOS
-; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 49 # 5 "../prefix.tmp/share/bcc09/include/string.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/string.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/string.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/string.h"
-; 10 # 5 "../prefix.tmp/lib/bc
-; 4 c09/include/stddef.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/strin
+; 9 g.h"
+; 10 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 13 "../prefix.tmp/share/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
@@ -172,19 +172,19 @@
 ;BCC_EOS
 ; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
-; 51 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
+; 51 # 6 "../prefix.tmp/share/bcc09/include/errno.h"
 ; 6  
 ; 7 # 11
 ; 11 extern int errno;
 ;BCC_EOS
-; 12 # 5 "../prefix.tmp/lib/bcc09/include/unistd.h"
+; 12 # 5 "../prefix.tmp/share/bcc09/include/unistd.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 9 "../prefix.tmp/lib/bcc09/include/unistd.h"
-; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 9 "../prefix.tmp/share/bcc09/include/unistd.h"
+; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/unistd.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/unistd.h"
 ; 10 # 22
 ; 22  
 ; 23 extern ssize_t read () __proto(int,void *,size_t);
@@ -220,9 +220,10 @@
 ;BCC_EOS
 ; 19 
 ; 20 void say(s)
-; 21 char *s;
+; 21 char 
 	EXPORT	_say
 _say:
+; 21 *s;
 ;BCC_EOS
 ; 22 {
 ; 23 	while (*s)
@@ -250,8 +251,7 @@ _say:
 	PULS	Y,PC
 ; 26 
 ; 27  
-; 28 void o
-; 28 k(n,cond)
+; 28 void ok(n,cond)
 ; 29 int n, cond;
 	EXPORT	_ok
 _ok:
@@ -1393,7 +1393,8 @@ _stress:
 	LEAX	0,X
 		BNE	.5E
 .5F:
-; 161 					good = 0;
+; 161 					good
+; 161  = 0;
 ; Debug: eq int = const 0 to int good = [S+$C-6] (used reg = )
 	LDD	#0
 	STD	6,S
@@ -1421,8 +1422,7 @@ _stress:
 	LDD	2,S
 	STD	0,X
 ;BCC_EOS
-; 164 				f
-; 164 ill(p,s,sz);
+; 164 				fill(p,s,sz);
 ; Debug: list int sz = [S+$C-$A] (used reg = )
 	LDD	2,S
 	PSHS	D

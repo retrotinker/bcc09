@@ -35,8 +35,8 @@ This will become the port of the dev86 C library.  So far it has:
 "make" builds libc.a, and each target's start-up code and library, with
 this tree's bcc09, as09 and ar09 (libc/.bcc holds links that bcc09 uses
 to find this tree's passes); "make install" puts them in
-$(PREFIX)/lib/bcc09, where bcc09 tells ld09 to look for them, and the
-headers in $(PREFIX)/lib/bcc09/include, where bcc09 looks for them.
+$(PREFIX)/share/bcc09, where bcc09 tells ld09 to look for them, and the
+headers in $(PREFIX)/share/bcc09/include, where bcc09 looks for them.
 
 All of libc is under the GNU Library General Public License, version 2
 (see COPYING.LIB), rather than the GPL that covers the rest of bcc09,

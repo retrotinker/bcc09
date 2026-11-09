@@ -35,7 +35,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   isn't tagged), as plm09's do; the spec builds with `PREFIX=/usr`, runs `make check`
   in `%check`, and its License follows Fedora's dev86 (adding LGPL-2.0-only for bcc09's
   libc files and SunPro for fdlibm). `bcc09.rpmlintrc` filters what rpmlint says of a
-  cross toolchain's 6809 files. Every install takes `DESTDIR`; every Makefile takes
+  cross toolchain's 6809 files. libc, the start-up files and the headers are in `$(PREFIX)/share/bcc09` (moved from
+  `lib/bcc09` 2026-11-09, for the package: they are no host's code), for every install
+  and the tests' prefixes alike, since the compiler's output names the headers' paths. Every install takes `DESTDIR`; every Makefile takes
   `CFLAGS`/`LDFLAGS` from the environment (rpmbuild's) and adds what it needs
   (`ALL_CFLAGS`), and nothing is stripped at link time (rpmbuild strips). A release
   bumps `VERSION`, the spec (with a `%changelog` entry) and the manual's tag.
@@ -51,7 +53,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `.tok` file, run `make -C cpp tokens` (needs gperf 3.1 or later, which uses `size_t`
   lengths).
 - `libc/` builds `libc.a` and each target's start-up file and library, installed in
-  `$(PREFIX)/lib/bcc09` (headers in `include/` there), so `bcc09 -o prog -X-T0x3000
+  `$(PREFIX)/share/bcc09` (headers in `include/` there), so `bcc09 -o prog -X-T0x3000
   prog.c` builds a whole program. libc has the 16- and 32-bit run-time helpers
   (`libc/bcc/`), `string.h`, `ctype.h`, `stdlib.h` with `malloc`, `stdarg.h` and `stdio.h`
   (dev86's `FILE` layer, and new `printf` and `scanf` families that match glibc); mostly

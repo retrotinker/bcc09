@@ -2,19 +2,19 @@
 ; 1 # 1 "strtest.c"
 ; 1 # 5
 ; 5  
-; 6 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 5 "../prefix.tmp/share/bcc09/include/string.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
 ; 7 # 17
 ; 17  
 ; 18 # 32
 ; 32  
-; 33 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 33 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
-; 7 # 10 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 7 # 10 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 10 # 14
 ; 14 typedef unsigned int size_t;	 
 ;BCC_EOS
@@ -32,12 +32,12 @@
 ;BCC_EOS
 ; 22 typedef long ino_t;
 ;BCC_EOS
-; 23 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 23 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
+; 6 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/lib/bcc09/include/stddef.h"
-; 10 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/stddef.h"
+; 10 # 13 "../prefix.tmp/share/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
@@ -189,9 +189,9 @@ EXPORT	_sign
 _sign:
 ;BCC_EOS
 ; 35 {
-; 36 	return n < 0 ? -1 : n >
+; 36 	retur
+; 36 n n < 0 ? -1 : n > 0;
 PSHS	X
-; 36  0;
 ; Debug: lt int = const 0 to int n = [S+2-2] (used reg = )
 LDD	0,S
 BGE	.8
@@ -1895,7 +1895,8 @@ LDX	#$37
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 122 	ok(56,strrchr(s,0)== s + 12);
+; 122 	ok(56,strrchr(s,0)== s + 12
+; 122 );
 ; Debug: expression subtree swapping
 ; Debug: list int = const 0 (used reg = )
 CLRA
@@ -1927,8 +1928,7 @@ LDX	#$38
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 123 	ok(57,strrchr(
-; 123 s,'l')== s + 10);
+; 123 	ok(57,strrchr(s,'l')== s + 10);
 ; Debug: expression subtree swapping
 ; Debug: list int = const $6C (used reg = )
 LDD	#$6C
@@ -3565,12 +3565,13 @@ LDX	#_buf2
 JSR	>_memset
 LEAS	4,S
 ;BCC_EOS
-; 209 	ok(100,memccpy(buf2,"abcdef",'c',6)== buf2 + 3);
+; 209 	ok(100,memccpy(buf2,"abcdef",'c',6)== 
 LOC	1
 .140:
 FCC	"abcdef"
 FCB	0
 LOC	0
+; 209 buf2 + 3);
 ; Debug: list unsigned int = const 6 (used reg = )
 LDD	#6
 PSHS	D
@@ -3602,8 +3603,7 @@ LDX	#$64
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 210 	ok(101
-; 210 ,buf2[2] == 'c' && buf2[3] == 'z');
+; 210 	ok(101,buf2[2] == 'c' && buf2[3] == 'z');
 ; Debug: logeq int = const $63 to char = [buf2+2] (used reg = )
 LDB	>_buf2+2
 SUBB	#$63

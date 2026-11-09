@@ -1,9 +1,9 @@
 # libc for bcc09: built with this tree's compiler, assembler and
-# librarian, and installed where bcc09 looks for it ($(PREFIX)/lib/bcc09,
-# and the headers in $(PREFIX)/lib/bcc09/include)
+# librarian, and installed where bcc09 looks for it ($(PREFIX)/share/bcc09,
+# and the headers in $(PREFIX)/share/bcc09/include)
 
 PREFIX	=/usr/local/bcc09
-LIBDIR	=$(PREFIX)/lib/bcc09
+LIBDIR	=$(PREFIX)/share/bcc09
 
 # (TOP, this directory, also when OS-9's libc is built in os9obj)
 TOP	?=$(CURDIR)
