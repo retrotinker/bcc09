@@ -17,11 +17,3 @@ cc1 (code generation)
     TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X
     TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X
   (Not covered by the tests.)
-
-ar09
-----
-
-- The move operation (m, ma, mb) doesn't move members: it deletes the
-  members it is given, and with a single-member archive and no position
-  it loops, writing its temporary file (archive_supersede) without end.
-  (Not covered by the tests.)

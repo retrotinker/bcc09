@@ -1267,7 +1267,9 @@ void move_members()
 				after_mapelt = after_mapelt->next;
 		}
 
-	write_archive(map, 0);
+	/* (from the start of the map as it is now: a member moved to the
+	   front comes before the one that was first) */
+	write_archive(mapstart.next, 0);
 }
 
 int move_in_map(name, map, after)
@@ -1279,6 +1281,9 @@ struct mapelt *map, *after;
 
 	if (!this)
 		return 0;
+	if (this == after)
+		return 1;	/* (already there: linking it after itself
+				   would make a loop) */
 	prev = prev_mapelt(map, this);
 	prev->next = this->next;
 	this->next = after->next;

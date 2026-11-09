@@ -1,0 +1,15 @@
+rc main ptr: main.o ptr.o 
+ra main control: main.o control.o ptr.o 
+rb main crt0: crt0.o main.o control.o ptr.o 
+d crt0: main.o control.o ptr.o 
+q crt0: main.o control.o ptr.o crt0.o 
+mb main crt0: crt0.o main.o control.o ptr.o 
+ma control crt0: main.o control.o crt0.o ptr.o 
+m main: control.o crt0.o ptr.o main.o 
+m main (already last): control.o crt0.o ptr.o main.o 
+mb ptr main crt0: control.o main.o crt0.o ptr.o 
+one member, m: main.o 
+x main.o: the same
+x control.o: the same
+x ptr.o: the same
+x crt0.o: the same

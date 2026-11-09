@@ -41,14 +41,18 @@ List the members (those named, or all).
 Print the members' contents on standard output.
 .TP
 .B m
-Meant to move the members named (to the end, or to
-.IR position ):
-it doesn't work (see
-.BR BUGS ).
+Move the members named, in the order named, to the end of the archive
+(or to
+.IR position ,
+with
+.BR a ,
+.B b
+or
+.BR i ).
 .SH MODIFIERS
 .TP
 .B a
-Put new members after the member
+Put new or moved members after the member
 .IR position .
 .TP
 .BR b ", " i
@@ -81,17 +85,6 @@ Say what is done to each member.
 .TP
 .B l
 Accepted and ignored.
-.SH BUGS
-The move operation
-.RB ( m )
-deletes the members it is given rather than moving them, and with a
-one-member archive and no position it loops, writing its temporary
-file without end.
-Don't use it: delete and add members with
-.B d
-and
-.B r
-instead.
 .SH EXIT STATUS
 0 if all went well, 1 otherwise.
 .SH EXAMPLES

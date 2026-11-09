@@ -163,7 +163,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 566 reference
+  `tests/src/` with this tree's tools and compare every result with the 567 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -263,6 +263,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   argv and terminal I/O; `flexfile.c` FLEX's files, and leaves `TEXT.TXT`, `BIN.DAT`,
   `DRV.TXT` and `LOWER.TXT` in `tests/out` (sim6809's FMS writes host files there),
   which are references too, and what `make check-flex` compares FLEX's own with.
+- `arops.result`: ar09's operations (adding at a position, appending, deleting, every
+  kind of move, extracting), each under `timeout` and `ulimit -f`, since a broken move
+  once looped writing its temporary file without end (fixed 2026-11-09).
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
 

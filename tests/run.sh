@@ -138,6 +138,35 @@ rm -f main-as.o
 run libtest.ar "$AR" rc libtest.a control.o ptr.o
 "$AR" t libtest.a > libtest.t
 "$OD" libtest.a > libtest.a.dump 2>&1
+# ar09's operations: the member list after each (adding at a position,
+# appending, deleting, and moving: before the first, after another, to
+# the end, one already last, several, and in a one-member archive, which
+# once looped without end), and extraction, which must give back the
+# objects; each with a time and size limit, in case of such a loop
+(
+	ulimit -f 4096
+	ar() { timeout 10 "$AR" "$@" 2>&1; }
+	list() { echo "$1: $(ar t arops.a | tr '\n' ' ')"; }
+	rm -f arops.a arone.a
+	ar rc arops.a main.o ptr.o;		list "rc main ptr"
+	ar ra main.o arops.a control.o;		list "ra main control"
+	ar rb main.o arops.a crt0.o;		list "rb main crt0"
+	ar d arops.a crt0.o;			list "d crt0"
+	ar q arops.a crt0.o;			list "q crt0"
+	ar mb main.o arops.a crt0.o;		list "mb main crt0"
+	ar ma control.o arops.a crt0.o;		list "ma control crt0"
+	ar m arops.a main.o;			list "m main"
+	ar m arops.a main.o;			list "m main (already last)"
+	ar mb ptr.o arops.a main.o crt0.o;	list "mb ptr main crt0"
+	ar rc arone.a main.o
+	ar m arone.a main.o
+	echo "one member, m: $(ar t arone.a | tr '\n' ' ')"
+	mkdir arx && cd arx && ar x ../arops.a
+	for f in main.o control.o ptr.o crt0.o; do
+		cmp -s $f ../$f && echo "x $f: the same" || echo "x $f: DIFFERS"
+	done
+	cd .. && rm -rf arx arops.a arone.a
+) > arops.result 2>&1
 
 # the linker: the test program, from objects and from the library, with
 # maps; stripped; headerless; with separate data; at address 0 (for
