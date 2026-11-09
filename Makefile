@@ -22,7 +22,7 @@ check-xroar: all
 	tests/xroar/run.sh
 
 $(SIM): tests/sim/*.c tests/sim/*.h
-	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.2"' -o $@ tests/sim/*.c
+	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.3"' -o $@ tests/sim/*.c
 
 # There is bound to be some more clever way to do this than copying
 # the "all" rule...

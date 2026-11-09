@@ -2,7 +2,7 @@ sim6809: a headless MC6809 simulator, used by the regression tests to
 run test programs.
 
 These sources are copied unchanged from the sim/ directory of the
-plm09 project (https://github.com/retrotinker/plm09), version 0.4.2,
+plm09 project (https://github.com/retrotinker/plm09), version 0.4.3,
 which is under the MIT license (see LICENSE in this directory). Its
 user manual is docs/sim6809.md in that project.
 
