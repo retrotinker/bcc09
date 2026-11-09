@@ -78,6 +78,7 @@ char **argv;
 	int icount = 0;
 
 	ioinit(argv[0]);
+	flag['y'] = TRUE;	/* (bcc09: whole names; -y- for 8 characters) */
 	objinit();
 	syminit();
 	typeconv_init(INT_BIG_ENDIAN, LONG_BIG_ENDIAN);

@@ -335,13 +335,12 @@ for f in pftest chartest sadd sftest fltcc fpio mtest inttest protoarg; do
 	rm -f $f-host $f-host.run $f.cmp $f-host.cmp
 done
 # floating point is optional: printf and scanf without it (pftest.out,
-# sftest.out) carry none of its code, and fpio.out has it all: __fmtfp
-# and __scanfp (objdump09 shows 8 characters of a name: T ___scanf is
-# __scanfp's code), strtod and the helpers
+# sftest.out) carry none of its code, and fpio.out has it all: __fmtfp,
+# __scanfp, strtod and the helpers
 for f in pftest sftest fpio; do
 	"$BCC" -Mi -o $f-opt.out -X-T0x1000 $f.c > /dev/null 2>&1
 	printf "%s:" $f
-	for s in ___fmtfp ___scanf _strtod Fpushd; do
+	for s in ___fmtfp ___scanfp _strtod Fpushd; do
 		"$OD" -n $f-opt.out | grep -q " T $s\$" && printf " %s" $s
 	done
 	echo

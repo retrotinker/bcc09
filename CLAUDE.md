@@ -28,6 +28,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 
 ## Layout
 
+- `ld09` writes whole symbol names into an executable (8 characters in each a.out entry,
+  the rest in entries after it): its `-y`, the default since 2026-11-08 (`-y-` for the old
+  8-character names); `objdump09 -n` joins them.
 - `ld/` builds `ld09` (linker), `objdump09` (also installed as `nm09` and `size09`) and
   `objcopy09` (`objcopy.c`, `srec.c`). objcopy09 writes binary, srec, ihex, cas, wav,
   decb, ddos and os9 output. `objcopy01` in `retrotinker/mc6801-tools` is derived from it;

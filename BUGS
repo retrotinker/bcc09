@@ -29,13 +29,3 @@ cc1 (code generation)
     TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X
     TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X
   (Not covered by the tests.)
-
-objdump09 (nm09, size09)
-------------------------
-
-- Symbol names longer than 8 characters are cut to 8: an executable's
-  a.out symbol table holds the rest in continuation entries
-  (n_sclass 0), which objdump09 doesn't join on (objcopy09 skips them;
-  see ld/objcopy.c).  So __fmtfp_hook and __fmtfp both print as
-  ___fmtfp.  References: none (prog.nm's names are short; run.sh's
-  check for fpoptional.result works around it)
