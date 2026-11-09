@@ -916,7 +916,8 @@ char **argv;
 		break;
 	case 'o':
 		prepend_option("-D__OS9__", 'p');
-		append_option("-p", 'c'); /* equivalent to '-C-p' */
+		append_option("-u", 'c'); /* position-independent, data
+					     through U (cc1 -u) */
 		opt_arch = MC6809_OS9;
 		break;
 	case 'f':

@@ -19,9 +19,6 @@ cc1 (code generation)
   References: none stable (maltest.s's JMP .49 has come and gone as
   headers it includes changed size)
 
-- In PIC mode, global (bss?) pointers and arrays use PC-relative
-  addressing rather than direct addressing.  (Not covered by the tests.)
-
 - Taking the address of a direct page object doesn't work: "LEAX <_foo"
   ignores DP.  Some possible sequences instead:
     LDD #_foo ; TFR DP,A ; TFR D,X

@@ -217,6 +217,30 @@ echo $? > selftest-O.run.rc
 rm -f selftest.srec selftest-O.srec selftest-O.out selftest-O.map \
 	selftest-O.err selftest-O.rc
 
+# OS-9's data model (bcc09 -Mo: code position-independent, data through
+# U): os9data.c (whose assembly shows the code), selftest.c and the code
+# it calls, fptest.c, ops.c and longops.c, built with -Mo and run with
+# simcrt0.s, which sets U to 0, so that the data is where the linker put
+# it; they call only helpers that keep U
+run os9data-Mo.cc "$BCC" -Mo -S -o os9data-Mo.s os9data.c
+for f in os9data selftest control switch ptr float fptest ops longops; do
+	"$BCC" -Mo -c -o $f-Mo.o $f.c > /dev/null 2>&1
+done
+for f in os9data "selftest control switch ptr float" fptest ops longops; do
+	set -- $f
+	objs=
+	for g in $f; do
+		objs="$objs $g-Mo.o"
+	done
+	"$LD" -T0x1000 -o $1-Mo.out simcrt0.o $objs -L"$LIBDIR" -lc \
+		> /dev/null 2>&1
+	"$OC" -O srec $1-Mo.out $1-Mo.srec > /dev/null 2>&1
+	"$SIM" -n 500000000 $1-Mo.srec > $1-Mo.run 2>&1
+	echo $? >> $1-Mo.run
+	rm -f $1-Mo.out $1-Mo.srec
+done
+rm -f *-Mo.o
+
 # libc's run-time helpers: ops.c checks 16-bit multiply, divide,
 # modulus and shifts (through the helpers, and the compiler's own code
 # for constants) and memcpy against tables from tests/gen-opsdata.py;

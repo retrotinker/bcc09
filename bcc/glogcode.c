@@ -6,6 +6,7 @@
 #include "condcode.h"
 #include "gencode.h"
 #include "reg.h"
+#include "sc.h"
 #include "scan.h"
 #include "sizes.h"
 #include "type.h"
@@ -216,6 +217,41 @@ bool_pt nojump;			/* NB if nonzero, is ~0 so complement is 0 */
 		lbranch(condtrue, truelab);
 }
 
+/* with data through U (no 4 registers for a double): the double value of
+   symptr on the stack at offset, with nothing else below it */
+PUBLIC void dblplace(symptr, offset)
+struct symstruct *symptr;
+offset_T offset;
+{
+	struct symstruct word;
+	int i;
+
+	fpush(symptr);			/* (nothing if it is on top already) */
+	if (sp != offset) {
+		/* copy it up, the last word first (they may overlap) */
+		for (i = 6; i >= 0; i -= 2) {
+			word = *symptr;
+			word.storage = LOCAL;
+			word.flags = 0;
+			word.level = EXPRLEVEL;
+			word.indcount = 1;
+			word.type = itype;
+			word.offset.offi = sp + i;
+			load(&word, DREG);
+			word.storage = LOCAL;	/* (load() moved it) */
+			word.indcount = 1;
+			word.offset.offi = offset + i;
+			storereg(DREG, &word);
+		}
+		modstk(offset);
+	}
+	symptr->storage = LOCAL;
+	symptr->flags = TEMP;
+	symptr->indcount = 1;
+	symptr->offset.offi = offset;
+	symptr->type = dtype;
+}
+
 PUBLIC void condop(exp)
 struct nodestruct *exp;
 {
@@ -227,6 +263,25 @@ struct nodestruct *exp;
 	struct nodestruct *truenode;
 	struct symstruct *truesym;
 
+	if (datareg && exp->nodetype->scalar & DOUBLE) {
+		/* each value to the same place on the stack */
+		offset_T spmark = sp;
+
+		jumpcond(exp->left.nodeptr, truelab = getlabel(),
+			 falselab = getlabel(), ~0);
+		deflabel(truelab);
+		makeleaf(truenode = exp->right->left.nodeptr);
+		dblplace(truesym = truenode->left.symptr, spmark - 8);
+		jump(exitlab = getlabel());
+		deflabel(falselab);
+		sp = spmark;
+		makeleaf(falsenode = exp->right->right);
+		dblplace(falsenode->left.symptr, spmark - 8);
+		deflabel(exitlab);
+		exp->tag = LEAF;
+		exp->left.symptr = truesym;
+		return;
+	}
 	jumpcond(exp->left.nodeptr, truelab = getlabel(),
 		 falselab = getlabel(), ~0);
 	deflabel(truelab);

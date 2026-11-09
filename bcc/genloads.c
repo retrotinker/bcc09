@@ -100,7 +100,7 @@ PUBLIC store_pt getindexreg()
 {
 	if (!(reguse & INDREG0))
 		return INDREG0;
-	if (!(reguse & INDREG1))
+	if (!(reguse & INDREG1) && !datareg)	/* (U: the data pointer) */
 		return INDREG1;
 	if (!(reguse & INDREG2))
 		return INDREG2;
@@ -504,6 +504,23 @@ store_pt reg;
 	outregname(reg);
 }
 
+/* nonzero if the global adr is data (not code: a function, or a string
+   constant, which is put with the code) */
+PRIVATE bool_pt isdata(adr)
+struct symstruct *adr;
+{
+	struct symstruct *symptr;
+
+	if ((adr->flags & (STRING | LABELLED)) == (STRING | LABELLED))
+		return FALSE;
+	if (adr->flags & LABELLED)
+		return TRUE;	/* (a static local) */
+	if ((symptr = findlorg(adr->name.namep)) != NULL &&
+	    symptr->type->constructor & FUNCTION)
+		return FALSE;
+	return TRUE;
+}
+
 PRIVATE void outnamoffset(adr)
 struct symstruct *adr;
 {
@@ -602,7 +619,8 @@ struct symstruct *adr;
 			outshex(adr->offset.offi);
 		}
 		if (posindependent) {
-			outcregname(GLOBAL);
+			/* data through U, if it is (OS-9); code PC-relative */
+			outcregname(datareg && isdata(adr) ? INDREG1 : GLOBAL);
 			bumplc2();
 		}
 		break;

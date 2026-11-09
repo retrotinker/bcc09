@@ -31,6 +31,7 @@ EXTERN bool_t long_big_endian;	/* nonzero if high long word is first */
 EXTERN offset_T lowsp;		/* low water sp (collects locals in switch) */
 #ifdef POSINDEPENDENT
 EXTERN bool_t posindependent;	/* nonzero to generate pos-independent code */
+EXTERN bool_t datareg;		/* nonzero to reach data through U (OS-9) */
 				/* depends on zero init */
 #endif
 EXTERN bool_t printf_fp;	/* nonzero if *printf called with FP arg  */

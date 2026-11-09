@@ -1,7 +1,8 @@
 ; start-up code for programs run on sim6809: set the stack, clear the
 ; BSS, call main, and exit with the low byte of its result; and routines
 ; for C that use the simulator's I/O block at $FF00 (libc's crt0 and
-; exit() are for programs with a loader to return to)
+; exit() are for programs with a loader to return to); it also runs code
+; built with -Mo (OS-9's data model) that calls only helpers that keep U
 
 io_out	equ	$ff00		; write a character
 io_exit	equ	$ff02		; stop, with this exit status
@@ -16,6 +17,8 @@ io_numl	equ	$ff05		; low byte: print the number
 	entry	start
 	import	_main
 start:	lds	#$7f00
+	ldu	#0		; (code built with -Mo reaches data through U:
+				; with U 0, as the linker placed it)
 	ldx	#__edata
 clear:	cmpx	#__end
 	bhs	go

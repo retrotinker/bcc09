@@ -503,6 +503,7 @@ char *argv[];
 			case 'P':	/* if acting as cpp, suppress line numbers */
 #ifdef POSINDEPENDENT
 			case 'p':	/* generate almost-position-independent code */
+			case 'u':	/* and data through U */
 #endif
 			case 't':	/* print source code in asm output */
 			case 'w':	/* watch location counter */
@@ -572,6 +573,8 @@ char *argv[];
 		posindependent = TRUE;
 		definestring("__POS_INDEPENDENT__");
 	}
+	if (flag['u'])
+		posindependent = datareg = TRUE;
 #endif
 	if (flag['O']) {
 		optimise = TRUE;
@@ -599,6 +602,8 @@ char *argv[];
 #ifdef POSINDEPENDENT
 	if (flag['p'])
 		posindependent = TRUE;
+	if (flag['u'])
+		posindependent = datareg = TRUE;
 #endif
 	if (flag['O'])
 		optimise = TRUE;

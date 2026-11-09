@@ -155,6 +155,9 @@ void ret P((void));
 void bileaf P((struct nodestruct *exp));
 fastin_pt bitcount P((uvalue_t number));
 void codeinit P((void));
+void dblplace P((struct symstruct *symptr, offset_T offset));
+struct symstruct *dretsym P((void));
+void dretcopy P((offset_T offset));
 fastin_pt highbit P((uvalue_t number));
 void makeleaf P((struct nodestruct *exp));
 

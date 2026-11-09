@@ -183,7 +183,22 @@ PUBLIC void loadretexpression()
 		exprptr = exprmark;
 	} else {
 		{
-			if (returntype->scalar & DOUBLE)
+			if (returntype->scalar & DOUBLE && datareg) {
+				/* (into __dret: see dretsym()) */
+				struct nodestruct *etmark;
+				struct nodestruct *lhs;
+				struct symstruct *exprmark;
+
+				etmark = etptr;
+				exprmark = exprptr;
+				lhs = leafnode(exprsym(dretsym()));
+				lhs->flags = LVALUE;
+				makeleaf(node(ASSIGNOP, lhs,
+					      castnode(returntype,
+						       expression())));
+				etptr = etmark;
+				exprptr = exprmark;
+			} else if (returntype->scalar & DOUBLE)
 				loadexpression(doublreturnregs, returntype);
 			else
 				loadexpression(RETURNREG, returntype);
@@ -198,9 +213,14 @@ offset_T lastargsp;
 	extend(target);
 	push(target);
 	if (lastargsp != 0 && sp != lastargsp - target->type->typesize) {
-		loadany(target);
-		modstk(lastargsp);
-		push(target);
+		if (datareg && target->type->scalar & DOUBLE)
+			dblplace(target, lastargsp - 8);	/* (not in D,
+							   X, Y and U) */
+		else {
+			loadany(target);
+			modstk(lastargsp);
+			push(target);
+		}
 		if (sp != lastargsp - target->type->typesize) {
 			bugerror("botched push of arg");
 #ifdef DBNODE
@@ -401,7 +421,8 @@ PUBLIC void ret()
 	/* (not into a register that holds the result: D and X hold a long
 	   or a float, and all four a double) */
 	if (reglist == 0 || (returntype->scalar & DOUBLE) ||
-	    (returntype->scalar & (DLONG | FLOAT) && reglist & BREG)) {
+	    (returntype->scalar & (DLONG | FLOAT) && reglist & BREG) ||
+	    (datareg && reglist & INDREG1)) {	/* (U: the data pointer) */
 		modstk(0);
 		outreturn();
 		return;

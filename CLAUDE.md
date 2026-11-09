@@ -75,8 +75,18 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     `make check-xroar`; no files yet; the CoCo 3 is untried (no ROM here).
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
   - The others can't link yet.
-- Next: Disk BASIC files for `-Me`, OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code
-  has a known bug), FLEX, `%a` in `printf`, faster floating point.
+- OS-9's data model (begun 2026-11-08): `-Mo` passes `cc1 -u`, which is `-p`
+  (position-independent code: functions and string constants `,PCR`, calls `LBSR`) with
+  data through U (`name,U`, linked as offsets: `isdata()` in `genloads.c`); U is then no
+  register for values (`codeinit()`), a double result goes through the common `__dret`
+  (`dretsym()`, `dretcopy()`), and `?:` and misplaced arguments of doubles are moved on
+  the stack (`dblplace()`), since D, X, Y and U can't hold one. Plain `-p` keeps data
+  PC-relative (code and data move together). `run.sh` runs `-Mo` code under `simcrt0.s`
+  with U 0. Still to do: an OS-9 build of libc (PIC helpers, `crt`, system calls),
+  linking and `objcopy09 -O os9` modules run by `sim6809 --os9`, and the start-up fixing
+  of static initializers that hold addresses.
+- Next: OS-9 (above), Disk BASIC files for `-Me`, FLEX, `%a` in `printf`, faster floating
+  point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
@@ -117,7 +127,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 522 reference
+  `tests/src/` with this tree's tools and compare every result with the 530 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

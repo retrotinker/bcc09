@@ -12,6 +12,7 @@
 #include "sc.h"
 #include "scan.h"
 #include "type.h"
+#include "parse.h"
 
 #undef EXTERN
 #define EXTERN
@@ -327,6 +328,14 @@ register uvalue_t number;
 
 PUBLIC void codeinit()
 {
+	if (datareg) {
+		/* U points at the data (OS-9's data area), and never
+		   changes: it is no register for values */
+		allregs &= ~INDREG1;
+		allindregs &= ~INDREG1;
+		regregs &= ~INDREG1;
+		calleemask &= ~INDREG1;
+	}
 #ifdef POSINDEPENDENT
 	if (posindependent) {
 		callstring = "LBSR\t";
@@ -554,7 +563,10 @@ struct nodestruct *exp;
 	if ((op_t) op == FUNCOP) {
 		lastargsp = saveargsp;
 		if (savelist != 0) {
-			savereturn(savelist, saveoffset);
+			if (datareg && savelist == doublreturnregs)
+				dretcopy(saveoffset);	/* (from __dret) */
+			else
+				savereturn(savelist, saveoffset);
 			onstack(target);
 			target->offset.offi = saveoffset;
 		}
@@ -614,3 +626,40 @@ register struct nodestruct *exp;
 }
 
 #endif /* SELFTYPECHECK */
+
+/* __dret: with data through U, where a function leaves a double result
+   (D, X, Y and U can't hold it: U is the data pointer); a common
+   symbol, in each module that uses it */
+PUBLIC struct symstruct *dretsym()
+{
+	struct symstruct *symptr;
+
+	if ((symptr = findlorg("__dret")) == NULL ||
+	    symptr->level != GLBLEVEL)
+		symptr = addglb("__dret", dtype);
+	return symptr;
+}
+
+/* copy __dret to the stack at offset (the place saved for the result) */
+PUBLIC void dretcopy(offset)
+offset_T offset;
+{
+	struct symstruct *source;
+	struct symstruct target;
+	int i;
+
+	for (i = 0; i < 8; i += 2) {
+		source = exprsym(dretsym());
+		source->type = itype;
+		source->indcount = 1;
+		source->offset.offi = i;
+		load(source, DREG);
+		target = *source;
+		target.storage = LOCAL;
+		target.flags = 0;	/* (not TEMP: that pops it) */
+		target.level = EXPRLEVEL;
+		target.indcount = 1;
+		target.offset.offi = offset + i;
+		storereg(DREG, &target);
+	}
+}
