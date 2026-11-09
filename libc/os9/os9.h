@@ -26,8 +26,18 @@ extern int __os9errno();	/* (b): errno for OS-9's error code b */
 #define OS9_GETSTT	7
 #define OS9_SETSTT	8
 #define OS9_DELETE	9
+#define OS9_READ	10
+#define OS9_MAKDIR	11
+#define OS9_CHGDIR	12
+#define OS9_MEM		13
 
 #define OS9_FAILED(r)	((r)->cc & 1)
+
+/* every register 0, before a call sets those it uses: OS-9 may read
+   others (with what was on the stack in A and Y, I$MakDir gave a new
+   directory nearly all of a disk) */
+#define OS9_CLEAR(r)	((r)->cc = (r)->a = (r)->b = (r)->dp = 0, \
+			 (r)->x = (r)->y = (r)->u = 0)
 
 /* OS-9's error codes */
 #define E_BPNUM	0xc9		/* bad path number */

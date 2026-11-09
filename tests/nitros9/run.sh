@@ -17,7 +17,8 @@
 # default) and the CoCo 3's ROM ($COCO3_ROM, by default
 # /usr/share/mame/roms/coco3.rom).  XRoar runs without a window (-ui
 # null), and is stopped after 15 minutes if it hasn't finished.
-# NITROS9_KEEP=1 keeps the files (the disk, the outputs).
+# NITROS9_KEEP=1 keeps the files (the disk, the outputs), and
+# NITROS9_PROGS="a b" runs only those programs.
 
 top=$(cd "$(dirname "$0")/../.." && pwd)
 dir=$top/tests/nitros9
@@ -25,7 +26,7 @@ disk=${NITROS9_DISK:-$HOME/coco/nitros9.os9}
 rom=${COCO3_ROM:-/usr/share/mame/roms/coco3.rom}
 # (os9io is given the parameters "one two"; the module names are the
 # programs', none of them a NitrOS-9 command)
-progs="os9io hello pftest chartest sadd fltcc fpio inttest protoarg"
+progs=${NITROS9_PROGS:-os9io os9dir hello pftest chartest sadd fltcc fpio inttest protoarg}
 
 for prog in xroar os9; do
 	if ! command -v $prog > /dev/null 2>&1; then

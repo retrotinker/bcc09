@@ -28,7 +28,11 @@
 ;BCC_EOS
 ; 20 typedef long time_t;
 ;BCC_EOS
-; 21 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 21 typedef unsigned int mode_t;
+;BCC_EOS
+; 22 typedef long ino_t;
+;BCC_EOS
+; 23 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 5  
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
@@ -185,8 +189,9 @@ _ok:
 _sign:
 ;BCC_EOS
 ; 35 {
-; 36 	return n < 0 ? -1 : n > 0;
+; 36 	return n < 0 ? -1 : n >
 	PSHS	X
+; 36  0;
 ; Debug: lt int = const 0 to int n = [S+2-2] (used reg = )
 	LDD	0,S
 		BGE	.8
@@ -218,7 +223,6 @@ _sign:
 ; 42 {
 	EXPORT	_lengths
 _lengths:
-; 43 
 ; 43 	int i;
 ;BCC_EOS
 ; 44 
@@ -1918,7 +1922,8 @@ _searches:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 123 	ok(57,strrchr(s,'l')== s + 10);
+; 123 	ok(57,strrchr(
+; 123 s,'l')== s + 10);
 ; Debug: expression subtree swapping
 ; Debug: list int = const $6C (used reg = )
 	LDD	#$6C
@@ -1950,8 +1955,7 @@ _searches:
 	LEAS	2,S
 ;BCC_EOS
 ; 124 
-; 125 	ok(58,memchr(s,'w',12)== s + 
-; 125 7);
+; 125 	ok(58,memchr(s,'w',12)== s + 7);
 ; Debug: expression subtree swapping
 ; Debug: list unsigned int = const $C (used reg = )
 	LDD	#$C
@@ -3588,7 +3592,8 @@ _memories:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 210 	ok(101,buf2[2] == 'c' && buf2[3] == 'z');
+; 210 	ok(101
+; 210 ,buf2[2] == 'c' && buf2[3] == 'z');
 ; Debug: logeq int = const $63 to char = [buf2+2] (used reg = )
 	LDB	>_buf2+2
 	SUBB	#$63
@@ -3613,8 +3618,7 @@ _memories:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 211 	ok(102,memcc
-; 211 py(buf2,"abcdef",'x',6)== 0 && buf2[5] == 'f');
+; 211 	ok(102,memccpy(buf2,"abcdef",'x',6)== 0 && buf2[5] == 'f');
 	LOC	1
 .147:
 	FCC	"abcdef"

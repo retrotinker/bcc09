@@ -28,7 +28,11 @@
 ;BCC_EOS
 ; 20 typedef long time_t;
 ;BCC_EOS
-; 21 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 21 typedef unsigned int mode_t;
+;BCC_EOS
+; 22 typedef long ino_t;
+;BCC_EOS
+; 23 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
 ; 44  
 ; 45 struct __stdio_file {
 ; 46   unsigned char *bufpos;    
@@ -135,10 +139,10 @@
 ; 130 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
 ; 131  
-; 132 extern int vprintf () __proto(char*,char*);
+; 132 extern int vprintf () __p
+; 132 roto(char*,char*);
 ;BCC_EOS
-; 133 extern int vfprintf () __proto
-; 133 (FILE*,char*,char*);
+; 133 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
 ; 134 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
@@ -235,7 +239,8 @@
 ; 10 int checks, failures;
 ;BCC_EOS
 ; 11 
-; 12 void ok(n,cond)
+; 12 void ok(n
+; 12 ,cond)
 ; 13 int n, cond;
 	EXPORT	_ok
 _ok:
@@ -252,8 +257,7 @@ _ok:
 	LDD	4,S
 		BNE	.1
 .2:
-; 17 		
-; 17 ++failures;
+; 17 		++failures;
 ; Debug: preinc int = [failures+0] (used reg = )
 	LDD	>_failures
 	ADDD	#1
@@ -1214,14 +1218,14 @@ _others:
 	JSR	>_printf
 	LEAS	6,S
 ;BCC_EOS
-; 97 	printf("[%ld][%li][%lu][%lx][%lX][%lo]\n",-1L,123456L,300000
+; 97 	printf("[%l
+; 97 d][%li][%lu][%lx][%lX][%lo]\n",-1L,123456L,3000000000UL,
 	LOC	1
 .62:
 	FCC	"[%ld][%li][%lu][%lx][%lX][%lo]"
 	FCB	$A
 	FCB	0
 	LOC	0
-; 97 0000UL,
 ; 98 0xdeadbeefUL,0xcafeUL,8L);
 ; Debug: list long = const 8 (used reg = )
 	LDD	#0

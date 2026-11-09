@@ -28,7 +28,11 @@
 ;BCC_EOS
 ; 20 typedef long time_t;
 ;BCC_EOS
-; 21 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 21 typedef unsigned int mode_t;
+;BCC_EOS
+; 22 typedef long ino_t;
+;BCC_EOS
+; 23 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
 ; 44  
 ; 45 struct __stdio_file {
 ; 46   unsigned char *bufpos;    
@@ -135,10 +139,10 @@
 ; 130 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
 ; 131  
-; 132 extern int vprintf () __proto(char*,char*);
+; 132 extern int vprintf () _
+; 132 _proto(char*,char*);
 ;BCC_EOS
-; 133 extern int vfprintf () __pro
-; 133 to(FILE*,char*,char*);
+; 133 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
 ; 134 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
@@ -525,7 +529,8 @@ FCC	"%d %d %d %d"
 FCB	$A
 FCB	0
 LOC	0
-; 80 sc_low(127));
+; 80 sc_lo
+; 80 w(127));
 ; Debug: rootlist int = const $7F (used reg = )
 LDX	#$7F
 ; Debug: func () char = sc_low+0 (used reg = )
@@ -564,14 +569,13 @@ LDX	#.B
 JSR	>_printf
 LEAS	8,S
 ;BCC_EOS
-; 81 	printf("%d %d %d\n",uc_clip(300),uc_cli
+; 81 	printf("%d %d %d\n",uc_clip(300),uc_clip(77),uc_clip(256));
 LOC	1
 .C:
 FCC	"%d %d %d"
 FCB	$A
 FCB	0
 LOC	0
-; 81 p(77),uc_clip(256));
 ; Debug: rootlist unsigned int = const $100 (used reg = )
 LDX	#$100
 ; Debug: func () unsigned char = uc_clip+0 (used reg = )

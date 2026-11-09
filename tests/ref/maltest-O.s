@@ -28,7 +28,11 @@
 ;BCC_EOS
 ; 20 typedef long time_t;
 ;BCC_EOS
-; 21 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 21 typedef unsigned int mode_t;
+;BCC_EOS
+; 22 typedef long ino_t;
+;BCC_EOS
+; 23 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 5  
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
@@ -104,10 +108,10 @@
 ; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/lib/bcc09/include/string.h"
-; 10 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 10 # 5 "../prefix.tmp/lib/bc
+; 4 c09/include/stddef.h"
 ; 5  
-; 6 # 13 "../prefix.tmp/lib/b
-; 12 cc09/include/string.h"
+; 6 # 13 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
@@ -195,16 +199,18 @@
 ;BCC_EOS
 ; 28 extern int unlink () __proto(char *);
 ;BCC_EOS
-; 29 
+; 29 extern int chdir () __proto(char *);	 
+;BCC_EOS
 ; 30 
-; 31  
-; 32 extern int brk () __proto(void *);
+; 31 
+; 32  
+; 33 extern int brk () __proto(void *);
 ;BCC_EOS
-; 33 extern void * sbrk () __proto(int);
+; 34 extern void * sbrk () __proto(int);
 ;BCC_EOS
-; 34 extern unsigned int __heap_margin;
+; 35 extern unsigned int __heap_margin;
 ;BCC_EOS
-; 35 # 15 "maltest.c"
+; 36 # 15 "maltest.c"
 ; 15 extern int putchar();
 ;BCC_EOS
 ; 16 extern void putnum();
@@ -244,7 +250,8 @@ BNE	.3
 PULS	Y,PC
 ; 26 
 ; 27  
-; 28 void ok(n,cond)
+; 28 void o
+; 28 k(n,cond)
 ; 29 int n, cond;
 EXPORT	_ok
 _ok:
@@ -278,8 +285,7 @@ LDX	#.7
 ; Debug: func () void = say+0 (used reg = )
 JSR	>_say
 ;BCC_EOS
-; 35 		putnum
-; 35 (n);
+; 35 		putnum(n);
 ; Debug: rootlist int n = [S+2-2] (used reg = )
 LDX	0,S
 ; Debug: func () void = putnum+0 (used reg = )
@@ -1426,7 +1432,8 @@ LEAX	D,X
 LDD	2,S
 STD	0,X
 ;BCC_EOS
-; 164 				fill(p,s,sz);
+; 164 				f
+; 164 ill(p,s,sz);
 ; Debug: list int sz = [S+$C-$A] (used reg = )
 LDD	2,S
 PSHS	D
@@ -1472,8 +1479,7 @@ STD	0,X
 .63:
 BRA	.64
 .56:
-; 170 			sz = 1 +
-; 170  rnd(300);
+; 170 			sz = 1 + rnd(300);
 ; Debug: rootlist int = const $12C (used reg = )
 LDX	#$12C
 ; Debug: func () int = rnd+0 (used reg = )

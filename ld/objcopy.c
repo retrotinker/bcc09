@@ -352,9 +352,10 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 	namelen = strlen(objname);
 
 	/* The data area: the program's data and BSS (bcc09 -Mo: at 0, U
-	   pointing at them), then -d bytes (or the heap ld09 -H asked
-	   for, or 1K) for the stack and heap.  The data's image follows the
-	   code, and the start-up code copies it and clears the BSS. */
+	   pointing at them), then -d bytes (or ld09 -H's, or 1K) for the
+	   stack (bcc09's libc grows the heap after the data area, with
+	   F$Mem).  The data's image follows the code, and the start-up
+	   code copies it and clears the BSS. */
 	heapsize = header.a_total - header.a_text -
 			header.a_data - header.a_bss;
 	if (!datasize)
@@ -392,7 +393,7 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 	*((unsigned short *)&os9hdr[9]) =
 		htobe16(sizeof(os9hdr) + header.a_entry);
 
-	/* Request data, stack and heap (F$Fork adds the parameters) */
+	/* Request data and stack (F$Fork adds the parameters) */
 	*((unsigned short *)&os9hdr[11]) = htobe16(datasize);
 
 	os9_crc_adjust(os9hdr, sizeof(os9hdr));

@@ -18,5 +18,7 @@ typedef int ptrdiff_t;
 
 typedef long off_t;
 typedef long time_t;
+typedef unsigned int mode_t;
+typedef long ino_t;
 
 #endif

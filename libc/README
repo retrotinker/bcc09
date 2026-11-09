@@ -178,8 +178,8 @@ files, so fopen() returns NULL.
 os9 is for OS-9 Level 1 and 2 (and NitrOS-9) program modules: bcc09
 -Mo links a program with its data at 0 (ld09 -i), and "objcopy09 -O os9
 -n name prog.out name" makes the module, whose data area holds the
-program's data and BSS and then the stack and heap (objcopy09 -d sets
-their size, 1K if neither it nor ld09 -H does).  The code is
+program's data and BSS and then the stack (objcopy09 -d sets its size,
+1K if neither it nor ld09 -H does).  The code is
 position-independent, and the data is reached through U, which points
 at the data area.  crtos9 (os9/crt0.s) copies the data's image from the
 module to the data area, clears the BSS, calls the init functions
@@ -187,8 +187,13 @@ module to the data area, clears the BSS, calls the init functions
 addresses, which aren't known until the program runs), and calls main
 with argc and argv from the parameters F$Fork passed (os9/start.c:
 argv[0] is the module's name, and the parameters are split at blanks,
-with "..." kept together).  The heap is between the end of
-the BSS and the stack (os9/sbrk.c).  The system functions (os9/sys.c)
+with "..." kept together).  The heap grows from the end of the data
+area F$Fork gave, which F$Mem makes bigger as it needs (os9/sbrk.c), in
+whole pages; Level 1 can do that only if the memory after the data area
+is free.  Memory malloc gets isn't given back to OS-9 until the program
+exits, and a malloc that fails takes what it can get first (dev86's
+malloc does), which on OS-9 is memory other processes could have used.
+The system functions (os9/sys.c)
 make OS-9's system calls (os9/call.s): read() and write() use I$ReadLn
 and I$WritLn, which a terminal edits, echoes and ends with a line feed a
 line at a time, so read() gives at most a line (up to a CR, OS-9's end
@@ -197,7 +202,16 @@ writes '\r' (or "\r\n") to end a line on OS-9, and reads lines that end
 with '\r'; open()
 uses I$Open and I$Create (O_CREAT, O_EXCL, O_TRUNC through SS.Size,
 O_APPEND), lseek() I$Seek and I$GetStt's SS.Pos and SS.Size, isatty()
-SS.Opt's device type (SCF), and unlink() and remove() I$Delete.  OS-9's
+SS.Opt's device type (SCF), and unlink() and remove() I$Delete.
+mkdir() (sys/stat.h) uses I$MakDir, with the owner's and the others'
+permissions in the mode as OS-9's attributes, chdir() I$ChgDir for the
+data directory, and opendir(), readdir(), rewinddir() and closedir()
+(dirent.h) read RBF's 32-byte entries (".." and "." among them; d_ino
+is the file descriptor's LSN) from the directory opened with DIR.
+There is no rmdir() (OS-9 deletes a directory only after its
+attributes are changed) or getcwd().  Each call clears the registers it
+doesn't set: with whatever was on the stack in them, I$MakDir once gave
+a new directory nearly all of a disk.  OS-9's
 errors become errno's ENOENT, EBADF, EACCES, EEXIST, ENOMEM or, for the
 rest, EIO.  "make check" runs such modules on sim6809 --os9, which
 emulates these calls on host files (tests/sim), and "make check-nitros9"

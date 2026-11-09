@@ -85,3 +85,15 @@ stubs:	swi2
 	swi2
 	fcb	$87		; 9: I$Delete
 	rts
+	swi2
+	fcb	$89		; 10: I$Read
+	rts
+	swi2
+	fcb	$85		; 11: I$MakDir
+	rts
+	swi2
+	fcb	$86		; 12: I$ChgDir
+	rts
+	swi2
+	fcb	$07		; 13: F$Mem
+	rts

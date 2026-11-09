@@ -26,9 +26,10 @@ extern int close __P ((int));
 extern off_t lseek __P ((int, off_t, int));
 extern int isatty __P ((int));
 extern int unlink __P ((__const char *));
+extern int chdir __P ((__const char *));	/* (OS-9's) */
 
 /* move the end of the heap (see sbrk.s); the heap stays __heap_margin
-   bytes below the stack pointer */
+   bytes below the stack pointer (but on OS-9, where it is above it) */
 extern int brk __P ((void *));
 extern void * sbrk __P ((int));
 extern unsigned int __heap_margin;

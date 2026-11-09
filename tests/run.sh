@@ -362,7 +362,9 @@ done
 # OS-9 modules (bcc09 -Mo: crtos9.o and libos9.a), made by objcopy09 and
 # run by sim6809 --os9 at $0100 with the data area after the module:
 # os9io.c, given the parameters "one two", checks the arguments, files
-# (open, read, write, lseek, close, unlink and stdio's) and isatty; and
+# (open, read, write, lseek, close, unlink and stdio's) and isatty;
+# os9dir.c, malloc beyond the data area (F$Mem) and directories (mkdir,
+# chdir, opendir, readdir; the directory it makes is removed after); and
 # the programs above that the host's compiler checks, and hello.c, must
 # run as they do on sim6809; not those that read lines (echo.c,
 # sftest.c: OS-9's end with a CR, which libc passes on as it is),
@@ -385,6 +387,11 @@ os9run() {	# $1 = name; the rest, sim6809's options
 os9run os9io --param "one two"
 mv os9io-os9.run os9io.run
 mv os9io-os9.run.rc os9io.run.rc
+rm -rf os9dir.tmp
+os9run os9dir
+mv os9dir-os9.run os9dir.run
+mv os9dir-os9.run.rc os9dir.run.rc
+rm -rf os9dir.tmp
 for f in hello pftest chartest sadd fltcc fpio inttest protoarg; do
 	os9run $f
 	if cmp -s $f.run $f-os9.run &&

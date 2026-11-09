@@ -12,6 +12,9 @@
 ; see libc/sa/crt0.s; cc1 -Mo makes one for each module whose data
 ; starts with addresses, which the data can't hold), then main(argc,
 ; argv) by way of __os9start (os9/start.c), and exit() with its result.
+; It keeps where the data area starts and ends (U and Y) in __dbase and
+; __dtop, for sbrk (os9/sbrk.c): the heap grows from the end, with F$Mem,
+; and the stack has the rest, down from the parameters.
 ;
 ; Written for bcc09.  Like the rest of libc, it is distributed under the
 ; GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -22,6 +25,9 @@
 	loc	5		; (and these in segment 5)
 	import	__seg5DL
 	import	__seg5DH
+	.data
+	import	___dbase
+	import	___dtop
 
 	.text
 	entry	start
@@ -29,7 +35,8 @@
 	import	___os9start
 	import	_exit
 
-start:	pshs	d,x		; 0,S: the parameters' length  2,S: them
+start:	pshs	d,x,y		; 0,S: the parameters' length  2,S: them
+				; 4,S: the data area's end
 	leay	__btext,pcr	; the module's header is just before the
 	leay	-13,y		; code; at 4 in it, where its name is
 	ldd	4,y
@@ -57,6 +64,9 @@ clear:	cmpy	,s
 	clr	,y+
 	bra	clear
 init0:	leas	2,s		; 0,S: the name  2,S: length  4,S: parameters
+	ldd	6,s		;   6,S: the data area's end
+	std	___dtop,u
+	stu	___dbase,u
 	leax	__seg5DL,u	; the init functions (their table is in
 init:	leay	__seg5DH,u	; the data, copied by now)
 	pshs	y

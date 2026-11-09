@@ -1,0 +1,5 @@
+malloc: 24 blocks of 1000, and one of 20000
+. .. one two
+. .. one two
+. ..
+checks 32 failures 0

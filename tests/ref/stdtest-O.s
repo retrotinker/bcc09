@@ -52,7 +52,11 @@
 ;BCC_EOS
 ; 20 typedef long time_t;
 ;BCC_EOS
-; 21 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
+; 21 typedef unsigned int mode_t;
+;BCC_EOS
+; 22 typedef long ino_t;
+;BCC_EOS
+; 23 # 5 "../prefix.tmp/lib/bcc09/include/stddef.h"
 ; 5  
 ; 6 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
 ; 5  
@@ -112,10 +116,10 @@
 ; 43  
 ; 44 extern char * itoa () __proto(int);
 ;BCC_EOS
-; 45 extern char * ltoa () __proto(long);
+; 45 extern char * ltoa (
+; 45 ) __proto(long);
 ;BCC_EOS
-; 46 extern char * ultoa () __proto(u
-; 46 nsigned long);
+; 46 extern char * ultoa () __proto(unsigned long);
 ;BCC_EOS
 ; 47 extern char * ltostr () __proto(long,int);
 ;BCC_EOS
@@ -364,7 +368,8 @@ STB	0,X
 ;BCC_EOS
 ; 56 	do {
 .11:
-; 57 		*--p = '0' + (int) (u % 10);
+; 57 		*--p = '0'
+; 57  + (int) (u % 10);
 ; Debug: mod unsigned long = const $A to unsigned long u = [S+$16-$16] (used reg = )
 CLRA
 CLRB
@@ -411,9 +416,8 @@ JSR	>ltst_b
 BNE	.11
 .12:
 ;BCC_EOS
-; 60 	if (
+; 60 	if (l < 0)
 .F:
-; 60 l < 0)
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
 CLRA
 CLRB
@@ -1446,7 +1450,8 @@ TFR	D,X
 ; Debug: func () void = putnum+0 (used reg = )
 JSR	>_putnum
 ;BCC_EOS
-; 132 	putlong((long)strtoul(s,&end,base)& 0xffffL);
+; 132 	putlong((long)strtoul(s,&end,bas
+; 132 e)& 0xffffL);
 ; Debug: list int base = [S+4+2] (used reg = )
 LDD	6,S
 PSHS	D
@@ -1487,7 +1492,6 @@ JSR	>_putnum
 PULS	U,Y,PC
 ; 135 
 ; 136 void numbers()
-; 136 
 ; 137 {
 EXPORT	_numbers
 _numbers:
@@ -2907,13 +2911,13 @@ LDX	#$2D
 JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
-; 221 	ok(46,strcmp(ltoa(2147483647L ),"2147483647")== 0);
+; 221 	ok
+; 221 (46,strcmp(ltoa(2147483647L ),"2147483647")== 0);
 LOC	1
 .10E:
 FCC	"2147483647"
 FCB	0
 LOC	0
-; 221 
 ; Debug: list * char = .10E+0 (used reg = )
 LDX	#.10E
 PSHS	X
@@ -4096,7 +4100,8 @@ LEAS	2,S
 LDB	#$71
 STB	2,S
 ;BCC_EOS
-; 314 	rp = (struct rec *) bsearch(&k,r,7,sizeof(r[0]),rcmp);
+; 314 	rp = (struct rec *) bsearch(&k,r,7,sizeof(r[0]),rcmp
+; 314 );
 ; Debug: cast * () int = const 0 to () int = rcmp+0 (used reg = )
 ; Debug: list * () int = rcmp+0 (used reg = )
 LDX	#_rcmp
@@ -4153,8 +4158,7 @@ JSR	>_ok
 LEAS	$76,S
 RTS
 ; 317 
-; 318 void rand
-; 318 oms()
+; 318 void randoms()
 ; 319 {
 EXPORT	_randoms
 _randoms:

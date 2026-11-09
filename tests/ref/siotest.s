@@ -30,7 +30,11 @@
 ;BCC_EOS
 ; 20 typedef long time_t;
 ;BCC_EOS
-; 21 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 21 typedef unsigned int mode_t;
+;BCC_EOS
+; 22 typedef long ino_t;
+;BCC_EOS
+; 23 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
 ; 44  
 ; 45 struct __stdio_file {
 ; 46   unsigned char *bufpos;    
@@ -137,10 +141,10 @@
 ; 130 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
 ; 131  
-; 132 extern int vprintf () __proto(char*,char*);
+; 132 extern int vprintf () __p
+; 132 roto(char*,char*);
 ;BCC_EOS
-; 133 extern int vfprintf () __proto
-; 133 (FILE*,char*,char*);
+; 133 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
 ; 134 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
@@ -236,10 +240,10 @@
 ;BCC_EOS
 ; 49 extern size_t strcspn () __proto(char *,char *);
 ;BCC_EOS
-; 50 extern size_t strspn () __proto(char *,char *);
+; 50 extern size_t strspn () _
+; 50 _proto(char *,char *);
 ;BCC_EOS
-; 51 # 5 "../prefix.tmp/lib/bcc
-; 4 09/include/unistd.h"
+; 51 # 5 "../prefix.tmp/lib/bcc09/include/unistd.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -261,16 +265,18 @@
 ;BCC_EOS
 ; 28 extern int unlink () __proto(char *);
 ;BCC_EOS
-; 29 
+; 29 extern int chdir () __proto(char *);	 
+;BCC_EOS
 ; 30 
-; 31  
-; 32 extern int brk () __proto(void *);
+; 31 
+; 32  
+; 33 extern int brk () __proto(void *);
 ;BCC_EOS
-; 33 extern void * sbrk () __proto(int);
+; 34 extern void * sbrk () __proto(int);
 ;BCC_EOS
-; 34 extern unsigned int __heap_margin;
+; 35 extern unsigned int __heap_margin;
 ;BCC_EOS
-; 35 # 11 "siotest.c"
+; 36 # 11 "siotest.c"
 ; 11 int checks, failures;
 ;BCC_EOS
 ; 12 
@@ -949,7 +955,8 @@ _input:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 68 	ok(14,fgets(buf,sizeof(buf),stdin)== buf
+; 68 	ok(14,fgets(buf,sizeof(buf),stdin)=
+; 68 = buf
 ; 69 	   && strcmp(buf," line\n")== 0);
 	LOC	1
 .39:
@@ -1001,8 +1008,7 @@ _input:
 	LEAS	2,S
 ;BCC_EOS
 ; 70 	ok(15,fgets(buf,sizeof(buf),stdin)== buf
-; 71 	   &
-; 71 & strcmp(buf,"second\n")== 0);
+; 71 	   && strcmp(buf,"second\n")== 0);
 	LOC	1
 .3E:
 	FCC	"second"

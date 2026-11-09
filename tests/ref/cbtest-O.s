@@ -28,7 +28,11 @@
 ;BCC_EOS
 ; 20 typedef long time_t;
 ;BCC_EOS
-; 21 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
+; 21 typedef unsigned int mode_t;
+;BCC_EOS
+; 22 typedef long ino_t;
+;BCC_EOS
+; 23 # 44 "../prefix.tmp/lib/bcc09/include/stdio.h"
 ; 44  
 ; 45 struct __stdio_file {
 ; 46   unsigned char *bufpos;    
@@ -135,10 +139,10 @@
 ; 130 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
 ; 131  
-; 132 extern int vprintf () __proto(char*,char*);
+; 132 extern int vprintf () __p
+; 132 roto(char*,char*);
 ;BCC_EOS
-; 133 extern int vfprintf () __proto
-; 133 (FILE*,char*,char*);
+; 133 extern int vfprintf () __proto(FILE*,char*,char*);
 ;BCC_EOS
 ; 134 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
@@ -233,10 +237,10 @@
 ;BCC_EOS
 ; 48 extern char * ultostr () __proto(unsigned long,int);
 ;BCC_EOS
-; 49 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 49 # 5 "../prefix.tmp/lib/bcc09/
+; 4 include/string.h"
 ; 5  
-; 6 # 6 "../prefix.tmp/lib/bcc09/
-; 5 include/features.h"
+; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
 ; 7 # 9 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
