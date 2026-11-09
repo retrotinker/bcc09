@@ -143,6 +143,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   rules (checked 2026-11-08) favor size: `LDD #0` becomes `CLRA`/`CLRB` (a byte smaller,
   a cycle slower), only before instructions that don't read C; adjacent `LEAS n,S` are
   merged.
+- `doc/manual.md` is the user's manual (added 2026-11-09); `make docs` (`doc/mkmanual.sh`:
+  pandoc, its man reader for the pages, which are its Appendix A, and xelatex, with
+  `doc/tex/footnotehyper.sty` from plm09) makes `doc/manual.pdf`, which is committed.
+  When a change alters what a program or target does, update the man page and the
+  manual (and run `make docs`) in the same commit, as libc/README and this file.
 - `doc/man/` has the man pages (added 2026-11-09): `bcc09.1`, `as09.1`, `ld09.1`, `ar09.1`,
   `objdump09.1` (`nm09.1` and `size09.1` are `.so` links to it) and `objcopy09.1`, written
   from the sources and checked against the tools; `make install` puts them in

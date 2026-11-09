@@ -3,7 +3,7 @@ MANDIR=$(PREFIX)/share/man
 
 DIRS=ar as bcc copt cpp ld unproto libc
 
-.PHONY: all check check-xroar check-nitros9 check-flex clean install
+.PHONY: all check check-xroar check-nitros9 check-flex docs clean install
 
 all: $(DIRS)
 	for i in $^ ;\
@@ -28,6 +28,13 @@ check-nitros9: all
 
 check-flex: all
 	tests/flex/run.sh
+
+# the user's manual, doc/manual.pdf (with pandoc and xelatex): run after
+# changing doc/manual.md or a man page, and commit the PDF
+docs: doc/manual.pdf
+
+doc/manual.pdf: doc/manual.md doc/man/*.1 doc/mkmanual.sh doc/tex/*.sty
+	doc/mkmanual.sh
 
 $(SIM): tests/sim/*.c tests/sim/*.h
 	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.6"' -o $@ tests/sim/*.c

@@ -28,7 +28,10 @@ ld09(1), ar09(1), objdump09(1) (also nm09 and size09) and objcopy09(1),
 and bcc09's passes, bcc09-cpp(1), bcc09-unproto(1), bcc09-cc1(1) and
 bcc09-copt(1);
 "make install" puts them in $(PREFIX)/share/man ("man -l doc/man/bcc09.1"
-reads one in place).
+reads one in place).  doc/manual.pdf is the user's manual: how to build
+and install bcc09, the C it compiles, each target, the C library, the
+calling conventions, and the tools, with the man pages as an appendix
+("make docs" makes it again from doc/manual.md and the man pages).
 
 The resulting binary can be loaded onto your 6809-based target device
 using whatever tools you have available to you.  Loading that code

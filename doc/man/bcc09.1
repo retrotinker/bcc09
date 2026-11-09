@@ -46,12 +46,16 @@ and
 .BR double ,
 and an unsigned
 .BR char ;
-.B const
-and
-.B volatile
-are accepted and ignored, and
 .B _Bool
 is C99's.
+The compiler doesn't know
+.B const
+and
+.BR volatile :
+the C library's headers define them away (in features.h), so a program
+that uses them must include one of the headers (or
+.BI \-D const=\c
+).
 .PP
 A file's suffix says what it is:
 .TP
