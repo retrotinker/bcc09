@@ -285,7 +285,8 @@ char *mtype;
 char *str;
 {
 	if (c_fname && (*c_fname || c_lineno))
-		fprintf(stderr, "%s:%d: ", c_fname, c_lineno);
+		fprintf(stderr, "%s:%d: ", c_fname,
+			c_dirline ? c_dirline : c_lineno);
 
 	if (mtype && *mtype)
 		fprintf(stderr, "%s: %s\n", mtype, str);

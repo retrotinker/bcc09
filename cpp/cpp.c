@@ -51,6 +51,8 @@ int dialect = 0;
 FILE *curfile;
 char *c_fname;
 int c_lineno = 0;
+int c_dirline = 0;	/* (a message about a directive gives its line, not
+			   the next, which may have been read) */
 
 /* a value in #if: 32 bits, as a long or an unsigned long (u) has on the
    target, kept in an unsigned long (of 32 bits or more) */
@@ -106,6 +108,7 @@ static int do_proc_copy_hashline P((void));
 static int do_proc_if P((int));
 static void do_proc_include P((void));
 static void do_proc_define P((void));
+static void do_proc_line P((void));
 static void do_proc_undef P((void));
 static void do_proc_else P((void));
 static void do_proc_endif P((void));
@@ -113,6 +116,7 @@ static void do_proc_tail P((void));
 static int get_if_expression P((void));
 static struct pp_val get_expression P((int));
 static struct pp_val get_exp_value P((void));
+static long sval P((unsigned long v));
 static void gen_substrings P((char *, char *, int, int));
 static char *insert_substrings P((char *, struct arg_store *, int));
 
@@ -677,7 +681,19 @@ static int realchget()
 	}
 }
 
+static int do_preproc1 P((void));
+
 static int do_preproc()
+{
+	int val;
+
+	c_dirline = c_lineno;
+	val = do_preproc1();
+	c_dirline = 0;
+	return val;
+}
+
+static int do_preproc1()
 {
 	int val, no_match = 0;
 
@@ -718,9 +734,7 @@ static int do_preproc()
 				pgetc();
 				/* Ignore #pragma ? */
 			} else if (strcmp(curword, "line") == 0) {
-				do_proc_copy_hashline();
-				pgetc();
-				/* Ignore #line for now. */
+				do_proc_line();
 			} else if (strcmp(curword, "asm") == 0) {
 				alltok |= 0x100;
 				return do_proc_copy_hashline();
@@ -799,8 +813,15 @@ static void do_proc_include()
 				if (fd) {
 					fi_count++;
 					curfile = fd;
-				} else
-					cerror("Cannot open include file");
+				} else {
+					char *msg = malloc(strlen(p) + 32);
+
+					sprintf(msg, "Cannot open include file %c%s%c",
+						ch == '"' ? '"' : '<', p,
+						ch == '"' ? '"' : '>');
+					cerror(msg);
+					free(msg);
+				}
 
 				return;
 			}
@@ -811,6 +832,45 @@ static void do_proc_include()
 	while (ch != '\n')
 		ch = pgetc();
 	return;
+}
+
+/* #line number "file": the next line is that number, in that file */
+static void do_proc_line()
+{
+	int ch, n = 0, digits = 0;
+	char *p;
+
+	do
+		ch = pgetc();
+	while (ch == ' ' || ch == '\t');
+	while (ch >= '0' && ch <= '9') {
+		n = n * 10 + ch - '0';
+		digits++;
+		ch = pgetc();
+	}
+	while (ch == ' ' || ch == '\t')
+		ch = pgetc();
+	if (!digits) {
+		cerror("Bad #line command");
+	} else if (ch == '"') {
+		p = curword;
+		while ((ch = pgetc()) != '"' && ch != '\n' && ch != EOF &&
+		       p < curword + WORDSIZE - 1)
+			*p++ = ch;
+		*p = '\0';
+		if (ch != '"')
+			cerror("Bad #line command");
+		else {
+			c_fname = strdup(curword);	/* (the old one may be
+							   argv's, or saved) */
+			ch = pgetc();
+		}
+	}
+	while (ch != '\n' && ch != EOF)
+		ch = pgetc();
+	unchget(ch);
+	if (digits)
+		c_lineno = n - 1;	/* (the newline counts one) */
 }
 
 static void do_proc_define()
@@ -1361,6 +1421,8 @@ static struct pp_val get_exp_value()
 		} else
 			curtok = get_onetok(SKIP_SPACE);
 
+	} else if (curtok == '\n') {
+		cerror("Expected a value in #if");
 	} else if (curtok == '(') {
 		r = get_expression(0);
 		if (curtok == ')')

@@ -35,5 +35,5 @@ int unsigned_ok;
 # 61
 int line = 61;
 char *file = "cpp.c";
-
-int line2 = 64;
+# 500 "renamed.c"
+int line2 = 500;

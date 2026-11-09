@@ -16,6 +16,7 @@ extern FILE * curfile;
 extern char   curword[];
 extern char * c_fname;
 extern int    c_lineno;
+extern int    c_dirline;	/* a directive's line, while it is processed */
 extern int    alltok;
 extern int    dialect;
 

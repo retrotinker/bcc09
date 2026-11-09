@@ -7,17 +7,6 @@ wrong output: fixing the bug changes them, so check the new output and
 update the references (tests/run.sh -u) in the same commit, and remove
 the entry from this file.
 
-cpp
----
-
-- #line is ignored: after '#line 500 "renamed.c"', __LINE__ gives the
-  real line number (64), and __FILE__ isn't renamed.
-  References: cpp.i, cpp-A.i, cpp-D.i, cpp-E.i
-
-- "#if" with no expression isn't an error, and "Cannot open include
-  file" doesn't say which file.
-  References: cpperr.err, cpperr.i
-
 cc1 (code generation)
 ---------------------
 
