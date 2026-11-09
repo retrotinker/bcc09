@@ -230,10 +230,10 @@ $(OBJS) $(SA_OBJS) $(CB_OBJS) $(SIM_OBJS) $(FLEX_OBJS) sa/crt0.o \
 	sim/crtsim.o flex/crt0.o: $(TOOLS)
 
 install: libc.a $(TARGETS)
-	install -d $(LIBDIR) $(LIBDIR)/include/sys
-	install -m 644 libc.a $(TARGETS) $(LIBDIR)
-	install -m 644 include/*.h $(LIBDIR)/include
-	install -m 644 include/sys/*.h $(LIBDIR)/include/sys
+	install -d $(DESTDIR)$(LIBDIR) $(DESTDIR)$(LIBDIR)/include/sys
+	install -m 644 libc.a $(TARGETS) $(DESTDIR)$(LIBDIR)
+	install -m 644 include/*.h $(DESTDIR)$(LIBDIR)/include
+	install -m 644 include/sys/*.h $(DESTDIR)$(LIBDIR)/include/sys
 
 clean realclean clobber:
 	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o cb/*.o sim/*.o flex/*.o \

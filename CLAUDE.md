@@ -29,6 +29,16 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 
 ## Layout
 
+- Version 0.8.0 (decided 2026-11-09; `VERSION` in the Makefile, and `bcc09.spec`): the
+  first release since v0.1 (2014). `make rpm`/`make srpm` (added 2026-11-09) build Fedora
+  packages in `rpmbuild/` from `git archive` of the tag `v$(VERSION)` (HEAD while it
+  isn't tagged), as plm09's do; the spec builds with `PREFIX=/usr`, runs `make check`
+  in `%check`, and its License follows Fedora's dev86 (adding LGPL-2.0-only for bcc09's
+  libc files and SunPro for fdlibm). `bcc09.rpmlintrc` filters what rpmlint says of a
+  cross toolchain's 6809 files. Every install takes `DESTDIR`; every Makefile takes
+  `CFLAGS`/`LDFLAGS` from the environment (rpmbuild's) and adds what it needs
+  (`ALL_CFLAGS`), and nothing is stripped at link time (rpmbuild strips). A release
+  bumps `VERSION`, the spec (with a `%changelog` entry) and the manual's tag.
 - `ld09` writes whole symbol names into an executable (8 characters in each a.out entry,
   the rest in entries after it): its `-y`, the default since 2026-11-08 (`-y-` for the old
   8-character names); `objdump09 -n` joins them.
@@ -280,5 +290,6 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 
 ## Known issues
 
-- The code is K&R C, so every Makefile builds with `-std=gnu89`. Without it, GCC 15 and
+- The code is K&R C, so every Makefile builds with `-std=gnu89` (in `ALL_CFLAGS`, kept
+  when `CFLAGS` is replaced). Without it, GCC 15 and
   later (C23 by default) can't build `bcc/`, `cpp/`, `ld/` or `unproto/`.

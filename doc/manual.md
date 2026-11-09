@@ -72,6 +72,17 @@ environment variable `BCC_PREFIX` names: so a build tree can be used without
 installing it, by pointing `BCC_PREFIX` at a directory of links to it, as
 the tests do.
 
+`make install` also takes `DESTDIR`, a directory to install into as if it
+were the root, for making packages: bcc09 still looks for its files under
+*PREFIX*. The host compiler's options can be set with `CFLAGS` and
+`LDFLAGS` (in the environment or on `make`'s command line); `-std=gnu89`
+and what each program needs are always added.
+
+On Fedora, `make rpm` builds an RPM package from `bcc09.spec`, with
+*PREFIX* `/usr`, in `rpmbuild/`: from the release's tag (`v0.8.0`), or from
+the last commit if that isn't tagged yet. `make srpm` builds the source
+package alone.
+
 # Getting started
 
 A first program:

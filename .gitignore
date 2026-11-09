@@ -23,3 +23,4 @@ tests/sim/sim6809
 libc/*.a
 libc/.bcc/
 libc/os9obj/
+rpmbuild/

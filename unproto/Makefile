@@ -81,8 +81,9 @@ FILES	= $(SOURCES) ../doc/man/unproto.1
 OBJECTS	= tok_io.o tok_class.o tok_pool.o unproto.o vstring.o symbol.o error.o \
 	hash.o strsave.o
 
-CFLAGS	= -O -std=gnu89
-LDFLAGS =
+# CFLAGS and LDFLAGS may come from the environment (rpmbuild's)
+CFLAGS	?= -O
+LDFLAGS ?=
 # For bcc09: in the definition of a function with a variable argument
 # list, put an int parameter named __va_alist where the "..." was, which
 # libc's stdarg.h takes the address of (the first argument is passed in
@@ -91,7 +92,7 @@ VA_ALIST = -D_VA_ALIST_=\"__va_alist\"
 # bcc09: give cc1 prototypes' argument types (see show_proto)
 PROTO	= -D_PROTO_=\"__proto\"
 
-CCFLAGS = $(CFLAGS) -w $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -DREOPEN \
+CCFLAGS = -std=gnu89 $(CFLAGS) -w $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -DREOPEN \
 	  $(VA_ALIST) $(PROTO)
 
 #CFLAGS	= -O $(PIPE) $(SKIP) $(BELL) $(MAP) $(ALIAS) -p -Dstatic=
@@ -127,8 +128,8 @@ clean realclean:
 	rm -f *.o core cpp unproto mon.out varargs.o varargs example.tmp
 
 install: $(PROG)
-	install -d $(LIBEXECDIR)
-	install -m 755 $(PROG) $(LIBEXECDIR)/$(PROG)
+	install -d $(DESTDIR)$(LIBEXECDIR)
+	install -m 755 $(PROG) $(DESTDIR)$(LIBEXECDIR)/$(PROG)
 
 error.o : error.c token.h error.h Makefile
 hash.o : hash.c Makefile

@@ -1,14 +1,17 @@
 PREFIX	=/usr
 LIBEXECDIR	=$(PREFIX)/libexec/bcc09
 
-CFLAGS=-std=gnu89 -Wall -Wstrict-prototypes
+# CFLAGS and LDFLAGS may come from the environment (rpmbuild's)
+CFLAGS?=
+LDFLAGS?=
+ALL_CFLAGS=-std=gnu89 -Wall -Wstrict-prototypes $(CFLAGS)
 
 all: cpp
 
 .PHONY: all clean realclean maintclean install tokens
 
 cpp: main.o cpp.o hash.o token1.o token2.o
-	$(CC) $(CFLAGS) -o cpp main.o cpp.o hash.o token1.o token2.o
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o cpp main.o cpp.o hash.o token1.o token2.o
 
 clean realclean:
 	rm -f cpp main.o cpp.o hash.o token1.o token2.o tmp.h
@@ -17,8 +20,11 @@ maintclean: realclean
 	rm -f token1.h token2.h
 
 install: cpp
-	install -d $(LIBEXECDIR)
-	install -m 755 cpp $(LIBEXECDIR)/cpp
+	install -d $(DESTDIR)$(LIBEXECDIR)
+	install -m 755 cpp $(DESTDIR)$(LIBEXECDIR)/cpp
+
+.c.o:
+	$(CC) $(ALL_CFLAGS) -c $< -o $@
 
 main.o: cc.h
 cpp.o: cc.h

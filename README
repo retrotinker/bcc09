@@ -33,6 +33,9 @@ and install bcc09, the C it compiles, each target, the C library, the
 calling conventions, and the tools, with the man pages as an appendix
 ("make docs" makes it again from doc/manual.md and the man pages).
 
+On Fedora, "make rpm" builds an RPM package (bcc09.spec, installed in
+/usr), in rpmbuild/; "make srpm" builds the source package.
+
 The resulting binary can be loaded onto your 6809-based target device
 using whatever tools you have available to you.  Loading that code
 and making it all work remains as an exercise for the reader...

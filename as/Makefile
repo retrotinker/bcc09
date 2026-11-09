@@ -1,6 +1,7 @@
-
-CFLAGS=-O -std=gnu89
-LDFLAGS=-s
+# CFLAGS and LDFLAGS may come from the environment (rpmbuild's)
+CFLAGS?=-O
+LDFLAGS?=
+ALL_CFLAGS=-std=gnu89 $(CFLAGS)
 LIBDIR=$(PREFIX)/bin
 BINDIR=$(PREFIX)/bin
 
@@ -12,7 +13,7 @@ OBJS		=as.o assemble.o errors.o express.o \
 all: as09
 
 as09: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o $@
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) $(OBJS) -o $@
 
 as86_encap: as86_encap.sh
 	sed -e "s:%%LIBDIR%%:$(LIBDIR):" -e "s:%%BINDIR%%:$(BINDIR):" \
@@ -21,8 +22,8 @@ as86_encap: as86_encap.sh
 	chmod +x $@
 	
 install: all
-	install -d $(LIBDIR)
-	install -m 755 as09 $(LIBDIR)
+	install -d $(DESTDIR)$(LIBDIR)
+	install -m 755 as09 $(DESTDIR)$(LIBDIR)
 #	install -d $(BINDIR)
 #	install -m 755 as86_encap $(BINDIR)/as86_encap
 	-@rm -f tmp
@@ -31,7 +32,7 @@ clean realclean clobber:
 	rm -f *.o as09 as86_encap
 
 .c.o:
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(ALL_CFLAGS) -c $<
 
 $(OBJS): const.h errors.h
 

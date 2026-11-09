@@ -1,14 +1,17 @@
+VERSION=0.8.0
+
 PREFIX=/usr/local/bcc09
 MANDIR=$(PREFIX)/share/man
 
 DIRS=ar as bcc copt cpp ld unproto libc
 
-.PHONY: all check check-xroar check-nitros9 check-flex docs clean install
+.PHONY: all check check-xroar check-nitros9 check-flex docs clean install \
+	rpm srpm FORCE
 
 all: $(DIRS)
 	for i in $^ ;\
 	do \
-		make PREFIX=$(PREFIX) -C $$i || exit 1 ;\
+		$(MAKE) PREFIX=$(PREFIX) -C $$i || exit 1 ;\
 	done
 
 # regression tests: compare outputs with the references in tests/ref,
@@ -44,15 +47,36 @@ $(SIM): tests/sim/*.c tests/sim/*.h
 clean: $(DIRS)
 	for i in $^ ;\
 	do \
-		make PREFIX=$(PREFIX) -C $$i clean || exit 1 ;\
+		$(MAKE) PREFIX=$(PREFIX) -C $$i clean || exit 1 ;\
 	done
 	rm -f $(SIM)
+	rm -rf rpmbuild
 
 install: $(DIRS)
 	for i in $^ ;\
 	do \
-		make PREFIX=$(PREFIX) LIBEXECDIR=$(PREFIX)/libexec/bcc09 \
+		$(MAKE) PREFIX=$(PREFIX) LIBEXECDIR=$(PREFIX)/libexec/bcc09 \
 			-C $$i install || exit 1 ;\
 	done
 	install -d $(DESTDIR)$(MANDIR)/man1
 	install -m 644 doc/man/*.1 $(DESTDIR)$(MANDIR)/man1
+
+# Fedora RPMs, in rpmbuild/.  The tarball is the release tag v$(VERSION),
+# the same files as the GitHub archive the spec's Source0 names, or HEAD
+# while VERSION isn't tagged yet; the spec itself comes from the work tree.
+RPMTOP=$(CURDIR)/rpmbuild
+TARBALL=$(RPMTOP)/SOURCES/bcc09-$(VERSION).tar.gz
+RPMTREE=$(shell git rev-parse -q --verify refs/tags/v$(VERSION) >/dev/null && echo v$(VERSION) || echo HEAD)
+
+$(TARBALL): FORCE
+	mkdir -p $(RPMTOP)/SOURCES
+	@echo "bcc09-$(VERSION).tar.gz from $(RPMTREE)"
+	git archive --format=tar.gz --prefix=bcc09-$(VERSION)/ -o $@ $(RPMTREE)
+	cp -p bcc09.rpmlintrc $(RPMTOP)/SOURCES/
+
+rpm: $(TARBALL)
+	rm -rf $(RPMTOP)/RPMS $(RPMTOP)/SRPMS
+	rpmbuild -ba --define "_topdir $(RPMTOP)" bcc09.spec
+
+srpm: $(TARBALL)
+	rpmbuild -bs --define "_topdir $(RPMTOP)" bcc09.spec

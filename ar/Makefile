@@ -3,19 +3,21 @@
 # distributed under the GNU General Public License.
 
 LIBDIR	=$(PREFIX)/bin
-CFLAGS	=-O -std=gnu89
-LDFLAGS	=
+# CFLAGS and LDFLAGS may come from the environment (rpmbuild's)
+CFLAGS	?=-O
+LDFLAGS	?=
+ALL_CFLAGS=-std=gnu89 $(CFLAGS)
 DEFS	=
 OBJS= ar.o alloca.o
 
 all: ar09
 
 ar09: $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o $@
+	$(CC) $(ALL_CFLAGS) $(LDFLAGS) $(OBJS) -o $@
 
 install: ar09
-	install -d $(LIBDIR)
-	install -m 755 ar09 $(LIBDIR)
+	install -d $(DESTDIR)$(LIBDIR)
+	install -m 755 ar09 $(DESTDIR)$(LIBDIR)
 
 clean realclean clobber:
 	rm -f *.o ar09 ar rel_aout.h
@@ -28,4 +30,4 @@ rel_aout.h:
 	ln ../ld/rel_aout.h .
 
 .c.o:
-	$(CC) $(CFLAGS) $(DEFS) -c $< -o $@
+	$(CC) $(ALL_CFLAGS) $(DEFS) -c $< -o $@
