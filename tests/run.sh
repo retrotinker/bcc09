@@ -299,24 +299,29 @@ done
 # adds and subtracts ints and signed chars; sftest.c prints a grid of
 # sscanf formats and inputs, and reads sftest.in with scanf, which must
 # be the same with the host's scanf; fltcc.c uses floats and doubles in
-# many ways; fpio.c prints and reads them (printf, strtod, scanf); and a
-# target with no start-up code yet can't be linked
-for f in hello echo pftest siotest chartest sadd sftest fltcc fpio; do
+# many ways; fpio.c prints and reads them (printf, strtod, scanf); mtest.c
+# runs math.h's functions; and a target with no start-up code yet can't
+# be linked
+for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
-	"$SIM" -n 500000000 $f.srec < $input > $f.run 2>&1
+	"$SIM" -n 1000000000 $f.srec < $input > $f.run 2>&1
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
-# pftest.c, chartest.c, sadd.c, sftest.c, fltcc.c and fpio.c must print
-# the same with the host's compiler and C library (but for the count of
-# checks, which differs)
-for f in pftest chartest sadd sftest fltcc fpio; do
+# pftest.c, chartest.c, sadd.c, sftest.c, fltcc.c, fpio.c and mtest.c
+# must print the same with the host's compiler and C library (but for the
+# count of checks, which differs); mtest.c with libc/math, the same
+# fdlibm code built on the host, without fused multiply-adds or builtins,
+# which must give the same results bit for bit
+for f in pftest chartest sadd sftest fltcc fpio mtest; do
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
-	if ${CC:-cc} -std=gnu89 -w -o $f-host $f.c > /dev/null 2>&1 &&
+	extra=
+	[ $f = mtest ] && extra="-fno-builtin -ffp-contract=off -I$top/libc/math $top/libc/math/*.c"
+	if ${CC:-cc} -std=gnu89 -w -o $f-host $f.c $extra > /dev/null 2>&1 &&
 	   ./$f-host < $input > $f-host.run 2>&1 &&
 	   grep -v '^checks ' $f.run > $f.cmp &&
 	   grep -v '^checks ' $f-host.run > $f-host.cmp &&
@@ -375,12 +380,12 @@ for f in ops longops fptest strtest stdtest maltest vatest; do
 	fi
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
-for f in hello echo pftest siotest chartest sadd sftest fltcc fpio; do
+for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
-	"$SIM" -n 500000000 $f-O.srec < $input > $f-O.run 2>&1
+	"$SIM" -n 1000000000 $f-O.srec < $input > $f-O.run 2>&1
 	echo $? >> $f-O.run
 	cat $f.run $f.run.rc > $f-plain.run
 	if cmp -s $f-plain.run $f-O.run; then

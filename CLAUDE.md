@@ -23,6 +23,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   - meet or exceed the linker script functionality in the mc6801-tools project
 - verify copt/rules.6809 and expand appropriately
 - target CoCo BASIC, OS-9, FLEX, and Vectrex
+- add stdint.h and stdbool.h to libc
 
 ## Layout
 
@@ -47,7 +48,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `cc1` makes a module that passes floating point to a `*printf` (a pointer to it to a
   `*scanf`) refer to `__xfpcvt` (`__xfptvc`), whose modules (`libc/stdio/xfp*.s`) install
   the code through an init function, so programs without floats don't carry it (decided
-  2026-11-08). No `%a` in `printf` yet, and no `math.h`.
+  2026-11-08). No `%a` in `printf` yet. `math.h` (C89's functions, and `copysign`,
+  `scalbn`, `expm1`, `finite`) is Sun's fdlibm 5.3 in `libc/math/` (its `README` lists
+  the changes: `__i32` for fdlibm's 32-bit ints, big-endian `__HI`/`__LO`, `errno` as
+  glibc sets it), in `libc.a`, a module per function.
   A double argument is always passed on the stack (even the first); a double result is in
   D, X, Y, U (in that order in memory), a float result in D:X; the helpers keep Y and U.
   `libc/README` gives the calling conventions and the changes from dev86.
@@ -68,7 +72,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
   - The others can't link yet.
 - Next: Disk BASIC files for `-Me`, OS-9 (sim6809 has an OS-9 mode, but bcc09's PIC code
-  has a known bug), FLEX, `math.h`, `%a` in `printf`.
+  has a known bug), FLEX, `%a` in `printf`, faster floating point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
@@ -96,7 +100,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 504 reference
+  `tests/src/` with this tree's tools and compare every result with the 510 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -132,7 +136,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   and returned with prototypes, and `sadd.c`, ints and signed chars added and
   subtracted, `sftest.c`, a grid of `sscanf` formats and inputs and `scanf` reading
   `sftest.in`, `fltcc.c`, floats and doubles in many places in C, and `fpio.c`, `printf`'s
-  floating formats, `strtod` and `scanf`'s `%f`, but for their counts of checks);
+  floating formats, `strtod` and `scanf`'s `%f`, but for their counts of checks; and
+  `mtest.c`, `math.h`'s functions, whose results must equal bit for bit those of
+  `libc/math` built on the host);
   `fpoptional.result` checks that `pftest` and `sftest` link none of that code; `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
 - `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
@@ -142,7 +148,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
   it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
   `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
-- Sixteen test programs are built again with `-O` and must run the same
+- Seventeen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.

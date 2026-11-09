@@ -1,0 +1,55 @@
+math.h for bcc09's libc
+=======================
+
+These are from Sun's fdlibm ("freely distributable libm"), version 5.3
+(2004), as https://netlib.org/fdlibm/ has it: each file keeps Sun's
+notice, under which it may be used, copied, changed and distributed
+freely.  bcc09's changes to them are under the GNU Library General
+Public License, version 2, like the rest of libc (see COPYING.LIB).
+
+fdlibm's algorithms work out each result with IEEE double arithmetic, one
+correctly rounded step at a time, which libc's floating point helpers
+(libc/bcc/fp*.s) do exactly.  So these give, bit for bit, what the same
+code gives on any IEEE host: tests/src/mtest.c checks that against a
+build of these files on the host.  The results are within about an ulp
+of the exact values (fdlibm's own claim; glibc's differ from them by an
+ulp or two now and then).
+
+The C89 functions: acos, asin, atan, atan2, cos, sin, tan, cosh, sinh,
+tanh, exp, frexp, ldexp, log, log10, modf, pow, sqrt, ceil, fabs, floor
+and fmod; and copysign, scalbn, expm1 and finite, which some of them use.
+HUGE_VAL is __huge_val (huge.s), an infinity: bcc09 can't make one from a
+constant expression.  Each function is a module of its own, so a program
+carries only what it uses (sin and cos bring the reduction of huge
+arguments, k_rem_pio2.c, about 5K of code).
+
+The changes:
+
+- fdlibm wants a 32-bit int (for the halves of a double); bcc09's int
+  has 16 bits.  Every int and unsigned is __i32 or __u32 (fdlibm.h: long
+  on bcc09, int on a host), but for the C interfaces (frexp's int *,
+  ldexp's and scalbn's int, finite's result) and a few small parameters
+  of fdlibm's own (__kernel_sin's and __kernel_tan's iy,
+  __kernel_rem_pio2's prec).  bcc09 doesn't convert arguments to a
+  prototype's types (see BUGS), so a call that passes an __i32 to one of
+  those casts it to int; and cc1 can't switch on a long, so those switches
+  cast to int.
+
+- __HI(x) and __LO(x), the high and low words of the double x, are the
+  first and second on the 6809, which is big-endian (fdlibm.h).
+
+- __ieee754_x is x (there are no wrappers: w_*.c and their
+  _LIB_VERSION and matherr are left out), and __ieee754_rem_pio2 is
+  __rem_pio2.  fdlibm.h replaces fdlibm's, declaring only what is used.
+
+- errno is set as the GNU C library sets it: EDOM for acos and asin of
+  more than 1 in size, log and log10 of a negative number, sqrt of one
+  (or of -inf), sin, cos and tan of an infinity, fmod(x, 0) and
+  fmod(inf, y), and pow of a negative number to a power that isn't an
+  integer; ERANGE for log(0) and log10(0), and for the overflows of exp,
+  expm1, cosh, sinh, pow and ldexp, and the underflows to 0 of exp, pow
+  and ldexp (fdlibm's ldexp already did).  Not for a NaN argument.
+  pow is a wrapper of fdlibm's (fdpow) that checks its result, as
+  glibc's does.
+
+- modf of a NaN gives a NaN, as C99 says (fdlibm gave 0).

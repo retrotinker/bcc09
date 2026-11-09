@@ -26,6 +26,7 @@ BCCFLAGS=-O -Iinclude
 # ctype: character classes
 # stdlib: stdlib.h's functions, and errno
 # string: string and memory functions
+# math: math.h, from Sun's fdlibm (math/README)
 # malloc: malloc, free, calloc and realloc (sbrk and brk are in stdlib)
 # stdio: the FILE functions (stdio.c, dev86's) and the printf and scanf
 #        families (their floating point in fpfmt.c and scanfp.c, linked
@@ -51,6 +52,14 @@ PRINTF_OBJS = stdio/__vformat.o stdio/vfprintf.o stdio/vprintf.o \
 	  stdio/vsprintf.o stdio/sprintf.o stdio/snprintf.o
 SCANF_OBJS = stdio/__vscan.o stdio/vfscanf.o stdio/vscanf.o \
 	  stdio/vsscanf.o stdio/scanf.o stdio/fscanf.o stdio/sscanf.o
+MATH_OBJS = math/e_acos.o math/e_asin.o math/s_atan.o math/e_atan2.o \
+	  math/s_ceil.o math/s_cos.o math/e_cosh.o math/e_exp.o math/s_fabs.o \
+	  math/s_floor.o math/e_fmod.o math/s_frexp.o math/s_ldexp.o \
+	  math/e_log.o math/e_log10.o math/s_modf.o math/e_pow.o math/s_sin.o \
+	  math/e_sinh.o math/e_sqrt.o math/s_tan.o math/s_tanh.o math/k_sin.o \
+	  math/k_cos.o math/k_tan.o math/e_rem_pio2.o math/k_rem_pio2.o \
+	  math/s_expm1.o math/s_scalbn.o math/s_copysign.o math/s_finite.o \
+	  math/huge.o
 ABS_OBJS = stdlib/abs.o stdlib/labs.o
 STRTOL_OBJS = stdlib/strtol.o stdlib/strtoul.o
 RAND_OBJS = stdlib/rand.o stdlib/srand.o
@@ -71,10 +80,10 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  string/memcpy.o $(STRING_OBJS) \
 	  string/strcspn.o string/strpbrk.o string/strsep.o \
 	  string/strspn.o string/strstr.o string/strtok.o \
-	  string/strcasecmp.o string/strncasecmp.o
+	  string/strcasecmp.o string/strncasecmp.o $(MATH_OBJS)
 
 HEADERS	= include/ctype.h include/errno.h include/fcntl.h \
-	  include/features.h include/stdio.h \
+	  include/features.h include/stdio.h include/math.h \
 	  include/limits.h include/malloc.h include/stdarg.h include/stddef.h \
 	  include/stdlib.h include/string.h include/sys/types.h \
 	  include/unistd.h
@@ -150,6 +159,7 @@ $(OBJS): .bcc/stamp $(HEADERS)
 # libc's own headers
 $(SCANF_OBJS) stdio/scanfp.o: stdio/scan.h
 stdio/fpfmt.o stdlib/bignum.o stdlib/strtod.o: stdlib/bignum.h
+$(MATH_OBJS): math/fdlibm.h
 
 # everything is built again when the tools change, the optimizer's rules
 # too (libc is built with -O)

@@ -18,6 +18,7 @@ This will become the port of the dev86 C library.  So far it has:
             atexit, exit and _exit, and dev86's itoa, ltoa, ultoa,
             ltostr and ultostr; errno; sbrk and brk, for malloc; and big
             integers (bignum.c) for strtod and printf's %f
+  math/     math.h's functions, from Sun's fdlibm (see math/README)
   string/   string.h's functions; memcpy (which the compiler also calls
             to copy structures) is in assembly, and the rest are C,
             compiled by bcc09
@@ -72,7 +73,7 @@ Changes from dev86:
     scanf.c had no license, and its printf departed from the C standard
     (precision on integers, %X, # and %p); see stdio/printf.c and
     stdio/scanf.c
-div and ldiv, %a in printf, and math.h are still to come.
+div and ldiv, and %a in printf, are still to come.
 
 Floating point in text: printf's %e, %f and %g (and %E, %F, %G), and
 strtod, atof and scanf's %a, %e, %f and %g, are exact, as the GNU C
@@ -279,5 +280,5 @@ when far out of range (or infinite, or a NaN).
 
 The tests in tests/ (ops.c, longops.c, fptest.c, regtest.s, strtest.c, stdtest.c,
 maltest.c, vatest.c; crtret.c, crtexit.c and crtatexit.c for the default target;
-hello.c, echo.c, pftest.c, siotest.c, sftest.c, fltcc.c and fpio.c for the sim target; cbtest.c
+hello.c, echo.c, pftest.c, siotest.c, sftest.c, fltcc.c, fpio.c and mtest.c for the sim target; cbtest.c
 for the Color BASIC target) check all of this on sim6809.
