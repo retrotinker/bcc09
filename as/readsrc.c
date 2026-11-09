@@ -37,7 +37,6 @@ struct get_s {			/* to record included files */
 	off_t position;
 };
 
-PRIVATE char hid_filnambuf[FILNAMLEN + 1];	/* buffer for file name */
 
 PRIVATE struct get_s hid_getstak[MAXGET];	/* GET stack */
 PRIVATE struct get_s *getstak;	/* ptr */
@@ -75,7 +74,6 @@ PRIVATE void line_too_long()
 
 PUBLIC void initsource()
 {
-	filnamptr = hid_filnambuf;
 	getstak = hid_getstak;
 	clearsource();		/* sentinel to invoke blank skipping */
 }

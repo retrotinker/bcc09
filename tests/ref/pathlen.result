@@ -1,2 +1,3 @@
 ok   fltcc's code doesn't depend on the prefix's length
 ok   pftest's code doesn't depend on the prefix's length
+ok   as09 assembles a file of a 250-character name

@@ -256,7 +256,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `NITROS9_PROGS` picks the programs. About a minute and a half.
 - Twenty test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
-- `pathlen.result`: fltcc.c and pftest.c compiled through prefixes of 20 to 240 characters
+- `pathlen.result`: as09 assembles a file of a 250-character name (it stopped at 64
+  characters, and overflowed a buffer for a long module name: fixed 2026-11-09, found
+  by the RPM's build in a long directory). fltcc.c and pftest.c compiled through
+  prefixes of 20 to 240 characters
   must give the same code. cc1 writes a forward branch long and makes it short when its
   label comes within reach; `flushout()` keeps the text from the oldest such branch
   (`openpatch()`, growing the buffer), so that no longer depends on how much text,

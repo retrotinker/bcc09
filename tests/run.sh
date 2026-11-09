@@ -557,6 +557,21 @@ for f in fltcc pftest; do
 	fi
 	rm -f $f-path.s $f-path.code
 done > pathlen.result
+# and as09 takes a source file name of any length (it stopped at 64
+# characters): simcrt0.s in a directory with a name of 240 characters
+# must give the object it does here
+"$AS" -o simcrt0-path.o simcrt0.s > /dev/null 2>&1
+long=$(printf 'd%.0s' $(seq 1 240))
+mkdir $long
+cp simcrt0.s $long/
+if "$AS" -o $long/simcrt0.o $long/simcrt0.s > /dev/null 2>&1 &&
+   cmp -s simcrt0-path.o $long/simcrt0.o; then
+	echo "ok   as09 assembles a file of a 250-character name"
+else
+	echo "DIFF as09 with a file of a 250-character name"
+fi >> pathlen.result
+rm -rf $long
+rm -f simcrt0-path.o
 
 run notarget.bcc "$BCC" -Mv -o notarget.out hello.c
 rm -f notarget.out
