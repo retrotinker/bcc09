@@ -35,7 +35,8 @@ cc1 (code generation)
   f(long);" f(3) passes an int where f wants a long, and with "double
   g(double);" g(3) passes an int for a double.  (Chars and shorts are
   widened to ints anyway, and floats passed as doubles, so those
-  work.)  References: none (the tests pass each parameter's type)
+  work; but a bool parameter given an int keeps its low byte, so 256
+  is false.)  References: none (the tests pass each parameter's type)
 
 - In PIC mode, global (bss?) pointers and arrays use PC-relative
   addressing rather than direct addressing.  (Not covered by the tests.)

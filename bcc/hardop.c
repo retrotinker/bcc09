@@ -93,6 +93,24 @@ struct symstruct *source;
 	if (op == POSTDECOP || op == POSTINCOP)
 		postflag = TRUE;
 	reguse |= targ.storage;
+	if (targ.type == btype) {
+		/* a _Bool: ++ makes it 1, and -- flips it (b - 1, then != 0);
+		   the old value goes in A for b++ and b-- */
+		load(source, DREG);
+		if (postflag)
+			outnop2str("TFR\tB,A");
+		if (op == PREINCOP || op == POSTINCOP)
+			loadconst((offset_T) 1, BREG);
+		else
+			outnop2str("EORB\t#1");
+		storereg(BREG, target);
+		if (postflag)
+			outnop2str("TFR\tA,B");
+		source->storage = BREG;
+		source->offset.offi = 0;
+		source->indcount = 0;
+		return;
+	}
 	if (targ.type->scalar & DLONG) {	/* cannot be direct */
 		if (postflag) {
 			regmark = reguse;

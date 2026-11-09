@@ -3,8 +3,9 @@ libc for bcc09
 This will become the port of the dev86 C library.  So far it has:
 
   include/  headers: ctype.h, errno.h, fcntl.h, limits.h, malloc.h,
-            stdarg.h, stdio.h, stdlib.h, string.h, stddef.h, unistd.h,
-            sys/types.h, features.h
+            math.h, stdarg.h, stdbool.h, stddef.h, stdint.h, stdio.h,
+            stdlib.h, string.h, unistd.h, sys/types.h, features.h
+            (stdint.h: no 64-bit types; stdbool.h: cc1's _Bool)
   bcc/      run-time helpers that the compiler calls for int and long
             operations the 6809 can't do in a few instructions, and
             for floating point (fp*.s)

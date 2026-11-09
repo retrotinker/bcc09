@@ -84,6 +84,7 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 
 HEADERS	= include/ctype.h include/errno.h include/fcntl.h \
 	  include/features.h include/stdio.h include/math.h \
+	  include/stdint.h include/stdbool.h \
 	  include/limits.h include/malloc.h include/stdarg.h include/stddef.h \
 	  include/stdlib.h include/string.h include/sys/types.h \
 	  include/unistd.h

@@ -47,6 +47,8 @@ struct typestruct *type;
 	exprmark = exprptr;
 	etmark = etptr;
 	exp = assignment_exp();
+	if (type == btype)		/* (0 or 1, from any scalar) */
+		exp = castnode(btype, exp);
 	if (gvarsymptr->storage != GLOBAL) {
 		lhs = leafnode(exprsym(gvarsymptr));
 		if (!(lhs->nodetype->constructor & (ARRAY | FUNCTION | VOID)))

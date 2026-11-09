@@ -178,6 +178,26 @@ register struct nodestruct *nodeptr;
 	return FALSE;
 }
 
+/* a value converted to _Bool: 0 or 1, as x != 0 is (a constant folded) */
+PRIVATE struct nodestruct *boolnode(nodeptr)
+struct nodestruct *nodeptr;
+{
+	struct symstruct *symptr;
+
+	if (nodeptr->nodetype == btype)
+		return nodeptr;
+	if (nodeptr->tag == LEAF &&
+	    (symptr = nodeptr->left.symptr)->storage == CONSTANT) {
+		if (symptr->type->scalar & RSCALAR)
+			return leafnode(constsym((value_t)
+						 (*symptr->offset.offd != 0)));
+		if (symptr->type->scalar & ISCALAR)
+			return leafnode(constsym((value_t)
+						 (symptr->offset.offv != 0)));
+	}
+	return node(NEOP, nodeptr, leafnode(constsym((value_t) 0)));
+}
+
 PUBLIC struct nodestruct *leafnode(source)
 struct symstruct *source;
 {
@@ -251,6 +271,14 @@ struct nodestruct *p2;
 	bool_t uflag;
 
 	switch ((op_t) t) {
+	case ASSIGNOP:
+		if (p1->nodetype == btype)	/* (abop() does the rest) */
+			p2 = boolnode(p2);
+		break;
+	case CASTOP:
+		if (p2->nodetype == btype)
+			p1 = boolnode(p1);
+		break;
 	case ADDABOP:
 		if (p1->nodetype->constructor & (ARRAY | POINTER))
 			t = PTRADDABOP;

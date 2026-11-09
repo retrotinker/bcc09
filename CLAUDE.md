@@ -94,6 +94,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   merged.
 - `bcc/bcc.doc` is out of date (it describes `-M` as a linker option); auditing it is a
   TODO item.
+- `stdint.h` has the 8-, 16- and 32-bit types (no 64-bit: `intmax_t` is `long`, `intptr_t`
+  is `int`); `stdbool.h`'s `bool` is `cc1`'s `_Bool` (added 2026-11-08): an `unsigned char`
+  type (`btype`) that every conversion makes 0 or 1 (`boolnode()` in `exptree.c` for
+  assignments, casts, returns and initializers; `abop()` and `incdec()` for `op=`, `++`, `--`).
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
@@ -101,7 +105,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 510 reference
+  `tests/src/` with this tree's tools and compare every result with the 516 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -139,7 +143,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `sftest.in`, `fltcc.c`, floats and doubles in many places in C, and `fpio.c`, `printf`'s
   floating formats, `strtod` and `scanf`'s `%f`, but for their counts of checks; and
   `mtest.c`, `math.h`'s functions, whose results must equal bit for bit those of
-  `libc/math` built on the host);
+  `libc/math` built on the host; `inttest.c`, `stdint.h` and `_Bool`);
   `fpoptional.result` checks that `pftest` and `sftest` link none of that code; `siotest.c` checks the `FILE`
   functions and buffering against its expected output (`siotest.in` is its input).
 - `make check-xroar` (`tests/xroar/run.sh`, optional: needs `xroar`, `python3` and the
@@ -149,7 +153,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
   it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
   `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
-- Seventeen test programs are built again with `-O` and must run the same
+- Eighteen test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.

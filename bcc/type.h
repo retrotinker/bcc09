@@ -79,6 +79,7 @@ EXTERN struct typestruct *ltype;
 EXTERN struct typestruct *sctype;
 EXTERN struct typestruct *stype;
 EXTERN struct typestruct *uctype;
+EXTERN struct typestruct *btype;	/* _Bool: an unsigned char that is 0 or 1 */
 EXTERN struct typestruct *uitype;
 EXTERN struct typestruct *ultype;
 EXTERN struct typestruct *ustype;

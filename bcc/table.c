@@ -32,9 +32,9 @@
 #define MAXLOCAL 100
 #define NKEYWORDS 39
 #ifdef NOFLOAT
-#define NSCALTYPES 10
+#define NSCALTYPES 11
 #else
-#define NSCALTYPES 12
+#define NSCALTYPES 13
 #endif
 #define STACKSPACE 256		/* punt for normal recursions - switch extra */
 
@@ -133,6 +133,7 @@ PRIVATE struct typedatastruct scaltypes[NSCALTYPES] = {
 	{"char", TRUE, CHAR, 1, &ctype,},
 	{"char", FALSE, UNSIGNED | CHAR, 1, &uctype,},
 	{"char", FALSE, CHAR, 1, &sctype,},
+	{"_Bool", TRUE, UNSIGNED | CHAR, 1, &btype,},
 	{"short", TRUE, SHORT, 2, &stype,},
 	{"short", FALSE, UNSIGNED | SHORT, 2, &ustype,},
 	{"int", TRUE, INT, 2, &itype,},
@@ -666,5 +667,6 @@ PUBLIC void syminit()
 	}
 	for (kwptr = keywords; kwptr < keywords + NKEYWORDS; ++kwptr)
 		addkeyword(kwptr->kwname, kwptr->kwcode);
+	btype->tname = "char";	/* (as unsigned char, in helpers' names) */
 	constemplate.type = itype;
 }

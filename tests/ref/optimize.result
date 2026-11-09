@@ -15,3 +15,4 @@ ok   sftest runs the same with -O
 ok   fltcc runs the same with -O
 ok   fpio runs the same with -O
 ok   mtest runs the same with -O
+ok   inttest runs the same with -O

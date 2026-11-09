@@ -141,6 +141,23 @@ struct symstruct *target;
 		sub(source, &temptarg);
 		break;
 	}
+	if (target->type == btype) {
+		/* a _Bool gets 0 or 1: the result, != 0 */
+		label_no lab;
+
+		load(&temptarg, DREG);
+		if (temptarg.storage == BREG)
+			outnop1str("TSTB");
+		else {
+			outnop2str("SUBD\t#0");
+			bumplc();
+		}
+		sbranch(EQ, lab = getlabel());
+		loadconst((offset_T) 1, DREG);
+		outnlabel(lab);
+		temptarg.storage = DREG;
+		temptarg.type = itype;
+	}
 	assign(&temptarg, target);
 	recovlist(regpushed);
 }
