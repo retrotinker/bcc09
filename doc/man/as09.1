@@ -1,0 +1,237 @@
+.TH AS09 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+as09 \- assembler for the Motorola 6809
+.SH SYNOPSIS
+.B as09
+.RB [ \-guwk ]
+.RB [ \-o
+.IR object ]
+.RB [ \-b
+.IR binary ]
+.RB [ \-l
+.RI [ listing ]]
+.RB [ \-m
+.RI [ listing ]]
+.RB [ \-s
+.IR symbols ]
+.RB [ \-n
+.IR name ]
+.RB [ \-t
+.IR seg ]
+.RI [ source ]
+.br
+.B as09 \-v
+.SH DESCRIPTION
+.B as09
+assembles 6809 assembly language into an object file for
+.BR ld09 (1),
+or straight into a binary image.
+It is dev86's as86 for the 6809, and the assembler that
+.BR bcc09 (1)
+runs on the compiler's output.
+With no
+.IR source ,
+or
+.BR \- ,
+it reads standard input.
+.PP
+A flag option is turned off by following it with
+.BR \- :
+.B \-w\-
+shows the warnings that
+.B \-w
+hides.
+.SH OPTIONS
+.TP
+.BI \-o " object"
+Write an object file, for the linker.
+.TP
+.BI \-b " binary"
+Write a binary image: the assembled bytes, at the addresses
+.B ORG
+gives them, with no symbols to link.
+.TP
+.BR \-l " [\fIlisting\fR]"
+Write a listing (to standard output if no file is named).
+.TP
+.BR \-m " [\fIlisting\fR]"
+Write a listing with the lines that macros expand to.
+.TP
+.BI \-s " symbols"
+Write the symbol table to a file.
+.TP
+.BI \-n " name"
+The module's name in the object file (and in error messages), in place
+of the source file's.
+.TP
+.B \-g
+Put only the global symbols (those exported or imported) in the object
+file.
+.TP
+.B \-u
+Take an undefined symbol as imported, as if
+.B IMPORT
+named it (rather than an error).
+.TP
+.B \-w
+Don't print warnings.
+.TP
+.B \-k
+Keep the output files even if there are errors.
+.TP
+.BI \-t " seg"
+Make
+.B .TEXT
+select segment
+.IR seg +3,
+rather than 0.
+.TP
+.B \-v
+Print the version and exit.
+.SH "SOURCE FORMAT"
+A line has a label (starting in the first column, with or without a
+colon), an operation and its operands, separated by blanks or tabs, and
+a comment after a
+.BR ; .
+A line starting with
+.B *
+or
+.B ;
+is a comment.
+Upper and lower case are the same in operations and register names, but
+not in symbols.
+.PP
+Numbers are decimal,
+.RB $ hex
+or
+.BR 0x hex,
+.BR % binary,
+or octal with a leading 0;
+.BI \(aq c
+is the character
+.IR c 's
+code.
+Expressions have
+.BR + ,
+.BR \- ,
+.BR * ,
+.BR / ,
+.BR & ,
+.BR | ,
+.BR << ,
+.BR >> ,
+unary
+.B \-
+and
+.BR ~ ,
+and parentheses.
+.B <
+before an operand makes it direct (a page-0 address, through DP),
+.B >
+extended; an indexed operand is
+.BI , reg\c
+,
+.IB offset , reg\c
+,
+.BR ,X+ ,
+.B ,\-X
+and so on, with
+.B ,PC
+or
+.B ,PCR
+for one relative to the program counter, and
+.BI [ ... ]
+for one indirect.
+.SS "Pseudo-operations"
+.TP
+.BR .TEXT ", " .DATA ", " .BSS ", " LOC " \fIn\fR"
+Assemble into the code, the data, the BSS (which take no room in the
+object file, and are cleared at start-up), or segment
+.I n
+(0 to 15; code is 0, data and BSS 3; see
+.BR ld09 (1)
+for where the linker puts each, and its
+.BI __seg n DL
+and
+.BI __seg n DH
+symbols for each one's start and end).
+.TP
+.BR FCB ", " .BYTE ", " DB " \fIvalue\fR,..."
+Bytes.
+.TP
+.BR FDB ", " .WORD ", " DW " \fIvalue\fR,..."
+Words, high byte first.
+.TP
+.BR FCC ", " .ASCII " \fI\(dqtext\(dq\fR"
+The characters of a string (in single or double quotes).
+.TP
+.BI .ASCIZ " \(dqtext\(dq"
+The same, then a 0.
+.TP
+.BR RMB ", " .BLKB ", " .SPACE " \fIn\fR"
+Leave
+.I n
+bytes;
+.BI .BLKW " n"
+leaves
+.I n
+words.
+.TP
+.IB symbol " EQU " value
+.TQ
+.IB symbol " SET " value
+Define a symbol (SET can define it again; EQU can't).
+.TP
+.BR EXPORT ", " PUBLIC ", " GLOBAL " \fIsymbol\fR,..."
+Make symbols this module defines visible to others.
+.TP
+.BR IMPORT ", " EXTERN " \fIsymbol\fR,..."
+Name symbols that other modules define.
+.TP
+.BI ENTRY " symbol"
+Make
+.I symbol
+an entry: the linker loads the modules that the entry symbols need
+(only those), and the first entry it reads is the program's entry
+point.
+.TP
+.IB symbol " COMM " size
+.TQ
+.BI .COMM " symbol" , size
+A common block, in the BSS: one, shared by every module that names it.
+.TP
+.BI ORG " address"
+The address to assemble at (for
+.BR \-b ).
+.TP
+.BI SETDP " page"
+Tell the assembler what DP holds, for direct addressing.
+.TP
+.BR IF ", " ELSE ", " ELSEIF ", " ENDIF
+Assemble lines or not, by an expression (IFC and ELSEIFC compare
+strings).
+.TP
+.BI MACRO " name"
+Define a macro, up to
+.BR MEND ;
+.I name
+then assembles its lines.
+.TP
+.BR INCLUDE ", " GET " \fIfile\fR"
+Assemble another file here.
+.TP
+.BR .ALIGN " \fIn\fR, " .EVEN
+Align the location.
+.TP
+.BR FAIL ", " .WARN
+An error, or a warning.
+.TP
+.B END
+The end of the source.
+.SH EXIT STATUS
+0 if there were no errors, 1 otherwise.
+.SH SEE ALSO
+.BR bcc09 (1),
+.BR ld09 (1),
+.BR ar09 (1),
+.BR objdump09 (1)

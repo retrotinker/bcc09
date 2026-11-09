@@ -143,6 +143,13 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   rules (checked 2026-11-08) favor size: `LDD #0` becomes `CLRA`/`CLRB` (a byte smaller,
   a cycle slower), only before instructions that don't read C; adjacent `LEAS n,S` are
   merged.
+- `doc/man/` has the man pages (added 2026-11-09): `bcc09.1`, `as09.1`, `ld09.1`, `ar09.1`,
+  `objdump09.1` (`nm09.1` and `size09.1` are `.so` links to it) and `objcopy09.1`, written
+  from the sources and checked against the tools; `make install` puts them in
+  `$(MANDIR)` (`$(PREFIX)/share/man`). `tests/man.sh` (run by `make check`) checks that
+  each formats without `groff -ww` warnings and names every option, from lists it keeps
+  of each program's options: change a program's options, and change both. The passes
+  (`cpp`, `cc1`, `copt`, `unproto`; `unproto/unproto.1` is dev86's) have none yet.
 - `bcc/bcc.doc` is out of date (it describes `-M` as a linker option); auditing it is a
   TODO item.
 - `stdint.h` has the 8-, 16- and 32-bit types (no 64-bit: `intmax_t` is `long`, `intptr_t`

@@ -1,0 +1,366 @@
+.TH BCC09 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+bcc09 \- C compiler for the Motorola 6809
+.SH SYNOPSIS
+.B bcc09
+.RB [ \-c | \-S | \-E | \-P ]
+.RB [ \-O ]
+.RB [ \-M\c
+.IR target ]
+.RB [ \-o
+.IR output ]
+.RI [ options ]
+.IR file ...
+.SH DESCRIPTION
+.B bcc09
+compiles C for the Motorola MC6809: the Tandy Color Computer and the
+Dragon under Color BASIC, OS-9, FLEX, and machines of one's own.
+It is a driver: it runs the preprocessor
+.RB ( cpp ),
+.B unproto
+(which turns ANSI C prototypes into what the compiler reads), the
+compiler
+.RB ( cc1 ),
+the peephole optimizer
+.RB ( copt ,
+with
+.BR \-O ),
+the assembler
+.BR as09 (1)
+and the linker
+.BR ld09 (1),
+as each file needs, keeping the intermediate files in a temporary
+directory.
+By default it links a program with the start-up code and C library of
+the target that
+.B \-M
+chooses.
+.PP
+The C is C89's, with a 16-bit
+.B int
+and pointers, a 32-bit
+.BR long ,
+IEEE single and double
+.B float
+and
+.BR double ,
+and an unsigned
+.BR char ;
+.B const
+and
+.B volatile
+are accepted and ignored, and
+.B _Bool
+is C99's.
+.PP
+A file's suffix says what it is:
+.TP
+.B .c
+C source.
+.TP
+.B .i
+C already preprocessed.
+.TP
+.B .s
+Assembly, for
+.BR as09 (1).
+.TP
+.BR .S ", " .x
+Assembly to be preprocessed first.
+.TP
+anything else
+An object file or library, for the linker.
+.SH OPTIONS
+.SS "What to do"
+.TP
+.B \-c
+Compile or assemble each file to an object file
+.RI ( name .o),
+without linking.
+.TP
+.B \-S
+Compile each C file to assembly
+.RI ( name .s).
+.TP
+.B \-E
+Preprocess each file, to standard output (or the
+.B \-o
+file).
+.TP
+.B \-P
+Preprocess, without the line numbers.
+.TP
+.BI \-o " output"
+The output file: the program (a.out by default), or, with
+.BR \-c ,
+.B \-S
+or
+.BR \-E ,
+the one file's.
+.TP
+.B \-O
+Optimize: run each compiled file through
+.BR copt ,
+with its 6809 rules.
+.BI \-O name
+also uses the rules in the file
+.RI rules. name .
+.SS Targets
+.TP
+.BI \-M target
+The machine and system the program is for.
+Each defines a macro, and links its own start-up code and library:
+.RS
+.TP
+.B s
+Standalone (the default): returns to its loader (a monitor, or Color
+BASIC's EXEC); no I/O.
+Defines
+.BR __STANDALONE_ .
+.TP
+.B e
+Color BASIC (or the Dragon's), loaded with LOADM or CLOADM and run with
+EXEC: I/O through the ROM's POLCAT and CHROUT, and, with Disk BASIC on
+a CoCo, its files.
+Defines
+.BR __CB__ .
+.TP
+.B o
+OS-9 (and NitrOS-9): a position-independent program module, with its
+data reached through the U register (make the module with
+.BR "objcopy09 \-O os9" ).
+Defines
+.BR __OS9__ .
+.TP
+.B f
+FLEX: a command, a .CMD file
+.RB ( "objcopy09 \-O flex" ),
+with FLEX's terminal and files.
+Defines
+.B __FLEX__
+and
+.BR __FLEX9__ .
+.TP
+.B i
+sim6809, the simulator bcc09's tests use.
+Defines
+.BR __SIM6809__ .
+.TP
+.BR u ", " r ", " b ", " v
+Color BASIC USR functions, ROM cartridges, Disk BASIC, and the
+Vectrex: they define
+.B __CB__
+(or
+.BR __VECTREX__ )
+but have no start-up code or library yet, so only
+.B \-x
+links them, with the C library alone.
+.RE
+.TP
+.B \-x
+Link no start-up code: the program brings its own (the C library, and
+the target's library if it has one, are still linked).
+.SS "Passing options on"
+.TP
+.BI \-D name\c
+.RI [= value ]
+.TQ
+.BI \-U name
+.TQ
+.BI \-I dir
+Define or undefine a macro, or add an include directory, as
+.BR cpp (1)
+does.
+.TP
+.B \-I
+(alone) Don't search the default include directory.
+.TP
+.BI \-L dir
+Add a library directory for the linker.
+.TP
+.B \-L
+(alone) Don't search the default library directory.
+.TP
+.BI \-l name
+Link the library
+.RI lib name .a.
+The linker's options
+.BR \-s ,
+.BR \-m ,
+.BR \-i ,
+.BR \-d ,
+.B \-y
+and
+.BI \-H size
+go to it too (see
+.BR ld09 (1));
+its others, such as
+.BI \-T addr\c
+, which
+.B bcc09
+uses for itself, are given with
+.BR \-X .
+.TP
+.BI \-X option
+Pass
+.I option
+to the linker, for example
+.B \-X\-T0x3000
+for the program's load address.
+.TP
+.BI \-A option
+Pass
+.I option
+to the assembler.
+.TP
+.BI \-t " seg"
+Pass
+.BI \-t " seg"
+to the assembler.
+.TP
+.BI \-C option
+Pass
+.I option
+to the compiler
+.RB ( cc1 ).
+.TP
+.BI \-P option
+Pass
+.I option
+to the preprocessor.
+.TP
+.BI \-u option
+Pass
+.I option
+to
+.BR unproto .
+.TP
+.B \-W
+Show the assembler's warnings.
+.TP
+.B \-kr
+Don't run
+.B unproto
+(for K&R C), and don't define
+.BR __STDC__ .
+.TP
+.B \-ansi
+Accepted and ignored (unproto is the default).
+.TP
+.BR \-g ", " \-p ", " \-w
+Accepted and ignored.
+.SS "Where things are"
+.TP
+.BI \-B prefix
+Look for the passes in
+.I prefix
+first.
+.TP
+.BI \-M /dir
+The directory bcc09 is installed in, as
+.B BCC_PREFIX
+gives it.
+.TP
+.B \-M\-
+Find it from where the
+.B bcc09
+program is: its directory, less its
+.IR bin .
+.TP
+.BI \-T dir
+The directory for temporary files (/tmp by default).
+.TP
+.B \-v
+Print each command as it is run; twice, the temporary files' removal
+too; three times, the commands without running them.
+.TP
+.B \-V
+Print each file's name as it is compiled.
+.TP
+.B \-e
+Use the compiler's own preprocessor in place of
+.BR cpp .
+.SH MACROS
+.B bcc09
+defines
+.BR __BCC__ ,
+.BR __6809__ ,
+.B __STDC__
+(unless
+.BR \-kr ),
+and the target's macro (see
+.BR \-M ).
+.SH ENVIRONMENT
+.TP
+.B BCC_PREFIX
+The directory bcc09 is installed in: it runs its passes from
+.IR libexec/bcc09 ,
+and finds the C library's headers in
+.I lib/bcc09/include
+and its libraries in
+.I lib/bcc09
+under it.
+By default, the directory bcc09 was built to be installed in
+.RB ( "make PREFIX=" ...;
+/usr/local/bcc09 unless that says otherwise).
+.TP
+.B BCC_EXEC_PREFIX
+Another directory to look for the passes in.
+.SH FILES
+.TP
+.IR prefix /libexec/bcc09
+The passes:
+.BR cpp ,
+.BR unproto ,
+.BR cc1 ,
+.B copt
+and its rules (rules.6809).
+.TP
+.IR prefix /lib/bcc09
+The C library (libc.a), and each target's start-up code and library
+(crt0.o and libsa.a for
+.BR \-Ms ;
+crt0.o and libcb.a for
+.BR \-Me ;
+crtos9.o and libos9.a, all of libc built for OS-9, for
+.BR \-Mo ;
+crtflex.o and libflex.a for
+.BR \-Mf ;
+crtsim.o and libsim.a for
+.BR \-Mi ).
+.TP
+.IR prefix /lib/bcc09/include
+The C library's headers.
+.SH EXIT STATUS
+0 if every file was compiled (and the program linked), 1 otherwise.
+.SH EXAMPLES
+A Color BASIC program, loaded at $3000, on a cassette:
+.PP
+.RS
+.nf
+bcc09 \-Me \-O \-o hello \-X\-T0x3000 hello.c
+objcopy09 \-O cas \-n HELLO hello hello.cas
+.fi
+.RE
+.PP
+An OS-9 program module:
+.PP
+.RS
+.nf
+bcc09 \-Mo \-O \-o hello.out hello.c
+objcopy09 \-O os9 \-n hello hello.out hello
+.fi
+.RE
+.SH NOTES
+OS-9's, Color BASIC's and FLEX's lines end with a carriage return,
+and the C library passes bytes as they are: a program writes
+\(dq\er\(dq (on FLEX, \(dq\er\en\(dq), and reads such lines with
+.BR getdelim (3)
+and \(aq\er\(aq.
+The C library's README describes each target in full.
+.SH SEE ALSO
+.BR as09 (1),
+.BR ld09 (1),
+.BR ar09 (1),
+.BR objdump09 (1),
+.BR objcopy09 (1)

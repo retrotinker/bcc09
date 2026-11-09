@@ -1,0 +1,78 @@
+.TH OBJDUMP09 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+objdump09, nm09, size09 \- show what is in 6809 object files, libraries
+and executables
+.SH SYNOPSIS
+.B objdump09
+.RB [ \-n | \-s ]
+.RB [ \-o ]
+.IR file ...
+.br
+.B nm09
+.RB [ \-o ]
+.IR file ...
+.br
+.B size09
+.IR file ...
+.SH DESCRIPTION
+.B objdump09
+reads object files from
+.BR as09 (1),
+libraries from
+.BR ar09 (1)
+(each member in turn), and executables from
+.BR ld09 (1).
+It is dev86's objdump86; called
+.B nm09
+it lists symbols, and called
+.B size09
+sizes, as
+.B \-n
+and
+.B \-s
+make it do.
+.PP
+By default it shows everything: an object file's module name, its
+symbols, its segments' sizes and its code, with the relocations; an
+executable's header (entry point, flags), sizes and symbols.
+.SH OPTIONS
+.TP
+.B \-n
+List the symbols, as
+.BR nm (1)
+does: each one's value, a letter for its kind, and its name.
+The letter is
+.B T
+or
+.B t
+for code (segments 0 and 1),
+.B D
+or
+.B d
+for data,
+.B a
+for an absolute value,
+.B b
+for a common block that is local,
+.B C
+for a common block, and
+.B U
+for a symbol that is undefined (imported); upper case is exported.
+.TP
+.B \-s
+Show the sizes of the code (text), data and BSS, as
+.BR size (1)
+does, with a total line for several files.
+.TP
+.B \-o
+With
+.BR \-n ,
+put the file's name before each symbol.
+.SH EXIT STATUS
+0, or 1 if no file is named.
+.SH SEE ALSO
+.BR bcc09 (1),
+.BR as09 (1),
+.BR ld09 (1),
+.BR ar09 (1),
+.BR objcopy09 (1)

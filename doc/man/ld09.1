@@ -1,0 +1,178 @@
+.TH LD09 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+ld09 \- linker for the Motorola 6809
+.SH SYNOPSIS
+.B ld09
+.RB [ \-Mdimstvy [ \- ]]
+.RB [ \-o
+.IR output ]
+.RB [ \-T\c
+.IR address ]
+.RB [ \-D\c
+.IR address ]
+.RB [ \-H\c
+.IR size ]
+.RB [ \-L\c
+.IR dir ]
+.RB [ \-C\c
+.IR name ]
+.RB [ \-l\c
+.IR name ]
+.RB [ \-O\c
+.IR file ]
+.IR file ...
+.br
+.B ld09 \-r \-o
+.I archive
+.IR object ...
+.SH DESCRIPTION
+.B ld09
+links object files from
+.BR as09 (1),
+and members of libraries (archives made by
+.BR ar09 (1)),
+into an executable: an a.out file, which
+.BR objcopy09 (1)
+turns into what a machine loads.
+It is dev86's ld86 for the 6809; the compiler driver
+.BR bcc09 (1)
+runs it.
+.PP
+.B ld09
+loads only the modules that something refers to, from the entry
+symbols (see
+.B ENTRY
+in
+.BR as09 (1))
+on: an object file named on the command line, like a library's
+member, is left out if nothing needs it.
+A library is searched only for what is undefined when it is read, so
+libraries come after the files that use them.
+.PP
+Of the 16 segments
+.RB ( LOC
+0 to 15 in
+.BR as09 (1)),
+0 and 1 are code, placed at the text address; 2 (the direct page,
+which must fit in one 256-byte page) and 3 (the data, then the BSS)
+are placed after the code, or at the data address; 4 to 15 are stored
+after the code, each where its
+.BI __seg n DL
+symbol says.
+.B ld09
+defines symbols for the program to find its parts:
+.B __btext
+and
+.B __etext
+(the code's start and end),
+.B __bdata
+and
+.B __edata
+(the data's),
+.B __end
+(the BSS's end),
+.B __heap_top
+(the end plus
+.BR \-H 's
+size), and
+.BI __seg n DL\c
+,
+.BI __seg n DH
+(segment
+.IR n 's
+start and end).
+.SH OPTIONS
+.TP
+.BI \-o " output"
+The executable (a.out by default).
+.TP
+.BI \-T address
+The address the code is linked at (0 by default).
+.TP
+.BI \-D address
+The address the data is linked at, rather than straight after the
+code; it makes the data separate
+.RB ( \-i ).
+.TP
+.BI \-H size
+Room after the BSS, for the heap (or OS-9's stack: see
+.BR objcopy09 (1)).
+.IP
+The addresses and the size are hexadecimal, with or without a
+.B 0x
+(so
+.B \-T3000
+and
+.B \-T0x3000
+are the same).
+.TP
+.B \-i
+Separate code and data: the data is linked at 0 (or at
+.BR \-D 's
+address) instead of after the code, as OS-9's programs reach their data
+through a register.
+.TP
+.BI \-l name
+Link the library
+.RI lib name .a,
+from the library directories.
+.TP
+.BI \-L dir
+Search
+.I dir
+for libraries (and start-up files) too.
+.TP
+.BI \-C name
+Link the start-up file
+.RI crt name .o,
+from the library directories, first.
+.TP
+.BI \-O file
+Link the library
+.IR file ,
+from the library directories.
+.TP
+.B \-s
+Leave the symbols out of the executable.
+.TP
+.B \-y
+Write each symbol's whole name, in the 8-character entries of an a.out
+symbol table and the entries after them (the default;
+.B \-y\-
+cuts names to 8 characters).
+.TP
+.B \-d
+Write the code and data alone, with no a.out header (and no symbols).
+.TP
+.B \-m
+Print the modules linked.
+.TP
+.B \-M
+Print the symbols linked.
+.TP
+.B \-t
+Trace the files and modules as they are read.
+.TP
+.B \-r
+Make an archive of the objects, for
+.BR ar09 (1)
+or a later link, rather than linking them (with
+.B \-o
+required).
+.TP
+.B \-v
+Print the version and exit.
+.PP
+A flag option is turned off by following it with
+.BR \- ,
+as in
+.BR \-y\- .
+.SH EXIT STATUS
+0 if the link succeeded, 1 otherwise (an undefined symbol, a file that
+can't be read).
+.SH SEE ALSO
+.BR bcc09 (1),
+.BR as09 (1),
+.BR ar09 (1),
+.BR objdump09 (1),
+.BR objcopy09 (1)

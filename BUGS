@@ -10,19 +10,18 @@ the entry from this file.
 cc1 (code generation)
 ---------------------
 
-- A missed optimization rather than a bug: cc1 makes a forward branch
-  short by changing its text in its output buffer when it reaches the
-  label, so a branch whose line has already left the buffer stays long.
-  The size of the code can then depend on how much text came before it,
-  such as comments copied from headers, and -S and -c can give slightly
-  different code.
-  References: none stable (maltest.s's JMP .49 has come and gone as
-  headers it includes changed size)
-
 - Taking the address of a direct page object doesn't work: "LEAX <_foo"
   ignores DP.  Some possible sequences instead:
     LDD #_foo ; TFR DP,A ; TFR D,X
     LEAS -1,S ; CLR 0,S ; PSHS DP ; PULS X ; LEAX _foo,X
     TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X
     TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X
+  (Not covered by the tests.)
+
+ar09
+----
+
+- The move operation (m, ma, mb) doesn't move members: it deletes the
+  members it is given, and with a single-member archive and no position
+  it loops, writing its temporary file (archive_supersede) without end.
   (Not covered by the tests.)

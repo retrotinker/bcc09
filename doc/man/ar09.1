@@ -1,0 +1,110 @@
+.TH AR09 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+ar09 \- make and change libraries (archives) of object files
+.SH SYNOPSIS
+.B ar09
+.RB [ \- ]\c
+.IR key " [" position "] " archive
+.RI [ file ...]
+.SH DESCRIPTION
+.B ar09
+keeps object files from
+.BR as09 (1)
+together in an archive, a library that
+.BR ld09 (1)
+links the members of that a program needs.
+It is the Free Software Foundation's ar of 1988, as dev86 has it.
+.PP
+The
+.I key
+is one operation letter, with modifier letters after it.
+.SH OPERATIONS
+.TP
+.B r
+Put the files in the archive, replacing members of the same names (made
+if there is no archive).
+.TP
+.B q
+Append the files to the archive quickly, without looking for members of
+the same names.
+.TP
+.B d
+Delete the members named.
+.TP
+.B x
+Extract the members named (all of them if none is).
+.TP
+.B t
+List the members (those named, or all).
+.TP
+.B p
+Print the members' contents on standard output.
+.TP
+.B m
+Meant to move the members named (to the end, or to
+.IR position ):
+it doesn't work (see
+.BR BUGS ).
+.SH MODIFIERS
+.TP
+.B a
+Put new members after the member
+.IR position .
+.TP
+.BR b ", " i
+Put them before
+.IR position .
+.TP
+.B c
+Make the archive without saying so.
+.TP
+.B u
+With
+.BR r ,
+replace only members older than their files.
+.TP
+.B o
+With
+.BR x ,
+give the files the dates the members have.
+.TP
+.B s
+Meant to write a symbol table into the archive, as the member
+__.SYMDEF: it can't read
+.BR as09 's
+objects, so the table is empty.
+.B ld09
+doesn't need one (it reads every member's symbols), and ignores it.
+.TP
+.B v
+Say what is done to each member.
+.TP
+.B l
+Accepted and ignored.
+.SH BUGS
+The move operation
+.RB ( m )
+deletes the members it is given rather than moving them, and with a
+one-member archive and no position it loops, writing its temporary
+file without end.
+Don't use it: delete and add members with
+.B d
+and
+.B r
+instead.
+.SH EXIT STATUS
+0 if all went well, 1 otherwise.
+.SH EXAMPLES
+A library of three objects, then its members:
+.PP
+.RS
+.nf
+ar09 rc libmine.a one.o two.o three.o
+ar09 t libmine.a
+.fi
+.RE
+.SH SEE ALSO
+.BR bcc09 (1),
+.BR as09 (1),
+.BR ld09 (1),
+.BR objdump09 (1)

@@ -23,6 +23,11 @@ Disk Extended Color BASIC LOADM files (-O decb), Dragon DOS binaries
 (-O ddos), OS-9 modules (-O os9), FLEX commands (-O flex, a .CMD file)
 and Color BASIC cassette images (-O cas or -O wav).
 
+The man pages in doc/man describe each program: bcc09(1), as09(1),
+ld09(1), ar09(1), objdump09(1) (also nm09 and size09) and objcopy09(1);
+"make install" puts them in $(PREFIX)/share/man ("man -l doc/man/bcc09.1"
+reads one in place).
+
 The resulting binary can be loaded onto your 6809-based target device
 using whatever tools you have available to you.  Loading that code
 and making it all work remains as an exercise for the reader...

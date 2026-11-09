@@ -1,0 +1,139 @@
+.TH OBJCOPY09 1 2026-11-09 bcc09 "bcc09 Manual"
+.SH NAME
+objcopy09 \- make a 6809 executable into what a machine loads
+.SH SYNOPSIS
+.B objcopy09
+.RB [ \-O
+.IR format ]
+.RB [ \-n
+.IR name ]
+.RB [ \-T
+.IR address ]
+.RB [ \-D
+.IR address ]
+.RB [ \-p ]
+.RB [ \-v
+.IR revision ]
+.RB [ \-d
+.IR size ]
+.RB [ \-r ]
+.I executable output
+.SH DESCRIPTION
+.B objcopy09
+reads an executable (an a.out file) from
+.BR ld09 (1)
+and writes its code and data in one of the forms that 6809 machines,
+their systems and their tools load.
+.SH OPTIONS
+.TP
+.BI \-O " format"
+The form to write:
+.RS
+.TP
+.B binary
+The bytes alone (the default): the code, then the data.
+.TP
+.B srec
+Motorola S-records: S0 (holding the name), S1, and S9 with the entry
+point.
+.TP
+.B ihex
+Intel hex records, with CR LF line ends.
+.TP
+.B decb
+A Disk Extended Color BASIC file, for LOADM (and EXEC): blocks of an
+address and bytes, a second for data linked apart from the code, and
+the entry point.
+.TP
+.B ddos
+A DragonDOS binary file (code and data together).
+.TP
+.B cas
+A Color BASIC cassette image, for CLOADM: a name block (the name, up to
+8 characters, and a machine-language file's entry point and load
+address), data blocks, and an end block, each after a leader.
+For the CoCo and the Dragon, and for emulators (XRoar's
+.BR \-load\-tape ).
+.TP
+.B wav
+The same, as the sound a cassette recorder plays to the machine
+(43200 samples a second).
+.TP
+.B os9
+An OS-9 program module: the module header (type $11, a 6809 program),
+the code, the image of the data (which the start-up code of
+.B "bcc09 \-Mo"
+copies to the data area), the name, and the CRC.
+The data area the module asks for holds the program's data and BSS
+and then
+.B \-d
+bytes for the stack.
+The executable's data should be linked at 0
+.RB ( "ld09 \-i" ,
+as
+.B "bcc09 \-Mo"
+does): there is a warning if it isn't.
+.TP
+.B flex
+A FLEX binary (.CMD) file, a FLEX command: $02 records of an address,
+a count (up to 255) and bytes, and a $16 record with the entry point.
+.RE
+.TP
+.BI \-n " name"
+The name: of the cassette file, the OS-9 module, or the S0 record.
+By default the output file's name, in upper case.
+.TP
+.BI \-T " address"
+The code's load address (by default the address it was linked at).
+.TP
+.BI \-D " address"
+The data's load address, for data linked apart from the code (by
+default the address it was linked at).
+.TP
+.B \-p
+With
+.BR binary ,
+pad the gap between the code and the data with zeros, so that the data
+is at its address's place in the file.
+.TP
+.BI \-v " revision"
+With
+.BR os9 ,
+the module's revision, the low 4 bits of its header's attribute and
+revision byte (0 to 15; up to 127 is taken, setting attribute bits
+too).
+.TP
+.BI \-d " size"
+With
+.BR os9 ,
+the bytes of the data area for the stack (by default the size of
+.BR "ld09 \-H" ,
+or 1024).
+.TP
+.B \-r
+With
+.BR os9 ,
+mark the module reentrant (it is anyway if its data is at 0, or it has
+none).
+.PP
+Addresses and sizes are decimal, hexadecimal after
+.B 0x
+or
+.BR $ ,
+or octal after a 0, and must fit in 16 bits.
+.SH EXIT STATUS
+0 if the file was written, 1 otherwise.
+.SH EXAMPLES
+A Color BASIC program on a cassette, a FLEX command and an OS-9 module:
+.PP
+.RS
+.nf
+objcopy09 \-O cas \-n HELLO hello hello.cas
+objcopy09 \-O flex hello.out HELLO.CMD
+objcopy09 \-O os9 \-n hello \-d 2048 hello.out hello
+.fi
+.RE
+.SH SEE ALSO
+.BR bcc09 (1),
+.BR ld09 (1),
+.BR objdump09 (1)

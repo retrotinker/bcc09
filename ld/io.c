@@ -596,11 +596,11 @@ PUBLIC void usage()
 	putstr(refname);
 #ifdef REL_OUTPUT
 	errexit("\
- [-03NMdimrstyz[-]] [-llib_extension] [-o outfile] [-Ccrtfile]\n\
+ [-Mdimrstvy[-]] [-llib_extension] [-o outfile] [-Ccrtfile]\n\
        [-Llibdir] [-Olibfile] [-Ttextaddr] [-Ddataaddr] [-Hheapsize] infile...");
 #else
 	errexit("\
- [-03NMdimstyz[-]] [-llib_extension] [-o outfile] [-Ccrtfile]\n\
+ [-Mdimstvy[-]] [-llib_extension] [-o outfile] [-Ccrtfile]\n\
        [-Llibdir] [-Olibfile] [-Ttextaddr] [-Ddataaddr] [-Hheapsize] infile...");
 #endif
 }

@@ -1,4 +1,5 @@
 PREFIX=/usr/local/bcc09
+MANDIR=$(PREFIX)/share/man
 
 DIRS=ar as bcc copt cpp ld unproto libc
 
@@ -16,6 +17,7 @@ SIM=tests/sim/sim6809
 
 check: all $(SIM)
 	tests/run.sh
+	tests/man.sh
 
 # optional: the Color BASIC target on real ROMs, in the XRoar emulator
 check-xroar: all
@@ -45,3 +47,5 @@ install: $(DIRS)
 		make PREFIX=$(PREFIX) LIBEXECDIR=$(PREFIX)/libexec/bcc09 \
 			-C $$i install || exit 1 ;\
 	done
+	install -d $(DESTDIR)$(MANDIR)/man1
+	install -m 644 doc/man/*.1 $(DESTDIR)$(MANDIR)/man1
