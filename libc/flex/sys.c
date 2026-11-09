@@ -4,7 +4,7 @@
  * terminal would, and standard output and standard error go to the
  * terminal.  The bytes pass as they are: a line typed ends with a CR
  * ('\r'), and FLEX's terminal starts a new line with CR LF ("\r\n").
- * There are no files yet.
+ * Descriptors from 3 up are FLEX's files (file.c).
  *
  * Written for bcc09.  Like the rest of libc, it is distributed under the
  * GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -13,13 +13,11 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "flex.h"
 
 #define CR		0x0d
 #define LF		0x0a
 #define BSCH		(*(unsigned char *) 0xcc00)	/* TTYSET's backspace */
-
-extern int __flex_inch();
-extern void __flex_putchr();
 
 #ifdef L_write
 ssize_t
@@ -31,6 +29,8 @@ size_t n;
    register const char *p = buf;
    register size_t i;
 
+   if (fd >= FLEX_FIRSTFILE && __flex_files)
+      return (*__flex_files->write) (fd, buf, n);
    if (fd != 1 && fd != 2)
    {
       errno = EBADF;
@@ -65,6 +65,8 @@ size_t n;
    size_t got;
    int bs = BSCH ? BSCH : 0x08;
 
+   if (fd >= FLEX_FIRSTFILE && __flex_files)
+      return (*__flex_files->read) (fd, buf, n);
    if (fd != 0)
    {
       errno = EBADF;
@@ -132,6 +134,8 @@ int fd;
 off_t offset;
 int whence;
 {
+   if (fd >= FLEX_FIRSTFILE && __flex_files)
+      return (*__flex_files->lseek) (fd, offset, whence);
    errno = (fd >= 0 && fd <= 2) ? ESPIPE : EBADF;
    return -1L;
 }
@@ -142,6 +146,8 @@ int
 close(fd)
 int fd;
 {
+   if (fd >= FLEX_FIRSTFILE && __flex_files)
+      return (*__flex_files->close) (fd);
    if (fd >= 0 && fd <= 2)
       return 0;
    errno = EBADF;
@@ -149,11 +155,6 @@ int fd;
 }
 #endif
 
-#ifdef L_open
-int
-open(const char *name, int flags, ...)
-{
-   errno = ENOENT;		/* (no files yet) */
-   return -1;
-}
+#ifdef L___flex_files
+struct __flex_fileops *__flex_files;	/* (file.c's open() sets it) */
 #endif

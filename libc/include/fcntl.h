@@ -18,6 +18,8 @@
 #define O_EXCL		0200
 #define O_TRUNC		01000
 #define O_APPEND	02000
+#define O_BINARY	04000	/* (FLEX's: no text space compression;
+				   fopen()'s "b") */
 
 /* each target's library has it (see libc/README) */
 extern int open __P ((__const char *, int, ...));

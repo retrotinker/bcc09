@@ -207,10 +207,28 @@ input (sim6809 --flex gives NULs after its input).  Neither changes the
 bytes, as on -Mo and -Me: FLEX's terminal starts a new line with CR LF
 ("\r\n"), and a line read ends with '\r' (getdelim(..., '\r', ...)).
 _exit() goes back to FLEX (WARMS), with the status in B, which FLEX
-ignores and sim6809 --flex takes as its exit status.  There are no files
-yet.  "make check" runs a program under sim6809 --flex (with arguments,
-in its line buffer, and input), and "make check-flex" runs one on
-Compusense FLEX for the Dragon 64 in XRoar (tests/flex).
+ignores and sim6809 --flex takes as its exit status, after closing every
+open file (FMSCLS).
+
+FLEX's files (flex/file.c) go through its File Management System, with a
+File Control Block from malloc for each: open(), unlink() and rename()
+(stdio.h; only FLEX has it so far), and read(), write(), lseek() and
+close() on the descriptors open() gives (3 up; 4 at a time).  Names are
+[D.]NAME[.EXT] or NAME[.EXT][.D], made upper case.  FLEX writes a file
+only from its start, into a new one: O_WRONLY needs O_TRUNC (which
+deletes the old file first; fopen()'s "w" has it) if the file is there,
+and O_RDWR and O_APPEND aren't possible (EINVAL).  A file is text, whose
+runs of spaces FLEX stores compressed and whose NULs reading skips,
+unless it is opened with O_BINARY (fcntl.h; fopen()'s "b"): then the
+bytes are as they are, but read() gives the zeros that pad the last
+sector, since FLEX keeps a file's size only in sectors.  lseek() on a
+file open for reading rewinds and reads up to the place (not past the
+end).  "make check" runs programs under sim6809 --flex (with arguments,
+in its line buffer, and input; and FLEX's files, which its FMS keeps on
+the host as their sectors' data), and "make check-flex" runs them on
+Compusense FLEX for the Dragon 64 in XRoar (tests/flex), where the
+files a program writes must be byte for byte the ones it writes under
+sim6809.
 
 sim is for sim6809, the simulator the tests use (tests/sim).  crtsim
 puts the stack just below the simulator's I/O block at $FF00, and

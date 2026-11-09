@@ -460,6 +460,15 @@ run flexio.bcc "$BCC" -Mf -o flexio.out -X-T0x1000 flexio.c
 	> flexio.run 2>&1
 echo $? > flexio.run.rc
 rm -f FLEXIO.CMD
+# and FLEX's files: flexfile.c under sim6809, whose FMS keeps each file's
+# sectors' data in a host file (here); the four files it leaves (TEXT.TXT,
+# BIN.DAT, DRV.TXT, LOWER.TXT) are results too, and must be what FLEX
+# itself writes (make check-flex)
+run flexfile.bcc "$BCC" -Mf -o flexfile.out -X-T0x1000 flexfile.c
+"$OC" -O flex flexfile.out FLEXFILE.CMD
+"$SIM" -n 100000000 --flex FLEXFILE.CMD < /dev/null > flexfile.run 2>&1
+echo $? > flexfile.run.rc
+rm -f FLEXFILE.CMD
 
 # copt's rules, checked by running code: each program above that runs
 # on sim6809 is built again with -O (libc is always built with -O), and

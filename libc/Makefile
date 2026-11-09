@@ -103,8 +103,8 @@ CB_SYS_OBJS = cb/write.o cb/read.o cb/isatty.o cb/lseek.o cb/close.o \
 	  cb/__cb_files.o
 CB_OBJS	= sa/_exit.o cb/rom.o cb/disk.o cb/dskcon.o $(CB_SYS_OBJS)
 FLEX_SYS_OBJS = flex/write.o flex/read.o flex/isatty.o flex/lseek.o \
-	  flex/close.o flex/open.o
-FLEX_OBJS = flex/flex.o flex/start.o $(FLEX_SYS_OBJS)
+	  flex/close.o flex/__flex_files.o
+FLEX_OBJS = flex/flex.o flex/start.o flex/file.o $(FLEX_SYS_OBJS)
 SIM_SYS_OBJS = sim/isatty.o sim/lseek.o sim/close.o sim/open.o
 SIM_OBJS = sim/_exit.o sim/read.o sim/write.o $(SIM_SYS_OBJS)
 
@@ -192,7 +192,7 @@ $(SCANF_OBJS): stdio/%.o: stdio/scanf.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(CB_SYS_OBJS): cb/%.o: cb/sys.c cb/cb.h $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
-$(FLEX_SYS_OBJS): flex/%.o: flex/sys.c $(HEADERS) .bcc/stamp
+$(FLEX_SYS_OBJS): flex/%.o: flex/sys.c flex/flex.h $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(SIM_SYS_OBJS): sim/%.o: sim/sys.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
@@ -219,6 +219,7 @@ $(SCANF_OBJS) stdio/scanfp.o: stdio/scan.h
 stdio/fpfmt.o stdlib/bignum.o stdlib/strtod.o: stdlib/bignum.h
 $(MATH_OBJS): math/fdlibm.h
 cb/disk.o: cb/cb.h $(HEADERS) .bcc/stamp
+flex/file.o: flex/flex.h $(HEADERS) .bcc/stamp
 
 # everything is built again when the tools change, the optimizer's rules
 # too (libc is built with -O)

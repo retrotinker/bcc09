@@ -86,7 +86,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     the word before LPOINT, which real FLEX leaves past the name's blank, so
     `P,PROG` gives `PROG`), I/O through `INCH`/`PUTCHR` with no newline translation
     (lines typed end with CR; FLEX's terminal wants CR LF), exit through `WARMS` with
-    B (sim6809's exit status). No files yet.
+    B (sim6809's exit status) after FMSCLS. Files (`flex/file.c`, added 2026-11-09)
+    through FMS: text (space compression) or `O_BINARY` (`"b"`), write only into new
+    files (`O_TRUNC` deletes first; no `O_RDWR`/`O_APPEND`), `lseek()` for reading only,
+    `unlink`, `rename`. Real FLEX's rewind makes an FCB text again, and delete puts `$FF`
+    in its name: `file.c` and sim6809 both allow for it.
   - The others (`-Mu`, `-Mr`, `-Mb`, `-Mv`) can't link yet (`notarget` uses `-Mv`).
 - OS-9's data model (begun 2026-11-08): `-Mo` passes `cc1 -u`, which is `-p`
   (position-independent code: functions and string constants `,PCR`, calls `LBSR`) with
@@ -110,7 +114,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `dirent.h`; added 2026-11-09). Every call clears the registers it doesn't set
   (`OS9_CLEAR`): garbage in them made `I$MakDir` take nearly a whole disk. Still to do:
   `rmdir`, `getcwd`.
-- Next: FLEX's files, `%a` in `printf`, faster floating
+- Next: `%a` in `printf`, faster floating
   point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
@@ -152,7 +156,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 557 reference
+  `tests/src/` with this tree's tools and compare every result with the 566 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -162,8 +166,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - `ld09` only loads modules that something refers to, even object files named on the
   command line.
 - Test programs run on `sim6809`, a copy of the simulator from the plm09 project
-  (0.4.5, whose `--os9` emulates OS-9's file, directory and `F$Mem` calls on the host,
-  and whose `--flex` puts `--param` in FLEX's line buffer) in
+  (0.4.6, whose `--os9` emulates OS-9's file, directory and `F$Mem` calls on the host,
+  and whose `--flex` puts `--param` in FLEX's line buffer and emulates FMS on host
+  files) in
   `tests/sim/` (see
   its README). `tests/src/selftest.c` checks code from the other test
   sources against values from the host compiler and exits with the number of failures;
@@ -218,9 +223,13 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `~/coco/flex/FLEX_1.3.2.VDK`) puts `tests/flex/xflex.c` (`-Mf`) and `done.s` (at
   `$C600`, where XRoar traps) on a copy of the disk with `flexdisk.py` (plm09's), with
   its boot image patched not to ask the date (as plm09's dragonflex tests do); its
-  `STARTUP` EXECs `P,XFLEX one,two three` and `DONE`, and the printer's output (XRoar's
-  `-lp-file`) must equal `tests/flex/expected`. FLEX has no exit status: xflex prints
-  its checks. `FLEX_KEEP=1` keeps the files.
+  `STARTUP` EXECs `P,XFLEX one,two three`, `P,FLEXFILE` (`tests/src/flexfile.c`) and
+  `DONE`; the printer's output (XRoar's `-lp-file`) must equal `tests/flex/expected` and
+  then flexfile's output under sim6809, and the files flexfile leaves, read off the disk
+  (`flexdisk.py get`), must equal the ones it leaves under sim6809. FLEX has no exit
+  status: the programs print their checks. The disk runs at real speed, so the run
+  takes minutes of emulated time (`-timeout 900`; a DONE snapshot shows it finished).
+  `FLEX_KEEP=1` keeps the files.
 - `make check-nitros9` (`tests/nitros9/run.sh`, optional: needs `xroar`, toolshed's `os9`,
   a NitrOS-9 Level 2 boot disk, `$NITROS9_DISK` or `~/coco/nitros9.os9`, and the CoCo 3
   ROM, `$COCO3_ROM` or `/usr/share/mame/roms/coco3.rom`) boots NitrOS-9 on a CoCo 3 in
@@ -243,6 +252,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `$C000`: DSKCON on tracks 16-18 kept in memory, granules 32-35 free) and checks
   `libc/cb/disk.c`: files of several granules, a full disk, deleting, truncating, and the
   FAT's and directory's bytes it prints.
+- `tests/src/flexio.c` (`-Mf`, under `sim6809 --flex` with `--param` and input) checks
+  argv and terminal I/O; `flexfile.c` FLEX's files, and leaves `TEXT.TXT`, `BIN.DAT`,
+  `DRV.TXT` and `LOWER.TXT` in `tests/out` (sim6809's FMS writes host files there),
+  which are references too, and what `make check-flex` compares FLEX's own with.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
 
