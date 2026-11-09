@@ -16,9 +16,13 @@ extern int errno;
 #define EBADF	9		/* bad file descriptor */
 #define ENOMEM	12		/* out of memory */
 #define EACCES	13		/* permission denied */
+#define EBUSY	16		/* in use */
 #define EEXIST	17		/* file exists */
+#define ENODEV	19		/* no such device */
 #define EINVAL	22		/* invalid argument */
+#define EMFILE	24		/* too many open files */
 #define ENOTTY	25		/* not a terminal */
+#define ENOSPC	28		/* no space left on the device */
 #define ESPIPE	29		/* can't seek */
 #define EDOM	33		/* argument out of a math function's domain */
 #define ERANGE	34		/* result out of range */

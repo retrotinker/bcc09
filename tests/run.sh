@@ -430,7 +430,22 @@ grep -v '^S[059]' cbrom.srec | cat - cbtest.srec > cbtest-rom.srec
 "$SIM" -n 50000000 --entry "0x$entry" cbtest-rom.srec < cbtest.in \
 	> cbtest.run 2>&1
 echo $? > cbtest.run.rc
-rm -f cbrom.o cbrom.out cbrom.srec cbtest.srec cbtest-rom.srec
+# and Disk BASIC's files: cbdisk.s stands in for its ROM at $C000, with
+# a disk of 4 free granules in memory; cbfile.c writes, reads, seeks,
+# fills the disk, deletes and truncates, and prints the FAT's and the
+# directory's bytes
+run cbdisk.as "$AS" -o cbdisk.o cbdisk.s
+"$LD" -T0xc000 -o cbdisk.out cbdisk.o
+"$OC" -O srec cbdisk.out cbdisk.srec
+run cbfile.bcc "$BCC" -Me -o cbfile.out -X-T0x3000 loader.s cbfile.c
+"$OC" -O srec cbfile.out cbfile.srec
+entry=$("$OD" -n cbfile.out | awk '$3 == "loader" { print $1 }')
+grep -hv '^S[059]' cbrom.srec cbdisk.srec | cat - cbfile.srec > cbfile-rom.srec
+"$SIM" -n 100000000 --entry "0x$entry" cbfile-rom.srec < /dev/null \
+	> cbfile.run 2>&1
+echo $? > cbfile.run.rc
+rm -f cbrom.o cbrom.out cbrom.srec cbtest.srec cbtest-rom.srec cbdisk.o \
+	cbdisk.out cbdisk.srec cbfile.srec cbfile-rom.srec
 
 # copt's rules, checked by running code: each program above that runs
 # on sim6809 is built again with -O (libc is always built with -O), and

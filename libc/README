@@ -156,14 +156,35 @@ showing the keys, with the left arrow to rub out and ENTER to end the
 line; BREAK at the start of a line is the end of the input.  Neither
 changes the bytes: a line ends with a carriage return ('\r'), on the
 screen and from the keyboard, so a program prints "\r" to end a line,
-and reads lines up to a '\r' (fgets() reads to a '\n').  There are no files yet (Disk BASIC's will come).
+and reads lines up to a '\r' (fgets() reads to a '\n').
+
+With Disk BASIC (on a CoCo, not a Dragon: DragonDOS's disks are
+another format), open() and unlink() work on its files (cb/disk.c), and
+read(), write(), lseek() and close() on the descriptors open() gives
+(3 up; 4 at a time), which stdio's fopen() uses.  The files are RS-DOS's,
+read and written a sector at a time through DSKCON (cb/dskcon.s), with
+libc's own FAT and directory handling: names are NAME.EXT (or
+NAME/EXT), with :D for drive D, or Disk BASIC's default drive; a new
+file is a data file marked ASCII, as Disk BASIC's OPEN "O" makes, and
+gets granules in the order Disk BASIC picks them; the FAT is written
+when a file is made, closed or deleted, and a file's directory entry
+when it is made and closed; write() takes a granule before it writes in
+it, so on a full disk it writes what fits and then fails with ENOSPC;
+lseek() can't go past the end of a file.  Disk BASIC reads the FAT
+again after the program, so the two can share a disk.  A program that
+opens no files doesn't carry this.  Without Disk BASIC, open() fails
+with ENODEV.
+
 Load the program low, at $2800 or $3000 say (bcc09 -X-T0x3000), below
 BASIC's stack and strings at the top of memory: the heap is the memory
 between the end of the program and the stack.  "make check" tests it
-with a stand-in for the ROM (tests/src/cbrom.s); "make check-xroar"
-tests it on the real ROMs of the CoCo, CoCo 2, Dragon 32 and Dragon 64,
-in the XRoar emulator (tests/xroar), where the Dragon's vectors turn out
-to be the same.  The CoCo 3 hasn't been tried.
+with stand-ins for the ROMs (tests/src/cbrom.s, and cbdisk.s for Disk
+BASIC, with a small disk in memory); "make check-xroar" tests it on the
+real ROMs of the CoCo, CoCo 2, Dragon 32 and Dragon 64, in the XRoar
+emulator (tests/xroar), where the Dragon's vectors turn out to be the
+same, and its files on the CoCo with Disk BASIC 1.0, the CoCo 2 with
+1.1 and the CoCo 3, where BASIC reads a file the program wrote and
+writes one, and toolshed's decb and xrdisk.py check the disk.
 
 sim is for sim6809, the simulator the tests use (tests/sim).  crtsim
 puts the stack just below the simulator's I/O block at $FF00, and

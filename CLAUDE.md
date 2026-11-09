@@ -74,7 +74,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     ROM's POLCAT/CHROUT vectors (the Dragon's are the same), with no newline
     translation (decided 2026-11-09: a line ends with `'\r'`, both ways); tested with a stand-in ROM
     (`tests/src/cbrom.s`) by `make check`, and on real ROMs in XRoar by
-    `make check-xroar`; no files yet; the CoCo 3 is untried (no ROM here).
+    `make check-xroar`. Disk BASIC's files (added 2026-11-09; CoCo only, not DragonDOS):
+    `libc/cb/disk.c` does RS-DOS's FAT and directory itself on DSKCON (`cb/dskcon.s`),
+    and `open()` sets the hook (`__cb_files`, `cb/cb.h`) that `read`/`write`/`lseek`/`close`
+    use for descriptors 3 up, so programs without files don't carry it.
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
   - `-Mo` → `crtos9.o` + `libos9.a` (all of libc built again with `-Mo`, in `os9obj`):
     OS-9 program modules (below).
@@ -101,7 +104,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `dirent.h`; added 2026-11-09). Every call clears the registers it doesn't set
   (`OS9_CLEAR`): garbage in them made `I$MakDir` take nearly a whole disk. Still to do:
   `rmdir`, `getcwd`.
-- Next: Disk BASIC files for `-Me`, FLEX, `%a` in `printf`, faster floating
+- Next: FLEX, `%a` in `printf`, faster floating
   point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
@@ -143,7 +146,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 536 reference
+  `tests/src/` with this tree's tools and compare every result with the 543 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -192,8 +195,16 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   with `objcopy09`, and runs it in XRoar on the CoCo, CoCo 2, Dragon 32 and Dragon 64:
   `CLOADM:EXEC` and the input are typed with `-type`, a trap at `__exit` takes a
   snapshot, and `xrscreen.py`/`xrcpu.py` read the text screen and the registers from
-  it, which must match `tests/xroar/expected` and exit status 42. Always run XRoar with
-  `-ui null` and a timeout: `xroar -vo help`, for one, starts the emulator in a window.
+  it, which must match `tests/xroar/expected` and exit status 42 (CLOADM's `F` on the
+  first line is inverse or not with the number of blocks: compared as `F`). With
+  toolshed's `decb`, `xdisk.c` then runs with a disk (`decb dskini`, and `IN.DAT`) on the
+  CoCo with Disk BASIC 1.0 and the CoCo 2 with 1.1 (`-cart rsdos -cart-rom diskNN`),
+  where BASIC then reads its `OUT.TXT` and writes a file (a `PEEK(&HFF6A)` ends the
+  run; screen in `expected-disk`), and on the CoCo 3 (exit status only: XRoar doesn't
+  trap that `PEEK` there); `xrdisk.py` checks each disk: the files, and every used
+  granule in one chain. Always run XRoar with `-ui null` and a timeout: `xroar -vo
+  help`, for one, starts the emulator in a window. In scratch work, make a new
+  `mktemp -d` directory rather than `rm` with a glob.
 - `make check-nitros9` (`tests/nitros9/run.sh`, optional: needs `xroar`, toolshed's `os9`,
   a NitrOS-9 Level 2 boot disk, `$NITROS9_DISK` or `~/coco/nitros9.os9`, and the CoCo 3
   ROM, `$COCO3_ROM` or `/usr/share/mame/roms/coco3.rom`) boots NitrOS-9 on a CoCo 3 in
@@ -212,6 +223,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   label comes within reach; `flushout()` keeps the text from the oldest such branch
   (`openpatch()`, growing the buffer), so that no longer depends on how much text,
   such as the headers' names in comments, comes between (fixed 2026-11-09).
+- `tests/src/cbfile.c` runs with `cbrom.s` and `cbdisk.s` (Disk BASIC's stand-in at
+  `$C000`: DSKCON on tracks 16-18 kept in memory, granules 32-35 free) and checks
+  `libc/cb/disk.c`: files of several granules, a full disk, deleting, truncating, and the
+  FAT's and directory's bytes it prints.
 - `tests/src/simcrt0.s` is start-up code for test programs that report through the
   simulator's I/O block; it isn't libc's `crt0`.
 

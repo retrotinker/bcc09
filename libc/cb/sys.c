@@ -3,7 +3,8 @@
  * (-DL_name).  Standard input is the keyboard, read a line at a time as a
  * terminal would, and standard output and standard error are the screen.
  * The bytes pass as they are: a line ends with a carriage return (CR,
- * '\r'), on the screen and from the keyboard.  There are no files yet.
+ * '\r'), on the screen and from the keyboard.  Descriptors from 3 up are
+ * Disk BASIC's files (disk.c).
  *
  * Written for bcc09.  Like the rest of libc, it is distributed under the
  * GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -12,14 +13,13 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "cb.h"
 
 #define KEY_BREAK	0x03
 #define KEY_LEFT	0x08		/* the left arrow: rub out */
 #define KEY_ENTER	0x0d
 #define CR		0x0d
 
-extern int __cb_polcat();
-extern void __cb_chrout();
 
 #ifdef L_write
 ssize_t
@@ -31,6 +31,8 @@ size_t n;
    register const char *p = buf;
    register size_t i;
 
+   if (fd >= CB_FIRSTFILE && __cb_files)
+      return (*__cb_files->write) (fd, buf, n);
    if (fd != 1 && fd != 2)
    {
       errno = EBADF;
@@ -62,6 +64,8 @@ size_t n;
    register int c;
    size_t got;
 
+   if (fd >= CB_FIRSTFILE && __cb_files)
+      return (*__cb_files->read) (fd, buf, n);
    if (fd != 0)
    {
       errno = EBADF;
@@ -127,6 +131,8 @@ int fd;
 off_t offset;
 int whence;
 {
+   if (fd >= CB_FIRSTFILE && __cb_files)
+      return (*__cb_files->lseek) (fd, offset, whence);
    errno = (fd >= 0 && fd <= 2) ? ESPIPE : EBADF;
    return -1L;
 }
@@ -137,6 +143,8 @@ int
 close(fd)
 int fd;
 {
+   if (fd >= CB_FIRSTFILE && __cb_files)
+      return (*__cb_files->close) (fd);
    if (fd >= 0 && fd <= 2)
       return 0;
    errno = EBADF;
@@ -144,11 +152,6 @@ int fd;
 }
 #endif
 
-#ifdef L_open
-int
-open(const char *name, int flags, ...)
-{
-   errno = ENOENT;		/* (no files yet) */
-   return -1;
-}
+#ifdef L___cb_files
+struct __cb_fileops *__cb_files;	/* (disk.c's open() sets it) */
 #endif
