@@ -5,12 +5,14 @@
 PREFIX	=/usr/local/bcc09
 LIBDIR	=$(PREFIX)/lib/bcc09
 
-AS09	=../as/as09
-AR09	=../ar/ar09
+# (TOP, this directory, also when OS-9's libc is built in os9obj)
+TOP	?=$(CURDIR)
+AS09	=$(TOP)/../as/as09
+AR09	=$(TOP)/../ar/ar09
 
 # bcc09 finds its passes under BCC_PREFIX: .bcc has links to this tree's
-BCC	=BCC_PREFIX=$(CURDIR)/.bcc ../bcc/bcc09
-BCCFLAGS=-O -Iinclude
+BCC	=BCC_PREFIX=$(TOP)/.bcc $(TOP)/../bcc/bcc09
+BCCFLAGS=-O -I$(TOP)/include
 
 # libc.a holds what is the same for every target.  Each target has its
 # own start-up code, which bcc09 links first (ld09 -C<name>: crt<name>.o),
@@ -21,6 +23,9 @@ BCCFLAGS=-O -Iinclude
 #   cb:  Color BASIC (-Me, a program run with EXEC): crt0.o and libcb.a,
 #        with I/O through the ROM
 #   sim: sim6809 (-Mi): crtsim.o and libsim.a
+#   os9: OS-9 (-Mo): crtos9.o and libos9.a, which is all of libc built
+#        again with -Mo (position-independent, data through U) in os9obj,
+#        with os9/'s sbrk, hooks and system functions
 #
 # bcc: the run-time helpers the compiler calls
 # ctype: character classes
@@ -70,7 +75,7 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/fpconv.o bcc/fpincdec.o \
 	  ctype/ctype.o ctype/ctypefn.o \
 	  $(MALLOC_OBJS) $(STDIO_OBJS) $(PRINTF_OBJS) stdio/fpfmt.o stdio/xfpcvt.o \
-	  $(SCANF_OBJS) stdio/scanfp.o stdio/xfptvc.o \
+	  $(SCANF_OBJS) stdio/scanfp.o stdio/xfptvc.o stdio/remove.o \
 	  stdlib/exit.o stdlib/atexit.o stdlib/errno.o stdlib/bignum.o \
 	  stdlib/strtod.o stdlib/atof.o \
 	  stdlib/sbrk.o \
@@ -96,7 +101,14 @@ CB_OBJS	= sa/_exit.o cb/rom.o $(CB_SYS_OBJS)
 SIM_SYS_OBJS = sim/isatty.o sim/lseek.o sim/close.o sim/open.o
 SIM_OBJS = sim/_exit.o sim/read.o sim/write.o $(SIM_SYS_OBJS)
 
-TARGETS	= crt0.o libsa.a libcb.a crtsim.o libsim.a
+OS9_SYS_OBJS = os9/__os9errno.o os9/_exit.o os9/write.o os9/read.o \
+	  os9/open.o os9/close.o os9/lseek.o os9/isatty.o os9/unlink.o
+OS9_OBJS = $(filter-out stdlib/sbrk.o stdio/xfpcvt.o stdio/xfptvc.o,$(OBJS)) \
+	  os9/call.o os9/start.o os9/sbrk.o os9/xfpcvt.o os9/xfptvc.o \
+	  $(OS9_SYS_OBJS)
+OS9_DIRS = bcc ctype malloc stdio stdlib string math os9
+
+TARGETS	= crt0.o libsa.a libcb.a crtsim.o libsim.a crtos9.o libos9.a
 
 all: libc.a $(TARGETS)
 
@@ -105,50 +117,75 @@ libc.a: $(OBJS)
 	$(AR09) rc $@ $(OBJS)
 
 crt0.o: sa/crt0.o
-	cp sa/crt0.o $@
+	cp $< $@
 libsa.a: $(SA_OBJS)
 	rm -f $@
 	$(AR09) rc $@ $(SA_OBJS)
+
+crtsim.o: sim/crtsim.o
+	cp $< $@
+libsim.a: $(SIM_OBJS)
+	rm -f $@
+	$(AR09) rc $@ $(SIM_OBJS)
 
 libcb.a: $(CB_OBJS)
 	rm -f $@
 	$(AR09) rc $@ $(CB_OBJS)
 
-crtsim.o: sim/crtsim.o
-	cp sim/crtsim.o $@
-libsim.a: $(SIM_OBJS)
+ifdef SUBOS9
+# (in os9obj, finding the sources in TOP: not with VPATH, which would
+# find the other build's objects there too)
+vpath %.c $(TOP)
+vpath %.s $(TOP)
+vpath %.h $(TOP)
+vpath %stamp $(TOP)
+libos9.a: $(OS9_OBJS)
 	rm -f $@
-	$(AR09) rc $@ $(SIM_OBJS)
+	$(AR09) rc $@ $(OS9_OBJS)
+crtos9.o: os9/crt0.o
+	cp $< $@
+$(OS9_SYS_OBJS): os9/%.o: os9/sys.c os9/os9.h $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+os9/start.o os9/sbrk.o: $(HEADERS) .bcc/stamp $(TOOLS)
+else
+libos9.a crtos9.o: os9build
+	cmp -s os9obj/$@ $@ || cp os9obj/$@ $@
+os9build: .bcc/stamp
+	mkdir -p $(addprefix os9obj/,$(OS9_DIRS))
+	$(MAKE) -C os9obj -f $(TOP)/Makefile TOP=$(TOP) SUBOS9=1 \
+		BCCFLAGS="-O -Mo -I$(TOP)/include" libos9.a crtos9.o
+.PHONY: os9build
+endif
 
 .bcc/stamp:
 	rm -rf .bcc
 	mkdir -p .bcc/bin .bcc/libexec/bcc09
-	ln -s $(CURDIR)/../as/as09 $(CURDIR)/../ld/ld09 .bcc/bin/
-	ln -s $(CURDIR)/../cpp/cpp $(CURDIR)/../bcc/cc1 \
-	      $(CURDIR)/../copt/copt $(CURDIR)/../copt/rules.6809 \
-	      $(CURDIR)/../unproto/unproto .bcc/libexec/bcc09/
+	ln -s $(TOP)/../as/as09 $(TOP)/../ld/ld09 .bcc/bin/
+	ln -s $(TOP)/../cpp/cpp $(TOP)/../bcc/cc1 \
+	      $(TOP)/../copt/copt $(TOP)/../copt/rules.6809 \
+	      $(TOP)/../unproto/unproto .bcc/libexec/bcc09/
 	touch $@
 
 $(STRING_OBJS): string/%.o: string/string.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ string/string.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(STDIO_OBJS): stdio/%.o: stdio/stdio.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdio/stdio.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(PRINTF_OBJS): stdio/%.o: stdio/printf.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdio/printf.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(SCANF_OBJS): stdio/%.o: stdio/scanf.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdio/scanf.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(CB_SYS_OBJS): cb/%.o: cb/sys.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ cb/sys.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(SIM_SYS_OBJS): sim/%.o: sim/sys.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ sim/sys.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(MALLOC_OBJS): malloc/%.o: malloc/malloc.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ malloc/malloc.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(ABS_OBJS): stdlib/%.o: stdlib/abs.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdlib/abs.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(STRTOL_OBJS): stdlib/%.o: stdlib/strtol.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdlib/strtol.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(RAND_OBJS): stdlib/%.o: stdlib/rand.c $(HEADERS) .bcc/stamp
-	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ stdlib/rand.c
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 
 .SUFFIXES: .s .c .o
 .s.o:
@@ -164,8 +201,9 @@ $(MATH_OBJS): math/fdlibm.h
 
 # everything is built again when the tools change, the optimizer's rules
 # too (libc is built with -O)
-TOOLS	= ../bcc/bcc09 ../bcc/cc1 ../cpp/cpp ../unproto/unproto \
-	  ../copt/copt ../copt/rules.6809 $(AS09)
+TOOLS	= $(TOP)/../bcc/bcc09 $(TOP)/../bcc/cc1 $(TOP)/../cpp/cpp \
+	  $(TOP)/../unproto/unproto $(TOP)/../copt/copt \
+	  $(TOP)/../copt/rules.6809 $(AS09)
 $(OBJS) $(SA_OBJS) $(CB_OBJS) $(SIM_OBJS) sa/crt0.o sim/crtsim.o: $(TOOLS)
 
 install: libc.a $(TARGETS)
@@ -176,6 +214,6 @@ install: libc.a $(TARGETS)
 
 clean realclean clobber:
 	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o cb/*.o sim/*.o stdio/*.o
-	rm -rf .bcc
+	rm -rf .bcc os9obj
 
 .PHONY: all install clean realclean clobber

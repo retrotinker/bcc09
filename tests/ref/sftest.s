@@ -105,57 +105,59 @@
 ; 113 
 ; 114 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 115 extern FILE *fdopen () __proto(int,char*);
+; 115 extern int remove () __proto(char*);
 ;BCC_EOS
-; 116 extern FILE *freopen  () __proto(char*,char*,FILE*);
+; 116 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 117 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
+; 117 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 118 
-; 119 extern int fseek () __proto(FILE*,long,int);
+; 118 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
-; 120 extern long ftell () __proto(FILE*);
+; 119 
+; 120 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 121 extern void rewind () __proto(FILE*);
+; 121 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 122 
-; 123 extern int fputs () __proto(char*,FILE*);
+; 122 extern void rewind () __proto(FILE*);
 ;BCC_EOS
-; 124 extern int puts () __proto(char*);
+; 123 
+; 124 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 125 
-; 126 extern int printf () __proto(char*,...);
+; 125 extern int puts () __proto(char*);
 ;BCC_EOS
-; 127 extern int fprintf () __proto(FILE*,char*,...);
+; 126 
+; 127 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 128 extern int sprintf () __proto(char*,char*,...);
+; 128 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 129 extern int snprintf () __proto(char*,size_t,char*,...);
+; 129 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 130  
-; 131 extern int vprintf () __proto(char*,char*);
+; 130 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
-; 132 extern int vfprintf () __proto(FILE*,char*,char*);
+; 131  
+; 132 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 133 extern int vspri
-; 133 ntf () __proto(char*,char*,char*);
+; 133 extern int vfprintf () __proto
+; 133 (FILE*,char*,char*);
 ;BCC_EOS
-; 134 extern int vsnprintf () __proto(char*,size_t,char*,char*);
+; 134 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 135 
-; 136 extern int scanf () __proto(char*,...);
+; 135 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
-; 137 extern int fscanf () __proto(FILE*,char*,...);
+; 136 
+; 137 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 138 extern int sscanf () __proto(char*,char*,...);
+; 138 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 139 extern int vscanf () __proto(char*,char*);
+; 139 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 140 extern int vfscanf () __proto(FILE*,char*,char*);
+; 140 extern int vscanf () __proto(char*,char*);
 ;BCC_EOS
-; 141 extern int vsscanf () __proto(char*,char*,char*);
+; 141 extern int vfscanf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 142 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 142 extern int vsscanf () __proto(char*,char*,char*);
+;BCC_EOS
+; 143 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -250,7 +252,8 @@ _ok:
 	LDD	4,S
 		BNE	.1
 .2:
-; 17 		++failures;
+; 17 		
+; 17 ++failures;
 ; Debug: preinc int = [failures+0] (used reg = )
 	LDD	>_failures
 	ADDD	#1
@@ -272,7 +275,6 @@ _ok:
 	JSR	>_printf
 	LEAS	2,S
 ;BCC_EOS
-; 19 
 ; 19 	}
 ; 20 }
 .1:
@@ -1740,12 +1742,13 @@ _numbers:
 	JSR	>_ti
 	LEAS	2,S
 ;BCC_EOS
-; 151 	ti("%d %n%d","12 34");
+; 151 	ti("%d %n%d","12 34
 	LOC	1
 .66:
 	FCC	"%d %n%d"
 	FCB	0
 	LOC	0
+; 151 ");
 	LOC	1
 .67:
 	FCC	"12 34"
@@ -1780,13 +1783,12 @@ _numbers:
 	JSR	>_ti
 	LEAS	2,S
 ;BCC_EOS
-; 153 	ti("%*d%d","
+; 153 	ti("%*d%d","5");
 	LOC	1
 .6A:
 	FCC	"%*d%d"
 	FCB	0
 	LOC	0
-; 153 5");
 	LOC	1
 .6B:
 	FCC	"5"
@@ -3446,13 +3448,14 @@ _others:
 ; Debug: eq int = X+0 to int r = [S+$2A-$28] (used reg = )
 	STX	2,S
 ;BCC_EOS
-; 255 	printf("%d %u\n",r,(unsigned)(unsigned long)p);
+; 255 	printf("%d %u\n",r,(unsigne
 	LOC	1
 .10C:
 	FCC	"%d %u"
 	FCB	$A
 	FCB	0
 	LOC	0
+; 255 d)(unsigned long)p);
 ; Debug: cast unsigned long = const 0 to * void p = [S+$2A-$22] (used reg = )
 	LDD	8,S
 	EXG	D,X
@@ -3470,8 +3473,7 @@ _others:
 	JSR	>_printf
 	LEAS	4,S
 ;BCC_EOS
-; 256 	sprintf(buf,"%p
-; 256 ",(void *)0x4321);
+; 256 	sprintf(buf,"%p",(void *)0x4321);
 	LOC	1
 .10D:
 	FCC	"%p"

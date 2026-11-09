@@ -1,0 +1,1 @@
+objcopy09: the data isn't at 0 (link with ld09 -i, as bcc09 -Mo does): the code can't find it

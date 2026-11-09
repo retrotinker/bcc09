@@ -74,6 +74,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     (`tests/src/cbrom.s`) by `make check`, and on real ROMs in XRoar by
     `make check-xroar`; no files yet; the CoCo 3 is untried (no ROM here).
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
+  - `-Mo` → `crtos9.o` + `libos9.a` (all of libc built again with `-Mo`, in `os9obj`):
+    OS-9 program modules (below).
   - The others can't link yet.
 - OS-9's data model (begun 2026-11-08): `-Mo` passes `cc1 -u`, which is `-p`
   (position-independent code: functions and string constants `,PCR`, calls `LBSR`) with
@@ -81,11 +83,17 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   register for values (`codeinit()`), a double result goes through the common `__dret`
   (`dretsym()`, `dretcopy()`), and `?:` and misplaced arguments of doubles are moved on
   the stack (`dblplace()`), since D, X, Y and U can't hold one. Plain `-p` keeps data
-  PC-relative (code and data move together). `run.sh` runs `-Mo` code under `simcrt0.s`
-  with U 0. Still to do: an OS-9 build of libc (PIC helpers, `crt`, system calls),
-  linking and `objcopy09 -O os9` modules run by `sim6809 --os9`, and the start-up fixing
-  of static initializers that hold addresses.
-- Next: OS-9 (above), Disk BASIC files for `-Me`, FLEX, `%a` in `printf`, faster floating
+  PC-relative (code and data move together). A static initializer that holds an
+  address becomes code in an init function (`dumpinits()` in `loadexp.c`). The driver
+  links with `ld09 -i` (data at 0); `objcopy09 -O os9` makes the module (`-d`: stack and
+  heap, 1K by default), whose `crtos9` copies the data, clears the BSS, runs the init
+  functions and passes `argv` from the parameters. `libc/os9/sys.c` has the system
+  functions (`read`/`write` through `I$ReadLn`/`I$WritLn`, with no newline translation:
+  decided 2026-11-09, OS-9's lines end with CR; files; `unlink`). `run.sh`
+  runs `-Mo` code under `simcrt0.s` with U 0, and modules under `sim6809 --os9`
+  (`os9io.c`, and eight programs that must run as with `-Mi`: `os9.result`). Still to do:
+  running on real OS-9 (NitrOS-9 in XRoar), directories, `F$` memory calls.
+- Next: OS-9 on real systems (above), Disk BASIC files for `-Me`, FLEX, `%a` in `printf`, faster floating
   point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
@@ -127,7 +135,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 530 reference
+  `tests/src/` with this tree's tools and compare every result with the 533 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -136,8 +144,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   an installed copy (such as an old one in `/usr/local/bcc09`) is never used.
 - `ld09` only loads modules that something refers to, even object files named on the
   command line.
-- Test programs run on `sim6809`, a copy of the simulator from the plm09 project in
-  `tests/sim/` (see its README). `tests/src/selftest.c` checks code from the other test
+- Test programs run on `sim6809`, a copy of the simulator from the plm09 project
+  (0.4.3, whose `--os9` emulates OS-9's file calls on host files) in `tests/sim/` (see
+  its README). `tests/src/selftest.c` checks code from the other test
   sources against values from the host compiler and exits with the number of failures;
   it runs both as compiled and with `-O`; it also calls `float.c` (double arguments
   and results).

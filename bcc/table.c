@@ -381,6 +381,7 @@ PUBLIC void dumpglbs()
 					common(symptr->name.namea);
 				outnhex(type->typesize);
 			}
+	dumpinits();	/* (with data through U) */
 	if (printf_fp)
 		globl("__xfpcvt");
 	if (scanf_fp)

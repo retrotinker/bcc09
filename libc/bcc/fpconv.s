@@ -118,9 +118,9 @@ pu1:	lda	#1		; the value is (long << 24) * 2^(38 - 62)
 	clr	MAN+6,u
 	clr	MAN+7,u
 	leay	,u
-	jsr	__fpnorm	; (0 becomes zero)
+	lbsr	__fpnorm	; (0 becomes zero)
 	leax	22,u
-	jsr	__fppd
+	lbsr	__fppd
 	leas	12,s
 	puls	d,x,y,u
 	rts
@@ -147,13 +147,13 @@ ftol:
 ftoul:	pshs	u,y
 	leas	-12,s
 	leay	,s
-	jsr	__fpuf
+	lbsr	__fpuf
 	bra	toint
 dtol:
 dtoul:	pshs	u,y
 	leas	-12,s
 	leay	,s
-	jsr	__fpud
+	lbsr	__fpud
 ; the record at Y as a long in D:X; the frame is a record, then Y and U
 toint:	lda	CLS,y
 	cmpa	#1
@@ -164,8 +164,8 @@ toint:	lda	CLS,y
 	bgt	ti0		; far too big
 	ldd	#61		; the integer part at the bottom: shift
 	subd	EXP,y		; right 61 - EXP, keeping one more bit
-	jsr	__fprsh		; than the integer (which the sticky bit
-	jsr	__fpmr1		; may change), then shift that out
+	lbsr	__fprsh		; than the integer (which the sticky bit
+	lbsr	__fpmr1		; may change), then shift that out
 	tst	SGN,y
 	bpl	ti1
 	com	MAN+4,y		; negative

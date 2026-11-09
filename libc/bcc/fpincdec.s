@@ -112,14 +112,14 @@ id2:	lda	#1
 	std	MAN+RB,u
 	leay	RA,u
 	leax	RB,u
-	jsr	__fpadd
+	lbsr	__fpadd
 	ldx	PTR,u		; the new value, stored
 	ldb	OP,u
 	bitb	#F_FLT
 	bne	id3
-	jsr	__fppd
+	lbsr	__fppd
 	bra	id4
-id3:	jsr	__fppf
+id3:	lbsr	__fppf
 id4:	leas	24,s
 	puls	u,y,x,b
 	rts
@@ -130,5 +130,5 @@ unpack:	ldx	PTR,u
 	ldb	OP,u
 	bitb	#F_FLT
 	bne	un1
-	jmp	__fpud
-un1:	jmp	__fpuf
+	lbra	__fpud
+un1:	lbra	__fpuf

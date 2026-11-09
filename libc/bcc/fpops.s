@@ -90,7 +90,7 @@ ad3:	tsta			; line up the other one: shift it right
 	beq	ad3a		; by the difference
 	ldb	#255
 ad3a:	exg	x,y
-	jsr	__fprsh
+	lbsr	__fprsh
 	exg	x,y
 	lda	SGN,y
 	cmpa	SGN,x
@@ -113,7 +113,7 @@ ad3a:	exg	x,y
 	std	MAN,y
 	bpl	ad9
 	ldb	#1		; one bit too many
-	jsr	__fprsh
+	lbsr	__fprsh
 	ldd	EXP,y
 	addd	#1
 	std	EXP,y
@@ -161,7 +161,7 @@ ad5:	ldd	MAN+6,y
 	inc	MAN+1,y
 	bne	ad6
 	inc	MAN,y
-ad6:	jsr	__fpnorm
+ad6:	lbsr	__fpnorm
 	lda	CLS,y		; x - x is +0
 	lbne	ad9
 	clr	SGN,y
@@ -273,7 +273,7 @@ mu8:	leax	-1,x
 	sta	MAN+7,y
 mu9:	leas	14,s
 	puls	y,x,u
-	jmp	__fpnorm
+	lbra	__fpnorm
 
 ; __fpdiv: Y = Y / X
 __fpdiv:
@@ -361,7 +361,7 @@ dv6:	blo	dv7
 	sbca	MAN,x
 	std	MAN,y
 	inc	8,s
-dv7:	jsr	__fpml1		; the remainder left 1
+dv7:	lbsr	__fpml1		; the remainder left 1
 	dec	,s
 	bne	dv5
 	lda	MAN,y		; anything left is sticky
@@ -385,4 +385,4 @@ dv8:	leas	1,s
 	std	MAN+4,y
 	puls	d
 	std	MAN+6,y
-	jmp	__fpnorm
+	lbra	__fpnorm

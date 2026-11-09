@@ -193,16 +193,18 @@
 ;BCC_EOS
 ; 27 extern int isatty () __proto(int);
 ;BCC_EOS
-; 28 
+; 28 extern int unlink () __proto(char *);
+;BCC_EOS
 ; 29 
-; 30  
-; 31 extern int brk () __proto(void *);
+; 30 
+; 31  
+; 32 extern int brk () __proto(void *);
 ;BCC_EOS
-; 32 extern void * sbrk () __proto(int);
+; 33 extern void * sbrk () __proto(int);
 ;BCC_EOS
-; 33 extern unsigned int __heap_margin;
+; 34 extern unsigned int __heap_margin;
 ;BCC_EOS
-; 34 # 15 "maltest.c"
+; 35 # 15 "maltest.c"
 ; 15 extern int putchar();
 ;BCC_EOS
 ; 16 extern void putnum();
@@ -276,7 +278,8 @@ LDX	#.7
 ; Debug: func () void = say+0 (used reg = )
 JSR	>_say
 ;BCC_EOS
-; 35 		putnum(n);
+; 35 		putnum
+; 35 (n);
 ; Debug: rootlist int n = [S+2-2] (used reg = )
 LDX	0,S
 ; Debug: func () void = putnum+0 (used reg = )
@@ -291,7 +294,6 @@ PULS	Y,PC
 ; 40 
 ; 41 
 ; 42 void fill(p,slot,size)
-; 43 
 ; 43 char *p;
 EXPORT	_fill
 _fill:
@@ -1470,7 +1472,8 @@ STD	0,X
 .63:
 BRA	.64
 .56:
-; 170 			sz = 1 + rnd(300);
+; 170 			sz = 1 +
+; 170  rnd(300);
 ; Debug: rootlist int = const $12C (used reg = )
 LDX	#$12C
 ; Debug: func () int = rnd+0 (used reg = )
@@ -1485,8 +1488,7 @@ JSR	>_malloc
 ; Debug: eq * void = X+0 to * char p = [S+$C-$C] (used reg = )
 STX	0,S
 ;BCC_EOS
-; 172 			if (p
-; 172  == 0) {
+; 172 			if (p == 0) {
 ; Debug: logeq int = const 0 to * char p = [S+$C-$C] (used reg = )
 LDD	0,S
 BNE	.65

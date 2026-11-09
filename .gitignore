@@ -22,3 +22,4 @@ tests/sim/sim6809
 !tests/ref/*.o
 libc/*.a
 libc/.bcc/
+libc/os9obj/

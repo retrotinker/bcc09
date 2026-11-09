@@ -12,44 +12,58 @@
 00012 0000              	.data			; the linker defines these in the data segment,
 00013                   	import	__edata		; so they must be imported there
 00014                   	import	__end
-00015                   
-00016 0000              	.text
-00017                   	entry	start
-00018                   	import	_main
-00019 0000 10CE   7F00  start:	lds	#$7f00
-00020 0004   CE   0000  	ldu	#0		; (code built with -Mo reaches data through U:
-00021                   				; with U 0, as the linker placed it)
-00022 0007   8E   0000> 	ldx	#__edata
-00023 000A   8C   0000> clear:	cmpx	#__end
-00024 000D   24     04  	bhs	go
-00025 000F   6F     80  	clr	,x+
-00026 0011   20     F7  	bra	clear
-00027 0013   BD   0000> go:	jsr	_main
-00028 0016   1F     10  stop:	tfr	x,d		; main's result is in X
-00029 0018   F7   FF02  	stb	io_exit
-00030 001B   20     F9  	bra	stop
-00031                   
-00032                   ; putchar(c): write c
-00033                   	export	_putchar
-00034             001D> _putchar:
-00035 001D   1F     10  	tfr	x,d
-00036 001F   F7   FF00  	stb	io_out
-00037 0022   39         	rts
-00038                   
-00039                   ; putnum(n): print n as an unsigned decimal number and a newline
-00040                   	export	_putnum
-00041             0023> _putnum:
-00042 0023   BF   FF04  	stx	io_numh
-00043 0026   39         	rts
+00015 0000              	loc	5		; (and these in segment 5)
+00016                   	import	__seg5DL
+00017                   	import	__seg5DH
+00018                   
+00019 0000              	.text
+00020                   	entry	start
+00021                   	import	_main
+00022 0000 10CE   7F00  start:	lds	#$7f00
+00023 0004   CE   0000  	ldu	#0		; (code built with -Mo reaches data through U:
+00024                   				; with U 0, as the linker placed it)
+00025 0007   8E   0000> 	ldx	#__edata
+00026 000A   8C   0000> clear:	cmpx	#__end
+00027 000D   24     04  	bhs	clear2
+00028 000F   6F     80  	clr	,x+
+00029 0011   20     F7  	bra	clear
+00030 0013   8E   0000> clear2:	ldx	#__seg5DL	; the init functions, as libc's start-up code
+00031 0016   8C   0000> init:	cmpx	#__seg5DH	; calls them (with -Mo, cc1 makes one to
+00032 0019   24     0D  	bhs	go		; store the addresses a module's data starts
+00033 001B   EC     81  	ldd	,x++		; with)
+00034 001D   27     F7  	beq	init
+00035 001F   34     10  	pshs	x
+00036 0021   AD98   FE  	jsr	[-2,x]
+00037 0024   35     10  	puls	x
+00038 0026   20     EE  	bra	init
+00039 0028   BD   0000> go:	jsr	_main
+00040 002B   1F     10  stop:	tfr	x,d		; main's result is in X
+00041 002D   F7   FF02  	stb	io_exit
+00042 0030   20     F9  	bra	stop
+00043                   
+00044                   ; putchar(c): write c
+00045                   	export	_putchar
+00046             0032> _putchar:
+00047 0032   1F     10  	tfr	x,d
+00048 0034   F7   FF00  	stb	io_out
+00049 0037   39         	rts
+00050                   
+00051                   ; putnum(n): print n as an unsigned decimal number and a newline
+00052                   	export	_putnum
+00053             0038> _putnum:
+00054 0038   BF   FF04  	stx	io_numh
+00055 003B   39         	rts
 
 Symbols:
 __edata                     3 0000 R I __end                       3 0000 R I 
-_main                       0 0000 R I _putchar                    0 001D R E 
-_putnum                     0 0023 R E clear                       0 000A R   
-go                          0 0013 R   io_exit                     0 FF02 A   
+__seg5DH                    5 0000 R I __seg5DL                    5 0000 R I 
+_main                       0 0000 R I _putchar                    0 0032 R E 
+_putnum                     0 0038 R E clear                       0 000A R   
+clear2                      0 0013 R   go                          0 0028 R   
+init                        0 0016 R   io_exit                     0 FF02 A   
 io_numh                     0 FF04 A   io_numl                     0 FF05 A   
 io_out                      0 FF00 A   start                       0 0000 R N 
-stop                        0 0016 R   
+stop                        0 002B R   
 
 00000 errors
 00000 warnings

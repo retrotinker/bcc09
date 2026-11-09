@@ -3,7 +3,8 @@
    so that the data is where the linker put it; calls only putnum and
    putchar (simcrt0.s) and libc's helpers, which keep U; checks globals,
    statics, strings, function pointers, double results (through __dret),
-   ?: of doubles (on the stack), and float arguments; exits with the
+   ?: of doubles (on the stack), float arguments, and initializers that
+   are addresses (stored by an init function at start-up); exits with the
    number of failed checks.  Its assembly (os9data-Mo.s) shows the code. */
 
 extern void putchar(), putnum();
@@ -17,6 +18,12 @@ long lg = 70000L;
 double dg = 2.5;
 int (*fp)();
 static double sd;
+int twice();
+char *greet = "hey";		/* (addresses: stored at start-up) */
+int (*tfp)() = twice;
+int *gp = &g;
+char *bp = buf + 3;
+static char *strs[] = { "one", "two", 0 };
 
 void check(n, cond)
 int n, cond;
@@ -74,6 +81,8 @@ int main()
 	check(4, sd == 1.25 && half(half(8.0)) == 2.0);
 	check(5, pick(1, 1.5, 2.5) == 1.5 && pick(0, 1.5, 2.5) == 2.5);
 	check(6, (g > 2 ? dg : sd) == 2.5 && scale((float) 1.5, 4) == 6.0);
+	check(7, greet[1] == 'e' && tfp(5) == 10 && *gp == 3);
+	check(8, bp == &buf[3] && strs[1][2] == 'o' && strs[2] == 0);
 	putnum(checks);
 	putchar('\n');
 	return failures;

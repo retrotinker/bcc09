@@ -106,23 +106,23 @@ __fpud:
 	lda	MAN,y		; the leading 1
 	ora	#$10
 	sta	MAN,y
-	jsr	__fpml1
-	jsr	__fpml1
+	lbsr	__fpml1
+	lbsr	__fpml1
 	lda	#1
 	sta	CLS,y
 	rts
-udsub:	jsr	mzero
+udsub:	lbsr	mzero
 	beq	uzero
 	ldd	#-1022
 	std	EXP,y
-	jsr	__fpml1
-	jsr	__fpml1
+	lbsr	__fpml1
+	lbsr	__fpml1
 	lda	#1
 	sta	CLS,y
 	bra	__fpnorm
 uzero:	clr	CLS,y
 	rts
-udinf:	jsr	mzero
+udinf:	lbsr	mzero
 	beq	uinf
 	lda	#3		; NaN
 	sta	CLS,y
@@ -163,12 +163,12 @@ __fpuf:
 	sta	MAN,y
 	lda	#1
 	sta	CLS,y
-	jmp	__fpmr1
-ufsub:	jsr	mzero
+	lbra	__fpmr1
+ufsub:	lbsr	mzero
 	beq	uzero
 	ldd	#-126
 	std	EXP,y
-	jsr	__fpmr1
+	lbsr	__fpmr1
 	lda	#1
 	sta	CLS,y
 	; (and normalize)
@@ -176,7 +176,7 @@ ufsub:	jsr	mzero
 ; __fpnorm: normalize the finite record at Y (whose bit 63 is clear):
 ; shift the mantissa left until bit 62 is set, or make it zero
 __fpnorm:
-	jsr	mzero
+	lbsr	mzero
 	bne	nm1
 	clr	CLS,y
 	rts
@@ -200,7 +200,7 @@ nm1:	lda	MAN,y		; a byte at a time while the top one is 0
 nm2:	lda	MAN,y		; then a bit at a time
 	bita	#$40
 	bne	nm3
-	jsr	__fpml1
+	lbsr	__fpml1
 	ldd	EXP,y
 	subd	#1
 	std	EXP,y
@@ -232,7 +232,7 @@ rs1:	lda	1,s
 	bra	rs1
 rs2:	tst	1,s		; then a bit at a time
 	beq	rs3
-	jsr	__fpmr1
+	lbsr	__fpmr1
 	bcc	rs2a
 	lda	#1		; (not INC: the byte loop may have left $FF)
 	ora	,s
@@ -251,7 +251,7 @@ rs4:	leas	2,s
 ; 255), rounding to the nearest, to even on a tie; the result may be
 ; one bit longer than was wanted (a carry from rounding up)
 round:	subb	#2		; keep a round bit and a sticky bit
-	jsr	__fprsh
+	lbsr	__fprsh
 	lda	MAN+7,y
 	bita	#2
 	beq	rd2		; below half: down
@@ -272,8 +272,8 @@ round:	subb	#2		; keep a round bit and a sticky bit
 	inc	MAN+1,y
 	bne	rd2
 	inc	MAN,y
-rd2:	jsr	__fpmr1
-	jmp	__fpmr1
+rd2:	lbsr	__fpmr1
+	lbra	__fpmr1
 
 ; __fppd: pack the record at Y into the double at X, rounding (this
 ; changes the record)
@@ -316,13 +316,13 @@ pd0:	ldd	#11		; a denormal: 1 - exponent bits more
 	ldb	#255
 pd1:	clr	,s		; (the exponent is 0)
 	clr	1,s
-pd2a:	jsr	round
+pd2a:	lbsr	round
 	ldd	,s
 	beq	pdden
 	lda	MAN+1,y		; a carry to bit 53: one bit less, and one
 	bita	#$20		; more in the exponent
 	beq	pd4
-	jsr	__fpmr1
+	lbsr	__fpmr1
 	ldd	,s
 	addd	#1
 	std	,s
@@ -400,13 +400,13 @@ pf0:	ldd	#40		; a denormal: 1 - exponent bits more
 	ldb	#255
 pf1:	clr	,s
 	clr	1,s
-pf3:	jsr	round
+pf3:	lbsr	round
 	ldd	,s
 	beq	pfden
 	lda	MAN+4,y		; a carry to bit 24
 	bita	#1
 	beq	pf4
-	jsr	__fpmr1
+	lbsr	__fpmr1
 	ldd	,s
 	addd	#1
 	std	,s

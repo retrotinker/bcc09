@@ -127,9 +127,9 @@ Fcompd:	pshs	y
 Fcompf:	pshs	u,y		; the float as a double, at 12,S
 	leas	-20,s
 	leay	,s
-	jsr	__fpuf
+	lbsr	__fpuf
 	leax	12,s
-	jsr	__fppd
+	lbsr	__fppd
 	leay	12,s
 	leax	26,s
 	lbsr	compare

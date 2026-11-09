@@ -1,0 +1,8 @@
+ok   hello runs the same as an OS-9 module
+ok   pftest runs the same as an OS-9 module
+ok   chartest runs the same as an OS-9 module
+ok   sadd runs the same as an OS-9 module
+ok   fltcc runs the same as an OS-9 module
+ok   fpio runs the same as an OS-9 module
+ok   inttest runs the same as an OS-9 module
+ok   protoarg runs the same as an OS-9 module

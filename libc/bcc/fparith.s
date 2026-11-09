@@ -79,15 +79,15 @@ arith:	pshs	u,y,b
 	bne	ar2
 	bitb	#OPF
 	bne	ar1
-	jsr	__fpud		; the double at X
+	lbsr	__fpud		; the double at X
 	bra	ar3
-ar1:	jsr	__fpuf		; the float at X
+ar1:	lbsr	__fpuf		; the float at X
 	bra	ar3
 ar2:	leax	RIGHT,u		; the one on the stack
-	jsr	__fpud
+	lbsr	__fpud
 ar3:	leax	LEFT,u
 	leay	RA,u
-	jsr	__fpud
+	lbsr	__fpud
 	leax	RB,u
 	ldb	OP,u
 	andb	#3
@@ -97,19 +97,19 @@ ar3:	leax	LEFT,u
 	lda	RB,u		; subtract: add the negative
 	eora	#$80
 	sta	RB,u
-ar5:	jsr	__fpadd
+ar5:	lbsr	__fpadd
 	bra	ar7
 ar4:	decb
 	bne	ar6
-	jsr	__fpmul
+	lbsr	__fpmul
 	bra	ar7
-ar6:	jsr	__fpdiv
+ar6:	lbsr	__fpdiv
 ar7:	leax	LEFT,u		; the result: in the left one's place, or
 	ldb	OP,u		; the right one's if both are popped
 	bitb	#OPS
 	beq	ar8
 	leax	RIGHT,u
-ar8:	jsr	__fppd
+ar8:	lbsr	__fppd
 	ldb	OP,u
 	leas	24,s
 	bitb	#OPS		; (CC is kept to the end)

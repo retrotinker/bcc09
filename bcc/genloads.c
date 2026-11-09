@@ -506,7 +506,7 @@ store_pt reg;
 
 /* nonzero if the global adr is data (not code: a function, or a string
    constant, which is put with the code) */
-PRIVATE bool_pt isdata(adr)
+PUBLIC bool_pt isdata(adr)
 struct symstruct *adr;
 {
 	struct symstruct *symptr;

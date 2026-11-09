@@ -12,8 +12,11 @@ extern int errno;
 
 #define ENOENT	2		/* no such file or directory */
 #define EINTR	4		/* interrupted system call */
+#define EIO	5		/* input or output failed */
 #define EBADF	9		/* bad file descriptor */
 #define ENOMEM	12		/* out of memory */
+#define EACCES	13		/* permission denied */
+#define EEXIST	17		/* file exists */
 #define EINVAL	22		/* invalid argument */
 #define ENOTTY	25		/* not a terminal */
 #define ESPIPE	29		/* can't seek */

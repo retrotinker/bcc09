@@ -76,7 +76,7 @@ void usage(void)
 	fprintf(stderr,
 		"Usage: %s [-O <output type>] [-n <object name>]\n"
 		"\t\t[-T <text address>] [-D <data address>]\n"
-		"\t\t[-v <object version>] [-d <data size>] [-rp]\n"
+		"\t\t[-v <object version>] [-d <stack size>] [-rp]\n"
 		"\t\tinfile outfile\n", progname);
 	exit(EXIT_FAILURE);
 }
@@ -351,19 +351,27 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	namelen = strlen(objname);
 
+	/* The data area: the program's data and BSS (bcc09 -Mo: at 0, U
+	   pointing at them), then -d bytes (or the heap ld09 -H asked
+	   for, or 1K) for the stack and heap.  The data's image follows the
+	   code, and the start-up code copies it and clears the BSS. */
 	heapsize = header.a_total - header.a_text -
 			header.a_data - header.a_bss;
-	if (datasize < heapsize)
-		datasize = heapsize;
 	if (!datasize)
-		fatal("OS-9 module data size is zero (use -d)");
+		datasize = heapsize ? heapsize : 1024;
+	if ((unsigned long)header.a_data + header.a_bss + datasize > 0xff00)
+		fatal("OS-9 module data area is too large");
+	if ((header.a_data + header.a_bss) && !(header.a_flags & A_SEP))
+		warning("the data isn't at 0 (link with ld09 -i, as "
+			"bcc09 -Mo does): the code can't find it");
+	datasize += header.a_data + header.a_bss;
 
-	/* can claim reentrant if no r/w static data allocations */
+	/* reentrant if each process has its own data (at 0), or none */
 	if (!reentrant)
-		reentrant = !(header.a_data + header.a_bss);
+		reentrant = (header.a_flags & A_SEP) ||
+			!(header.a_data + header.a_bss);
 
-	nameoffset = sizeof(os9hdr) + header.a_text +
-			header.a_data + header.a_bss;
+	nameoffset = sizeof(os9hdr) + header.a_text + header.a_data;
 	modsize = nameoffset + namelen + sizeof(os9crc);
 
 	*((unsigned short *)&os9hdr[2]) = htobe16(modsize);
@@ -384,7 +392,7 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 	*((unsigned short *)&os9hdr[9]) =
 		htobe16(sizeof(os9hdr) + header.a_entry);
 
-	/* Request stack + parameter storage */
+	/* Request data, stack and heap (F$Fork adds the parameters) */
 	*((unsigned short *)&os9hdr[11]) = htobe16(datasize);
 
 	os9_crc_adjust(os9hdr, sizeof(os9hdr));
@@ -400,8 +408,6 @@ void os9_output(FILE *ifd, FILE *ofd, struct exec header)
 		fatal("Cannot seek to start of data");
 
 	write_file(ifd, ofd, header.a_data);
-
-	write_zeroes(ofd, header.a_bss);
 
 	/* End of string needs MSB set... */
 	objname[namelen - 1] |= 0x80;

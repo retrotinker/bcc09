@@ -49,7 +49,7 @@ ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 mkdir -p "$prefix/lib/bcc09"
 ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
 	"$top/libc/libsa.a" "$top/libc/libcb.a" "$top/libc/crtsim.o" \
-	"$top/libc/libsim.a" \
+	"$top/libc/libsim.a" "$top/libc/crtos9.o" "$top/libc/libos9.a" \
 	"$prefix/lib/bcc09/"
 LIBDIR=$prefix/lib/bcc09
 # (relative to $out, where everything runs: the compiler's output names
@@ -190,8 +190,9 @@ run prog-Dsrec.oc "$OC" -O srec -n PROG -T 0x1000 -D 0x4000 prog-D.out \
 run prog-noT.oc "$OC" -O srec -n PROG prog.out prog-noT.srec
 run prog-os9.oc "$OC" -O os9 -n Prog -d 0x200 -v 1 prog-0.out prog.os9
 run prog-os9r.oc "$OC" -O os9 -n Prog -d 0x200 -r prog-0.out prog-r.os9
-# objcopy09 errors: no OS-9 data size; a bad format name; an address
-# that doesn't fit in 16 bits
+# objcopy09: an OS-9 module without -d (1K of stack and heap; and
+# prog-0.out's data isn't at 0, a warning); errors: a bad format name;
+# an address that doesn't fit in 16 bits
 run os9-nodata.oc "$OC" -O os9 -n Prog prog-0.out nodata.os9
 run badformat.oc "$OC" -O nosuch prog.out bad.out
 run badaddr.oc "$OC" -T 0x10000 prog.out bad.out
@@ -358,6 +359,43 @@ for f in pftest chartest sadd sftest fltcc fpio mtest inttest protoarg; do
 	fi > $f-host.result
 	rm -f $f-host $f-host.run $f.cmp $f-host.cmp
 done
+# OS-9 modules (bcc09 -Mo: crtos9.o and libos9.a), made by objcopy09 and
+# run by sim6809 --os9 at $0100 with the data area after the module:
+# os9io.c, given the parameters "one two", checks the arguments, files
+# (open, read, write, lseek, close, unlink and stdio's) and isatty; and
+# the programs above that the host's compiler checks, and hello.c, must
+# run as they do on sim6809; not those that read lines (echo.c,
+# sftest.c: OS-9's end with a CR, which libc passes on as it is),
+# siotest.c (it closes fd 1, which OS-9 really closes) or mtest.c (too
+# big for 64K with its data)
+os9run() {	# $1 = name; the rest, sim6809's options
+	f=$1
+	shift
+	input=/dev/null
+	[ -f $f.in ] && input=$f.in
+	"$BCC" -Mo -o $f-os9.out $f.c > /dev/null 2>&1
+	"$OC" -O os9 -n $f $f-os9.out $f.mod > /dev/null 2>&1
+	size=$(wc -c < $f.mod)
+	"$SIM" -n 1000000000 --os9 --load 0x100 \
+		--data $(( (0x100 + size + 255) / 256 * 256 )) "$@" $f.mod \
+		< $input > $f-os9.run 2>&1
+	echo $? > $f-os9.run.rc
+	rm -f $f-os9.out $f.mod
+}
+os9run os9io --param "one two"
+mv os9io-os9.run os9io.run
+mv os9io-os9.run.rc os9io.run.rc
+for f in hello pftest chartest sadd fltcc fpio inttest protoarg; do
+	os9run $f
+	if cmp -s $f.run $f-os9.run &&
+	   cmp -s $f.run.rc $f-os9.run.rc; then
+		echo "ok   $f runs the same as an OS-9 module"
+	else
+		echo "DIFF $f as an OS-9 module"
+	fi
+	rm -f $f-os9.run $f-os9.run.rc
+done > os9.result
+
 # floating point is optional: printf and scanf without it (pftest.out,
 # sftest.out) carry none of its code, and fpio.out has it all: __fmtfp,
 # __scanfp, strtod and the helpers
@@ -421,7 +459,7 @@ for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest
 	rm -f $f-O.out $f-O.srec $f-O.run $f-plain.run
 done >> optimize.result
 
-run notarget.bcc "$BCC" -Mo -o notarget.out hello.c
+run notarget.bcc "$BCC" -Mf -o notarget.out hello.c
 rm -f notarget.out
 
 # the copied sources aren't results

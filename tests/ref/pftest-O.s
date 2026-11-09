@@ -105,57 +105,59 @@
 ; 113 
 ; 114 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 115 extern FILE *fdopen () __proto(int,char*);
+; 115 extern int remove () __proto(char*);
 ;BCC_EOS
-; 116 extern FILE *freopen  () __proto(char*,char*,FILE*);
+; 116 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 117 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
+; 117 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 118 
-; 119 extern int fseek () __proto(FILE*,long,int);
+; 118 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
-; 120 extern long ftell () __proto(FILE*);
+; 119 
+; 120 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 121 extern void rewind () __proto(FILE*);
+; 121 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 122 
-; 123 extern int fputs () __proto(char*,FILE*);
+; 122 extern void rewind () __proto(FILE*);
 ;BCC_EOS
-; 124 extern int puts () __proto(char*);
+; 123 
+; 124 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 125 
-; 126 extern int printf () __proto(char*,...);
+; 125 extern int puts () __proto(char*);
 ;BCC_EOS
-; 127 extern int fprintf () __proto(FILE*,char*,...);
+; 126 
+; 127 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 128 extern int sprintf () __proto(char*,char*,...);
+; 128 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 129 extern int snprintf () __proto(char*,size_t,char*,...);
+; 129 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 130  
-; 131 extern int vprintf () __proto(char*,char*);
+; 130 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
-; 132 extern int vfprintf () __proto(FILE*,char*,char*);
+; 131  
+; 132 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 133 extern int vspri
-; 133 ntf () __proto(char*,char*,char*);
+; 133 extern int vfprintf () __proto
+; 133 (FILE*,char*,char*);
 ;BCC_EOS
-; 134 extern int vsnprintf () __proto(char*,size_t,char*,char*);
+; 134 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 135 
-; 136 extern int scanf () __proto(char*,...);
+; 135 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
-; 137 extern int fscanf () __proto(FILE*,char*,...);
+; 136 
+; 137 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 138 extern int sscanf () __proto(char*,char*,...);
+; 138 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 139 extern int vscanf () __proto(char*,char*);
+; 139 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 140 extern int vfscanf () __proto(FILE*,char*,char*);
+; 140 extern int vscanf () __proto(char*,char*);
 ;BCC_EOS
-; 141 extern int vsscanf () __proto(char*,char*,char*);
+; 141 extern int vfscanf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 142 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
+; 142 extern int vsscanf () __proto(char*,char*,char*);
+;BCC_EOS
+; 143 # 5 "../prefix.tmp/lib/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
@@ -250,7 +252,8 @@ STD	>_checks
 LDD	4,S
 BNE	.1
 .2:
-; 17 		++failures;
+; 17 		
+; 17 ++failures;
 ; Debug: preinc int = [failures+0] (used reg = )
 LDD	>_failures
 ADDD	#1
@@ -272,7 +275,6 @@ LDX	#.3
 JSR	>_printf
 LEAS	2,S
 ;BCC_EOS
-; 19 
 ; 19 	}
 ; 20 }
 .1:
@@ -1221,13 +1223,14 @@ LDX	#.61
 JSR	>_printf
 LEAS	6,S
 ;BCC_EOS
-; 97 	printf("[%ld][%li][%lu][%lx][%lX][%lo]\n",-1L,123456L,3000000000UL,
+; 97 	printf("[%ld][%li][%lu][%lx][%lX][%lo]\n",-1L,123456L,300000
 LOC	1
 .62:
 FCC	"[%ld][%li][%lu][%lx][%lX][%lo]"
 FCB	$A
 FCB	0
 LOC	0
+; 97 0000UL,
 ; 98 0xdeadbeefUL,0xcafeUL,8L);
 ; Debug: list long = const 8 (used reg = )
 CLRA
@@ -1262,8 +1265,7 @@ JSR	>_printf
 LEAS	$18,S
 ;BCC_EOS
 ; 99 
-; 100 	
-; 100  
+; 100 	 
 ; 101 	printf("[%p][%10p][%-10p]\n",(void *)0,(void *)0,(void *)0);
 LOC	1
 .63:

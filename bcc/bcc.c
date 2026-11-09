@@ -916,8 +916,14 @@ char **argv;
 		break;
 	case 'o':
 		prepend_option("-D__OS9__", 'p');
-		append_option("-u", 'c'); /* position-independent, data
-					     through U (cc1 -u) */
+		/* (first, so that -C options can change them) */
+		prepend_option("-u", 'c'); /* position-independent, data
+					      through U (cc1 -u) */
+		if (do_link)
+			prepend_option("-i", 'l'); /* data at 0 (offsets
+						      from U) */
+		crtname = "-Cos9";
+		libc = "-los9";	/* all of libc, built with -Mo */
 		opt_arch = MC6809_OS9;
 		break;
 	case 'f':

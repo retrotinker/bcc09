@@ -12,6 +12,9 @@ io_numl	equ	$ff05		; low byte: print the number
 	.data			; the linker defines these in the data segment,
 	import	__edata		; so they must be imported there
 	import	__end
+	loc	5		; (and these in segment 5)
+	import	__seg5DL
+	import	__seg5DH
 
 	.text
 	entry	start
@@ -21,9 +24,18 @@ start:	lds	#$7f00
 				; with U 0, as the linker placed it)
 	ldx	#__edata
 clear:	cmpx	#__end
-	bhs	go
+	bhs	clear2
 	clr	,x+
 	bra	clear
+clear2:	ldx	#__seg5DL	; the init functions, as libc's start-up code
+init:	cmpx	#__seg5DH	; calls them (with -Mo, cc1 makes one to
+	bhs	go		; store the addresses a module's data starts
+	ldd	,x++		; with)
+	beq	init
+	pshs	x
+	jsr	[-2,x]
+	puls	x
+	bra	init
 go:	jsr	_main
 stop:	tfr	x,d		; main's result is in X
 	stb	io_exit

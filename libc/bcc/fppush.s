@@ -55,9 +55,9 @@ cpd:	ldd	,x
 cvf:	pshs	u,y		; 0,S: a record  12,S: U, Y  16,S: return
 	leas	-12,s		; addresses  20,S: the room
 	leay	,s
-	jsr	__fpuf
+	lbsr	__fpuf
 	leax	20,s
-	jsr	__fppd
+	lbsr	__fppd
 	leas	12,s
 	puls	u,y
 	rts
@@ -66,9 +66,9 @@ cvf:	pshs	u,y		; 0,S: a record  12,S: U, Y  16,S: return
 cvd:	pshs	u,y
 	leas	-12,s
 	leay	,s
-	jsr	__fpud
+	lbsr	__fpud
 	leax	20,s
-	jsr	__fppf
+	lbsr	__fppf
 	leas	12,s
 	puls	u,y
 	rts
@@ -112,9 +112,9 @@ Fpullf:	pshs	u,y,x		; 0,S: a record  12,S: X  14,S: Y, U
 	leas	-12,s		; 18,S: return address  20,S: the double
 	leax	20,s
 	leay	,s
-	jsr	__fpud
+	lbsr	__fpud
 	ldx	12,s
-	jsr	__fppf
+	lbsr	__fppf
 	leas	12,s
 	puls	u,y,x
 	puls	x

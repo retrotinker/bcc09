@@ -25,6 +25,7 @@ extern ssize_t write __P ((int, __const void *, size_t));
 extern int close __P ((int));
 extern off_t lseek __P ((int, off_t, int));
 extern int isatty __P ((int));
+extern int unlink __P ((__const char *));
 
 /* move the end of the heap (see sbrk.s); the heap stays __heap_margin
    bytes below the stack pointer */

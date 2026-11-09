@@ -26,6 +26,7 @@ This will become the port of the dev86 C library.  So far it has:
   sa/       the default target (see below)
   cb/       the Color BASIC target (see below)
   sim/      the sim6809 target (see below)
+  os9/      the OS-9 target (see below)
 
 "make" builds libc.a, and each target's start-up code and library, with
 this tree's bcc09, as09 and ar09 (libc/.bcc holds links that bcc09 uses
@@ -124,8 +125,13 @@ and links with libc.a (ld09 -C<name> links crt<name>.o):
   -Ms       sa: crt0.o and libsa.a (the default)
   -Me       cb: crt0.o and libcb.a (Color BASIC, run with EXEC)
   -Mi       sim: crtsim.o and libsim.a
+  -Mo       os9: crtos9.o and libos9.a (an OS-9 program module)
 
-The others (-Mu, -Mr, -Mb, -Mo, -Mf, -Mv) have none yet, and bcc09
+-Mo compiles code differently (position-independent, with the data
+reached through U), so libos9.a is all of libc built again with it (in
+os9obj), which bcc09 links in place of libc.a.
+
+The others (-Mu, -Mr, -Mb, -Mf, -Mv) have none yet, and bcc09
 won't link for them (bcc09 -x leaves out the start-up code, for a
 program that brings its own).  Each target's start-up code clears the
 BSS and calls main; when main returns, its result goes to exit(), which
@@ -166,6 +172,33 @@ a 0 byte, which is how the simulator marks the end).  isatty() is true
 for fds 0 to 2, so stdout is line buffered as on a terminal; lseek()
 fails with ESPIPE; and open() fails with ENOENT, since there are no
 files, so fopen() returns NULL.
+
+os9 is for OS-9 Level 1 and 2 (and NitrOS-9) program modules: bcc09
+-Mo links a program with its data at 0 (ld09 -i), and "objcopy09 -O os9
+-n name prog.out name" makes the module, whose data area holds the
+program's data and BSS and then the stack and heap (objcopy09 -d sets
+their size, 1K if neither it nor ld09 -H does).  The code is
+position-independent, and the data is reached through U, which points
+at the data area.  crtos9 (os9/crt0.s) copies the data's image from the
+module to the data area, clears the BSS, calls the init functions
+(among them the ones cc1 makes to set static variables that hold
+addresses, which aren't known until the program runs), and calls main
+with argc and argv from the parameters F$Fork passed (os9/start.c:
+argv[0] is the module's name, and the parameters are split at blanks,
+with "..." kept together).  The heap is between the end of
+the BSS and the stack (os9/sbrk.c).  The system functions (os9/sys.c)
+make OS-9's system calls (os9/call.s): read() and write() use I$ReadLn
+and I$WritLn, which a terminal edits, echoes and ends with a line feed a
+line at a time, so read() gives at most a line (up to a CR, OS-9's end
+of line), from a file too; neither changes the bytes, so a program
+writes '\r' (or "\r\n") to end a line on OS-9, and reads lines that end
+with '\r'; open()
+uses I$Open and I$Create (O_CREAT, O_EXCL, O_TRUNC through SS.Size,
+O_APPEND), lseek() I$Seek and I$GetStt's SS.Pos and SS.Size, isatty()
+SS.Opt's device type (SCF), and unlink() and remove() I$Delete.  OS-9's
+errors become errno's ENOENT, EBADF, EACCES, EEXIST, ENOMEM or, for the
+rest, EIO.  "make check" runs such modules on sim6809 --os9, which
+emulates these calls on host files (tests/sim).
 
 bcc09 links programs at address 0 unless told otherwise, so give it a
 load address for ld09, for example: bcc09 -o prog -X-T0x3000 prog.c

@@ -29,6 +29,8 @@
 # define outdseg() outop0str("LOC\t3\n")
 # define STRSEG 1
 # define outstrseg() outop0str("LOC\t1\n")
+# define INITSEG 5	/* the start-up code's table of init functions */
+# define outinitseg() outop0str("LOC\t5\n")
 
 FORWARD void clr P((store_pt reg));
 FORWARD bool_pt lowregisDreg P((void));
@@ -584,6 +586,16 @@ PUBLIC void dpseg()
 	if (segment != DPSEG) {
 		segment = DPSEG;
 		outdpseg();
+	}
+}
+
+/* set the segment of init functions */
+
+PUBLIC void initseg()
+{
+	if (segment != INITSEG) {
+		segment = INITSEG;
+		outinitseg();
 	}
 }
 
@@ -1176,7 +1188,7 @@ PRIVATE void opregadr()
 	outtab();
 	if (posindependent) {
 		outccname(opregstr);
-		outncregname(GLOBAL);
+		outncregname(datareg ? INDREG1 : GLOBAL);
 		bumplc();
 	} else {
 		outextended();

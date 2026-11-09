@@ -107,57 +107,59 @@
 ; 113 
 ; 114 extern FILE *fopen () __proto(char*,char*);
 ;BCC_EOS
-; 115 extern FILE *fdopen () __proto(int,char*);
+; 115 extern int remove () __proto(char*);
 ;BCC_EOS
-; 116 extern FILE *freopen  () __proto(char*,char*,FILE*);
+; 116 extern FILE *fdopen () __proto(int,char*);
 ;BCC_EOS
-; 117 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
+; 117 extern FILE *freopen  () __proto(char*,char*,FILE*);
 ;BCC_EOS
-; 118 
-; 119 extern int fseek () __proto(FILE*,long,int);
+; 118 extern FILE *__fopen () __proto(char*,int,FILE*,char*);
 ;BCC_EOS
-; 120 extern long ftell () __proto(FILE*);
+; 119 
+; 120 extern int fseek () __proto(FILE*,long,int);
 ;BCC_EOS
-; 121 extern void rewind () __proto(FILE*);
+; 121 extern long ftell () __proto(FILE*);
 ;BCC_EOS
-; 122 
-; 123 extern int fputs () __proto(char*,FILE*);
+; 122 extern void rewind () __proto(FILE*);
 ;BCC_EOS
-; 124 extern int puts () __proto(char*);
+; 123 
+; 124 extern int fputs () __proto(char*,FILE*);
 ;BCC_EOS
-; 125 
-; 126 extern int printf () __proto(char*,...);
+; 125 extern int puts () __proto(char*);
 ;BCC_EOS
-; 127 extern int fprintf () __proto(FILE*,char*,...);
+; 126 
+; 127 extern int printf () __proto(char*,...);
 ;BCC_EOS
-; 128 extern int sprintf () __proto(char*,char*,...);
+; 128 extern int fprintf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 129 extern int snprintf () __proto(char*,size_t,char*,...);
+; 129 extern int sprintf () __proto(char*,char*,...);
 ;BCC_EOS
-; 130  
-; 131 extern int vprintf () __proto(char*,char*);
+; 130 extern int snprintf () __proto(char*,size_t,char*,...);
 ;BCC_EOS
-; 132 extern int vfprintf () __proto(FILE*,char*,char*);
+; 131  
+; 132 extern int vprintf () __proto(char*,char*);
 ;BCC_EOS
-; 133 extern int vspri
-; 133 ntf () __proto(char*,char*,char*);
+; 133 extern int vfprintf () __proto
+; 133 (FILE*,char*,char*);
 ;BCC_EOS
-; 134 extern int vsnprintf () __proto(char*,size_t,char*,char*);
+; 134 extern int vsprintf () __proto(char*,char*,char*);
 ;BCC_EOS
-; 135 
-; 136 extern int scanf () __proto(char*,...);
+; 135 extern int vsnprintf () __proto(char*,size_t,char*,char*);
 ;BCC_EOS
-; 137 extern int fscanf () __proto(FILE*,char*,...);
+; 136 
+; 137 extern int scanf () __proto(char*,...);
 ;BCC_EOS
-; 138 extern int sscanf () __proto(char*,char*,...);
+; 138 extern int fscanf () __proto(FILE*,char*,...);
 ;BCC_EOS
-; 139 extern int vscanf () __proto(char*,char*);
+; 139 extern int sscanf () __proto(char*,char*,...);
 ;BCC_EOS
-; 140 extern int vfscanf () __proto(FILE*,char*,char*);
+; 140 extern int vscanf () __proto(char*,char*);
 ;BCC_EOS
-; 141 extern int vsscanf () __proto(char*,char*,char*);
+; 141 extern int vfscanf () __proto(FILE*,char*,char*);
 ;BCC_EOS
-; 142 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
+; 142 extern int vsscanf () __proto(char*,char*,char*);
+;BCC_EOS
+; 143 # 6 "../prefix.tmp/lib/bcc09/include/errno.h"
 ; 6  
 ; 7 # 11
 ; 11 extern int errno;
@@ -236,10 +238,10 @@
 ;BCC_EOS
 ; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
-; 51 # 5 "../prefix.tmp/lib/bcc09/include/unistd.h"
+; 51 # 5 "../prefix.tmp/lib/bcc
+; 4 09/include/unistd.h"
 ; 5  
-; 6 # 6 "../prefix
-; 5 .tmp/lib/bcc09/include/features.h"
+; 6 # 6 "../prefix.tmp/lib/bcc09/include/features.h"
 ; 6  
 ; 7 # 9 "../prefix.tmp/lib/bcc09/include/unistd.h"
 ; 9 # 5 "../prefix.tmp/lib/bcc09/include/sys/types.h"
@@ -257,16 +259,18 @@
 ;BCC_EOS
 ; 27 extern int isatty () __proto(int);
 ;BCC_EOS
-; 28 
+; 28 extern int unlink () __proto(char *);
+;BCC_EOS
 ; 29 
-; 30  
-; 31 extern int brk () __proto(void *);
+; 30 
+; 31  
+; 32 extern int brk () __proto(void *);
 ;BCC_EOS
-; 32 extern void * sbrk () __proto(int);
+; 33 extern void * sbrk () __proto(int);
 ;BCC_EOS
-; 33 extern unsigned int __heap_margin;
+; 34 extern unsigned int __heap_margin;
 ;BCC_EOS
-; 34 # 11 "siotest.c"
+; 35 # 11 "siotest.c"
 ; 11 int checks, failures;
 ;BCC_EOS
 ; 12 
@@ -997,7 +1001,8 @@ JSR	>_ok
 LEAS	2,S
 ;BCC_EOS
 ; 70 	ok(15,fgets(buf,sizeof(buf),stdin)== buf
-; 71 	   && strcmp(buf,"second\n")== 0);
+; 71 	   &
+; 71 & strcmp(buf,"second\n")== 0);
 LOC	1
 .3E:
 FCC	"second"
@@ -1083,8 +1088,7 @@ CLRA
 CLRB
 STD	0,S
 ;BCC_EOS
-; 74 	whi
-; 74 le ((c = (((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++)))!= '\n' && c != (-1))
+; 74 	while ((c = (((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++)))!= '\n' && c != (-1))
 ; 75 		buf[n++] = c;
 BRA	.46
 .47:

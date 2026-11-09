@@ -32,6 +32,76 @@ PUBLIC value_t constexpression()
 	return 1;
 }
 
+/* With data through U (OS-9), an address can't be in the data the program
+   starts with (where the code and the data are is known only then): an
+   initializer that is one leaves 0, under a label, and dumpinits() makes
+   an init function (see the start-up code) to store it there */
+struct addrinit
+{
+	struct addrinit *next;
+	label_no where;		/* the label on the place */
+	bool_t labelled;	/* the address: of a label */
+	label_no label;
+	char *name;		/* or of a name */
+	offset_T offset;	/* and an offset */
+	bool_t data;		/* through U, or PC-relative */
+};
+
+PRIVATE struct addrinit *addrinits;
+
+PRIVATE void addrinit(symptr)
+struct symstruct *symptr;
+{
+	struct addrinit *ai;
+
+	ai = ourmalloc(sizeof *ai);
+	ai->next = addrinits;
+	addrinits = ai;
+	outnlabel(ai->where = getlabel());
+	ai->labelled = (symptr->flags & LABELLED) != 0;
+	if (ai->labelled)
+		ai->label = symptr->name.label;
+	else
+		ai->name = symptr->name.namep;
+	ai->offset = symptr->offset.offi;
+	ai->data = isdata(symptr);
+	defword();
+	outnhex((uoffset_T) 0);
+}
+
+PUBLIC void dumpinits()
+{
+	struct addrinit *ai;
+	label_no fn;
+
+	if (addrinits == NULL)
+		return;
+	cseg();
+	outnlabel(fn = getlabel());
+	for (ai = addrinits; ai != NULL; ai = ai->next) {
+		outstr("\tLEAX\t");
+		if (ai->labelled)
+			outlabel(ai->label);
+		else
+			outccname(ai->name);
+		if (ai->offset != 0) {
+			if (ai->offset > 0)
+				outplus();
+			outshex(ai->offset);
+		}
+		outstr(ai->data ? ",U\n" : ",PC\n");
+		outstr("\tSTX\t");
+		outlabel(ai->where);
+		outstr(",U\n");
+	}
+	outstr("\tRTS\n");
+	initseg();
+	defword();
+	outlabel(fn);
+	outnl();
+	addrinits = NULL;
+}
+
 PUBLIC void initexpression(type)
 struct typestruct *type;
 {
@@ -80,6 +150,13 @@ struct typestruct *type;
 				outnhex((uoffset_T) w[i]);
 			}
 			etptr = etmark;	/* XXX - stuff from end of function */
+			exprptr = exprmark;
+			return;
+		}
+		if (datareg && symptr->storage == GLOBAL &&
+		    ((symptr->flags & LABELLED) || *symptr->name.namep != 0)) {
+			addrinit(symptr);	/* (an address: at start-up) */
+			etptr = etmark;
 			exprptr = exprmark;
 			return;
 		}
