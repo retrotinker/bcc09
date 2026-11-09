@@ -43,6 +43,17 @@ int still_max;
 int arith_ok;
 #endif
 
+/* 32-bit long and unsigned long arithmetic, precedence, and ?: */
+#if 2147483647L > 65535 && -2147483647L - 1 < 0 && 4294967295UL > 0
+int long_ok;
+#endif
+#if 1 + 2 * 3 == 7 && 10 - 2 - 3 == 5 && (0 ? 1 : 0 ? 2 : 3) == 3
+int precedence_ok;
+#endif
+#if -1 > 0u && 0xFFFFFFFF >> 28 == 15 && -1 >> 1 == -1 && 0xFFFFFFFF + 1 == 0
+int unsigned_ok;
+#endif
+
 #if 0
 this text is skipped, even if it isn't C
 #endif

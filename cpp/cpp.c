@@ -52,11 +52,13 @@ FILE *curfile;
 char *c_fname;
 int c_lineno = 0;
 
-#ifdef __BCC__
-typedef long int_type;		/* Used for preprocessor expressions */
-#else
-typedef int int_type;		/* Used for preprocessor expressions */
-#endif
+/* a value in #if: 32 bits, as a long or an unsigned long (u) has on the
+   target, kept in an unsigned long (of 32 bits or more) */
+struct pp_val {
+	unsigned long v;
+	int u;
+};
+#define MASK32	0xFFFFFFFFUL
 static int curtok = 0;		/* Used for preprocessor expressions */
 
 static int fi_count = 0;
@@ -109,8 +111,8 @@ static void do_proc_else P((void));
 static void do_proc_endif P((void));
 static void do_proc_tail P((void));
 static int get_if_expression P((void));
-static int_type get_expression P((int));
-static int_type get_exp_value P((void));
+static struct pp_val get_expression P((int));
+static struct pp_val get_exp_value P((void));
 static void gen_substrings P((char *, char *, int, int));
 static char *insert_substrings P((char *, struct arg_store *, int));
 
@@ -1067,23 +1069,33 @@ static void do_proc_tail()
 
 static int get_if_expression()
 {
-	int value = get_expression(0);
+	struct pp_val value;
 
+	value = get_expression(0);
 	if (curtok != '\n')
 		do_proc_tail();
 
-	return value;
+	return (value.v & MASK32) != 0;
 }
 
-static int_type get_expression(prio)
+/* a value's 32 bits as a long */
+static long sval(v)
+unsigned long v;
+{
+	if (v & 0x80000000UL)
+		return -(long)(0x7FFFFFFFUL - (v & 0x7FFFFFFFUL)) - 1;
+	return (long)(v & 0x7FFFFFFFUL);
+}
+
+static struct pp_val get_expression(prio)
 int prio;
 {
-	int_type lvalue;
-	int_type rvalue;
+	struct pp_val l, r, f;
+	int u;
 	int no_op = 0;
 
 	curtok = get_onetok(SKIP_SPACE);
-	lvalue = get_exp_value();
+	l = get_exp_value();
 
 	do {
 		switch (curtok) {
@@ -1091,162 +1103,210 @@ int prio;
 		case '/':
 		case '%':
 			if (prio >= 10)
-				return lvalue;
+				return l;
 			break;
 		case '+':
 		case '-':
 			if (prio >= 9)
-				return lvalue;
+				return l;
 			break;
 		case TK_RIGHT_OP:
 		case TK_LEFT_OP:
 			if (prio >= 8)
-				return lvalue;
+				return l;
 			break;
 		case '<':
 		case '>':
 		case TK_LE_OP:
 		case TK_GE_OP:
 			if (prio >= 7)
-				return lvalue;
+				return l;
 			break;
 		case TK_EQ_OP:
 		case TK_NE_OP:
 			if (prio >= 6)
-				return lvalue;
+				return l;
 			break;
 		case '&':
 			if (prio >= 5)
-				return lvalue;
+				return l;
 			break;
 		case '^':
 			if (prio >= 4)
-				return lvalue;
+				return l;
 			break;
 		case '|':
 			if (prio >= 3)
-				return lvalue;
+				return l;
 			break;
 		case TK_AND_OP:
 			if (prio >= 2)
-				return lvalue;
+				return l;
 			break;
 		case TK_OR_OP:
 			if (prio >= 1)
-				return lvalue;
+				return l;
+			break;
+		case '?':
+			if (prio >= 1)
+				return l;
 			break;
 		}
+		/* (each operand has 32 bits, as a long or an unsigned long
+		   would on the target, which is unsigned if either is) */
 		switch (curtok) {
 		case '*':
-			rvalue = get_expression(10);
-			lvalue *= rvalue;
+			r = get_expression(10);
+			l.v *= r.v;
+			l.u |= r.u;
 			break;
 		case '/':
-			rvalue = get_expression(10);
-			if (rvalue)
-				lvalue /= rvalue;
-			break;
 		case '%':
-			rvalue = get_expression(10);
-			if (rvalue)
-				lvalue %= rvalue;
+			u = curtok;
+			r = get_expression(10);
+			if (r.v & MASK32) {
+				if (l.u || r.u)
+					l.v = u == '/' ? (l.v & MASK32) / (r.v & MASK32)
+					    : (l.v & MASK32) % (r.v & MASK32);
+				else
+					l.v = u == '/' ? sval(l.v) / sval(r.v)
+					    : sval(l.v) % sval(r.v);
+			} else
+				cerror("Division by zero in #if");
+			l.u |= r.u;
 			break;
 		case '+':
-			rvalue = get_expression(9);
-			lvalue += rvalue;
+			r = get_expression(9);
+			l.v += r.v;
+			l.u |= r.u;
 			break;
 		case '-':
-			rvalue = get_expression(9);
-			lvalue -= rvalue;
+			r = get_expression(9);
+			l.v -= r.v;
+			l.u |= r.u;
 			break;
-		case TK_RIGHT_OP:
-			rvalue = get_expression(8);
-			lvalue >>= rvalue;
+		case TK_RIGHT_OP:	/* (the left operand's type) */
+			r = get_expression(8);
+			if (l.u)
+				l.v = (l.v & MASK32) >> (r.v & 31);
+			else
+				l.v = sval(l.v) >> (r.v & 31);
 			break;
 		case TK_LEFT_OP:
-			rvalue = get_expression(8);
-			lvalue <<= rvalue;
+			r = get_expression(8);
+			l.v <<= (r.v & 31);
 			break;
 		case '<':
-			rvalue = get_expression(7);
-			lvalue = (lvalue < rvalue);
-			break;
 		case '>':
-			rvalue = get_expression(7);
-			lvalue = (lvalue > rvalue);
-			break;
 		case TK_LE_OP:
-			rvalue = get_expression(7);
-			lvalue = (lvalue <= rvalue);
-			break;
 		case TK_GE_OP:
-			rvalue = get_expression(7);
-			lvalue = (lvalue >= rvalue);
+			u = curtok;
+			r = get_expression(7);
+			if (l.u || r.u) {
+				l.v &= MASK32;
+				r.v &= MASK32;
+				l.v = u == '<' ? l.v < r.v : u == '>' ? l.v > r.v :
+				    u == TK_LE_OP ? l.v <= r.v : l.v >= r.v;
+			} else
+				l.v = u == '<' ? sval(l.v) < sval(r.v) :
+				    u == '>' ? sval(l.v) > sval(r.v) :
+				    u == TK_LE_OP ? sval(l.v) <= sval(r.v) :
+				    sval(l.v) >= sval(r.v);
+			l.u = 0;
 			break;
 		case TK_EQ_OP:
-			rvalue = get_expression(6);
-			lvalue = (lvalue == rvalue);
+			r = get_expression(6);
+			l.v = ((l.v ^ r.v) & MASK32) == 0;
+			l.u = 0;
 			break;
 		case TK_NE_OP:
-			rvalue = get_expression(6);
-			lvalue = (lvalue != rvalue);
+			r = get_expression(6);
+			l.v = ((l.v ^ r.v) & MASK32) != 0;
+			l.u = 0;
 			break;
 		case '&':
-			rvalue = get_expression(5);
-			lvalue = (lvalue & rvalue);
+			r = get_expression(5);
+			l.v &= r.v;
+			l.u |= r.u;
 			break;
 		case '^':
-			rvalue = get_expression(4);
-			lvalue = (lvalue ^ rvalue);
+			r = get_expression(4);
+			l.v ^= r.v;
+			l.u |= r.u;
 			break;
 		case '|':
-			rvalue = get_expression(3);
-			lvalue = (lvalue | rvalue);
+			r = get_expression(3);
+			l.v |= r.v;
+			l.u |= r.u;
 			break;
 		case TK_AND_OP:
-			rvalue = get_expression(2);
-			lvalue = (lvalue && rvalue);
+			r = get_expression(2);
+			l.v = (l.v & MASK32) && (r.v & MASK32);
+			l.u = 0;
 			break;
 		case TK_OR_OP:
-			rvalue = get_expression(1);
-			lvalue = (lvalue || rvalue);
+			r = get_expression(1);
+			l.v = (l.v & MASK32) || (r.v & MASK32);
+			l.u = 0;
 			break;
-
-		case '?':	/* XXX: To add */
+		case '?':
+			r = get_expression(0);
+			if (curtok != ':') {
+				cerror("Expected ':'");
+				f = r;
+			} else
+				f = get_expression(0);
+			l.u = r.u || f.u;
+			l.v = (l.v & MASK32) ? r.v : f.v;
+			break;
 
 		default:
 			no_op = 1;
 		}
+		l.v &= MASK32;
 	}
-	while (prio == 0 && !no_op);
+	while (!no_op);	/* (until an operator binds no tighter than prio) */
 
-	return lvalue;
+	return l;
 }
 
-static int_type get_exp_value()
+static struct pp_val get_exp_value()
 {
-	int_type value = 0;
-	int sign = 1;
+	struct pp_val r;
+	int neg = 0;
+	char *end;
 
+	r.v = 0;
+	r.u = 0;
 	if (curtok == '!') {
 		curtok = get_onetok(SKIP_SPACE);
-		return !get_exp_value();
+		r = get_exp_value();
+		r.v = (r.v & MASK32) == 0;
+		r.u = 0;
+		return r;
 	}
 	if (curtok == '~') {
 		curtok = get_onetok(SKIP_SPACE);
-		return ~get_exp_value();
+		r = get_exp_value();
+		r.v = ~r.v & MASK32;
+		return r;
 	}
 
 	while (curtok == '+' || curtok == '-') {
 		if (curtok == '-')
-			sign = -sign;
+			neg = !neg;
 		curtok = get_onetok(SKIP_SPACE);
 	}
 
 	if (curtok == TK_NUM) {
-		value = strtoul(curword, (void *)0, 0);
+		/* unsigned with a U, or too big for a long */
+		r.v = strtoul(curword, &end, 0);
+		r.u = (*end == 'u' || *end == 'U' || r.v > 0x7FFFFFFFUL);
+		r.v &= MASK32;
 		curtok = get_onetok(SKIP_SPACE);
 	} else if (curtok == TK_QUOT) {
+		long value;
+
 		value = curword[1];
 		if (value == '\\') {
 			if (curword[2] >= '0' && curword[2] <= '7') {
@@ -1283,15 +1343,15 @@ static int_type get_exp_value()
 #else
 		value = (unsigned char)value;
 #endif
+		r.v = value & MASK32;
 		curtok = get_onetok(SKIP_SPACE);
 	} else if (curtok == TK_WORD) {
-		value = 0;
 		if (strcmp("defined", curword) == 0) {
 			curtok = gettok_nosub();
 			if (curtok == '(' && gettok_nosub() != TK_WORD)
 				cerror("'defined' keyword requires argument");
 			else {
-				value = (read_entry(0, curword) != 0);
+				r.v = (read_entry(0, curword) != 0);
 				if (curtok == '(' && gettok_nosub() != ')')
 					cerror
 					    ("'defined' keyword requires closing ')'");
@@ -1302,7 +1362,7 @@ static int_type get_exp_value()
 			curtok = get_onetok(SKIP_SPACE);
 
 	} else if (curtok == '(') {
-		value = get_expression(0);
+		r = get_expression(0);
 		if (curtok == ')')
 			curtok = get_onetok(SKIP_SPACE);
 		else {
@@ -1311,7 +1371,9 @@ static int_type get_exp_value()
 		}
 	}
 
-	return sign < 0 ? -value : value;
+	if (neg)
+		r.v = -r.v & MASK32;
+	return r;
 }
 
 void gen_substrings(macname, data_str, arg_count, is_vararg)
@@ -1466,6 +1528,7 @@ int arg_count;
 	int in_quote = 0;
 	int quote_char = 0;
 	int ansi_stringize = 0;
+	int pasting = 0;	/* just after ## */
 
 #if CPP_DEBUG
 	fprintf(stderr, "\n### Macro substitution in '%s'\n", data_str);
@@ -1527,6 +1590,7 @@ int arg_count;
 						cerror
 						    ("'##' operator at end of macro");
 					}
+					pasting = 1;
 					continue;
 				}
 				data_str++;
@@ -1541,6 +1605,7 @@ int arg_count;
 			}
 
 			/* Other characters ... */
+			pasting = 0;
 			if (cc + 2 > len) {
 				len += 20;
 				rv = realloc(rv, len);
@@ -1600,6 +1665,12 @@ int arg_count;
 			    ("'#' operator should be followed by a macro argument name");
 		}
 
+		/* (an argument after ## without the blanks before it: they
+		   come from after the comma in the call) */
+		if (pasting)
+			while (*s == ' ' || *s == '\t')
+				s++;
+		pasting = 0;
 		if (cc + 2 + strlen(s) > len) {
 			len += strlen(s) + 20;
 			rv = realloc(rv, len);
