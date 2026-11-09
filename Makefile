@@ -2,7 +2,7 @@ PREFIX=/usr/local/bcc09
 
 DIRS=ar as bcc copt cpp ld unproto libc
 
-.PHONY: all check check-xroar check-nitros9 clean install
+.PHONY: all check check-xroar check-nitros9 check-flex clean install
 
 all: $(DIRS)
 	for i in $^ ;\
@@ -24,8 +24,11 @@ check-xroar: all
 check-nitros9: all
 	tests/nitros9/run.sh
 
+check-flex: all
+	tests/flex/run.sh
+
 $(SIM): tests/sim/*.c tests/sim/*.h
-	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.4"' -o $@ tests/sim/*.c
+	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.5"' -o $@ tests/sim/*.c
 
 # There is bound to be some more clever way to do this than copying
 # the "all" rule...
