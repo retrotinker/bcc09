@@ -1956,7 +1956,7 @@ char *string;
 struct mapelt *mapelt;
 {
 	fprintf(stderr, "%s: ", program_name);
-	fprintf(stderr, string);
+	fputs(string, stderr);
 	if (mapelt->info.offset != 0)
 		fprintf(stderr, "%s(%s)", archive, mapelt->info.name);
 	else
