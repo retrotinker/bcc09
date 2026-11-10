@@ -29,8 +29,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 
 ## Layout
 
-- Version 0.9.0 (released 2026-11-09; `VERSION` in the Makefile, and `bcc09.spec`); 0.8.0,
-  the same day, was the first release since v0.1 (2014). `make rpm`/`make srpm` (added 2026-11-09) build Fedora
+- Version 0.10.0 (released 2026-11-09; `VERSION` in the Makefile, and `bcc09.spec`);
+  0.8.0, the same day, was the first release since v0.1 (2014), then 0.9.0. 0.9.0 and later have a
+  GitHub release with the RPM and source RPM attached (`gh release create`). `make rpm`/`make srpm` (added 2026-11-09) build Fedora
   packages in `rpmbuild/` from `git archive` of the tag `v$(VERSION)` (HEAD while it
   isn't tagged), as plm09's do; the spec builds with `PREFIX=/usr`, runs `make check`
   in `%check`, and its License follows Fedora's dev86 (adding LGPL-2.0-only for bcc09's

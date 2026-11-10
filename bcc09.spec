@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.9.0
+Version:        0.10.0
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -71,6 +71,11 @@ cp -p libc/math/README README.libm
 %{_mandir}/man1/objcopy09.1*
 
 %changelog
+* Mon Nov 09 2026 John W. Linville <linville@tuxdriver.com> - 0.10.0-1
+- bcc09 -Mv: Vectrex cartridges, with the BIOS's routines in vectrex.h
+- ld09: a symbol defined again is warned about only if both modules are
+  linked
+
 * Mon Nov 09 2026 John W. Linville <linville@tuxdriver.com> - 0.9.0-1
 - ld09: linker scripts (-S, -A, -P, -Z), from ld01 in mc6801-tools; the
   default script gives the same layout as before
