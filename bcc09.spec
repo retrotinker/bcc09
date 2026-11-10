@@ -1,6 +1,6 @@
 Name:           bcc09
 Version:        0.11.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
 # The tools are dev86's (GPL-2.0-or-later; ar09 GPL-1.0-or-later); libc is
@@ -18,6 +18,8 @@ BuildRequires:  make
 BuildRequires:  sim6809 >= 1.2.0
 BuildRequires:  python3
 BuildRequires:  groff-base
+# the PDF manuals (installed with it unless left out)
+Recommends:     %{name}-doc = %{version}-%{release}
 
 %description
 bcc09 is a C compiler for the Motorola MC6809, with its preprocessor,
@@ -88,6 +90,9 @@ cp -p libc/math/README README.libm
 %doc doc/manual.pdf doc/basic.pdf
 
 %changelog
+* Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.2-3
+- bcc09 recommends bcc09-doc, the PDF manuals
+
 * Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.2-2
 - The PDF manuals (the user's manual and bcc09 for BASIC Programmers) are
   in a noarch subpackage, bcc09-doc
