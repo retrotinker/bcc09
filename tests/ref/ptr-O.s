@@ -134,11 +134,9 @@ _sum:
 ;BCC_EOS
 ; 30 {
 ; 31 	int t = 0;
-PSHS	D,X
-; Debug: eq int = const 0 to int t = [S+4-4] (used reg = )
 CLRA
 CLRB
-STD	0,S
+PSHS	D,X
 ;BCC_EOS
 ; 32 
 ; 33 	while (n-- > 0)

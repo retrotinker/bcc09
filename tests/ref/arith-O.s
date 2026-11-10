@@ -271,11 +271,9 @@ _compare:
 ;BCC_EOS
 ; 48 {
 ; 49 	int n = 0;
-PSHS	D,X
-; Debug: eq int = const 0 to int n = [S+4-4] (used reg = )
 CLRA
 CLRB
-STD	0,S
+PSHS	D,X
 ;BCC_EOS
 ; 50 
 ; 51 	if (a == b) n++;

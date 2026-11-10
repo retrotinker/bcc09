@@ -196,9 +196,17 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   dropped from a match; a label ends one); `%(expr)` is arithmetic, and a rule with an
   expression that isn't a number (a symbol's offset) doesn't apply. A rule can't
   replace lines with nothing: an empty replacement ends the reading of the rules. The
-  rules (checked 2026-11-08) favor size: `LDD #0` becomes `CLRA`/`CLRB` (a byte smaller,
-  a cycle slower), only before instructions that don't read C; adjacent `LEAS n,S` are
-  merged.
+  rules (checked 2026-11-08, and every rule again 2026-11-10) favor size: `LDD #0`
+  becomes `CLRA`/`CLRB` (a byte smaller, a cycle slower), only before instructions that
+  don't read C; adjacent `LEAS n,S` are merged. Added 2026-11-10, from counting the
+  sequences in libc's and the tests' `-O` assembly (each exact: registers, flags and
+  stack the same): `CLRA;CLRB;LDX #0` → `TFR D,X` last; a value stored over a just-pushed
+  D is pushed instead (`PSHS D` and `PSHS D,...`: `D%1` would match DP); a second
+  `CLRA;CLRB` after `STD`; `PSHS D,X,U,Y;PULS D,X,U,Y` goes. libc 499 bytes smaller (of
+  143K). cc1's output has none of the classic redundancies (a test after a load, a
+  branch over a branch, TFR pairs); what's left needs to know which registers are live,
+  or whether two stack offsets overlap, which copt can't. The store/load rules take
+  every address for memory (no `volatile`): the copt man page says so.
 - `doc/basic.md` is "bcc09 for BASIC Programmers" (added 2026-11-10): C taught from Color
   BASIC, chapter by chapter, with `coco.h`; `make docs` (`doc/mkbasic.sh`) makes
   `doc/basic.pdf`, committed and packaged. `tests/run.sh` compiles and links every

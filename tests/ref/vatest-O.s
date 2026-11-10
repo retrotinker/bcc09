@@ -120,7 +120,7 @@ STX	2,S
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 LEAY	$12,S
 JSR	>lcmp_b
 BLE	.8
@@ -198,7 +198,7 @@ BNE	.C
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 LEAY	$12,S
 JSR	>lcmp_b
 BLE	.E
@@ -302,7 +302,7 @@ LEAS	-6,S
 ; Debug: eq int = const 0 to long t = [S+8-8] (used reg = )
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 STD	0,S
 STX	2,S
 ;BCC_EOS
@@ -752,11 +752,9 @@ _vsum:
 ;BCC_EOS
 ; 147 {
 ; 148 	int t = 0;
-PSHS	D,X
-; Debug: eq int = const 0 to int t = [S+4-4] (used reg = )
 CLRA
 CLRB
-STD	0,S
+PSHS	D,X
 ;BCC_EOS
 ; 149 
 ; 150 	while (n-- > 0)
@@ -1496,7 +1494,7 @@ LEAS	4,S
 PSHS	D,X
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 PSHS	D,X
 LDD	4,S
 LDX	6,S

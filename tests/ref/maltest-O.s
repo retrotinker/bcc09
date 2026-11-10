@@ -311,11 +311,9 @@ _fill:
 ;BCC_EOS
 ; 47 
 ; 48 	for (i = 0; i < size; i++)
-PSHS	D,X
-; Debug: eq int = const 0 to int i = [S+4-4] (used reg = )
 CLRA
 CLRB
-STD	0,S
+PSHS	D,X
 ;BCC_EOS
 ;BCC_EOS
 ; 49 		p[i] = ((char)((slot)* 7 + (size)+ (i))) ;
@@ -373,11 +371,9 @@ _intact:
 ;BCC_EOS
 ; 58 
 ; 59 	for (i = 0; i < n; i++)
-PSHS	D,X
-; Debug: eq int = const 0 to int i = [S+4-4] (used reg = )
 CLRA
 CLRB
-STD	0,S
+PSHS	D,X
 ;BCC_EOS
 ;BCC_EOS
 ; 60 		if (p[i] != ((char)((slot)* 7 + (size)+ (i))))

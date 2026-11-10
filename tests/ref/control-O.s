@@ -277,11 +277,9 @@ _gotoloop:
 ;BCC_EOS
 ; 59 {
 ; 60 	int i = 0, t = 0;
-PSHS	D,X
-; Debug: eq int = const 0 to int i = [S+4-4] (used reg = )
 CLRA
 CLRB
-STD	0,S
+PSHS	D,X
 LEAS	-2,S
 ; Debug: eq int = const 0 to int t = [S+6-6] (used reg = )
 CLRA

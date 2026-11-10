@@ -1,4 +1,6 @@
-## Redundant STx ... ; LDx ...
+## Redundant STx ... ; LDx ...  (This takes every address for memory: a
+## hardware register written and read straight back isn't read; cc1 has
+## no volatile, and bcc09-copt(1) says so.)
 
 # Exclude indexed with pre/post inc/decrement
 ST%1	%2,%[X|Y|U|S]3
@@ -34,6 +36,79 @@ LDD	#0
 CLRA
 CLRB
 %1	%2
+
+## The LDD #0 above makes CLRA, CLRB: an LDX #0 after them (a long 0, in
+## D:X) is TFR D,X, two bytes rather than three, with the same flags
+## (CLRB left Z set and N, V and C clear, as LDX #0 would; TFR changes
+## none)
+
+CLRA
+CLRB
+LDX	#0
+=
+CLRA
+CLRB
+TFR	D,X
+
+## A 2-byte local given a value as it is pushed: PSHS D (or D and
+## more), then a value stored over the D it pushed, is that value pushed
+## (D and the flags come out the same).  (Two forms each, as D%1 would
+## match DP.)
+
+PSHS	D
+CLRA
+CLRB
+STD	0,S
+=
+CLRA
+CLRB
+PSHS	D
+
+PSHS	D,%1
+CLRA
+CLRB
+STD	0,S
+=
+CLRA
+CLRB
+PSHS	D,%1
+
+PSHS	D
+LDD	#%1
+STD	0,S
+=
+LDD	#%1
+PSHS	D
+
+PSHS	D,%1
+LDD	#%2
+STD	0,S
+=
+LDD	#%2
+PSHS	D,%1
+
+## 0 stored, then 0 loaded again: STD leaves D 0, and the flags as the
+## second CLRA, CLRB would (Z set, N and V clear, and C clear from the
+## first CLRB)
+
+CLRA
+CLRB
+STD	%1
+CLRA
+CLRB
+=
+CLRA
+CLRB
+STD	%1
+
+## Every register pushed and pulled straight back does nothing (the
+## flags are untouched); as with LEAS 0,S below, the line after is kept
+
+PSHS	D,X,U,Y
+PULS	D,X,U,Y
+%1
+=
+%1
 
 ## Two LEAS n,S in a row: one, with the sum (the offsets must be numbers:
 ## copt's arithmetic takes anything else as 0)

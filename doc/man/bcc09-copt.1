@@ -118,6 +118,14 @@ LD%1	%2,%[X|Y|U|S]3
 ST%1	%2,%3
 .fi
 .RE
+.SH NOTES
+rules.6809's rules take every address for memory: a load straight
+after a store to the same address goes.
+A program that writes a hardware register and reads it straight back
+(cc1 has no
+.BR volatile )
+gets the value it wrote, not the register's: compile that code without
+.BR \-O .
 .SH EXIT STATUS
 0, or 1 if a file can't be read or written.
 .SH SEE ALSO

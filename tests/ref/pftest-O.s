@@ -1379,7 +1379,7 @@ STD	6,S
 ; Debug: eq int = const 0 to long ln = [S+$2C-$2A] (used reg = )
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 STD	2,S
 STX	4,S
 ;BCC_EOS

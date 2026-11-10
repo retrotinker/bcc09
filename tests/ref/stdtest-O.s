@@ -343,7 +343,7 @@ STX	2,S
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 LEAY	$12,S
 JSR	>lcmp_b
 BLE	.D
@@ -421,7 +421,7 @@ BNE	.11
 ; Debug: lt long = const 0 to long l = [S+$16-4] (used reg = )
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 LEAY	$12,S
 JSR	>lcmp_b
 BLE	.13
@@ -1934,7 +1934,7 @@ LEAS	4,S
 PSHS	D,X
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 PSHS	D,X
 LDD	4,S
 LDX	6,S
@@ -1967,7 +1967,7 @@ LEAS	4,S
 PSHS	D,X
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 PSHS	D,X
 LDD	4,S
 LDX	6,S
@@ -2852,7 +2852,7 @@ PSHS	X
 ; Debug: rootlist long = const 0 (used reg = )
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 ; Debug: func () * char = ltoa+0 (used reg = )
 JSR	>_ltoa
 ; Debug: rootlist * char = X+0 (used reg = )
@@ -3255,10 +3255,8 @@ _sorted:
 ;BCC_EOS
 ; 253 
 ; 254 	for (i = 1; i < n; i++)
-PSHS	D,X
-; Debug: eq int = const 1 to int i = [S+4-4] (used reg = )
 LDD	#1
-STD	0,S
+PSHS	D,X
 ;BCC_EOS
 ;BCC_EOS
 ; 255 		if (a[i - 1] > a[i])

@@ -300,10 +300,8 @@ _ti:
 ;BCC_EOS
 ; 25 {
 ; 26 	int a = -99, b = -99, c = -99, d = -99, r;
-PSHS	D,X
-; Debug: eq int = const -$63 to int a = [S+4-4] (used reg = )
 LDD	#-$63
-STD	0,S
+PSHS	D,X
 LEAS	-2,S
 ; Debug: eq int = const -$63 to int b = [S+6-6] (used reg = )
 LDD	#-$63
@@ -535,10 +533,8 @@ _th:
 ;BCC_EOS
 ; 56 {
 ; 57 	short a = -99, b = -99;
-PSHS	D,X
-; Debug: eq int = const -$63 to short a = [S+4-4] (used reg = )
 LDD	#-$63
-STD	0,S
+PSHS	D,X
 LEAS	-2,S
 ; Debug: eq int = const -$63 to short b = [S+6-6] (used reg = )
 LDD	#-$63

@@ -178,7 +178,7 @@ JSR	>linc_b
 ; Debug: expression subtree swapping
 CLRA
 CLRB
-LDX	#0
+TFR	D,X
 PSHS	D,X
 LDD	4,S
 LDX	6,S
