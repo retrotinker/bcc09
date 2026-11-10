@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.10.0
+Version:        0.11.0
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -71,6 +71,13 @@ cp -p libc/math/README README.libm
 %{_mandir}/man1/objcopy09.1*
 
 %changelog
+* Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.0-1
+- coco.h: inkey, cls, locate and joystk for Color BASIC programs and
+  cartridges; stdio flushes stdout at the end of a '\r' line
+- doc/basic.pdf: bcc09 for BASIC Programmers, a guide to C from Color
+  BASIC, packaged as documentation
+- copt: five more rules (libc 499 bytes smaller)
+
 * Mon Nov 09 2026 John W. Linville <linville@tuxdriver.com> - 0.10.0-1
 - bcc09 -Mv: Vectrex cartridges, with the BIOS's routines in vectrex.h
 - ld09: a symbol defined again is warned about only if both modules are
