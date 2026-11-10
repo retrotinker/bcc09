@@ -5,7 +5,8 @@ bcc09 is a C compiler for the Motorola MC6809, with the preprocessor,
 peephole optimizer, assembler, linker, librarian, binary utilities and
 C library that go with it.  It targets the Tandy Color Computer and the
 Dragon (Color BASIC, Disk BASIC and ROM cartridges), OS-9 and NitrOS-9,
-and FLEX, or any 6809 machine through its own start-up code.  It is
+FLEX, and the Vectrex, or any 6809 machine through its own start-up
+code.  It is
 derived from the 6809 configuration of Bruce Evans' C compiler, as the
 dev86 project has it.
 
@@ -50,8 +51,9 @@ bcc09 builds on any Unix-like system with a C compiler and make:
 "make check" runs the regression tests: the programs they build run on
 sim6809, a 6809 simulator from the plm09 project (in tests/sim).  The
 optional "make check-xroar", "make check-nitros9" and "make check-flex"
-run test programs on real ROMs and systems in the XRoar emulator (see
-the manual for what each needs).
+run test programs on real ROMs and systems in the XRoar emulator, and
+"make check-vectrex" on the Vectrex's BIOS in MAME (see the manual for
+what each needs).
 
 "make install" puts the programs in PREFIX/bin, the passes in
 PREFIX/libexec/bcc09, the C library and its headers in
@@ -73,6 +75,10 @@ cartridge for the CoCo or the Dragon, its image ready for an EPROM (or
 XRoar's -cart-rom):
 
 	bcc09 -Mr -O -o hello.rom hello.c
+
+A Vectrex cartridge, drawing through the BIOS's routines (vectrex.h):
+
+	bcc09 -Mv -O -o hello.bin hello.c
 
 An OS-9
 program module, and a FLEX command:

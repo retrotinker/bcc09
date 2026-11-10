@@ -5,7 +5,8 @@ MANDIR=$(PREFIX)/share/man
 
 DIRS=ar as bcc copt cpp ld unproto libc
 
-.PHONY: all check check-xroar check-nitros9 check-flex docs clean install \
+.PHONY: all check check-xroar check-nitros9 check-flex check-vectrex docs clean \
+	install \
 	rpm srpm FORCE
 
 all: $(DIRS)
@@ -31,6 +32,10 @@ check-nitros9: all
 
 check-flex: all
 	tests/flex/run.sh
+
+# optional: the Vectrex target in MAME
+check-vectrex: all
+	tests/vectrex/run.sh
 
 # the user's manual, doc/manual.pdf (with pandoc and xelatex): run after
 # changing doc/manual.md or a man page, and commit the PDF

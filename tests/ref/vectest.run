@@ -1,0 +1,17 @@
+Wait_Recal dp D0
+Intensity_a 7F dp D0
+Moveto_d EC 28 dp D0
+Draw_Line_d 1E B0 00 dp D0
+Dot_d 03 01 dp D0
+Reset0Ref dp D0
+Print_Str_d 3C BA HELLO  dp D0
+Intensity_a 49 dp D0
+Draw_VLc 03 00 14 dp D0
+Read_Btns dp D0
+Intensity_a 5A dp D0
+Random dp D0
+Moveto_d 33 FF dp D0
+Joy_Digital dp D0
+Init_Music_chk FD0D dp C8
+Do_Sound dp D0
+sim6809: instruction limit (2000000) reached, in _exit's loop

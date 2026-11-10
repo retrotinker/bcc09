@@ -133,6 +133,8 @@ and links with libc.a (ld09 -C<name> links crt<name>.o):
   -Me       cb: crt0.o and libcb.a (Color BASIC, run with EXEC)
   -Mr       rom: crtrom.o and librom.a, linked with rom.ld (a Color
             BASIC ROM cartridge)
+  -Mv       vec: crtvec.o and libvec.a, linked with vectrex.ld (a
+            Vectrex cartridge)
   -Mi       sim: crtsim.o and libsim.a
   -Mf       flex: crtflex.o and libflex.a (a FLEX command, a .CMD file)
   -Mo       os9: crtos9.o and libos9.a (an OS-9 program module)
@@ -141,7 +143,7 @@ and links with libc.a (ld09 -C<name> links crt<name>.o):
 reached through U), so libos9.a is all of libc built again with it (in
 os9obj), which bcc09 links in place of libc.a.
 
-The others (-Mu, -Mb, -Mv) have none yet, and bcc09
+The others (-Mu, -Mb) have none yet, and bcc09
 won't link for them (bcc09 -x leaves out the start-up code, for a
 program that brings its own).  Each target's start-up code clears the
 BSS and calls main; when main returns, its result goes to exit(), which
@@ -216,6 +218,26 @@ cartridge before its BASIC is set up (the CHROUT vector isn't there
 yet), so this I/O doesn't work on it.  "make check" runs a cartridge on
 sim6809 with cbrom.s (tests/src/romtest.c); "make check-xroar" on the
 CoCo, CoCo 2, Dragon 32 and Dragon 64 (tests/xroar/xrom.c).
+
+vec is for a Vectrex cartridge.  bcc09 -Mv links it with the linker
+script vec/vectrex.ld (installed as vectrex.ld), whose output is the
+ROM's image: the cartridge's header (segment 12) at $0000, then
+crtvec.o's code, which the BIOS runs after the header, the rest of the
+code, and an image of the initialized data; the data and BSS are in the
+Vectrex's RAM from $C880 (after the BIOS's variables), and the stack
+below __stack_top, $CBEA.  crtvec (vec/crt0.s) sets S and DP ($D0, the
+VIA's page, where the BIOS routines want it), copies the data to RAM,
+clears the BSS, and calls the init functions and main.  libvec.a has
+the default header (vec/header.s: "BCC09", with the BIOS's tune), which
+a module of the program's own that defines __vec_header in segment 12
+takes the place of (include/vectrex.h shows one); _exit() (vec/_exit.s),
+which stops; and C functions for the BIOS's routines, named as Vectrex
+programmers know them (vec/draw.s, input.s, sound.s, random.s), which
+put their arguments in the registers the routines want and set DP.
+There is no read() or write(), so no stdio.  "make check" runs a
+cartridge on sim6809 with tests/src/vecbios.s standing in for the BIOS,
+printing each call; "make check-vectrex" runs tests/vectrex/xvec.c in
+MAME's Vectrex.
 
 flex is for a FLEX command: "objcopy09 -O flex prog.out PROG.CMD" makes
 the .CMD file, of load records and a transfer address, for any load

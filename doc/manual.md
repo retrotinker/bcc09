@@ -203,12 +203,13 @@ files, the end of the program), which `bcc09` links with the C library:
 | `-Ms` | standalone (default) | `crt0.o`, `libsa.a` | any (`objcopy09`) |
 | `-Me` | Color BASIC, run with `EXEC` | `crt0.o`, `libcb.a` | `cas`, `wav`, `decb` |
 | `-Mr` | ROM cartridge (CoCo, Dragon) | `crtrom.o`, `librom.a`, `rom.ld` | the ROM's image |
+| `-Mv` | Vectrex cartridge | `crtvec.o`, `libvec.a`, `vectrex.ld` | the ROM's image |
 | `-Mo` | OS-9 program module | `crtos9.o`, `libos9.a` | `os9` |
 | `-Mf` | FLEX command | `crtflex.o`, `libflex.a` | `flex` |
 | `-Mi` | sim6809 | `crtsim.o`, `libsim.a` | `srec` |
 
-(`-Mu`, `-Mb` and `-Mv`, for Color BASIC `USR` functions, Disk BASIC and
-the Vectrex, define their macros but have no start-up code yet.)
+(`-Mu` and `-Mb`, for Color BASIC `USR` functions and Disk BASIC, define
+their macros but have no start-up code yet.)
 
 Every target's start-up code clears the BSS, calls the *init functions*
 (section 7.4), then `main`; `main`'s result goes to `exit()`, which calls
@@ -299,6 +300,58 @@ The CoCo 3 starts a cartridge before its BASIC is ready for `CHROUT` and
 `POLCAT`, so `-Mr`'s I/O doesn't work there. For another layout, copy
 `rom.ld` (from bcc09's library directory), change it, and link with
 `-X-S` and the copy.
+
+## Vectrex (`-Mv`)
+
+A Vectrex cartridge. The BIOS checks the cartridge's header, shows its
+title, plays its tune, and then runs the code after the header:
+
+```c
+#include <vectrex.h>
+
+int main()
+{
+	for (;;) {
+		Wait_Recal();
+		Intensity_a(0x7F);
+		Print_Str_d(0, -40, "HELLO\200");
+		Reset0Ref();
+		Moveto_d(-30, -30);
+		Draw_Line_d(0, 60);
+	}
+}
+```
+
+```
+bcc09 -Mv -O -o hello.bin hello.c
+mame vectrex -cart hello.bin
+```
+
+* **The ROM,** from `$0000`: the header, the code, and an image of the
+  initialized data (up to 32K).
+* **The RAM** is the Vectrex's 1K, less the BIOS's own variables: the
+  data and BSS from `$C880`, the stack below `$CBEA`. That is room for a
+  game's variables, but not for stdio's buffers, and the heap is small.
+* **Start-up:** the start-up code sets the stack and DP (`$D0`, where the
+  BIOS's routines want it), copies the initialized data to RAM, clears
+  the BSS, and calls the init functions and `main`.
+* **The BIOS:** `vectrex.h` declares its routines for drawing
+  (`Wait_Recal`, `Intensity_a`, `Moveto_d`, `Draw_Line_d`, `Dot_d`,
+  `Draw_VLc`, `Print_Str_d`, `Reset0Ref`), the controllers (`Read_Btns`,
+  `Joy_Digital`), sound (`Init_Music_chk`, `Do_Sound`) and `Random`, with
+  the names Vectrex programmers know, and its variables (`Vec_Btn_State`,
+  `Vec_Joy_1_X`, `VIA_t1_cnt_lo` for the scale, and others). Coordinates
+  are -128 to 127, y first; the BIOS's strings are in capitals and end
+  with `\200` (`$80`), not 0.
+* **No other I/O:** `read()` and `write()` aren't there, so neither is
+  stdio.
+* **The end:** `_exit()` stops, with the status in D.
+
+The header is `libvec.a`'s, with the title "BCC09", unless the program
+has its own: `vectrex.h` shows one, an assembly file of a few lines,
+linked with the program (`bcc09 -Mv -o game.bin game.c title.s`). For
+another layout, copy `vectrex.ld`, change it, and link with `-X-S` and
+the copy.
 
 ## OS-9 (`-Mo`)
 
@@ -532,19 +585,22 @@ which `LOADM` puts in their places.
 `make check` runs bcc09's regression tests: it compiles the test sources
 with this build's tools, runs the programs on sim6809 (for every target:
 Color BASIC with stand-ins for its ROMs, OS-9 modules and FLEX commands
-with the simulator's emulation of their systems), compares every result
+with the simulator's emulation of their systems, cartridges with
+stand-ins for BASIC's ROM and the Vectrex's BIOS), compares every result
 with a reference copy, and checks the manual pages. Many of the
 programs are also compiled with the host's C compiler, and must print
 the same.
 
-Three more test suites run programs on real ROMs and systems, in the XRoar
-emulator, if XRoar and the ROMs and disks they need are there:
+Four more test suites run programs on real ROMs and systems, in the XRoar
+and MAME emulators, if they and the ROMs and disks they need are there:
 
 * `make check-xroar`: Color BASIC on the CoCo 1, 2 and 3 and the Dragon 32
-  and 64, with Disk BASIC's files on the CoCos;
+  and 64, with Disk BASIC's files on the CoCos, and ROM cartridges;
 * `make check-nitros9`: OS-9 modules on NitrOS-9 Level 2;
 * `make check-flex`: FLEX commands, and FLEX's files, on Compusense FLEX
-  for the Dragon 64.
+  for the Dragon 64;
+* `make check-vectrex`: a Vectrex cartridge on the Vectrex's BIOS in MAME
+  (`$VECTREX_ROM`, or MAME's own ROM set).
 
 # Appendix A: the manual pages {.unnumbered}
 

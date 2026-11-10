@@ -132,7 +132,21 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     files (`O_TRUNC` deletes first; no `O_RDWR`/`O_APPEND`), `lseek()` for reading only,
     `unlink`, `rename`. Real FLEX's rewind makes an FCB text again, and delete puts `$FF`
     in its name: `file.c` and sim6809 both allow for it.
-  - The others (`-Mu`, `-Mb`, `-Mv`) can't link yet (`notarget` uses `-Mv`).
+  - `-Mv` → `crtvec.o` + `libvec.a` + `vectrex.ld` (added 2026-11-09): a Vectrex
+    cartridge. `vectrex.ld`: the header (segment 12, `*(LOC12)`) at $0000, then
+    `crtvec.o(LOC0)` (the BIOS runs the code after the header), code and the data's image
+    in ROM; data and BSS in RAM $C880-$CBEA (the BIOS's variables are below, its stack
+    area above), stack at `__stack_top` $CBEA. `crtvec` sets S and DP $D0, copies data,
+    clears BSS, init functions, main; it imports `__vec_header` in segment 12 (ld09
+    matches an import with a definition in the same segment only), which links libvec's
+    default header ("BCC09") or a program's own module (`vectrex.h` shows one;
+    `vectitle.s`; no warning, since the ld09 change). libvec: `_exit` (stops), wrappers
+    named as the BIOS routines (`Wait_Recal`, `Moveto_d(y, x)`, `Print_Str_d(y, x, s)`
+    with `\200`-ended strings...; addresses from the common VECTREX.INC, written fresh:
+    the gcc6809 tutorial's `vectrex.h` is GPLv3), each setting DP $D0 ($C8 for
+    `Init_Music_chk`); as09's `INCLUDE` is relative to the current directory, so each
+    module has its own equates. No read/write, so no stdio. Defines `__VECTREX__`.
+  - The others (`-Mu`, `-Mb`) can't link yet (`notarget` uses `-Mu`).
 - OS-9's data model (begun 2026-11-08): `-Mo` passes `cc1 -u`, which is `-p`
   (position-independent code: functions and string constants `,PCR`, calls `LBSR`) with
   data through U (`name,U`, linked as offsets: `isdata()` in `genloads.c`); U is then no
@@ -210,7 +224,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 714 reference
+  `tests/src/` with this tree's tools and compare every result with the 726 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -324,6 +338,19 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `tests/xroar/xrom.c` as a cartridge (`-cart-rom`, `-cart-autorun`) on the CoCo, CoCo 2,
   Dragon 32 and Dragon 64, finding RAM in the snapshot by the data's first string at
   $0600 (`expected-rom`).
+- `tests/src/vectest.c` is a Vectrex cartridge (`vectrex.ld` included with
+  `OUTPUT_FORMAT(srec)`) run on sim6809 from crtvec's `start` with `vecbios.s`, which
+  prints each BIOS call's registers and DP: it is linked at 0 with `org $F192` and so on
+  (after an ORG, as09's labels are absolute but the bytes are placed from the segment's
+  start), and only its S-records from $F000 are kept. `vectitle.s` is a header of a
+  program's own. `make check-vectrex` (`tests/vectrex/run.sh`, optional: `mame` and the
+  BIOS, `$VECTREX_ROM` or `~/vectrex/bnz17/SYSTEM.IMG`, CRC 34142feb, which isn't
+  either of MAME's known dumps but runs, after a warning; or MAME's own set) runs
+  `xvec.c` headless (`-video none`), `run.lua` stopping it at `_exit`'s loop (CURPC: a
+  frame can end partway through an instruction) and printing the status and `results[]`
+  from RAM (`expected`); MAME's own files go to the scratch directory
+  (`-cfg_directory` and others), not the user's. Snapshots (`manager.machine.video:
+  snapshot()` in Lua) work with `-video none`, for looking at the screen.
 - `tests/src/cbfile.c` runs with `cbrom.s` and `cbdisk.s` (Disk BASIC's stand-in at
   `$C000`: DSKCON on tracks 16-18 kept in memory, granules 32-35 free) and checks
   `libc/cb/disk.c`: files of several granules, a full disk, deleting, truncating, and the

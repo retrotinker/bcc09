@@ -960,6 +960,10 @@ char **argv;
 	case 'v':
 		prepend_option("-D__VECTREX__", 'p');
 		opt_arch = MC6809_VECTREX;
+		crtname = "-Cvec";	/* a cartridge: header, then code */
+		targetlib = "-lvec";	/* the BIOS's routines, for
+					   vectrex.h */
+		linkscript = "vectrex.ld";
 		break;
 	case 'i':
 		prepend_option("-D__SIM6809__", 'p');

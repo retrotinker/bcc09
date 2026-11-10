@@ -162,16 +162,33 @@ Defines
 and
 .BR __FLEX9__ .
 .TP
+.B v
+A Vectrex cartridge: the output is the ROM's image, laid out by the
+linker script
+.I vectrex.ld
+(the cartridge header at $0000, then the code and an image of the
+initialized data; the data, BSS and stack in the Vectrex's RAM, $C880
+to $CBEA), with the BIOS's routines for drawing, the controllers and
+sound in
+.I vectrex.h
+and no other I/O; the start-up code copies the data to RAM, and
+.B _exit
+stops the program.
+The header (the title the BIOS shows) is libvec.a's, unless a module
+of the program's own defines
+.B __vec_header
+in segment 12.
+Defines
+.BR __VECTREX__ .
+.TP
 .B i
 sim6809, the simulator bcc09's tests use.
 Defines
 .BR __SIM6809__ .
 .TP
-.BR u ", " b ", " v
-Color BASIC USR functions, Disk BASIC, and the Vectrex: they define
+.BR u ", " b
+Color BASIC USR functions and Disk BASIC: they define
 .B __CB__
-(or
-.BR __VECTREX__ )
 but have no start-up code or library yet, so only
 .B \-x
 links them, with the C library alone.
@@ -350,6 +367,8 @@ crt0.o and libcb.a for
 .BR \-Me ;
 crtrom.o, librom.a and the linker script rom.ld for
 .BR \-Mr ;
+crtvec.o, libvec.a and vectrex.ld for
+.BR \-Mv ;
 crtos9.o and libos9.a, all of libc built for OS-9, for
 .BR \-Mo ;
 crtflex.o and libflex.a for
@@ -378,6 +397,17 @@ or an EPROM):
 .RS
 .nf
 bcc09 \-Mr \-O \-o hello.rom hello.c
+.fi
+.RE
+.PP
+A Vectrex cartridge, with a title of its own in
+.I title.s
+(see
+.IR vectrex.h ):
+.PP
+.RS
+.nf
+bcc09 \-Mv \-O \-o game.bin game.c title.s
 .fi
 .RE
 .PP

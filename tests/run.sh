@@ -51,7 +51,8 @@ ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
 	"$top/libc/libsa.a" "$top/libc/libcb.a" "$top/libc/crtsim.o" \
 	"$top/libc/libsim.a" "$top/libc/crtos9.o" "$top/libc/libos9.a" \
 	"$top/libc/crtflex.o" "$top/libc/libflex.a" "$top/libc/crtrom.o" \
-	"$top/libc/librom.a" "$top/libc/rom/rom.ld" \
+	"$top/libc/librom.a" "$top/libc/rom/rom.ld" "$top/libc/crtvec.o" \
+	"$top/libc/libvec.a" "$top/libc/vec/vectrex.ld" \
 	"$prefix/share/bcc09/"
 LIBDIR=$prefix/share/bcc09
 # (the same, relative to $out, for links whose maps name the library)
@@ -631,6 +632,38 @@ run rom.bcc "$BCC" -Mr -o romtest.rom romtest.c
   od -An -tx1 -N4 romtest.rom
   tail -c 4 romtest.rom | od -An -tx1; } > romtest.img
 rm -f romsrec.ld romtest.srec romtest-rom.srec romtest.rom
+
+# a Vectrex cartridge (bcc09 -Mv): vectrex.ld, with S-record output,
+# and vecbios.s for the BIOS (linked at 0, with labels from $F000 up:
+# only its records from there are kept), which prints each call with
+# its registers and DP; run from crtvec.o's start, after the header, to
+# _exit()'s loop (2 bytes after __exit), where the instruction limit
+# ends it
+printf 'INCLUDE "%s"\nOUTPUT_FORMAT(srec)\n' "$LIBREL/vectrex.ld" > vecsrec.ld
+run vectest.bcc "$BCC" -Mv -o vectest.srec -X-Svecsrec.ld vectest.c
+"$BCC" -Mv -o vectest-map.srec -X-Svecsrec.ld -X-M vectest.c \
+	> vectest.map 2>&1
+run vecbios.as "$AS" -o vecbios.o vecbios.s
+"$LD" -T0 -o vecbios.out vecbios.o
+"$OC" -O srec vecbios.out vecbios.srec 2> /dev/null
+start=$(grep -a ' crt0 *start ' vectest.map | awk '{ print substr($4, 5) }')
+stop=$(grep -a ' __exit ' vectest.map | awk '{ print $4 }')
+stop=$(printf '%04X' $((0x$stop + 2)))
+awk 'substr($0, 1, 2) == "S1" && substr($0, 5, 4) >= "F000"' vecbios.srec |
+	cat - vectest.srec > vectest-all.srec
+"$SIM" -n 2000000 --entry "0x$start" vectest-all.srec > vectest.run 2>&1
+echo $? > vectest.run.rc
+sed -i "s/ reached at PC=$stop\$/ reached, in _exit's loop/" vectest.run
+# and its image: the header at $0000 ("g GCE"), then the code; and with
+# a header of its own (vectitle.s), with no warning about libvec.a's
+run vec.bcc "$BCC" -Mv -o vectest.bin vectest.c
+{ echo "$(wc -c < vectest.bin) bytes"
+  od -An -c -N24 vectest.bin; } > vectest.img
+run vectitle.bcc "$BCC" -Mv -o vectitle.bin vectest.c vectitle.s
+od -An -c -N26 vectitle.bin > vectitle.img
+rm -f vectitle.bin
+rm -f vecsrec.ld vectest.srec vectest-map.srec vectest.map vecbios.o \
+	vecbios.out vecbios.srec vectest-all.srec vectest.bin
 # and Disk BASIC's files: cbdisk.s stands in for its ROM at $C000, with
 # a disk of 4 free granules in memory; cbfile.c writes, reads, seeks,
 # fills the disk, deletes and truncates, and prints the FAT's and the
@@ -743,7 +776,7 @@ fi >> pathlen.result
 rm -rf $long
 rm -f simcrt0-path.o
 
-run notarget.bcc "$BCC" -Mv -o notarget.out hello.c
+run notarget.bcc "$BCC" -Mu -o notarget.out hello.c
 rm -f notarget.out
 
 # the copied sources aren't results
