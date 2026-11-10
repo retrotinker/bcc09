@@ -69,6 +69,15 @@ FILE  stderr[1] =
    functions registered before stdio was first used after the flush, and
    lost their output) */
 extern void (*__stdio_exit)();
+extern void (*__stdio_flushout)();
+
+/* flush stdout (for __stdio_flushout: coco.h's cls() and locate() call
+   it before they move the cursor) */
+static void
+__stdio_flushstdout()
+{
+   fflush(stdout);
+}
 
 static void
 __stdio_close_all()
@@ -95,6 +104,7 @@ __io_init_vars()
    if (isatty(1))
       stdout->mode |= _IOLBF;
    __stdio_exit = __stdio_close_all;
+   __stdio_flushout = __stdio_flushstdout;
 }
 #endif
 
@@ -124,8 +134,9 @@ FILE *fp;
    *(fp->bufpos++) = ch;
    fp->mode |= __MODE_WRITING;
 
-   /* Unbuffered or Line buffered and end of line */
-   if (((ch == '\n' && (v & _IOLBF)) || (v & _IONBF))
+   /* Unbuffered or Line buffered and end of line (bcc09: '\r' too, the
+      end of a line on Color BASIC, OS-9 and FLEX) */
+   if ((((ch == '\n' || ch == '\r') && (v & _IOLBF)) || (v & _IONBF))
        && fflush(fp))
       return EOF;
 
@@ -449,7 +460,8 @@ FILE *fp;
       memcpy(fp->bufpos, buf, bytes);
       if (v & _IOLBF)
       {
-         if(memchr(fp->bufpos, '\n', bytes))
+         if(memchr(fp->bufpos, '\n', bytes)
+	    || memchr(fp->bufpos, '\r', bytes))
 	    do_flush=1;
       }
       fp->bufpos += bytes;

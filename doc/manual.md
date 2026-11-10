@@ -269,6 +269,14 @@ The Dragon's ROM has the same `POLCAT` and `CHROUT`, so programs run on
 the Dragon 32 and 64 too, but without files: DragonDOS's disks are of
 another format, and `open()` fails with `ENODEV` there.
 
+`coco.h` has the keyboard, the text screen and the joysticks as BASIC has
+them, for `-Me` and `-Mr` programs: `inkey()` (`INKEY$`: the key pressed,
+or 0), `cls(c)` (`CLS c`; -1 for plain `CLS`), `locate(row, col)` (where
+`PRINT@` would print: `PRINT@ n` is `locate(n / 32, n % 32)`), `joystk(n)`
+(`JOYSTK`), and `peek()` and `poke()`. stdout is written out at the end of
+each line (a `'\r'` as well as a `'\n'`), before input is read, and before
+`cls()` and `locate()` move the cursor.
+
 ## ROM cartridges (`-Mr`)
 
 A program in a cartridge's ROM, which the CoCo and the Dragon start by

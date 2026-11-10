@@ -6,8 +6,8 @@
 # types its input, and when it calls _exit a trap takes a snapshot, from
 # which xrscreen.py shows the text screen and xrcpu.py the registers.
 # Each machine's screen must be the same as ./expected, and the exit
-# status (X) 42.  Then a ROM cartridge (-Mr), and Disk BASIC's files (see
-# below; needs toolshed's decb too).
+# status (X) 42.  Then coco.h, a ROM cartridge (-Mr), and Disk BASIC's
+# files (see below; needs toolshed's decb too).
 #
 # Optional (make check-xroar): it needs xroar, python3 and the machines'
 # ROMs (in ~/.xroar/roms, say); a machine whose ROM isn't there or
@@ -76,6 +76,46 @@ for m in $machines; do
 	if ! cmp -s "$dir/expected" $m.screen; then
 		echo "FAIL $m: the screen differs:"
 		diff "$dir/expected" $m.screen
+	fi
+done
+
+# coco.h (cls, locate, inkey, joystk): xcoco.c, built and loaded as
+# xcb.c is; it waits for a key, which XRoar types after the EXEC.  The
+# screen must be the same as ./expected-coco, and the status 42.
+BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Me -o xcoco -X-T0x3000 \
+	"$dir/xcoco.c" || exit 1
+"$top/ld/objcopy09" -O cas -n XCOCO xcoco xcoco.cas || exit 1
+"$top/ld/objcopy09" -O decb xcoco xcoco.bin || exit 1
+cexit_pc=$("$top/ld/objdump09" -n xcoco | awk '$3 == "__exit" { print $1 }')
+for m in $machines; do
+	rm -f snap
+	timeout 60 xroar -ui null -ao null -machine $m -no-ratelimit \
+		-load-tape xcoco.cas \
+		-type "$(printf 'CLOADM:EXEC\rQ')" \
+		-trap pc=0x$cexit_pc -trap-snap snap -trap-timeout 0 \
+		-timeout 30 > $m-coco.log 2>&1
+	if grep -qiE "CRC32 INVALID|not found|no rom" $m-coco.log; then
+		echo "skip $m coco.h (its ROM isn't there or doesn't check)"
+		continue
+	fi
+	if [ ! -f snap ]; then
+		echo "FAIL $m coco.h: it didn't reach _exit"
+		failed=$((failed + 1))
+		continue
+	fi
+	python3 "$dir/xrscreen.py" snap xcoco.bin 0x3000 > $m-coco.screen
+	status=$(python3 "$dir/xrcpu.py" snap | awk '$1 == "0c:" { print $2 }')
+	if cmp -s "$dir/expected-coco" $m-coco.screen && [ "$status" = "002a" ]; then
+		echo "ok   $m coco.h"
+		continue
+	fi
+	failed=$((failed + 1))
+	if [ "$status" != "002a" ]; then
+		echo "FAIL $m coco.h: exit status $status, not 002a"
+	fi
+	if ! cmp -s "$dir/expected-coco" $m-coco.screen; then
+		echo "FAIL $m coco.h: the screen differs:"
+		diff "$dir/expected-coco" $m-coco.screen
 	fi
 done
 

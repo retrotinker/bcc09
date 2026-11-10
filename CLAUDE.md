@@ -225,7 +225,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 726 reference
+  `tests/src/` with this tree's tools and compare every result with the 731 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -332,6 +332,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   label comes within reach; `flushout()` keeps the text from the oldest such branch
   (`openpatch()`, growing the buffer), so that no longer depends on how much text,
   such as the headers' names in comments, comes between (fixed 2026-11-09).
+- `tests/src/cocotest.c` checks `coco.h` (`cb/coco.s`, added 2026-11-10: `inkey`, `cls`,
+  `locate`, `joystk`, `peek`/`poke`) with `cbrom.s` (which has a JOYIN at $A00A giving
+  10, 20, 30, 40): the screen's bytes and CURPOS, and that `cls()` writes out stdout's
+  buffer first (`__stdio_flushout`, set by stdio). `tests/xroar/xcoco.c` checks it on
+  the real ROMs (`expected-coco`). stdio flushes a line-buffered stream at `'\r'` too.
 - `tests/src/romtest.c` is a cartridge (`-Mr`, with `rom.ld` included by a script that
   sets `OUTPUT_FORMAT(srec)`) run on sim6809 from $C000 with `cbrom.s`: data copied, BSS
   cleared (sim6809 fills memory with $A5), init functions, input, heap, atexit; the run

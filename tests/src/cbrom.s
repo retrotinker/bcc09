@@ -1,6 +1,7 @@
 ; stands in for Color BASIC's ROM on sim6809, for testing the Color
 ; BASIC target (bcc09 -Me): linked at $A000, it has the ROM's vector
-; table there, with POLCAT and CHROUT using the simulator's I/O block
+; table there, with POLCAT and CHROUT using the simulator's I/O block,
+; and JOYIN giving fixed values
 ;
 ; POLCAT gives "no key" every other time it is called, to test that
 ; programs wait for a key; it gives the input's '\n' as ENTER, and BREAK
@@ -13,6 +14,8 @@ IO_IN	equ	$ff01
 	entry	vectors		; (ld09 needs one; it isn't run)
 vectors: fdb	polcat		; $A000: POLCAT
 	fdb	chrout		; $A002: CHROUT
+	fdb	0,0,0		; ($A004-$A009: not stood in for)
+	fdb	joyin		; $A00A: JOYIN
 
 polcat:	lda	toggle
 	eora	#1
@@ -35,6 +38,19 @@ chrout:	pshs	a
 	lda	#$0a
 co1:	sta	IO_OUT
 	puls	a,pc
+
+; JOYIN: the joysticks' values, 10, 20, 30 and 40, in POTVAL
+joyin:	pshs	x,a
+	ldx	#$015A
+	lda	#10
+	sta	,x+
+	lda	#20
+	sta	,x+
+	lda	#30
+	sta	,x+
+	lda	#40
+	sta	,x
+	puls	x,a,pc
 
 	.data
 toggle:	fcb	0

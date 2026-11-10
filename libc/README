@@ -188,6 +188,17 @@ again after the program, so the two can share a disk.  A program that
 opens no files doesn't carry this.  Without Disk BASIC, open() fails
 with ENODEV.
 
+coco.h (cb/coco.s, in libcb.a and librom.a) has the keyboard, the text
+screen and the joysticks as BASIC has them: inkey() (INKEY$, through
+POLCAT), cls(c) (CLS c, or -1 for plain CLS: fills $0400-$05FF and puts
+the cursor, CURPOS at $0088, at its start), locate(row, col) (CURPOS, for
+PRINT@), joystk(n) (JOYSTK, through the ROM's JOYIN vector at $A00A, from
+POTVAL at $015A), and peek() and poke() macros.  cls() and locate()
+first call __stdio_flushout, which stdio sets (and exit.c defines), to
+write out what stdout has buffered, so programs without stdio don't
+carry it.  stdio flushes a line-buffered stream (stdout, on a terminal)
+at a '\r' as well as a '\n', so that lines ending in '\r' show at once.
+
 Load the program low, at $2800 or $3000 say (bcc09 -X-T0x3000), below
 BASIC's stack and strings at the top of memory: the heap is the memory
 between the end of the program and the stack.  "make check" tests it

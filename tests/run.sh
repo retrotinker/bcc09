@@ -606,6 +606,15 @@ grep -v '^S[059]' cbrom.srec | cat - cbtest.srec > cbtest-rom.srec
 "$SIM" -n 50000000 --entry "0x$entry" cbtest-rom.srec < cbtest.in \
 	> cbtest.run 2>&1
 echo $? > cbtest.run.rc
+# coco.h's functions: cls(), locate(), joystk(), inkey(), peek(), poke()
+run cocotest.bcc "$BCC" -Me -o cocotest.out -X-T0x3000 loader.s cocotest.c
+"$OC" -O srec cocotest.out cocotest.srec
+entry=$("$OD" -n cocotest.out | awk '$3 == "loader" { print $1 }')
+grep -v '^S[059]' cbrom.srec | cat - cocotest.srec > cocotest-rom.srec
+"$SIM" -n 50000000 --entry "0x$entry" cocotest-rom.srec < cocotest.in \
+	> cocotest.run 2>&1
+echo $? > cocotest.run.rc
+rm -f cocotest.srec cocotest-rom.srec
 
 # a Color BASIC ROM cartridge (bcc09 -Mr): rom.ld, with S-record output
 # for sim6809, which starts it at $C000 with cbrom.s: crtrom.o copies

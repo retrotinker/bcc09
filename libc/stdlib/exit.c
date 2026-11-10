@@ -12,6 +12,7 @@
 
 void (*__cleanup)() = 0;	/* set by atexit() */
 void (*__stdio_exit)() = 0;	/* set by stdio */
+void (*__stdio_flushout)() = 0;	/* set by stdio: flush stdout */
 
 void
 exit(status)
