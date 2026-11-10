@@ -238,7 +238,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 732 reference
+  `tests/src/` with this tree's tools and compare every result with the 738 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -350,6 +350,15 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   10, 20, 30, 40): the screen's bytes and CURPOS, and that `cls()` writes out stdout's
   buffer first (`__stdio_flushout`, set by stdio). `tests/xroar/xcoco.c` checks it on
   the real ROMs (`expected-coco`). stdio flushes a line-buffered stream at `'\r'` too.
+  `sound(tone, duration)` (added 2026-11-10): `cb/tone.s` is BASIC's SOUND loop copied
+  instruction for instruction from the ROM (CoCo $A964, Dragon $BAB3: $7E, $FE, $7E,
+  $02 to the DAC, an INCA delay up from SNDTON $8C read with DP 0; a period is 100 + 20
+  * (256 - tone) cycles: SOUND 89 260 Hz, middle C), with Y counting periods in the 8
+  cycles BASIC's LDX/BNE take; `cb/sound.c` divides 59659 cycles (a fifteenth of a
+  second, the CoCo's unit) by the period, so no interrupt is needed. sim6809 counts no
+  cycles, so `soundtest.c` is checked from sim6809's trace (`-t`): the writes to $FF20,
+  counted and in turn (`soundtest.dac`); `xcoco.c` plays middle C on the real ROMs
+  (XRoar can't record audio, so the sound itself isn't checked).
 - `tests/src/romtest.c` is a cartridge (`-Mr`, with `rom.ld` included by a script that
   sets `OUTPUT_FORMAT(srec)`) run on sim6809 from $C000 with `cbrom.s`: data copied, BSS
   cleared (sim6809 fills memory with $A5), init functions, input, heap, atexit; the run

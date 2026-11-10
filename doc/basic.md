@@ -549,6 +549,26 @@ screen[0] = 42;		/* the same as poke(0x400, 42) */
 `joystk(n)` is `JOYSTK(n)`: 0 to 63, `n` 0 and 1 for the right joystick's
 left-right and up-down, 2 and 3 for the left one's.
 
+## SOUND
+
+`sound(tone, duration)`, from `coco.h`, is `SOUND`: the tone is 1 (low) to
+255 (high), with BASIC's own pitches (89 is middle C), and the duration
+is in fifteenths of a second, as on the CoCo:
+
+```c
+#include <coco.h>
+
+int main()
+{
+	int t;
+
+	for (t = 1; t <= 255; t += 20)
+		sound(t, 1);
+	sound(89, 15);			/* middle C, for a second */
+	return 0;
+}
+```
+
 ## Random numbers
 
 `rand()`, in `stdlib.h`, gives a random whole number from 0 to 32767;
@@ -558,9 +578,9 @@ with `srand()`: a good start is the time the player takes to press a key.
 
 ## What C doesn't have yet
 
-bcc09 has no `SOUND`, `PLAY`, `LINE`, `CIRCLE` or `PMODE` for you: C
-programs make their own sound and graphics, by writing to the hardware
-and to the screen's memory, which is how the fastest games do it. The
+bcc09 has no `PLAY`, `LINE`, `CIRCLE` or `PMODE` for you: C programs make
+their own music and graphics, by writing to the hardware and to the
+screen's memory, which is how the fastest games do it. The
 bcc09 manual says how to call machine language from C, and so the ROM's
 routines.
 
@@ -712,6 +732,7 @@ with `OPEN "I",#1,"SCORES.DAT"` and `INPUT #1`.
 | `VAL(A$)`, `STR$(N)` | `atoi(a)`, `sprintf(a, "%d", n)` |
 | `PEEK(A)`, `POKE A, V` | `peek(a)`, `poke(a, v)` |
 | `JOYSTK(N)` | `joystk(n)` |
+| `SOUND T, D` | `sound(t, d);` |
 | `RND(N)` | `rand() % n + 1` |
 | `INT(X)` | `floor(x)` (`math.h`) |
 | `ABS(X)`, `SQR(X)` | `abs(x)`, `sqrt(x)` |

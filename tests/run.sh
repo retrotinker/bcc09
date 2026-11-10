@@ -631,6 +631,25 @@ grep -v '^S[059]' cbrom.srec | cat - cocotest.srec > cocotest-rom.srec
 	> cocotest.run 2>&1
 echo $? > cocotest.run.rc
 rm -f cocotest.srec cocotest-rom.srec
+# coco.h's sound(), traced: its writes to the DAC ($FF20), counted, must
+# be $7E, $FE, $7E, $02 in turn (the program prints the rest)
+run soundtest.bcc "$BCC" -Me -o soundtest.out -X-T0x3000 loader.s soundtest.c
+"$OC" -O srec soundtest.out soundtest.srec
+entry=$("$OD" -n soundtest.out | awk '$3 == "loader" { print $1 }')
+grep -v '^S[059]' cbrom.srec | cat - soundtest.srec > soundtest-rom.srec
+"$SIM" -t -n 5000000 --entry "0x$entry" soundtest-rom.srec < /dev/null \
+	> soundtest.run 2> soundtest.trace
+echo $? > soundtest.run.rc
+awk '/STA   \$FF20 / {
+	a = substr($0, index($0, "A=") + 2, 2)
+	if (a != pat[n % 4]) bad++
+	n++
+     }
+     BEGIN { pat[0] = "7E"; pat[1] = "FE"; pat[2] = "7E"; pat[3] = "02" }
+     END { printf "%d writes to the DAC, %s\n", n,
+	   bad ? bad " out of turn" : "in turn" }' soundtest.trace \
+	> soundtest.dac
+rm -f soundtest.srec soundtest-rom.srec soundtest.trace
 
 # a Color BASIC ROM cartridge (bcc09 -Mr): rom.ld, with S-record output
 # for sim6809, which starts it at $C000 with cbrom.s: crtrom.o copies

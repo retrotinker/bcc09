@@ -193,7 +193,15 @@ screen and the joysticks as BASIC has them: inkey() (INKEY$, through
 POLCAT), cls(c) (CLS c, or -1 for plain CLS: fills $0400-$05FF and puts
 the cursor, CURPOS at $0088, at its start), locate(row, col) (CURPOS, for
 PRINT@), joystk(n) (JOYSTK, through the ROM's JOYIN vector at $A00A, from
-POTVAL at $015A), and peek() and poke() macros.  cls() and locate()
+POTVAL at $015A), sound(tone, duration) (SOUND: cb/sound.c works out
+how many periods of the tone a fifteenth of a second takes, a period
+being 100 + 20 * (256 - tone) cycles, and cb/tone.s plays them with
+BASIC's own loop, instruction for instruction, so the pitches are
+BASIC's: four writes to the DAC a period, $7E, $FE, $7E, $02, each
+followed by an INCA loop up from the tone kept in BASIC's SNDTON, $8C;
+the DAC is selected as the sound's source, bit 3 of $FF01 and $FF03
+clear, and the sound turned on, bit 3 of $FF23, while it plays), and
+peek() and poke() macros.  cls() and locate()
 first call __stdio_flushout, which stdio sets (and exit.c defines), to
 write out what stdout has buffered, so programs without stdio don't
 carry it.  stdio flushes a line-buffered stream (stdout, on a terminal)

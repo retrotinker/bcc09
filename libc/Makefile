@@ -107,9 +107,10 @@ HEADERS	= include/ctype.h include/errno.h include/fcntl.h \
 SA_OBJS	= sa/_exit.o
 CB_SYS_OBJS = cb/write.o cb/read.o cb/isatty.o cb/lseek.o cb/close.o \
 	  cb/__cb_files.o
-CB_OBJS	= sa/_exit.o cb/rom.o cb/disk.o cb/dskcon.o cb/coco.o $(CB_SYS_OBJS)
-ROM_OBJS = rom/_exit.o cb/rom.o cb/disk.o cb/dskcon.o cb/coco.o \
-	   $(CB_SYS_OBJS)
+CB_OBJS	= sa/_exit.o cb/rom.o cb/disk.o cb/dskcon.o cb/coco.o cb/sound.o \
+	  cb/tone.o $(CB_SYS_OBJS)
+ROM_OBJS = rom/_exit.o cb/rom.o cb/disk.o cb/dskcon.o cb/coco.o cb/sound.o \
+	   cb/tone.o $(CB_SYS_OBJS)
 VEC_OBJS = vec/_exit.o vec/header.o vec/draw.o vec/input.o vec/sound.o \
 	   vec/random.o
 FLEX_SYS_OBJS = flex/write.o flex/read.o flex/isatty.o flex/lseek.o \

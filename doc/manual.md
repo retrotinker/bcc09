@@ -275,7 +275,10 @@ another format, and `open()` fails with `ENODEV` there.
 them, for `-Me` and `-Mr` programs: `inkey()` (`INKEY$`: the key pressed,
 or 0), `cls(c)` (`CLS c`; -1 for plain `CLS`), `locate(row, col)` (where
 `PRINT@` would print: `PRINT@ n` is `locate(n / 32, n % 32)`), `joystk(n)`
-(`JOYSTK`), and `peek()` and `poke()`. stdout is written out at the end of
+(`JOYSTK`), `sound(tone, duration)` (`SOUND`: BASIC's own tone loop, so
+its pitches, with the duration in fifteenths of a second counted in
+periods of the tone, so that it works with the interrupts off), and
+`peek()` and `poke()`. stdout is written out at the end of
 each line (a `'\r'` as well as a `'\n'`), before input is read, and before
 `cls()` and `locate()` move the cursor.
 

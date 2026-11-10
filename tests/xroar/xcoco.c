@@ -1,7 +1,9 @@
 /* run on Color BASIC and Dragon ROMs in XRoar (see run.sh): built by
    bcc09 -Me, loaded from a cassette and run with EXEC; coco.h's cls(),
    locate() (text printed where it puts the cursor, without a '\r'),
-   inkey() (a key XRoar types) and joystk() (each in 0-63); returns 42 */
+   inkey() (a key XRoar types), joystk() (each in 0-63) and sound()
+   (middle C, for 2/15 seconds: it must come back, with the sound off);
+   returns 42 */
 
 #include <stdio.h>
 #include <coco.h>
@@ -26,6 +28,9 @@ int main()
 			ok = 0;
 	locate(8, 0);
 	printf("JOYSTK %s", ok ? "OK" : "WRONG");
+	sound(89, 2);
+	locate(10, 0);
+	printf("SOUND %s", (peek(0xFF23) & 8) ? "STILL ON" : "PLAYED");
 	locate(14, 20);
 	printf("BYE");
 	return 42;
