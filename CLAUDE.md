@@ -249,12 +249,16 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   command line. A symbol defined again is warned about only if both modules are linked
   (2026-11-09; it was at reading, so a program's own version of a library function
   warned): `redefinitions()` after `linksyms()`; `redef-quiet` and `redef-both` test it.
-- Test programs run on `sim6809`, a copy of the simulator from the plm09 project
-  (0.4.6, whose `--os9` emulates OS-9's file, directory and `F$Mem` calls on the host,
-  and whose `--flex` puts `--param` in FLEX's line buffer and emulates FMS on host
-  files) in
-  `tests/sim/` (see
-  its README). `tests/src/selftest.c` checks code from the other test
+- Test programs run on `sim6809`, the sim6809 project's (`retrotinker/sim6809`, 1.1.0
+  or later: `--os9` emulates OS-9's file, directory and `F$Mem` calls on the host,
+  `--flex` puts `--param` in FLEX's line buffer and emulates FMS on host files, and the
+  trace's `CYC=` counts cycles), from `PATH` or `$SIM6809` (the Makefile exports
+  `SIM6809 ?= sim6809`, as plm09's does); `run.sh` stops if it isn't there. bcc09 kept
+  a copy of plm09's 0.4.6 in `tests/sim` until 2026-11-10, when sim6809 became a
+  project of its own; 1.1.0 gave every result the same. The spec `BuildRequires:
+  sim6809 >= 1.1.0`, so a mock build needs its RPM in a repository (`createrepo_c` a
+  directory with it, and `mock --addrepo`), as plm09's does.
+- `tests/src/selftest.c` checks code from the other test
   sources against values from the host compiler and exits with the number of failures;
   it runs both as compiled and with `-O`; it also calls `float.c` (double arguments
   and results).
@@ -355,10 +359,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   $02 to the DAC, an INCA delay up from SNDTON $8C read with DP 0; a period is 100 + 20
   * (256 - tone) cycles: SOUND 89 260 Hz, middle C), with Y counting periods in the 8
   cycles BASIC's LDX/BNE take; `cb/sound.c` divides 59659 cycles (a fifteenth of a
-  second, the CoCo's unit) by the period, so no interrupt is needed. sim6809 counts no
-  cycles, so `soundtest.c` is checked from sim6809's trace (`-t`): the writes to $FF20,
-  counted and in turn (`soundtest.dac`); `xcoco.c` plays middle C on the real ROMs
-  (XRoar can't record audio, so the sound itself isn't checked).
+  second, the CoCo's unit) by the period, so no interrupt is needed. `soundtest.c` is
+  checked from sim6809's trace (`-t`): the writes to $FF20, counted and in turn, and
+  each period's cycles (the trace's `CYC=`), which must be BASIC's but where a fifteenth
+  of a second ends (`soundtest.dac`); `xcoco.c` plays middle C on the real ROMs (XRoar
+  can't record audio).
 - `tests/src/romtest.c` is a cartridge (`-Mr`, with `rom.ld` included by a script that
   sets `OUTPUT_FORMAT(srec)`) run on sim6809 from $C000 with `cbrom.s`: data copied, BSS
   cleared (sim6809 fills memory with $A5), init functions, input, heap, atexit; the run

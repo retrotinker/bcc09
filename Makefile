@@ -16,10 +16,13 @@ all: $(DIRS)
 	done
 
 # regression tests: compare outputs with the references in tests/ref,
-# and run programs on sim6809 (from the plm09 project; see tests/sim)
-SIM=tests/sim/sim6809
+# and run programs on sim6809, from the sim6809 project
+# (https://github.com/retrotinker/sim6809), found on PATH (SIM6809= names
+# another)
+SIM6809 ?= sim6809
+export SIM6809
 
-check: all $(SIM)
+check: all
 	tests/run.sh
 	tests/man.sh
 
@@ -48,9 +51,6 @@ doc/manual.pdf: doc/manual.md doc/man/*.1 doc/mkmanual.sh doc/tex/*.sty
 doc/basic.pdf: doc/basic.md doc/mkbasic.sh doc/tex/*.sty
 	doc/mkbasic.sh
 
-$(SIM): tests/sim/*.c tests/sim/*.h
-	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.6"' -o $@ tests/sim/*.c
-
 # There is bound to be some more clever way to do this than copying
 # the "all" rule...
 clean: $(DIRS)
@@ -58,7 +58,6 @@ clean: $(DIRS)
 	do \
 		$(MAKE) PREFIX=$(PREFIX) -C $$i clean || exit 1 ;\
 	done
-	rm -f $(SIM)
 	rm -rf rpmbuild
 
 install: $(DIRS)

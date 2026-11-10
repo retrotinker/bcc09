@@ -421,7 +421,8 @@ it, separated by blanks or commas.
 
 ## sim6809 (`-Mi`)
 
-For the simulator bcc09's tests use (`tests/sim`, from the plm09 project):
+For sim6809, the simulator bcc09's tests use (from
+<https://github.com/retrotinker/sim6809>):
 standard output goes to the simulator's output, standard input comes from
 its input, and `main`'s result becomes the simulator's exit status. There
 are no files.
@@ -596,7 +597,9 @@ which `LOADM` puts in their places.
 # Testing
 
 `make check` runs bcc09's regression tests: it compiles the test sources
-with this build's tools, runs the programs on sim6809 (for every target:
+with this build's tools, runs the programs on sim6809 (1.1.0 or later,
+from <https://github.com/retrotinker/sim6809>, on `PATH` or named by
+`SIM6809`; for every target:
 Color BASIC with stand-ins for its ROMs, OS-9 modules and FLEX commands
 with the simulator's emulation of their systems, cartridges with
 stand-ins for BASIC's ROM and the Vectrex's BIOS), compares every result

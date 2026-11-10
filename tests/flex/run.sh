@@ -61,7 +61,7 @@ BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Mf -o flexfile -X-T0x1000 \
 "$top/ld/objcopy09" -O flex flexfile FLEXFILE.CMD || exit 1
 # flexfile under sim6809, in sim/: its output, and its files
 mkdir sim
-(cd sim && "$top/tests/sim/sim6809" -n 100000000 --flex ../FLEXFILE.CMD \
+(cd sim && "${SIM6809:-sim6809}" -n 100000000 --flex ../FLEXFILE.CMD \
 	< /dev/null > ../flexfile.sim 2>&1)
 files="TEXT.TXT BIN.DAT DRV.TXT LOWER.TXT"
 "$top/as/as09" -o done.o "$dir/done.s" &&

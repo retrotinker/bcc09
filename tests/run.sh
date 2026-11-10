@@ -22,10 +22,12 @@ if [ "${1:-}" = "-u" ]; then
 	update=1
 fi
 
-# sim6809 runs the test programs (make check builds it)
-SIM=$tests/sim/sim6809
-if [ ! -x "$SIM" ]; then
-	echo "run.sh: $SIM is missing (make check builds it)" >&2
+# sim6809 runs the test programs: the sim6809 project's
+# (https://github.com/retrotinker/sim6809), from PATH, or $SIM6809
+SIM=${SIM6809:-sim6809}
+if ! command -v "$SIM" > /dev/null 2>&1; then
+	echo "run.sh: no $SIM: the tests need sim6809, from" \
+	     "https://github.com/retrotinker/sim6809 (or set SIM6809)" >&2
 	exit 2
 fi
 
@@ -632,7 +634,10 @@ grep -v '^S[059]' cbrom.srec | cat - cocotest.srec > cocotest-rom.srec
 echo $? > cocotest.run.rc
 rm -f cocotest.srec cocotest-rom.srec
 # coco.h's sound(), traced: its writes to the DAC ($FF20), counted, must
-# be $7E, $FE, $7E, $02 in turn (the program prints the rest)
+# be $7E, $FE, $7E, $02 in turn, and each period (from a write to the
+# fourth after it, of the same tone, in B) must take BASIC's 100 + 20 *
+# (256 - tone) cycles (sim6809's CYC=), but where a fifteenth of a second
+# ends and sound() calls the loop again (the program prints the rest)
 run soundtest.bcc "$BCC" -Me -o soundtest.out -X-T0x3000 loader.s soundtest.c
 "$OC" -O srec soundtest.out soundtest.srec
 entry=$("$OD" -n soundtest.out | awk '$3 == "loader" { print $1 }')
@@ -640,15 +645,42 @@ grep -v '^S[059]' cbrom.srec | cat - soundtest.srec > soundtest-rom.srec
 "$SIM" -t -n 5000000 --entry "0x$entry" soundtest-rom.srec < /dev/null \
 	> soundtest.run 2> soundtest.trace
 echo $? > soundtest.run.rc
-awk '/STA   \$FF20 / {
-	a = substr($0, index($0, "A=") + 2, 2)
+awk 'function field(name,   i) {
+	i = index($0, name "=")
+	return substr($0, i + length(name) + 1)
+     }
+     function hex(s,   i, v) {	# (strtonum is gawk'"'"'s)
+	v = 0
+	for (i = 1; i <= length(s); i++)
+		v = v * 16 + index("0123456789ABCDEF", substr(s, i, 1)) - 1
+	return v
+     }
+     /STA   \$FF20 / {
+	a = substr(field("A"), 1, 2)
+	t = hex(substr(field("B"), 1, 2))
+	c = field("CYC") + 0
 	if (a != pat[n % 4]) bad++
+	if (n >= 4 && tone[n - 4] == t) {
+		if (n % 4 == 0) {
+			if (c - cyc[n - 4] == 100 + 20 * (256 - t))
+				exact[t]++
+			else
+				longer[t]++
+		}
+	}
+	tone[n] = t
+	cyc[n] = c
 	n++
      }
-     BEGIN { pat[0] = "7E"; pat[1] = "FE"; pat[2] = "7E"; pat[3] = "02" }
-     END { printf "%d writes to the DAC, %s\n", n,
-	   bad ? bad " out of turn" : "in turn" }' soundtest.trace \
-	> soundtest.dac
+     BEGIN { n = 0; pat[0] = "7E"; pat[1] = "FE"; pat[2] = "7E"; pat[3] = "02" }
+     END {
+	printf "%d writes to the DAC, %s\n", n,
+	       bad ? bad " out of turn" : "in turn"
+	for (t = 0; t < 256; t++)
+		if (t in exact)
+			printf "tone %d: %d periods of %d cycles, %d longer\n",
+			       t, exact[t], 100 + 20 * (256 - t), longer[t]
+     }' soundtest.trace > soundtest.dac
 rm -f soundtest.srec soundtest-rom.srec soundtest.trace
 
 # a Color BASIC ROM cartridge (bcc09 -Mr): rom.ld, with S-record output

@@ -18,7 +18,6 @@ ld/objcopy09
 unproto/unproto
 tests/out/
 tests/prefix.tmp/
-tests/sim/sim6809
 !tests/ref/*.o
 libc/*.a
 libc/.bcc/

@@ -298,7 +298,8 @@ Compusense FLEX for the Dragon 64 in XRoar (tests/flex), where the
 files a program writes must be byte for byte the ones it writes under
 sim6809.
 
-sim is for sim6809, the simulator the tests use (tests/sim).  crtsim
+sim is for sim6809, the simulator the tests use (the sim6809 project's,
+https://github.com/retrotinker/sim6809).  crtsim
 puts the stack just below the simulator's I/O block at $FF00, and
 _exit() stops the simulator with the low byte of the status as its exit
 status.  write() to fd 1 or 2 goes to the simulator's output, and read()
@@ -347,7 +348,7 @@ doesn't set: with whatever was on the stack in them, I$MakDir once gave
 a new directory nearly all of a disk.  OS-9's
 errors become errno's ENOENT, EBADF, EACCES, EEXIST, ENOMEM or, for the
 rest, EIO.  "make check" runs such modules on sim6809 --os9, which
-emulates these calls on host files (tests/sim), and "make check-nitros9"
+emulates these calls on host files, and "make check-nitros9"
 runs them on NitrOS-9 Level 2, on a CoCo 3 in XRoar (tests/nitros9).
 
 bcc09 links programs at address 0 unless told otherwise, so give it a
