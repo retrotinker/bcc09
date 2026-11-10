@@ -82,12 +82,15 @@ Changes from dev86:
     scanf.c had no license, and its printf departed from the C standard
     (precision on integers, %X, # and %p); see stdio/printf.c and
     stdio/scanf.c
-div and ldiv, and %a in printf, are still to come.
+div and ldiv are still to come.
 
-Floating point in text: printf's %e, %f and %g (and %E, %F, %G), and
-strtod, atof and scanf's %a, %e, %f and %g, are exact, as the GNU C
-library's are: printf prints the exact decimal value of the double,
-rounded to the nearest (to even on a tie), and strtod gives the double
+Floating point in text: printf's %e, %f, %g and %a (and %E, %F, %G,
+%A), and strtod, atof and scanf's %a, %e, %f and %g, are exact, as the
+GNU C library's are: printf prints the exact decimal value of the double,
+rounded to the nearest (to even on a tie), %a its bits in hexadecimal
+(0x1.8p+1; 0x0.0000000000001p-1022 for a denormal; rounded the same way
+to a precision, which may make the first digit 2, as glibc's does), and
+strtod gives the double
 nearest the number it reads, from big integers rather than floating
 point arithmetic.  printf works out at most 340 digits (more are printed
 as zeros), strtod reads 120 significant digits exactly (and the rest as

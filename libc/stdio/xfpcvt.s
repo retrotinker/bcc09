@@ -1,4 +1,4 @@
-; xfpcvt.s: printf's %e, %f and %g, in a program that wants them
+; xfpcvt.s: printf's %e, %f, %g and %a, in a program that wants them
 ;
 ; bcc09 makes a module that calls a printf function with a floating
 ; point argument refer to __xfpcvt (as dev86's did).  This module defines

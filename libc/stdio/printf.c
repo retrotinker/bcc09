@@ -6,18 +6,20 @@
  * distributed under the GNU Library General Public License, version 2 (see
  * COPYING.LIB).
  *
- * The conversions are d, i, u, o, x, X, e, E, f, F, g, G, c, s, p, n and
- * %, with the flags -, +, space, # and 0, a width and a precision (either
- * may be *), and the sizes hh, h, l and L (a double: there is no long
- * double), as the C standard describes them; fpfmt.c does e, f and g,
- * through __fmtfp_hook, which xfpcvt.s sets only in a program that has a
- * printf with a floating point argument (bcc09 makes such a module refer
- * to __xfpcvt), so that others don't carry the code; without it, these
- * conversions print as they are written.
+ * The conversions are d, i, u, o, x, X, e, E, f, F, g, G, a, A, c, s, p,
+ * n and %, with the flags -, +, space, # and 0, a width and a precision
+ * (either may be *), and the sizes hh, h, l and L (a double: there is no
+ * long double), as the C standard describes them; fpfmt.c does e, f, g
+ * and a, through __fmtfp_hook, which xfpcvt.s sets only in a program that
+ * has a printf with a floating point argument (bcc09 makes such a module
+ * refer to __xfpcvt), so that others don't carry the code; without it,
+ * these conversions print as they are written.
  * What the standard leaves to the implementation is as in the GNU C
  * library: %p is 0x and the hex digits, or (nil); %s of a null pointer is
- * (null); infinity and NaN are inf and nan (INF and NAN for E, F and G),
- * with a sign if negative.
+ * (null); infinity and NaN are inf and nan (INF and NAN for E, F, G and A),
+ * with a sign if negative; %a's first digit is 1 (0 for 0 and denormals,
+ * as 0x0.0000000000001p-1022), and with no precision, its zeros at the
+ * end are dropped (0x1p+0).
  */
 
 #include <stdio.h>
@@ -249,6 +251,8 @@ va_list ap;
       case 'F':
       case 'g':
       case 'G':
+      case 'a':
+      case 'A':
 	 /* (the double's bytes: no floating point here) */
 	 s = ap;
 	 ap += sizeof(double);

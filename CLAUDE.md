@@ -82,13 +82,14 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   dev86's C, compiled by `bcc09` itself. Floating point (started 2026-11-08) is IEEE 754
   single and double, big-endian, in software: the helpers `cc1` calls are in
   `libc/bcc/fp*.s` (round to nearest even, denormals, infinities, NaNs; results must equal
-  the host's). `printf`'s `%e`/`%f`/`%g`, `strtod`/`atof` and `scanf`'s `%a`/`%e`/`%f`/`%g`
+  the host's). `printf`'s `%e`/`%f`/`%g`/`%a`, `strtod`/`atof` and `scanf`'s `%a`/`%e`/`%f`/`%g`
   are exact, like glibc's, from big integers (`libc/stdlib/bignum.c`), and optional:
   `cc1` makes a module that passes floating point to a `*printf` (a pointer to it to a
   `*scanf`) refer to `__xfpcvt` (`__xfptvc`), whose modules (`libc/stdio/xfp*.s`) install
   the code through an init function, so programs without floats don't carry it (decided
-  2026-11-08). No `%a` in `printf` yet. `math.h` (C89's functions, and `copysign`,
-  `scalbn`, `expm1`, `finite`) is Sun's fdlibm 5.3 in `libc/math/` (its `README` lists
+  2026-11-08). `%a` (added 2026-11-10: `hexfp()` in `fpfmt.c`, about 950 bytes) is
+  glibc's: leading 1, or 0 with `p-1022` for denormals, rounded to even, which can make
+  it `0x2p+0`. `math.h` (C89's functions, and `copysign`, `scalbn`, `expm1`, `finite`) is Sun's fdlibm 5.3 in `libc/math/` (its `README` lists
   the changes: `__i32` for fdlibm's 32-bit ints, big-endian `__HI`/`__LO`, `errno` as
   glibc sets it), in `libc.a`, a module per function.
   A double argument is always passed on the stack (even the first); a double result is in
@@ -181,8 +182,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   agree (the root), then `/` and SS.DevNm's name (`D1`, bit 7 ending it). sim6809 1.2.0
   emulates these (made for it: start directory = root of device `H0`, inode LSNs);
   `os9path.c` runs on both and prints paths without the device, so one reference fits.
-- Next: `%a` in `printf`, faster floating
-  point.
+- Next: faster floating point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such

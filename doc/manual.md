@@ -446,10 +446,10 @@ so a program carries only what it uses.
   which behave as the GNU C library's do; and POSIX's `getline()` and
   `getdelim()`.
 * **Floating point in text:** `printf`'s `%e`, `%f` and `%g` print the
-  exact decimal value of a double, and `strtod()`, `atof()` and `scanf`
-  give the double nearest the number they read, as the GNU C library's
-  do. This code is linked only into programs that print or read a floating
-  point number. (`%a` isn't done in `printf` yet.)
+  exact decimal value of a double, `%a` its bits in hexadecimal
+  (`0x1.8p+1`), and `strtod()`, `atof()` and `scanf` give the double
+  nearest the number they read, as the GNU C library's do. This code is
+  linked only into programs that print or read a floating point number.
 * **math.h:** the C89 functions, from Sun's fdlibm, whose results are bit
   for bit what the same code gives on any IEEE host; `errno` is set as the
   GNU C library sets it.
@@ -459,8 +459,8 @@ so a program carries only what it uses.
   come within `__heap_margin` bytes (256) of the stack pointer: a program
   that needs a deeper stack after filling its heap should raise it.
 
-What is still to come: `div()` and `ldiv()`, `%a` in `printf`, and the
-functions of later C standards beyond those named here.
+What is still to come: `div()` and `ldiv()`, and the functions of later
+C standards beyond those named here.
 
 # Calling conventions and assembly
 

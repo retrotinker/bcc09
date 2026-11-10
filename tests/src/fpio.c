@@ -1,5 +1,5 @@
 /* built by bcc09 -Mi (for sim6809): floating point in and out of text:
-   printf's %e, %f and %g over a grid of formats and values, strtod and
+   printf's %e, %f, %g and %a over a grid of formats and values, strtod and
    atof over cases that round the hard way (halfway, at the ends of the
    range, many digits, hexadecimal), and sscanf's %f and friends; prints
    the results, which must be the same with the host's C library (but
@@ -47,7 +47,12 @@ double v[] = { 0.0, -0.0, 1.0, -1.5, 0.1, 0.5, 1.5, 2.5, 3.14159265358979,
 	123456.789, 1e-5, 9.9999995e-5, 0.000123456, 1e10, 1e22, 1e100,
 	-1e300, 1.7976931348623157e308, 2.2250738585072014e-308, 4.9e-324,
 	999999.5, 0.95, 0.05, 1e15 + 0.3, 12345678901234567890.0,
-	0.3333333333333333, 2.0 / 3, 0, 0, 0, 0
+	0.3333333333333333, 2.0 / 3, 0, 0, 0, 0,
+	/* (for %a's rounding: 0x1.08p0, 0x1.18p0, 0x1.fffffffffffffp0, the
+	   largest denormal, 1 + 2^-49 and 1 + 3 * 2^-49) */
+	1.03125, 1.09375, 1.9999999999999998, 2.2250738585072009e-308,
+	1.0000000000000017763568394002504646778106689453125,
+	1.0000000000000053290705182007513940334320068359375
 };
 
 /* (not %#g: glibc prints 999999.5 as 1.e+06, where C says 1.00000e+06,
@@ -55,7 +60,9 @@ double v[] = { 0.0, -0.0, 1.0, -1.5, 0.1, 0.5, 1.5, 2.5, 3.14159265358979,
 char *fmts[] = { "%f", "%e", "%g", "%.0f", "%.0e", "%.0g", "%.1f", "%.3e",
 	"%.10g", "%.17g", "%#.0f", "%#.8g", "%+.2e", "% f", "%12.4f",
 	"%-12.3e|", "%012.3f", "%G", "%E", "%F", "%.20f", "%.30e", "%#.3g",
-	"%-+8.1f|", "%08.2e", 0
+	"%-+8.1f|", "%08.2e", "%a", "%A", "%.0a", "%.1a", "%.3a", "%.12a",
+	"%.15a", "%#a", "%#.0a", "%+.2a", "% a", "%25a", "%-25.4a|",
+	"%025.2a", "%#A", 0
 };
 
 char *strs[] = { "0.1", "1e23", "8.98846567431158e307",
@@ -138,11 +145,17 @@ int main()
 	r = sscanf("12.5e1x", "%4lf%n", &d, &n);
 	printf("%d %g %d\n", r, d, n);
 
-	/* round trips: %.17g of a double reads back as the same double */
-	for (i = 0; i < 27; i++) {
+	/* round trips: %.17g and %a of a double read back as the same
+	   double */
+	for (i = 0; i < sizeof(v) / sizeof(v[0]); i++) {
+		if (i >= 27 && i <= 30)
+			continue;
 		sprintf(buf, "%.17g", v[i]);
 		d = strtod(buf, &e);
 		ok(i, d == v[i] && *e == '\0');
+		sprintf(buf, "%a", v[i]);
+		d = strtod(buf, &e);
+		ok(100 + i, d == v[i] && *e == '\0');
 	}
 	printf("checks %d failures %d\n", checks, failures);
 	return failures;

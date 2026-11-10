@@ -2,7 +2,7 @@
 0000616a D __seg5DL
 000063ae D __end
 0000616e D __edata
-00004bf5 T __exit
+00004fec T __exit
 00000e00 T __btext
-00004cb6 T __etext
+000050ad T __etext
 00006000 D __bdata

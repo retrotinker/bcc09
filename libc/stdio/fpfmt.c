@@ -1,4 +1,4 @@
-/* fpfmt.c - printf's %e, %f and %g, for bcc09's libc
+/* fpfmt.c - printf's %e, %f, %g and %a, for bcc09's libc
  *
  * Written for bcc09.  Like the rest of libc, it is distributed under the
  * GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -8,7 +8,8 @@
  * 10, in big integers (bignum.c), then rounded to the nearest, to even
  * on a tie, as the GNU C library does.  So no floating point arithmetic
  * is needed here (nor its helpers linked).  At most DIGMAX digits are
- * worked out; any more (%.400f, say) are printed as zeros.
+ * worked out; any more (%.400f, say) are printed as zeros.  %a's hex
+ * digits are the bits themselves.
  */
 
 #include <string.h>
@@ -197,8 +198,107 @@ int c, n;
       (*out)(c, arg);
 }
 
-/* print the double whose bytes are at d by conversion c (e, E, f, F, g
-   or G), with printf's flags, width and precision (-1 for none), by
+/* %a: the double whose bytes are at d as 0x, the leading digit (1, or 0
+   for 0 and denormals, whose exponent is then -1022), the fraction's 13
+   hex digits (prec of them, rounded to the nearest, to even on a tie,
+   which can make the leading digit 2; with no precision, up to the last
+   that isn't 0), then p and the binary exponent, as the GNU C library
+   prints them */
+static int
+hexfp(out, arg, d, upper, sign, flags, width, prec)
+void (*out)();
+char *arg;
+unsigned char *d;
+int upper;
+char *sign;
+int flags, width, prec;
+{
+   unsigned char h[14], xbuf[7];
+   register unsigned char *p;
+   unsigned char *q;
+   char *hex;
+   int e, flen, dot, len, up;
+
+   /* (pointers, not h[i]: cc1's code for them is much smaller) */
+   hex = upper ? "0123456789ABCDEF" : "0123456789abcdef";
+   e = (d[0] & 0x7f) << 4 | d[1] >> 4;
+   p = h;			/* the leading digit, then the fraction's */
+   *p++ = e != 0;
+   *p++ = d[1] & 0x0f;
+   for (q = d + 2; q < d + 8; q++)
+   {
+      *p++ = *q >> 4;
+      *p++ = *q & 0x0f;
+   }
+   if (e)
+      e -= 1023;
+   else
+      for (p = h + 1; p < h + 14; p++)
+	 if (*p)
+	    e = -1022;
+
+   if (prec < 0)
+   {
+      for (p = h + 14; p > h + 1 && p[-1] == 0; p--)
+	 ;
+      flen = p - (h + 1);
+   }
+   else
+   {
+      flen = prec;
+      if (prec < 13)
+      {
+	 p = h + 1 + prec;	/* the first digit dropped */
+	 up = *p > 8;
+	 if (*p == 8)
+	 {
+	    up = p[-1] & 1;	/* (the last kept, perhaps the leading) */
+	    for (q = p + 1; q < h + 14; q++)
+	       if (*q)
+		  up = 1;
+	 }
+	 while (up && p > h + 1)
+	 {
+	    up = *--p == 15;
+	    *p = (*p + 1) & 15;
+	 }
+	 h[0] += up;
+      }
+   }
+   dot = flen > 0 || (flags & F_HASH);
+
+   /* the exponent, backwards */
+   q = xbuf;
+   up = e < 0 ? -e : e;
+   do
+      *q++ = '0' + up % 10;
+   while ((up /= 10) != 0);
+   *q++ = e < 0 ? '-' : '+';
+   *q++ = upper ? 'P' : 'p';
+   len = strlen(sign) + 3 + dot + flen + (q - xbuf);
+
+   if (!(flags & (F_MINUS | F_ZERO)))
+      rep(out, arg, ' ', width - len);
+   for (; *sign; sign++)
+      (*out)(*sign, arg);
+   (*out)('0', arg);
+   (*out)(upper ? 'X' : 'x', arg);
+   if ((flags & (F_MINUS | F_ZERO)) == F_ZERO)
+      rep(out, arg, '0', width - len);
+   (*out)(hex[h[0]], arg);
+   if (dot)
+      (*out)('.', arg);
+   for (p = h + 1; flen > 0; flen--)
+      (*out)(p < h + 14 ? hex[*p++] : '0', arg);
+   while (q > xbuf)
+      (*out)(*--q, arg);
+   if (flags & F_MINUS)
+      rep(out, arg, ' ', width - len);
+   return width > len ? width : len;
+}
+
+/* print the double whose bytes are at d by conversion c (e, E, f, F, g,
+   G, a or A), with printf's flags, width and precision (-1 for none), by
    calling (*out)(c, arg) for each character; return how many */
 int
 __fmtfp(out, arg, d, c, flags, width, prec)
@@ -212,7 +312,7 @@ int c, flags, width, prec;
    int upper, n, decpt, pad, mode, ilen, flen, dot, x, xlen, len, i, g;
    char xbuf[6];
 
-   upper = (c == 'E' || c == 'F' || c == 'G');
+   upper = (c == 'E' || c == 'F' || c == 'G' || c == 'A');
    c |= 0x20;			/* (lower case) */
    sign = (d[0] & 0x80) ? "-" : (flags & F_PLUS) ? "+" :
       (flags & F_SPACE) ? " " : "";
@@ -233,6 +333,8 @@ int c, flags, width, prec;
 	 rep(out, arg, ' ', width - len);
       return width > len ? width : len;
    }
+   if (c == 'a')
+      return hexfp(out, arg, d, upper, sign, flags, width, prec);
 
    if (prec < 0)
       prec = 6;
