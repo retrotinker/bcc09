@@ -200,6 +200,19 @@ done
 link redef-quiet	-m -T1000 redefmain.o -L. -lredef
 link redef-both	-m -T1000 redefboth.o -L. -lredef
 rm -f redefmain.o redefboth.o redeflib.o libredef.a
+# a common block that a library member has too: not a reason to link
+# the member (it was, for scanfp.o's __opreg, into FLEX programs with
+# files); a member that is linked for something else, and its common
+# block the same as the program's; and an import that only the member's
+# common block satisfies, which links it
+for f in commmain commneed commref commlib; do
+	"$AS" -o $f.o $f.s > /dev/null 2>&1
+done
+"$AR" rc libcomm.a commlib.o
+link comm-quiet	-m -M -T1000 commmain.o -L. -lcomm
+link comm-need	-m -M -T1000 commneed.o -L. -lcomm
+link comm-ref	-m -M -T1000 commref.o -L. -lcomm
+rm -f commmain.o commneed.o commref.o commlib.o libcomm.a
 if cmp -s prog.out prog-lib.out; then
 	echo "ok   prog-lib.out is the same as prog.out"
 else

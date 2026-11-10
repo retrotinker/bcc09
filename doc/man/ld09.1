@@ -59,6 +59,10 @@ in
 .BR as09 (1))
 on: an object file named on the command line, like a library's
 member, is left out if nothing needs it.
+A common block (an uninitialized variable from the compiler) that
+another module has too is no reason to load that module; a common
+block's storage comes with a loaded module that has one, as large as
+the largest of any module's.
 A library is searched only for what is undefined when it is read, so
 libraries come after the files that use them.
 .PP

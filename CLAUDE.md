@@ -272,7 +272,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 740 reference
+  `tests/src/` with this tree's tools and compare every result with the 752 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -283,6 +283,15 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   command line. A symbol defined again is warned about only if both modules are linked
   (2026-11-09; it was at reading, so a program's own version of a library function
   warned): `redefinitions()` after `linksyms()`; `redef-quiet` and `redef-both` test it.
+  A common block isn't followed to the module the symbol was given to (the first with
+  the largest size) when the referring module has its own (`comflags` in `modstruct`,
+  set by `readmodule()`; `linkrefs()`), and after linking, a common whose module isn't
+  loaded goes to a loaded module that has it, with the largest size (2026-11-10): cc1
+  makes `__opreg` a common in several modules, and FLEX's `file.o` loaded `scanfp.o`
+  (and with it `__vscan`, `strtod`, `bignum` and the floating point helpers: 10K) for
+  it; the math modules did the same to `mtest` (7K). A plain import that only a
+  member's common satisfies still loads the member. `comm-quiet`, `comm-need` and
+  `comm-ref` test it. ld01 (mc6801-tools) has the same `linkrefs()`, and the bug: not fixed there yet.
 - Test programs run on `sim6809`, the sim6809 project's (`retrotinker/sim6809`, 1.2.0
   or later, which `run.sh` checks: 1.2.0's OS-9 directories, for `os9path.c`; `--os9`
   emulates OS-9's file, directory and `F$Mem` calls on the host, `--flex` puts

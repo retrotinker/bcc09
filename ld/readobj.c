@@ -164,6 +164,7 @@ char *archentry;
 	char *symname;
 	struct symstruct **symparray;
 	struct symstruct *symptr;
+	char *comflags;
 
 	reedmodheader();
 	modlast->filename = filename;
@@ -183,11 +184,15 @@ char *archentry;
 	    moveup(nsymbol * sizeof(struct symdstruct));
 	modlast->symparray = symparray = (struct symstruct **)
 	    ourmalloc((nsymbol + 1) * sizeof(struct symstruct *));
+	modlast->comflags = comflags = ourmalloc(nsymbol + 1);
 	symname = readstring();	/* module name */
 	modlast->modname = stralloc(symname);	/* likely OK overlapped copy */
 	for (endsymdptr = symdptr + nsymbol; symdptr < endsymdptr;
 	     *symparray++ = symptr, release((char *)++symdptr)) {
 		symname = readstring();
+		/* a common block: imported, with its size */
+		*comflags++ = (symdptr->dflags & (E_MASK | I_MASK)) == I_MASK
+		    && symdptr->dvalue != 0;
 		if ((flags = symdptr->dflags) & (E_MASK | I_MASK) &&
 		    (symptr = findsym(symname)) != NUL_PTR) {
 			/*
@@ -223,6 +228,7 @@ char *archentry;
 			entrysym(symptr);
 	}
 	*symparray = NUL_PTR;
+	*comflags = 0;
 }
 
 /* put symbol on entry symbol list if it is not already */
