@@ -7,13 +7,7 @@ wrong output: fixing the bug changes them, so check the new output and
 update the references (tests/run.sh -u) in the same commit, and remove
 the entry from this file.
 
-cc1 (code generation)
----------------------
-
-- Taking the address of a direct page object doesn't work: "LEAX <_foo"
-  ignores DP.  Some possible sequences instead:
-    LDD #_foo ; TFR DP,A ; TFR D,X
-    LEAS -1,S ; CLR 0,S ; PSHS DP ; PULS X ; LEAX _foo,X
-    TFR D,X ; TFR DP,A ; CLR B ; EXG D,X ; LEAX _foo,X
-    TFR D,X ; LDD #_foo ; TFR DP,A ; EXG D,X
-  (Not covered by the tests.)
+None are known.  (The entry that was here, that taking the address of a
+direct-page object gave "LEAX <_foo", described nothing cc1 does: it
+makes no direct-page objects, and with them switched on, & gives the
+address with LDX #_foo; see bcc/sc.h.)

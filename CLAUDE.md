@@ -231,6 +231,13 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   is `int`); `stdbool.h`'s `bool` is `cc1`'s `_Bool` (added 2026-11-08): an `unsigned char`
   type (`btype`) that every conversion makes 0 or 1 (`boolnode()` in `exptree.c` for
   assignments, casts, returns and initializers; `abop()` and `incdec()` for `op=`, `++`, `--`).
+- Direct-page objects are off (`DIRECTPAGE_BROKEN` in `bcc/sc.h`, since 60d57e48 in
+  2014): nothing makes one. BUGS said `&` of one gave `LEAX <_foo`; checked 2026-11-10
+  with them switched on, `&` gives `LDX #_foo` (`LEAX _foo,PC`/`,U` with `-p`/`-u`, which
+  don't use the direct page) in assignments, arguments, arithmetic, comparisons and
+  initializers, so the entry went (BUGS has none now). What's really missing is DP:
+  nothing sets it to segment 2's page, and the ROM (DP 0) and Vectrex BIOS ($D0) want
+  their own; opt-in direct-page variables are in TODO.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.

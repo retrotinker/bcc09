@@ -9,6 +9,9 @@
 - Add support for Color TRSDOS (i.e. Disk EDTASM) environment?
 - Add code generation option for 6309
 - Implement more/better copt rules
+- Opt-in direct-page variables: a way to choose them, start-up code that
+  sets DP to their page, and DP restored around the ROM's and BIOS's
+  routines (see bcc/sc.h)
 - For hysterical reasons, change a.out magic to $201e (i.e. BRA $1E)?
 - Currently "-C-f-" does _not_ disable "1st arg in register" calling protocol...
 - Ditto for "-C-c-" and "caller saves"...
