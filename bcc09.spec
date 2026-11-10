@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.11.0
+Version:        0.11.1
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -73,6 +73,12 @@ cp -p libc/math/README README.libm
 %{_mandir}/man1/objcopy09.1*
 
 %changelog
+* Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.1-1
+- coco.h: sound(tone, duration), as BASIC's SOUND, with its pitches
+- The tests run on sim6809 from its own project (BuildRequires sim6809),
+  which times sound()'s periods to the cycle
+- BUGS: the direct-page entry described nothing cc1 does
+
 * Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.0-1
 - coco.h: inkey, cls, locate and joystk for Color BASIC programs and
   cartridges; stdio flushes stdout at the end of a '\r' line
