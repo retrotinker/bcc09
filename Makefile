@@ -39,10 +39,14 @@ check-vectrex: all
 
 # the user's manual, doc/manual.pdf (with pandoc and xelatex): run after
 # changing doc/manual.md or a man page, and commit the PDF
-docs: doc/manual.pdf
+docs: doc/manual.pdf doc/basic.pdf
 
 doc/manual.pdf: doc/manual.md doc/man/*.1 doc/mkmanual.sh doc/tex/*.sty
 	doc/mkmanual.sh
+
+# and "bcc09 for BASIC Programmers"
+doc/basic.pdf: doc/basic.md doc/mkbasic.sh doc/tex/*.sty
+	doc/mkbasic.sh
 
 $(SIM): tests/sim/*.c tests/sim/*.h
 	$(CC) -std=c11 -O2 -DPLM09_VERSION='"0.4.6"' -o $@ tests/sim/*.c

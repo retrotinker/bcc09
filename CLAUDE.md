@@ -199,6 +199,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   rules (checked 2026-11-08) favor size: `LDD #0` becomes `CLRA`/`CLRB` (a byte smaller,
   a cycle slower), only before instructions that don't read C; adjacent `LEAS n,S` are
   merged.
+- `doc/basic.md` is "bcc09 for BASIC Programmers" (added 2026-11-10): C taught from Color
+  BASIC, chapter by chapter, with `coco.h`; `make docs` (`doc/mkbasic.sh`) makes
+  `doc/basic.pdf`, committed and packaged. `tests/run.sh` compiles and links every
+  complete program in it (a ```c block with `main()`: `basic.result`), so change the
+  guide's programs with the library. It is original text, not CMOC's guide's.
 - `doc/manual.md` is the user's manual (added 2026-11-09); `make docs` (`doc/mkmanual.sh`:
   pandoc, its man reader for the pages, which are its Appendix A, and xelatex, with
   `doc/tex/footnotehyper.sty` from plm09) makes `doc/manual.pdf`, which is committed.
@@ -225,7 +230,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 731 reference
+  `tests/src/` with this tree's tools and compare every result with the 732 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

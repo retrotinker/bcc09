@@ -106,7 +106,8 @@ doc/manual.pdf is the user's manual: building and installing, the C
 bcc09 compiles, each target, the C library, the calling conventions and
 how to write assembly for them, the tools and the tests, with the man
 pages as an appendix ("make docs" makes it again from doc/manual.md).
-The man pages are in doc/man: bcc09(1), as09(1), ld09(1), ar09(1),
+doc/basic.pdf, "bcc09 for BASIC Programmers", teaches C to those who
+know Color BASIC (from doc/basic.md).  The man pages are in doc/man: bcc09(1), as09(1), ld09(1), ar09(1),
 objdump09(1), objcopy09(1), and the passes' bcc09-cpp(1),
 bcc09-unproto(1), bcc09-cc1(1) and bcc09-copt(1) ("man -l
 doc/man/bcc09.1" reads one in place).  libc/README describes the C

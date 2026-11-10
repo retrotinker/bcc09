@@ -606,6 +606,22 @@ grep -v '^S[059]' cbrom.srec | cat - cbtest.srec > cbtest-rom.srec
 "$SIM" -n 50000000 --entry "0x$entry" cbtest-rom.srec < cbtest.in \
 	> cbtest.run 2>&1
 echo $? > cbtest.run.rc
+# the programs in doc/basic.md (bcc09 for BASIC Programmers): each
+# complete one (with a main) must compile and link for Color BASIC
+awk '/^```c$/ { n++; f = sprintf("basic%02d.c", n); b = 1; next }
+     /^```$/ { b = 0; next }
+     b { print > f }' "$top/doc/basic.md"
+for f in basic[0-9]*.c; do
+	if grep -q 'main()' $f; then
+		if "$BCC" -Me -O -o basic.out -X-T0x3000 $f > basic.err 2>&1; then
+			echo "ok   $f compiles and links"
+		else
+			echo "FAIL $f:"
+			cat basic.err
+		fi
+	fi
+	rm -f $f basic.out basic.err
+done > basic.result
 # coco.h's functions: cls(), locate(), joystk(), inkey(), peek(), poke()
 run cocotest.bcc "$BCC" -Me -o cocotest.out -X-T0x3000 loader.s cocotest.c
 "$OC" -O srec cocotest.out cocotest.srec

@@ -38,6 +38,8 @@ This manual describes how to use it: building and installing it (chapter
 2), compiling a first program for each target (3), the C it compiles (4),
 each target (5), the C library (6), how compiled code calls functions, so
 that assembly can be written to work with it (7), and the tools (8).
+For a gentler start, "bcc09 for BASIC Programmers" (`basic.pdf`) teaches
+C from Color BASIC.
 Appendix A is the reference: the manual pages of every program.
 
 bcc09 is free software. The compiler and tools are under the GNU General

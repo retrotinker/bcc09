@@ -49,7 +49,7 @@ cp -p libc/math/README README.libm
 
 %files
 %license COPYING libc/COPYING.LIB
-%doc README README.libc README.libm BUGS TODO doc/manual.pdf
+%doc README README.libc README.libm BUGS TODO doc/manual.pdf doc/basic.pdf
 %{_bindir}/bcc09
 %{_bindir}/as09
 %{_bindir}/ld09
