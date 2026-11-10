@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.11.1
+Version:        0.11.2
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -73,6 +73,10 @@ cp -p libc/math/README README.libm
 %{_mandir}/man1/objcopy09.1*
 
 %changelog
+* Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.2-1
+- libc: rmdir() and getcwd() for OS-9 (-Mo), which has no calls for them
+- The tests need sim6809 1.2.0 (BuildRequires sim6809 >= 1.2.0)
+
 * Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.1-1
 - coco.h: sound(tone, duration), as BASIC's SOUND, with its pitches
 - The tests run on sim6809 from its own project (BuildRequires sim6809),

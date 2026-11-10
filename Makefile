@@ -1,4 +1,4 @@
-VERSION=0.11.1
+VERSION=0.11.2
 
 PREFIX=/usr/local/bcc09
 MANDIR=$(PREFIX)/share/man

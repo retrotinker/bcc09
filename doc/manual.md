@@ -81,7 +81,7 @@ were the root, for making packages: bcc09 still looks for its files under
 and what each program needs are always added.
 
 On Fedora, `make rpm` builds an RPM package from `bcc09.spec`, with
-*PREFIX* `/usr`, in `rpmbuild/`: from the release's tag (`v0.11.1`), or from
+*PREFIX* `/usr`, in `rpmbuild/`: from the release's tag (`v0.11.2`), or from
 the last commit if that isn't tagged yet. `make srpm` builds the source
 package alone.
 
