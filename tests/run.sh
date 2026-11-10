@@ -491,7 +491,8 @@ done
 # _Bool); protoarg.c passes arguments of other types to prototyped
 # functions; gltest.c reads gltest.in with getline() and getdelim();
 # and a target with no start-up code yet can't be linked
-for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest; do
+for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
+	 atexitio; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null

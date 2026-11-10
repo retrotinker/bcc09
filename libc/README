@@ -74,7 +74,10 @@ Changes from dev86:
     losing the ones before it (so they weren't flushed at exit);
     ungetc(EOF) pushed back a byte, and ungetc didn't clear the end of
     file indicator; fgets with a count of 0 overran its buffer; BUFSIZ
-    is 256
+    is 256; exit() flushed the streams before the atexit() functions
+    registered before stdio was first used, losing their output (stdio
+    registered its flush with atexit() then; exit() now flushes after
+    every atexit() function, through __stdio_exit)
   - the printf and scanf families are new: dev86's printf.c and
     scanf.c had no license, and its printf departed from the C standard
     (precision on integers, %X, # and %p); see stdio/printf.c and

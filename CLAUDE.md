@@ -198,7 +198,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 694 reference
+  `tests/src/` with this tree's tools and compare every result with the 699 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -227,7 +227,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   on (and, for floating point, pop and push what it expects). `crtret.c` and `crtexit.c`
   are built by `bcc09` alone (with `crt0` and `libc`) and run under `loader.s`, which
   calls `start` as a loader would and checks that the stack comes back; `crtatexit.c`
-  checks that returning from `main` runs the `atexit()` functions.
+  checks that returning from `main` runs the `atexit()` functions, and
+  `atexitio.c` that what one prints isn't lost (stdio's flush comes after them, through
+  `__stdio_exit`; fixed 2026-11-09).
 - `tests/src/strtest.c`, `stdtest.c`, `maltest.c` and `vatest.c` check libc's `string.h`,
   `ctype.h`, `stdlib.h`, `malloc` and `stdarg.h`; `run.sh` also builds them with the host's compiler and C library
   (`tests/host/putnum.c` supplies `putnum`), and each must print the same on both,

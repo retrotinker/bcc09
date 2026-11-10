@@ -63,7 +63,12 @@ FILE  stderr[1] =
     2, _IONBF | __MODE_WRITE | __MODE_IOTRAN}
 };
 
-/* Call the stdio initiliser; it's main job it to call atexit */
+/* The stdio initialiser: its main job is to have exit() flush and close
+   the streams, after the atexit() functions (bcc09: through
+   __stdio_exit, rather than by registering with atexit(), which ran the
+   functions registered before stdio was first used after the flush, and
+   lost their output) */
+extern void (*__stdio_exit)();
 
 static void
 __stdio_close_all()
@@ -89,7 +94,7 @@ __io_init_vars()
    first_time = 0;
    if (isatty(1))
       stdout->mode |= _IOLBF;
-   atexit(__stdio_close_all);
+   __stdio_exit = __stdio_close_all;
 }
 #endif
 
