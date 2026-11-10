@@ -1,0 +1,9 @@
+CARTRIDGE: INITIALIZED 3
+BSS CLEAR, 1.5
+iNITIALIZED
+ONE
+[ONE] AT RAM
+TWO
+[TWO] AT RAM
+ATEXIT
+sim6809: instruction limit (20000000) reached, in _exit's loop

@@ -202,13 +202,13 @@ files, the end of the program), which `bcc09` links with the C library:
 |---|---|---|---|
 | `-Ms` | standalone (default) | `crt0.o`, `libsa.a` | any (`objcopy09`) |
 | `-Me` | Color BASIC, run with `EXEC` | `crt0.o`, `libcb.a` | `cas`, `wav`, `decb` |
+| `-Mr` | ROM cartridge (CoCo, Dragon) | `crtrom.o`, `librom.a`, `rom.ld` | the ROM's image |
 | `-Mo` | OS-9 program module | `crtos9.o`, `libos9.a` | `os9` |
 | `-Mf` | FLEX command | `crtflex.o`, `libflex.a` | `flex` |
 | `-Mi` | sim6809 | `crtsim.o`, `libsim.a` | `srec` |
 
-(`-Mu`, `-Mr`, `-Mb` and `-Mv`, for Color BASIC `USR` functions, ROM
-cartridges, Disk BASIC and the Vectrex, define their macros but have no
-start-up code yet.)
+(`-Mu`, `-Mb` and `-Mv`, for Color BASIC `USR` functions, Disk BASIC and
+the Vectrex, define their macros but have no start-up code yet.)
 
 Every target's start-up code clears the BSS, calls the *init functions*
 (section 7.4), then `main`; `main`'s result goes to `exit()`, which calls
@@ -267,6 +267,38 @@ stack.
 The Dragon's ROM has the same `POLCAT` and `CHROUT`, so programs run on
 the Dragon 32 and 64 too, but without files: DragonDOS's disks are of
 another format, and `open()` fails with `ENODEV` there.
+
+## ROM cartridges (`-Mr`)
+
+A program in a cartridge's ROM, which the CoCo and the Dragon start by
+themselves (with the cartridge's CART line wired to Q, as in a game
+cartridge): BASIC's FIRQ handler jumps to `$C000`. `bcc09 -Mr` links it
+with the linker script `rom.ld` (section 8.1), and its output is the ROM's
+image, ready for an EPROM or for XRoar:
+
+```
+bcc09 -Mr -O -o hello.rom hello.c
+xroar -cart-rom hello.rom -cart-autorun
+```
+
+* **The ROM,** from `$C000`: the code, then an image of the initialized
+  data, filled out with `$FF` to 8K, or to 16K less the last page (`$FF00`
+  up is I/O).
+* **The RAM:** the data, the BSS and the heap from `$0600`, after the text
+  screen; the stack below `$8000`, a 32K machine's top (`-X-A__stack_top=0x4000`
+  for 16K).
+* **Start-up:** with the interrupts off (and the cartridge's FIRQ turned
+  off), the start-up code sets the stack, copies the initialized data to
+  RAM, clears the BSS, and calls the init functions and `main`.
+* **I/O,** as with `-Me` (but no files): the screen and keyboard through
+  the ROM's `CHROUT` and `POLCAT`.
+* **The end:** a cartridge has nothing to return to, so `_exit()` stops,
+  with the status in D.
+
+The CoCo 3 starts a cartridge before its BASIC is ready for `CHROUT` and
+`POLCAT`, so `-Mr`'s I/O doesn't work there. For another layout, copy
+`rom.ld` (from bcc09's library directory), change it, and link with
+`-X-S` and the copy.
 
 ## OS-9 (`-Mo`)
 

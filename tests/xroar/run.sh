@@ -6,8 +6,8 @@
 # types its input, and when it calls _exit a trap takes a snapshot, from
 # which xrscreen.py shows the text screen and xrcpu.py the registers.
 # Each machine's screen must be the same as ./expected, and the exit
-# status (X) 42.  Then Disk BASIC's files (see below; needs toolshed's
-# decb too).
+# status (X) 42.  Then a ROM cartridge (-Mr), and Disk BASIC's files (see
+# below; needs toolshed's decb too).
 #
 # Optional (make check-xroar): it needs xroar, python3 and the machines'
 # ROMs (in ~/.xroar/roms, say); a machine whose ROM isn't there or
@@ -35,7 +35,8 @@ ln -s "$top/as/as09" "$top/ld/ld09" prefix/bin/
 ln -s "$top/cpp/cpp" "$top/bcc/cc1" "$top/copt/copt" "$top/copt/rules.6809" \
 	"$top/unproto/unproto" prefix/libexec/bcc09/
 ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
-	"$top/libc/libcb.a" prefix/share/bcc09/
+	"$top/libc/libcb.a" "$top/libc/crtrom.o" "$top/libc/librom.a" \
+	"$top/libc/rom/rom.ld" prefix/share/bcc09/
 
 BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Me -o xcb -X-T0x3000 "$dir/xcb.c" ||
 	exit 1
@@ -75,6 +76,51 @@ for m in $machines; do
 	if ! cmp -s "$dir/expected" $m.screen; then
 		echo "FAIL $m: the screen differs:"
 		diff "$dir/expected" $m.screen
+	fi
+done
+
+# a ROM cartridge (bcc09 -Mr): xrom.c, built as rom.ld lays it out (the
+# image to plug in at $C000), started by BASIC (-cart-autorun); its
+# initialized data is copied to RAM at $0600, where xrscreen.py finds it
+# by its first string (given as a DECB file loaded there).  The screen
+# must be the same as ./expected-rom, and the status 42.  (Not on the
+# CoCo 3, which starts a cartridge before BASIC is ready for its I/O.)
+BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Mr -o xrom.rom -X-M "$dir/xrom.c" \
+	> xrom.map || exit 1
+rexit_pc=$(awk '$2 == "__exit" { print substr($4, 5) }' xrom.map)
+python3 -c 'import sys
+m = b"XROM DATA AT 0600"
+sys.stdout.buffer.write(bytes([0, 0, len(m), 6, 0]) + m)' > xrom-data.bin
+for m in $machines; do
+	rm -f snap
+	timeout 60 xroar -ui null -ao null -machine $m -no-ratelimit \
+		-cart-rom xrom.rom -cart-autorun \
+		-type "$(printf 'ABX\bC\r')" \
+		-trap pc=0x$rexit_pc -trap-snap snap -trap-timeout 0 \
+		-timeout 30 > $m-rom.log 2>&1
+	if grep -qiE "CRC32 INVALID|not found|no rom" $m-rom.log; then
+		echo "skip $m rom (its ROM isn't there or doesn't check)"
+		continue
+	fi
+	if [ ! -f snap ]; then
+		echo "FAIL $m rom: it didn't reach _exit"
+		failed=$((failed + 1))
+		continue
+	fi
+	python3 "$dir/xrscreen.py" snap xrom-data.bin 0x0600 | grep -v '^$' \
+		> $m-rom.screen
+	status=$(python3 "$dir/xrcpu.py" snap | awk '$1 == "0c:" { print $2 }')
+	if cmp -s "$dir/expected-rom" $m-rom.screen && [ "$status" = "002a" ]; then
+		echo "ok   $m rom"
+		continue
+	fi
+	failed=$((failed + 1))
+	if [ "$status" != "002a" ]; then
+		echo "FAIL $m rom: exit status $status, not 002a"
+	fi
+	if ! cmp -s "$dir/expected-rom" $m-rom.screen; then
+		echo "FAIL $m rom: the screen differs:"
+		diff "$dir/expected-rom" $m-rom.screen
 	fi
 done
 

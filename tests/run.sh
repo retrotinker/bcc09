@@ -50,7 +50,8 @@ mkdir -p "$prefix/share/bcc09"
 ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
 	"$top/libc/libsa.a" "$top/libc/libcb.a" "$top/libc/crtsim.o" \
 	"$top/libc/libsim.a" "$top/libc/crtos9.o" "$top/libc/libos9.a" \
-	"$top/libc/crtflex.o" "$top/libc/libflex.a" \
+	"$top/libc/crtflex.o" "$top/libc/libflex.a" "$top/libc/crtrom.o" \
+	"$top/libc/librom.a" "$top/libc/rom/rom.ld" \
 	"$prefix/share/bcc09/"
 LIBDIR=$prefix/share/bcc09
 # (the same, relative to $out, for links whose maps name the library)
@@ -594,6 +595,32 @@ grep -v '^S[059]' cbrom.srec | cat - cbtest.srec > cbtest-rom.srec
 "$SIM" -n 50000000 --entry "0x$entry" cbtest-rom.srec < cbtest.in \
 	> cbtest.run 2>&1
 echo $? > cbtest.run.rc
+
+# a Color BASIC ROM cartridge (bcc09 -Mr): rom.ld, with S-record output
+# for sim6809, which starts it at $C000 with cbrom.s: crtrom.o copies
+# the initialized data to RAM and clears the BSS; romtest.c reads lines
+# until BREAK, and its atexit() function runs before _exit() stops in
+# its loop (so the run ends at the instruction limit, in __exit's loop)
+printf 'INCLUDE "%s"\nOUTPUT_FORMAT(srec)\n' "$LIBREL/rom.ld" > romsrec.ld
+run romtest.bcc "$BCC" -Mr -o romtest.srec -X-Sromsrec.ld romtest.c
+grep -v '^S[059]' cbrom.srec | cat - romtest.srec > romtest-rom.srec
+"$SIM" -n 20000000 --entry 0xC000 romtest-rom.srec < romtest.in \
+	> romtest.run 2>&1
+echo $? > romtest.run.rc
+# (where it stopped: _exit's loop, 2 bytes after __exit, from a map)
+"$BCC" -Mr -o romtest-map.srec -X-Sromsrec.ld -X-M romtest.c \
+	> romtest.map 2>&1
+stop=$(awk '$2 == "__exit" { print $4 }' romtest.map)
+stop=$(printf '%04X' $((0x$stop + 2)))
+sed -i "s/ reached at PC=$stop\$/ reached, in _exit's loop/" romtest.run
+rm -f romtest.map romtest-map.srec
+# and its image: 16K less the last page (8K for a smaller program), from
+# crtrom.o's code at $C000 (ORCC #$50, LDS), filled out with $FF
+run rom.bcc "$BCC" -Mr -o romtest.rom romtest.c
+{ echo "$(wc -c < romtest.rom) bytes"
+  od -An -tx1 -N4 romtest.rom
+  tail -c 4 romtest.rom | od -An -tx1; } > romtest.img
+rm -f romsrec.ld romtest.srec romtest-rom.srec romtest.rom
 # and Disk BASIC's files: cbdisk.s stands in for its ROM at $C000, with
 # a disk of 4 free granules in memory; cbfile.c writes, reads, seeks,
 # fills the disk, deletes and truncates, and prints the FAT's and the

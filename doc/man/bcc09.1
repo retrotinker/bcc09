@@ -129,6 +129,23 @@ a CoCo, its files.
 Defines
 .BR __CB__ .
 .TP
+.B r
+A ROM cartridge for the CoCo (1 and 2) and the Dragon, which BASIC
+starts at $C000: the output is the ROM's image, laid out by the linker
+script
+.I rom.ld
+(the code and an image of the initialized data in the ROM, the data,
+BSS and heap in RAM from $0600, the stack below $8000), and I/O through
+the ROM's POLCAT and CHROUT, as with
+.BR e ;
+the start-up code copies the data to RAM, and
+.B _exit
+stops the program.
+Defines
+.B __CB__
+and
+.BR __CBROM__ .
+.TP
 .B o
 OS-9 (and NitrOS-9): a position-independent program module, with its
 data reached through the U register (make the module with
@@ -150,9 +167,8 @@ sim6809, the simulator bcc09's tests use.
 Defines
 .BR __SIM6809__ .
 .TP
-.BR u ", " r ", " b ", " v
-Color BASIC USR functions, ROM cartridges, Disk BASIC, and the
-Vectrex: they define
+.BR u ", " b ", " v
+Color BASIC USR functions, Disk BASIC, and the Vectrex: they define
 .B __CB__
 (or
 .BR __VECTREX__ )
@@ -332,6 +348,8 @@ The C library (libc.a), and each target's start-up code and library
 .BR \-Ms ;
 crt0.o and libcb.a for
 .BR \-Me ;
+crtrom.o, librom.a and the linker script rom.ld for
+.BR \-Mr ;
 crtos9.o and libos9.a, all of libc built for OS-9, for
 .BR \-Mo ;
 crtflex.o and libflex.a for
@@ -350,6 +368,16 @@ A Color BASIC program, loaded at $3000, on a cassette:
 .nf
 bcc09 \-Me \-O \-o hello \-X\-T0x3000 hello.c
 objcopy09 \-O cas \-n HELLO hello hello.cas
+.fi
+.RE
+.PP
+A ROM cartridge's image (for XRoar's
+.BR \-cart\-rom ,
+or an EPROM):
+.PP
+.RS
+.nf
+bcc09 \-Mr \-O \-o hello.rom hello.c
 .fi
 .RE
 .PP

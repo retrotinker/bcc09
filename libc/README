@@ -131,6 +131,8 @@ and links with libc.a (ld09 -C<name> links crt<name>.o):
 
   -Ms       sa: crt0.o and libsa.a (the default)
   -Me       cb: crt0.o and libcb.a (Color BASIC, run with EXEC)
+  -Mr       rom: crtrom.o and librom.a, linked with rom.ld (a Color
+            BASIC ROM cartridge)
   -Mi       sim: crtsim.o and libsim.a
   -Mf       flex: crtflex.o and libflex.a (a FLEX command, a .CMD file)
   -Mo       os9: crtos9.o and libos9.a (an OS-9 program module)
@@ -139,7 +141,7 @@ and links with libc.a (ld09 -C<name> links crt<name>.o):
 reached through U), so libos9.a is all of libc built again with it (in
 os9obj), which bcc09 links in place of libc.a.
 
-The others (-Mu, -Mr, -Mb, -Mv) have none yet, and bcc09
+The others (-Mu, -Mb, -Mv) have none yet, and bcc09
 won't link for them (bcc09 -x leaves out the start-up code, for a
 program that brings its own).  Each target's start-up code clears the
 BSS and calls main; when main returns, its result goes to exit(), which
@@ -194,6 +196,26 @@ emulator (tests/xroar), where the Dragon's vectors turn out to be the
 same, and its files on the CoCo with Disk BASIC 1.0, the CoCo 2 with
 1.1 and the CoCo 3, where BASIC reads a file the program wrote and
 writes one, and toolshed's decb and xrdisk.py check the disk.
+
+rom is for a ROM cartridge, which the CoCo and the Dragon start at
+$C000 (BASIC's FIRQ handler jumps there when the cartridge's CART line
+is wired to Q).  bcc09 -Mr links it with the linker script rom/rom.ld
+(installed as rom.ld, in the library directory), whose output is the
+ROM's image: the code at $C000, then an image of the initialized data,
+filled out with $FF to 8K, or to 16K less the last page; the data, BSS
+and heap are in RAM from $0600, after the text screen, and the stack is
+below __stack_top, $8000 (ld09 -A __stack_top=0x4000 for a 16K
+machine).  crtrom (rom/crt0.s) masks the interrupts, turns off the
+cartridge's FIRQ, sets S, copies the data from the ROM (__data_load) to
+RAM (__data_start to __data_end), clears the BSS (__edata to __end, which
+rom.ld defines), and calls the init functions and main.  librom.a is
+libcb.a's I/O (but files need Disk BASIC's ROM, which the cartridge
+replaces), with an _exit() (rom/_exit.s) that stops, with the status in
+D, since a cartridge has nothing to return to.  The CoCo 3 starts a
+cartridge before its BASIC is set up (the CHROUT vector isn't there
+yet), so this I/O doesn't work on it.  "make check" runs a cartridge on
+sim6809 with cbrom.s (tests/src/romtest.c); "make check-xroar" on the
+CoCo, CoCo 2, Dragon 32 and Dragon 64 (tests/xroar/xrom.c).
 
 flex is for a FLEX command: "objcopy09 -O flex prog.out PROG.CMD" makes
 the .CMD file, of load records and a transfer address, for any load

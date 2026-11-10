@@ -108,6 +108,18 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     and `open()` sets the hook (`__cb_files`, `cb/cb.h`) that `read`/`write`/`lseek`/`close`
     use for descriptors 3 up, so programs without files don't carry it.
   - `-Mi` → `crtsim.o` + `libsim.a`: sim6809, for the tests.
+  - `-Mr` → `crtrom.o` + `librom.a` + `rom.ld` (added 2026-11-09): a ROM cartridge for
+    the CoCo 1/2 and the Dragon, started at $C000 by BASIC's FIRQ handler (probed in
+    XRoar: all enter at $C000; the CoCo 3 enters before BASIC is set up, with S 0 and no
+    CHROUT vector, so no I/O there). The driver passes `-S` with `rom.ld` from the
+    library directory unless the command has a `-S`. `rom.ld`: code and the data's
+    image in ROM from $C000, filled with $FF to 8K or $FF00 (XRoar takes a file's size
+    mod 256 as a header to skip); data, BSS, heap in RAM from $0600; `__stack_top`
+    $8000 (`-A` to change); it defines `__edata`/`__end` itself (ld09's would reach the
+    fill section). `crtrom` masks interrupts, turns off the CART FIRQ ($FF23 bit 0),
+    copies `__data_load` to `__data_start`..`__data_end`; `librom.a` is libcb's objects
+    with `rom/_exit.s` (stops in a loop), not libcb's `_exit` (an `_exit` in the crt
+    made ld09 warn of a redefinition on every link). Defines `__CB__` and `__CBROM__`.
   - `-Mo` → `crtos9.o` + `libos9.a` (all of libc built again with `-Mo`, in `os9obj`):
     OS-9 program modules (below).
   - `-Mf` → `crtflex.o` + `libflex.a` (added 2026-11-09): FLEX commands
@@ -120,7 +132,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     files (`O_TRUNC` deletes first; no `O_RDWR`/`O_APPEND`), `lseek()` for reading only,
     `unlink`, `rename`. Real FLEX's rewind makes an FCB text again, and delete puts `$FF`
     in its name: `file.c` and sim6809 both allow for it.
-  - The others (`-Mu`, `-Mr`, `-Mb`, `-Mv`) can't link yet (`notarget` uses `-Mv`).
+  - The others (`-Mu`, `-Mb`, `-Mv`) can't link yet (`notarget` uses `-Mv`).
 - OS-9's data model (begun 2026-11-08): `-Mo` passes `cc1 -u`, which is `-p`
   (position-independent code: functions and string constants `,PCR`, calls `LBSR`) with
   data through U (`name,U`, linked as offsets: `isdata()` in `genloads.c`); U is then no
@@ -198,7 +210,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 699 reference
+  `tests/src/` with this tree's tools and compare every result with the 706 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -303,6 +315,13 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   label comes within reach; `flushout()` keeps the text from the oldest such branch
   (`openpatch()`, growing the buffer), so that no longer depends on how much text,
   such as the headers' names in comments, comes between (fixed 2026-11-09).
+- `tests/src/romtest.c` is a cartridge (`-Mr`, with `rom.ld` included by a script that
+  sets `OUTPUT_FORMAT(srec)`) run on sim6809 from $C000 with `cbrom.s`: data copied, BSS
+  cleared (sim6809 fills memory with $A5), init functions, input, heap, atexit; the run
+  ends at the instruction limit in `_exit`'s loop. `make check-xroar` also runs
+  `tests/xroar/xrom.c` as a cartridge (`-cart-rom`, `-cart-autorun`) on the CoCo, CoCo 2,
+  Dragon 32 and Dragon 64, finding RAM in the snapshot by the data's first string at
+  $0600 (`expected-rom`).
 - `tests/src/cbfile.c` runs with `cbrom.s` and `cbdisk.s` (Disk BASIC's stand-in at
   `$C000`: DSKCON on tracks 16-18 kept in memory, granules 32-35 free) and checks
   `libc/cb/disk.c`: files of several granules, a full disk, deleting, truncating, and the

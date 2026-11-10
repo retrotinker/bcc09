@@ -94,6 +94,8 @@ enum supported_arches {
    differs between targets (_exit, read, write); 0 if there are none yet */
 char *crtname = 0;
 char *targetlib = 0;
+char *linkscript = 0;		/* the target's linker script, in the library
+				   directory, unless the command gives one */
 
 int opt_v, opt_V, opt_e, opt_x, opt_I, opt_L, opt_W, opt_O, opt_M;
 
@@ -427,6 +429,19 @@ void run_link()
 	command_opts('l');
 	if (!opt_L)
 		command_opt(default_libdir);
+	if (linkscript) {
+		struct opt_list *ol;
+
+		for (ol = options; ol; ol = ol->next)
+			if (ol->opttype == 'l' && strncmp(ol->opt, "-S", 2) == 0)
+				break;
+		if (!ol) {
+			/* (default_libdir is -L and the directory) */
+			char *dir = catstr(default_libdir + 2, "/");
+
+			command_opt(catstr("-S", catstr(dir, linkscript)));
+		}
+	}
 
 	if (!opt_x) {
 		if (!crtname)
@@ -911,7 +926,13 @@ char **argv;
 		break;
 	case 'r':
 		prepend_option("-D__CB__", 'p');
+		prepend_option("-D__CBROM__", 'p');
 		opt_arch = MC6809_CB_ROM;
+		crtname = "-Crom";	/* a ROM cartridge, at $C000 */
+		targetlib = "-lrom";	/* libcb.a's I/O, through the ROM,
+					   and an _exit that stops */
+		linkscript = "rom.ld";	/* code and data in the ROM, the
+					   data copied to RAM */
 		break;
 	case 'b':
 		prepend_option("-D__CB__", 'p');

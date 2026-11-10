@@ -4,9 +4,10 @@ bcc09 0.8.0
 bcc09 is a C compiler for the Motorola MC6809, with the preprocessor,
 peephole optimizer, assembler, linker, librarian, binary utilities and
 C library that go with it.  It targets the Tandy Color Computer and the
-Dragon (Color BASIC and Disk BASIC), OS-9 and NitrOS-9, and FLEX, or any
-6809 machine through its own start-up code.  It is derived from the 6809
-configuration of Bruce Evans' C compiler, as the dev86 project has it.
+Dragon (Color BASIC, Disk BASIC and ROM cartridges), OS-9 and NitrOS-9,
+and FLEX, or any 6809 machine through its own start-up code.  It is
+derived from the 6809 configuration of Bruce Evans' C compiler, as the
+dev86 project has it.
 
 	https://github.com/retrotinker/bcc09
 
@@ -67,7 +68,13 @@ A Color BASIC program, on a cassette image for CLOADM:EXEC:
 	bcc09 -Me -O -o hello -X-T0x3000 hello.c
 	objcopy09 -O cas -n HELLO hello hello.cas
 
-(or "objcopy09 -O decb hello HELLO.BIN" for LOADM from a disk).  An OS-9
+(or "objcopy09 -O decb hello HELLO.BIN" for LOADM from a disk).  A ROM
+cartridge for the CoCo or the Dragon, its image ready for an EPROM (or
+XRoar's -cart-rom):
+
+	bcc09 -Mr -O -o hello.rom hello.c
+
+An OS-9
 program module, and a FLEX command:
 
 	bcc09 -Mo -O -o hello.out hello.c

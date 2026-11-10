@@ -22,6 +22,9 @@ BCCFLAGS=-O -I$(TOP)/include
 #        program's loader; no I/O
 #   cb:  Color BASIC (-Me, a program run with EXEC): crt0.o and libcb.a,
 #        with I/O through the ROM
+#   rom: a Color BASIC ROM cartridge (-Mr): crtrom.o and librom.a (libcb.a
+#        with an _exit that stops), linked with rom/rom.ld (installed as
+#        rom.ld): crtrom.o copies the initialized data from the ROM to RAM
 #   sim: sim6809 (-Mi): crtsim.o and libsim.a
 #   flex: FLEX (-Mf, a .CMD command): crtflex.o and libflex.a, with I/O
 #        through FLEX's DOS
@@ -102,6 +105,7 @@ SA_OBJS	= sa/_exit.o
 CB_SYS_OBJS = cb/write.o cb/read.o cb/isatty.o cb/lseek.o cb/close.o \
 	  cb/__cb_files.o
 CB_OBJS	= sa/_exit.o cb/rom.o cb/disk.o cb/dskcon.o $(CB_SYS_OBJS)
+ROM_OBJS = rom/_exit.o cb/rom.o cb/disk.o cb/dskcon.o $(CB_SYS_OBJS)
 FLEX_SYS_OBJS = flex/write.o flex/read.o flex/isatty.o flex/lseek.o \
 	  flex/close.o flex/__flex_files.o
 FLEX_OBJS = flex/flex.o flex/start.o flex/file.o $(FLEX_SYS_OBJS)
@@ -118,7 +122,7 @@ OS9_OBJS = $(filter-out stdlib/sbrk.o stdio/xfpcvt.o stdio/xfptvc.o,$(OBJS)) \
 OS9_DIRS = bcc ctype malloc stdio stdlib string math os9
 
 TARGETS	= crt0.o libsa.a libcb.a crtsim.o libsim.a crtos9.o libos9.a \
-	  crtflex.o libflex.a
+	  crtflex.o libflex.a crtrom.o librom.a
 
 all: libc.a $(TARGETS)
 
@@ -143,6 +147,12 @@ crtflex.o: flex/crt0.o
 libflex.a: $(FLEX_OBJS)
 	rm -f $@
 	$(AR09) rc $@ $(FLEX_OBJS)
+
+crtrom.o: rom/crt0.o
+	cp $< $@
+librom.a: $(ROM_OBJS)
+	rm -f $@
+	$(AR09) rc $@ $(ROM_OBJS)
 
 libcb.a: $(CB_OBJS)
 	rm -f $@
@@ -226,17 +236,18 @@ flex/file.o: flex/flex.h $(HEADERS) .bcc/stamp
 TOOLS	= $(TOP)/../bcc/bcc09 $(TOP)/../bcc/cc1 $(TOP)/../cpp/cpp \
 	  $(TOP)/../unproto/unproto $(TOP)/../copt/copt \
 	  $(TOP)/../copt/rules.6809 $(AS09)
-$(OBJS) $(SA_OBJS) $(CB_OBJS) $(SIM_OBJS) $(FLEX_OBJS) sa/crt0.o \
-	sim/crtsim.o flex/crt0.o: $(TOOLS)
+$(OBJS) $(SA_OBJS) $(CB_OBJS) $(ROM_OBJS) $(SIM_OBJS) $(FLEX_OBJS) sa/crt0.o \
+	sim/crtsim.o flex/crt0.o rom/crt0.o: $(TOOLS)
 
 install: libc.a $(TARGETS)
 	install -d $(DESTDIR)$(LIBDIR) $(DESTDIR)$(LIBDIR)/include/sys
 	install -m 644 libc.a $(TARGETS) $(DESTDIR)$(LIBDIR)
+	install -m 644 rom/rom.ld $(DESTDIR)$(LIBDIR)
 	install -m 644 include/*.h $(DESTDIR)$(LIBDIR)/include
 	install -m 644 include/sys/*.h $(DESTDIR)$(LIBDIR)/include/sys
 
 clean realclean clobber:
-	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o cb/*.o sim/*.o flex/*.o \
+	rm -f libc.a $(OBJS) $(TARGETS) sa/*.o cb/*.o sim/*.o flex/*.o rom/*.o \
 	      stdio/*.o
 	rm -rf .bcc os9obj
 
