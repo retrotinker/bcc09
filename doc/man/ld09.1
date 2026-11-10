@@ -616,6 +616,12 @@ The a.out header's total memory reaches
 .B __heap_top
 if the script sets it.
 .SH DIAGNOSTICS
+A symbol defined in two linked modules is reported with a warning, as in
+\(lqdup redefined in file libx.a(x.o); using definition in prog.o\(rq: the
+first definition read is used.
+A library member that isn't linked doesn't count, so a program can have
+its own version of a library function.
+.PP
 Input that a script doesn't place is reported with a warning, as in
 \(lqsegs.o(LOC5) isn't placed by the script; adding it to .data\(rq.
 Initialized data in a module's segment that a script puts in a

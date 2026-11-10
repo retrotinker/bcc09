@@ -180,6 +180,16 @@ link prog-s	-s -T0x1000 crt0.o main.o control.o ptr.o
 link prog-d	-d -T0x1000 crt0.o main.o control.o ptr.o
 link prog-D	-m -M -T0x1000 -D0x4000 crt0.o main.o control.o ptr.o
 link prog-0	-T0 crt0.o main.o control.o ptr.o
+# a symbol a library member defines again: no warning if the member
+# isn't linked (a program's own version of a library function); a
+# warning if something else needs the member
+for f in redefmain redefboth redeflib; do
+	"$AS" -o $f.o $f.s > /dev/null 2>&1
+done
+"$AR" rc libredef.a redeflib.o
+link redef-quiet	-m -T1000 redefmain.o -L. -lredef
+link redef-both	-m -T1000 redefboth.o -L. -lredef
+rm -f redefmain.o redefboth.o redeflib.o libredef.a
 if cmp -s prog.out prog-lib.out; then
 	echo "ok   prog-lib.out is the same as prog.out"
 else

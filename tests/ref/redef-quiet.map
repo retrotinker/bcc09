@@ -1,0 +1,2 @@
+redefmain       +redefmain.o
+redeflib        -libredef.a(redeflib.o)

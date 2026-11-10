@@ -247,6 +247,7 @@ char **argv;
 	script_set_entry();
 
 	linksyms(flag['r']);
+	redefinitions();
 	if (outfilename == NUL_PTR)
 		outfilename = "a.out";
 	write_elks(outfilename, flag['i'], flag['s'], flag['y']);

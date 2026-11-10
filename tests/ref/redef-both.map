@@ -1,0 +1,2 @@
+redefboth       +redefboth.o
+redeflib        +libredef.a(redeflib.o)

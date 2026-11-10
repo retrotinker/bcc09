@@ -1,0 +1,1 @@
+ld09: warning: dup redefined in file ./libredef.a(redeflib.o); using definition in redefboth.o

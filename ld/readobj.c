@@ -29,6 +29,18 @@ PRIVATE unsigned convertsize[NSEG / 4] = { 0, 1, 2, 4 };
 
 PRIVATE struct entrylist *entrylast;	/* last on list of entry symbols */
 PRIVATE struct redlist *redlast;	/* last on list of redefined symbols */
+
+/* a symbol defined again, reported (by redefinitions()) only if both
+   modules are linked: a library member that isn't can't conflict */
+struct redef {
+	struct redef *next;
+	char *name;
+	char *message;
+	struct modstruct *modptr;	/* the module defining it again */
+	struct modstruct *defmodptr;	/* the one whose definition is used */
+};
+PRIVATE struct redef *redefs, **redeftail = &redefs;
+FORWARD void redefinition P((struct symstruct *symptr, char *message));
 PRIVATE struct modstruct *modlast;	/* data for last module */
 
 FORWARD long readarheader P((char **parchentry));
@@ -190,18 +202,14 @@ char *archentry;
 				    ~(flags_t) SEGM_MASK | (symptr->
 							    flags & SEGM_MASK);
 			if ((flags ^ symptr->flags) & (A_MASK | SEGM_MASK)) {
-				redefined(symname,
-					  " with different segment or relocatability",
-					  archentry, symptr->modptr->filename,
-					  symptr->modptr->archentry);
+				redefinition(symptr,
+					     " with different segment or relocatability");
 				continue;
 			}
 			if (symptr->flags & E_MASK) {
 				if (flags & E_MASK
 				    && redsym(symptr, symdptr->dvalue))
-					redefined(symname, "", archentry,
-						  symptr->modptr->filename,
-						  symptr->modptr->archentry);
+					redefinition(symptr, "");
 				continue;
 			}
 			if (flags & I_MASK && symdptr->dvalue <= symptr->value)
@@ -359,4 +367,36 @@ unsigned seg;
 struct modstruct *modptr;
 {
 	return convertsize[segbits(seg, modptr->segsizedesc)];
+}
+
+/* note that the module being read defines symptr's symbol again */
+
+PRIVATE void redefinition(symptr, message)
+struct symstruct *symptr;
+char *message;
+{
+	struct redef *rd = (struct redef *)ourmalloc(sizeof(struct redef));
+
+	rd->next = NUL_PTR;
+	rd->name = symptr->name;
+	rd->message = message;
+	rd->modptr = modlast;
+	rd->defmodptr = symptr->modptr;
+	*redeftail = rd;
+	redeftail = &rd->next;
+}
+
+/* once the modules to link are known: warn of each symbol defined again
+   in a linked module, where the module with the definition used is
+   linked too */
+
+PUBLIC void redefinitions()
+{
+	struct redef *rd;
+
+	for (rd = redefs; rd != NUL_PTR; rd = rd->next)
+		if (rd->modptr->loadflag && rd->defmodptr->loadflag)
+			redefined(rd->name, rd->message, rd->modptr->filename,
+				  rd->modptr->archentry, rd->defmodptr->filename,
+				  rd->defmodptr->archentry);
 }

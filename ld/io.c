@@ -498,9 +498,11 @@ PUBLIC void prematureeof()
 	inputerror("premature end of");
 }
 
-PUBLIC void redefined(name, message, archentry, deffilename, defarchentry)
+PUBLIC void redefined(name, message, filename, archentry, deffilename,
+		      defarchentry)
 char *name;
 char *message;
+char *filename;
 char *archentry;
 char *deffilename;
 char *defarchentry;
@@ -512,7 +514,7 @@ char *defarchentry;
 	putstr(" redefined");
 	putstr(message);
 	putstr(" in file ");
-	putstr(inputname);
+	putstr(filename);
 	if (archentry != NUL_PTR) {
 		putbyte('(');
 		putstr(archentry);

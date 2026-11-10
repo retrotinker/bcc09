@@ -120,8 +120,8 @@ void inputerror P((char *message));
 void input1error P((char *message));
 void outofmemory P((void));
 void prematureeof P((void));
-void redefined P((char *name, char *message, char *archentry,
-		  char *deffilename, char *defarchentry));
+void redefined P((char *name, char *message, char *filename,
+		  char *archentry, char *deffilename, char *defarchentry));
 void interseg P((char *fname, char *aname, char *name));
 void reserved P((char *name));
 void size_error P((int seg, bin_off_t count, bin_off_t size));
@@ -138,6 +138,7 @@ int main P((int argc, char **argv));
 /* readobj.c */
 void objinit P((void));
 void readsyms P((char *filename, bool_pt trace));
+void redefinitions P((void));
 #ifdef OBJ_H
 void entrysym P((struct symstruct *symptr));
 unsigned segsizecount P((unsigned seg, struct modstruct *modptr));

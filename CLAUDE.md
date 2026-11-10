@@ -210,7 +210,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 706 reference
+  `tests/src/` with this tree's tools and compare every result with the 714 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -218,7 +218,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - The tests run the tools through links in `tests/prefix.tmp/` and set `BCC_PREFIX`, so
   an installed copy (such as an old one in `/usr/local/bcc09`) is never used.
 - `ld09` only loads modules that something refers to, even object files named on the
-  command line.
+  command line. A symbol defined again is warned about only if both modules are linked
+  (2026-11-09; it was at reading, so a program's own version of a library function
+  warned): `redefinitions()` after `linksyms()`; `redef-quiet` and `redef-both` test it.
 - Test programs run on `sim6809`, a copy of the simulator from the plm09 project
   (0.4.6, whose `--os9` emulates OS-9's file, directory and `F$Mem` calls on the host,
   and whose `--flex` puts `--param` in FLEX's line buffer and emulates FMS on host
