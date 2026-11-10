@@ -61,8 +61,9 @@ what each needs).
 PREFIX/libexec/bcc09, the C library and its headers in
 PREFIX/share/bcc09, and the man pages in PREFIX/share/man.
 
-On Fedora, "make rpm" builds an RPM package (bcc09.spec, installed in
-/usr), in rpmbuild/; "make srpm" builds the source package.
+On Fedora, "make rpm" builds the RPM packages (bcc09.spec, installed in
+/usr): bcc09, and bcc09-doc with the PDF manuals, in rpmbuild/; "make
+srpm" builds the source package.
 
 Getting started
 ---------------

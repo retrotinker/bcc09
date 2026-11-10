@@ -1,6 +1,6 @@
 Name:           bcc09
 Version:        0.11.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
 # The tools are dev86's (GPL-2.0-or-later; ar09 GPL-1.0-or-later); libc is
@@ -33,6 +33,17 @@ boolean types), and start-up code and system functions for the Tandy
 Color Computer and Dragon (Color BASIC and Disk BASIC), OS-9 and
 NitrOS-9, and FLEX.
 
+%package doc
+Summary:        Manuals for bcc09: the user's manual and bcc09 for BASIC Programmers
+BuildArch:      noarch
+
+%description doc
+The PDF manuals for bcc09, the C compiler and tools for the Motorola 6809:
+the user's manual (building and installing, the C it compiles, each target,
+the C library, the calling conventions, the tools and the tests, with the
+manual pages as an appendix), and bcc09 for BASIC Programmers, a guide to C
+for those who know the Color Computer's and Dragon's Color BASIC.
+
 %prep
 %autosetup
 # three READMEs: libc's two are packaged under their own names
@@ -51,7 +62,7 @@ cp -p libc/math/README README.libm
 
 %files
 %license COPYING libc/COPYING.LIB
-%doc README README.libc README.libm BUGS TODO doc/manual.pdf doc/basic.pdf
+%doc README README.libc README.libm BUGS TODO
 %{_bindir}/bcc09
 %{_bindir}/as09
 %{_bindir}/ld09
@@ -72,7 +83,15 @@ cp -p libc/math/README README.libm
 %{_mandir}/man1/size09.1*
 %{_mandir}/man1/objcopy09.1*
 
+%files doc
+%license COPYING libc/COPYING.LIB
+%doc doc/manual.pdf doc/basic.pdf
+
 %changelog
+* Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.2-2
+- The PDF manuals (the user's manual and bcc09 for BASIC Programmers) are
+  in a noarch subpackage, bcc09-doc
+
 * Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.2-1
 - libc: rmdir() and getcwd() for OS-9 (-Mo), which has no calls for them
 - The tests need sim6809 1.2.0 (BuildRequires sim6809 >= 1.2.0)

@@ -7,4 +7,4 @@ addFilter(r"devel-file-in-non-devel-package /usr/share/bcc09/")
 # host's)
 addFilter(r"arch-dependent-file-in-usr-share /usr/share/bcc09/")
 # the license texts are as upstream (dev86) has them
-addFilter(r"incorrect-fsf-address /usr/share/licenses/bcc09/")
+addFilter(r"incorrect-fsf-address /usr/share/licenses/bcc09(-doc)?/")
