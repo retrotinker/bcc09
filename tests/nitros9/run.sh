@@ -26,7 +26,7 @@ disk=${NITROS9_DISK:-$HOME/coco/nitros9.os9}
 rom=${COCO3_ROM:-/usr/share/mame/roms/coco3.rom}
 # (os9io is given the parameters "one two"; the module names are the
 # programs', none of them a NitrOS-9 command)
-progs=${NITROS9_PROGS:-os9io os9dir hello pftest chartest sadd fltcc fpio inttest protoarg}
+progs=${NITROS9_PROGS:-os9io os9dir os9path hello pftest chartest sadd fltcc fpio inttest protoarg}
 
 for prog in xroar os9; do
 	if ! command -v $prog > /dev/null 2>&1; then

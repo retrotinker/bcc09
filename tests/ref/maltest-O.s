@@ -201,16 +201,21 @@
 ;BCC_EOS
 ; 29 extern int chdir () __proto(char *);	 
 ;BCC_EOS
-; 30 
-; 31 
-; 32  
-; 33 extern int brk () __proto(void *);
+; 30 extern int rmdir () __proto(char *);	 
 ;BCC_EOS
-; 34 extern void * sbrk () __proto(int);
+; 31 extern char *getcwd () __proto(char *,size_t);	 
 ;BCC_EOS
-; 35 extern unsigned int __heap_margin;
+; 32 
+; 33 
+; 34  
+; 35 extern int brk () __proto(void *);
 ;BCC_EOS
-; 36 # 15 "maltest.c"
+; 36 extern void * sbrk () __proto(int);
+;BCC_EOS
+; 37 extern unsigned int __heap_margin;
+;BCC_EOS
+; 38 # 15 "maltest.
+; 14 c"
 ; 15 extern int putchar();
 ;BCC_EOS
 ; 16 extern void putnum();
@@ -220,10 +225,9 @@
 ;BCC_EOS
 ; 19 
 ; 20 void say(s)
-; 21 char 
+; 21 char *s;
 EXPORT	_say
 _say:
-; 21 *s;
 ;BCC_EOS
 ; 22 {
 ; 23 	while (*s)
@@ -1348,7 +1352,8 @@ LDD	4,S
 ADDD	#1
 STD	4,S
 ;BCC_EOS
-; 157 					continue;
+; 157 	
+; 157 				continue;
 JMP	.53
 ;BCC_EOS
 ; 158 				}
@@ -1399,8 +1404,7 @@ LEAS	6,S
 LEAX	0,X
 BNE	.5E
 .5F:
-; 161 					good
-; 161  = 0;
+; 161 					good = 0;
 ; Debug: eq int = const 0 to int good = [S+$C-6] (used reg = )
 CLRA
 CLRB

@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include "os9.h"
@@ -314,6 +315,254 @@ const char *name;
       return -1;
    }
    return 0;
+}
+#endif
+
+#if defined(L_rmdir) || defined(L_getcwd)
+/* open the directory name for reading, as a directory: its path number,
+   or -1 with errno set */
+static int
+opendp(name)
+const char *name;
+{
+   struct os9regs r;
+
+   OS9_CLEAR(&r);
+   r.a = 0x81;			/* DIR. + READ. */
+   r.x = (unsigned) name;
+   __os9call(&r, OS9_OPEN);
+   if (OS9_FAILED(&r))
+   {
+      errno = __os9errno(r.b);
+      return -1;
+   }
+   return r.a;
+}
+
+/* read the next 32-byte entry of directory path p into ent: 1, or 0 at
+   the end (or an error) */
+static int
+nextent(p, ent)
+int p;
+unsigned char *ent;
+{
+   struct os9regs r;
+
+   OS9_CLEAR(&r);
+   r.a = p;
+   r.x = (unsigned) ent;
+   r.y = 32;
+   __os9call(&r, OS9_READ);
+   return !OS9_FAILED(&r) && r.y == 32;
+}
+
+static void
+closep(p)
+int p;
+{
+   struct os9regs r;
+
+   OS9_CLEAR(&r);
+   r.a = p;
+   __os9call(&r, OS9_CLOSE);
+}
+
+/* an entry's LSN */
+#define ENTLSN(e) ((long) (e)[29] << 16 | (unsigned) (e)[30] << 8 | (e)[31])
+#endif
+
+#ifdef L_rmdir
+/* OS-9 has no call to remove a directory: as its deldir does, rmdir()
+   checks that the directory is empty (every entry after ".." and "."
+   deleted: with a first byte of 0), turns off its D attribute (I$SetStt
+   SS.Attr, NitrOS-9's and Level 2's), and deletes it as a file; if the
+   delete fails, the attribute goes back */
+static int
+setattr(name, mode, attr)
+const char *name;
+int mode;
+int attr;
+{
+   struct os9regs r;
+   int p;
+
+   OS9_CLEAR(&r);
+   r.a = mode;
+   r.x = (unsigned) name;
+   __os9call(&r, OS9_OPEN);
+   if (OS9_FAILED(&r))
+      return r.b;
+   p = r.a;
+   OS9_CLEAR(&r);
+   r.a = p;
+   r.b = SS_ATTR;
+   r.x = attr;
+   __os9call(&r, OS9_SETSTT);
+   closep(p);
+   return OS9_FAILED(&r) ? r.b : 0;
+}
+
+int
+rmdir(name)
+const char *name;
+{
+   struct os9regs r;
+   unsigned char ent[32];
+   int p, n, attr, err;
+
+   if ((p = opendp(name)) < 0)
+      return -1;
+   for (n = 0; nextent(p, ent); n++)
+      if (n >= 2 && ent[0] != 0)
+      {
+	 closep(p);
+	 errno = ENOTEMPTY;
+	 return -1;
+      }
+   OS9_CLEAR(&r);
+   r.a = p;
+   r.b = SS_FD;
+   r.x = (unsigned) ent;
+   r.y = 1;			/* (the attributes) */
+   __os9call(&r, OS9_GETSTT);
+   closep(p);
+   if (OS9_FAILED(&r))
+   {
+      errno = __os9errno(r.b);
+      return -1;
+   }
+   attr = ent[0];
+   if ((err = setattr(name, 0x81, attr & 0x7f)) != 0)
+   {
+      errno = __os9errno(err);
+      return -1;
+   }
+   OS9_CLEAR(&r);
+   r.x = (unsigned) name;
+   __os9call(&r, OS9_DELETE);
+   if (OS9_FAILED(&r))
+   {
+      err = r.b;
+      setattr(name, 0x01, attr);	/* (a file now: READ.) */
+      errno = __os9errno(err);
+      return -1;
+   }
+   return 0;
+}
+#endif
+
+#ifdef L_getcwd
+/* OS-9 has no call for it: as its pwd does, getcwd() goes up through
+   "..", finding at each level the name of the entry whose LSN is the
+   directory's own (its "." entry's), until a directory's ".." and "."
+   are the same, the device's root; then the device's name (I$GetStt
+   SS.DevNm) goes first: "/D1/USR/SRC".  The relative paths up ("..",
+   "../.." ...) are at most 96 levels.  ERANGE if size is too small;
+   with buf 0, a buffer of size bytes (or 256) from malloc */
+#define MAXUP	96
+
+char *
+getcwd(buf, size)
+char *buf;
+size_t size;
+{
+   struct os9regs r;
+   static char up[3 * MAXUP + 2];	/* ".", "..", "../.." ... */
+   unsigned char ent[32];
+   char *end;			/* the name so far is from end to buf + size */
+   long self, parent;
+   int p, n, i, len, levels, found;
+
+   if (buf == 0)
+   {
+      if (size == 0)
+	 size = 256;
+      if ((buf = malloc(size)) == 0)
+      {
+	 errno = ENOMEM;
+	 return 0;
+      }
+   }
+   if (size < 2)
+   {
+      errno = size ? ERANGE : EINVAL;
+      return 0;
+   }
+   end = buf + size - 1;
+   *end = 0;
+   strcpy(up, ".");
+   for (levels = 0;; levels++)
+   {
+      /* this level's ".." and "." */
+      if ((p = opendp(up)) < 0)
+	 return 0;
+      parent = self = -1;
+      if (nextent(p, ent))
+	 parent = ENTLSN(ent);
+      if (nextent(p, ent))
+	 self = ENTLSN(ent);
+      if (self == parent || levels >= MAXUP)
+	 break;			/* (the root: p stays open) */
+      closep(p);
+      /* its name, in the directory above */
+      if (levels == 0)
+	 strcpy(up, "..");
+      else
+	 strcat(up, "/..");
+      if ((p = opendp(up)) < 0)
+	 return 0;
+      found = 0;
+      for (n = 0; nextent(p, ent); n++)
+	 if (n >= 2 && ent[0] != 0 && ENTLSN(ent) == self)
+	 {
+	    found = 1;
+	    break;
+	 }
+      closep(p);
+      if (!found)
+      {
+	 errno = ENOENT;
+	 return 0;
+      }
+      for (len = 0; len < 29 && !(ent[len] & 0x80); len++)
+	 ;
+      len++;
+      if (end - buf < len + 2)	/* (and the root's "/") */
+      {
+	 errno = ERANGE;
+	 return 0;
+      }
+      end -= len;
+      for (i = 0; i < len; i++)
+	 end[i] = ent[i] & 0x7f;
+      *--end = '/';
+   }
+   /* the device's name */
+   OS9_CLEAR(&r);
+   r.a = p;
+   r.b = SS_DEVNM;
+   r.x = (unsigned) ent;
+   __os9call(&r, OS9_GETSTT);
+   closep(p);
+   if (OS9_FAILED(&r))
+   {
+      errno = __os9errno(r.b);
+      return 0;
+   }
+   for (len = 0; len < 31 && !(ent[len] & 0x80); len++)
+      ;
+   len++;
+   if (end - buf < len + 1)
+   {
+      errno = ERANGE;
+      return 0;
+   }
+   end -= len;
+   for (i = 0; i < len; i++)
+      end[i] = ent[i] & 0x7f;
+   *--end = '/';
+   memmove(buf, end, buf + size - end);
+   return buf;
 }
 #endif
 

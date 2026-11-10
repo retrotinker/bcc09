@@ -163,14 +163,21 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   functions (`read`/`write` through `I$ReadLn`/`I$WritLn`, with no newline translation:
   decided 2026-11-09, OS-9's lines end with CR; files; `unlink`). `run.sh`
   runs `-Mo` code under `simcrt0.s` with U 0, and modules under `sim6809 --os9`
-  (`os9io.c`, `os9dir.c`, and eight programs that must run as with `-Mi`: `os9.result`),
-  and `make check-nitros9` runs the same ten on real NitrOS-9 Level 2 (all the same, since
+  (`os9io.c`, `os9dir.c`, `os9path.c`, and eight programs that must run as with `-Mi`: `os9.result`),
+  and `make check-nitros9` runs the same eleven on real NitrOS-9 Level 2 (all the same, since
   2026-11-09). The heap grows after the data area with `F$Mem` (`os9/sbrk.c`; crt0
   keeps `__dbase`/`__dtop`), and the stack has the data area's rest (`objcopy09 -d`).
   `mkdir`, `chdir`, `opendir`/`readdir`/`rewinddir`/`closedir` (`sys/stat.h`,
   `dirent.h`; added 2026-11-09). Every call clears the registers it doesn't set
-  (`OS9_CLEAR`): garbage in them made `I$MakDir` take nearly a whole disk. Still to do:
-  `rmdir`, `getcwd`.
+  (`OS9_CLEAR`): garbage in them made `I$MakDir` take nearly a whole disk. `rmdir` and
+  `getcwd` (added 2026-11-10; OS-9 has no calls for them) do what `deldir` and `pwd` do,
+  as probed on NitrOS-9 Level 2: I$Delete of a directory gives E$FNA (214) until its D
+  attribute is off (I$SetStt SS.Attr $1C, attributes in X; it then can't be opened with
+  DIR.), so `rmdir` checks it's empty first (RBF would orphan its files), clears D and
+  deletes; `getcwd` walks up `..` matching each `.` LSN in the parent until `..` and `.`
+  agree (the root), then `/` and SS.DevNm's name (`D1`, bit 7 ending it). sim6809 1.2.0
+  emulates these (made for it: start directory = root of device `H0`, inode LSNs);
+  `os9path.c` runs on both and prints paths without the device, so one reference fits.
 - Next: `%a` in `printf`, faster floating
   point.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
@@ -246,7 +253,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 738 reference
+  `tests/src/` with this tree's tools and compare every result with the 740 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -257,14 +264,15 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   command line. A symbol defined again is warned about only if both modules are linked
   (2026-11-09; it was at reading, so a program's own version of a library function
   warned): `redefinitions()` after `linksyms()`; `redef-quiet` and `redef-both` test it.
-- Test programs run on `sim6809`, the sim6809 project's (`retrotinker/sim6809`, 1.1.0
-  or later: `--os9` emulates OS-9's file, directory and `F$Mem` calls on the host,
-  `--flex` puts `--param` in FLEX's line buffer and emulates FMS on host files, and the
-  trace's `CYC=` counts cycles), from `PATH` or `$SIM6809` (the Makefile exports
+- Test programs run on `sim6809`, the sim6809 project's (`retrotinker/sim6809`, 1.2.0
+  or later, which `run.sh` checks: 1.2.0's OS-9 directories, for `os9path.c`; `--os9`
+  emulates OS-9's file, directory and `F$Mem` calls on the host, `--flex` puts
+  `--param` in FLEX's line buffer and emulates FMS on host files, and the trace's
+  `CYC=` counts cycles), from `PATH` or `$SIM6809` (the Makefile exports
   `SIM6809 ?= sim6809`, as plm09's does); `run.sh` stops if it isn't there. bcc09 kept
   a copy of plm09's 0.4.6 in `tests/sim` until 2026-11-10, when sim6809 became a
   project of its own; 1.1.0 gave every result the same. The spec `BuildRequires:
-  sim6809 >= 1.1.0`, so a mock build needs its RPM in a repository (`createrepo_c` a
+  sim6809 >= 1.2.0`, so a mock build needs its RPM in a repository (`createrepo_c` a
   directory with it, and `mock --addrepo`), as plm09's does.
 - `tests/src/selftest.c` checks code from the other test
   sources against values from the host compiler and exits with the number of failures;
@@ -331,7 +339,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - `make check-nitros9` (`tests/nitros9/run.sh`, optional: needs `xroar`, toolshed's `os9`,
   a NitrOS-9 Level 2 boot disk, `$NITROS9_DISK` or `~/coco/nitros9.os9`, and the CoCo 3
   ROM, `$COCO3_ROM` or `/usr/share/mame/roms/coco3.rom`) boots NitrOS-9 on a CoCo 3 in
-  XRoar with the `-Mo` modules (`os9io`, `os9dir` and the eight of `os9.result`) on a blank
+  XRoar with the `-Mo` modules (`os9io`, `os9dir`, `os9path` and the eight of `os9.result`) on a blank
   disk in
   drive 1 (40 tracks, double sided, as the boot's `D1` is: the boot disk is full); the
   startup script runs each through `trun.c` (`F$Fork` and `F$Wait`; added 2026-11-09),

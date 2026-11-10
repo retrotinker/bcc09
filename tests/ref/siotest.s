@@ -275,16 +275,20 @@
 ;BCC_EOS
 ; 29 extern int chdir () __proto(char *);	 
 ;BCC_EOS
-; 30 
-; 31 
-; 32  
-; 33 extern int brk () __proto(void *);
+; 30 extern int rmdir () __proto(char *);	 
 ;BCC_EOS
-; 34 extern void * sbrk () __proto(int);
+; 31 extern char *getcwd () __proto(char *,size_t);	 
 ;BCC_EOS
-; 35 extern unsigned int __heap_margin;
+; 32 
+; 33 
+; 34  
+; 35 extern int brk () __proto(void *);
 ;BCC_EOS
-; 36 # 11 "siotest.c"
+; 36 extern void * sbrk () __proto(int);
+;BCC_EOS
+; 37 extern unsigned int __heap_margin;
+;BCC_EOS
+; 38 # 11 "siotest.c"
 ; 11 int checks, failures;
 ;BCC_EOS
 ; 12 
@@ -808,8 +812,9 @@ _input:
 ; 61 	int c, n;
 ;BCC_EOS
 ; 62 
-; 63 	c = (((stdin)->bufpos >= (stdin)->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++))  ;
+; 63 	c = (((stdin)->bufpos >= (stdin)
 	LEAS	-$24,S
+; 63 ->bufread)? fgetc(stdin):		    (*(stdin)->bufpos++))  ;
 ; Debug: ge * unsigned char = [stdin+2] to * unsigned char = [stdin+0] (used reg = )
 	LDX	>_stdin
 	CMPX	>_stdin+2
@@ -851,8 +856,7 @@ _input:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 65 	ok(11,ungetc(
-; 65 c,stdin)== 'f');
+; 65 	ok(11,ungetc(c,stdin)== 'f');
 ; Debug: list * struct __stdio_file = stdin+0 (used reg = )
 	LDX	#_stdin
 	PSHS	X

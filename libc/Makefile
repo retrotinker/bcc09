@@ -121,8 +121,8 @@ SIM_OBJS = sim/_exit.o sim/read.o sim/write.o $(SIM_SYS_OBJS)
 
 OS9_SYS_OBJS = os9/__os9errno.o os9/_exit.o os9/write.o os9/read.o \
 	  os9/open.o os9/close.o os9/lseek.o os9/isatty.o os9/unlink.o \
-	  os9/mkdir.o os9/chdir.o os9/opendir.o os9/readdir.o \
-	  os9/rewinddir.o os9/closedir.o
+	  os9/mkdir.o os9/chdir.o os9/rmdir.o os9/getcwd.o os9/opendir.o \
+	  os9/readdir.o os9/rewinddir.o os9/closedir.o
 OS9_OBJS = $(filter-out stdlib/sbrk.o stdio/xfpcvt.o stdio/xfptvc.o,$(OBJS)) \
 	  os9/call.o os9/start.o os9/sbrk.o os9/xfpcvt.o os9/xfptvc.o \
 	  $(OS9_SYS_OBJS)

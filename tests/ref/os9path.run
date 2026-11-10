@@ -1,0 +1,12 @@
+at the start: []
+in QA/QB: [/QA/QB]
+getcwd(buf, 4): 0, errno 34 (ERANGE 34)
+getcwd(0, 0): /QA/QB
+back up: []
+rmdir QA: -1, errno 39
+rmdir QA/QB: -1, errno 39
+rmdir QA/QB: ok
+rmdir QA: ok
+rmdir QA: -1, errno 2
+rmdir QF: -1, errno 13
+ENOTEMPTY 39, ENOENT 2

@@ -54,3 +54,8 @@ extern int __os9errno();	/* (b): errno for OS-9's error code b */
 #define SS_OPT	0		/* path options (32 bytes at X) */
 #define SS_SIZE	2		/* file size (X:U) */
 #define SS_POS	5		/* file position (X:U) */
+#define SS_DEVNM 14		/* the device's name (to 32 bytes at X, bit 7 set
+				   in its last character) */
+#define SS_FD	15		/* the file descriptor (Y bytes at X: the
+				   attributes first) */
+#define SS_ATTR	28		/* (I$SetStt, Level 2's) the attributes, X */

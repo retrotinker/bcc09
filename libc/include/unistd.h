@@ -27,6 +27,8 @@ extern off_t lseek __P ((int, off_t, int));
 extern int isatty __P ((int));
 extern int unlink __P ((__const char *));
 extern int chdir __P ((__const char *));	/* (OS-9's) */
+extern int rmdir __P ((__const char *));	/* (OS-9's) */
+extern char *getcwd __P ((char *, size_t));	/* (OS-9's) */
 
 /* move the end of the heap (see sbrk.s); the heap stays __heap_margin
    bytes below the stack pointer (but on OS-9, where it is above it) */

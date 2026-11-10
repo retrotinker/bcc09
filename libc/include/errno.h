@@ -26,5 +26,6 @@ extern int errno;
 #define ESPIPE	29		/* can't seek */
 #define EDOM	33		/* argument out of a math function's domain */
 #define ERANGE	34		/* result out of range */
+#define ENOTEMPTY 39		/* directory not empty */
 
 #endif

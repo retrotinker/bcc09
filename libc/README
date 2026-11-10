@@ -342,8 +342,18 @@ permissions in the mode as OS-9's attributes, chdir() I$ChgDir for the
 data directory, and opendir(), readdir(), rewinddir() and closedir()
 (dirent.h) read RBF's 32-byte entries (".." and "." among them; d_ino
 is the file descriptor's LSN) from the directory opened with DIR.
-There is no rmdir() (OS-9 deletes a directory only after its
-attributes are changed) or getcwd().  Each call clears the registers it
+OS-9 has no calls for rmdir() and getcwd() (unistd.h), which do what
+its deldir and pwd do.  rmdir() reads the directory to see that it is
+empty (every entry after ".." and "." deleted: RBF would delete one that
+isn't, and lose its files), turns off its D attribute with I$SetStt
+SS.Attr (NitrOS-9's and Level 2's: X, the attributes; I$GetStt SS.FD
+gives the old), deletes it with I$Delete, and puts the attribute back if
+that fails; ENOTEMPTY if it isn't empty.  getcwd() goes up through
+"..", finding each directory's name in its parent as the entry whose LSN
+is the directory's own (its "." entry's), until ".." and "." are the
+same, the device's root, then puts "/" and the device's name (I$GetStt
+SS.DevNm) first: "/D1/USR/SRC"; ERANGE if it doesn't fit, and with a
+null buffer, one from malloc.  Each call clears the registers it
 doesn't set: with whatever was on the stack in them, I$MakDir once gave
 a new directory nearly all of a disk.  OS-9's
 errors become errno's ENOENT, EBADF, EACCES, EEXIST, ENOMEM or, for the

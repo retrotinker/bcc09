@@ -390,8 +390,13 @@ aren't known until the program runs). `main` gets the command line's words
   line, up to its CR.
 * **Files:** `open()` (with `O_CREAT`, `O_EXCL`, `O_TRUNC` and
   `O_APPEND`), `lseek()`, `unlink()`, `remove()`.
-* **Directories:** `mkdir()`, `chdir()`, and `opendir()`, `readdir()`,
-  `rewinddir()` and `closedir()` (`dirent.h`).
+* **Directories:** `mkdir()`, `chdir()`, `rmdir()`, `getcwd()`, and
+  `opendir()`, `readdir()`, `rewinddir()` and `closedir()` (`dirent.h`).
+  OS-9 has no calls for `rmdir()` and `getcwd()`, which do what its `deldir`
+  and `pwd` do: `rmdir()` checks that the directory is empty, turns off its
+  `D` attribute (`SS.Attr`, NitrOS-9's and Level 2's) and deletes it;
+  `getcwd()` goes up through `..` to the device's root, and gives a path such
+  as `/D1/USR/SRC`.
 * **The heap** grows with `F$Mem` beyond the data area F$Fork gave
   (Level 1 can only grow it if the memory after it is free).
 * **errno:** OS-9's errors become `ENOENT`, `EBADF`, `EACCES`, `EEXIST`,
@@ -597,7 +602,7 @@ which `LOADM` puts in their places.
 # Testing
 
 `make check` runs bcc09's regression tests: it compiles the test sources
-with this build's tools, runs the programs on sim6809 (1.1.0 or later,
+with this build's tools, runs the programs on sim6809 (1.2.0 or later,
 from <https://github.com/retrotinker/sim6809>, on `PATH` or named by
 `SIM6809`; for every target:
 Color BASIC with stand-ins for its ROMs, OS-9 modules and FLEX commands

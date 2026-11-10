@@ -30,6 +30,13 @@ if ! command -v "$SIM" > /dev/null 2>&1; then
 	     "https://github.com/retrotinker/sim6809 (or set SIM6809)" >&2
 	exit 2
 fi
+# (1.2.0 or later: os9path.c needs its OS-9 directories)
+case $("$SIM" --version 2>/dev/null | awk '{ print $2 }') in
+0.*|1.0.*|1.1.*|"")
+	echo "run.sh: $SIM is too old: the tests need sim6809 1.2.0 or" \
+	     "later, from https://github.com/retrotinker/sim6809" >&2
+	exit 2 ;;
+esac
 
 export LC_ALL=C
 
@@ -570,6 +577,15 @@ os9run os9dir
 mv os9dir-os9.run os9dir.run
 mv os9dir-os9.run.rc os9dir.run.rc
 rm -rf os9dir.tmp
+# rmdir() and getcwd(), which OS-9 has no calls for (os9path.c): sim6809
+# (1.2.0) emulates what they use as NitrOS-9 has it (the D attribute,
+# I$Delete of a directory, the entries' LSNs, the device's name), and
+# make check-nitros9 runs it there too, for the same output
+rm -rf QA QF
+os9run os9path
+mv os9path-os9.run os9path.run
+mv os9path-os9.run.rc os9path.run.rc
+rm -rf QA QF
 for f in hello pftest chartest sadd fltcc fpio inttest protoarg; do
 	os9run $f
 	if cmp -s $f.run $f-os9.run &&
