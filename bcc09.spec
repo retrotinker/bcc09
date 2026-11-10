@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.8.0
+Version:        0.9.0
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -71,5 +71,12 @@ cp -p libc/math/README README.libm
 %{_mandir}/man1/objcopy09.1*
 
 %changelog
+* Mon Nov 09 2026 John W. Linville <linville@tuxdriver.com> - 0.9.0-1
+- ld09: linker scripts (-S, -A, -P, -Z), from ld01 in mc6801-tools; the
+  default script gives the same layout as before
+- bcc09 -Mr: Color BASIC ROM cartridges for the CoCo and the Dragon
+- libc: exit() flushes stdio after the atexit() functions
+- bcc09, as09 and ld09 print their version with -v
+
 * Mon Nov 09 2026 John W. Linville <linville@tuxdriver.com> - 0.8.0-1
 - First package
