@@ -434,7 +434,8 @@ addresses.
 * **`ld09`**, the linker: links object files and libraries into an
   executable (an a.out file), loading only the modules something refers
   to. `-T` gives the code's address (hexadecimal), `-i` puts the data at 0
-  (OS-9's way), `-m` and `-M` list the modules and symbols.
+  (OS-9's way), `-m` and `-M` list the modules and the layout, and `-S`
+  takes a linker script (section 8.1).
 * **`ar09`** makes libraries: `ar09 rc libmine.a one.o two.o`.
 * **`objdump09`**, `nm09` and `size09` show what is in object files,
   libraries and executables.
@@ -451,6 +452,48 @@ addresses.
 | `flex` | a FLEX command (`.CMD`) |
 
 Appendix A has each program's options in full.
+
+## Linker scripts
+
+A linker script says where the linker puts each part of a program. Without
+one, `ld09` uses its default script, which `ld09 -P` prints (with the `-T`,
+`-D` and `-H` given): the code at the text address, the data straight
+after it, and the BSS after the data. A script of one's own can put the
+code and data anywhere, in any order, store data in ROM to be copied to
+RAM, fill gaps, define symbols, and write S-records or Intel hex itself.
+`ld09(1)` describes the language; it comes from `ld01`, the linker of the
+mc6801-tools project, where it is GNU ld's in a smaller form.
+
+This one puts a Color BASIC program's code low in memory, at `$0E00`, and
+its data and BSS at `$6000`, out of the way:
+
+```
+SECTIONS
+{
+    .text 0x0E00 : { *(LOC0 LOC1) }
+    .data 0x6000 :
+    {
+        *(LOC2 LOC3 LOC4)
+        *(LOC5)
+        *(LOC6 LOC7 LOC8 LOC9 LOC1?)
+        *(COMMON)
+    }
+}
+```
+
+```
+bcc09 -Me -O -o prog -X-Ssplit.ld prog.c
+objcopy09 -O decb prog PROG.BIN
+```
+
+`LOCn` is segment *n* of every module, and `COMMON` the common blocks
+(uninitialized variables). The script needn't define anything for the C
+library: `ld09` provides the symbols the start-up code uses (`__edata` and
+`__end`, between which it clears the BSS, and `__seg5DL` and `__seg5DH`
+around the init functions). The init functions must be in one place, so
+segment 5 has a statement of its own: a statement takes its input module by
+module. `objcopy09 -O decb` writes the code and the data as two blocks,
+which `LOADM` puts in their places.
 
 # Testing
 

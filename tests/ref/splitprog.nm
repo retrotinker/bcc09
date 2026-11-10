@@ -1,0 +1,8 @@
+0000616a D __seg5DH
+00006166 D __seg5DL
+000063ee D __end
+0000616a D __edata
+00004c31 T __exit
+00000e00 T __btext
+00004cf2 T __etext
+00006000 D __bdata

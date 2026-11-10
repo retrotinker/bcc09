@@ -1,0 +1,2 @@
+ld09: warning: segs.o(LOC5) isn't placed by the script; adding it to .data
+ld09: warning: segs.o(LOC15) isn't placed by the script; adding it to .data

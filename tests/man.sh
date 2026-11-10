@@ -17,7 +17,7 @@ man=$top/doc/man
 
 opts_bcc09="-c -S -E -P -o -O -M -x -D -U -I -L -l -X -A -t -C -u -W -kr -ansi -g -p -w -B -T -v -V -e"
 opts_as09="-o -b -l -m -s -n -g -u -w -k -t -v"
-opts_ld09="-o -T -D -H -i -l -L -C -O -s -y -d -m -M -t -r -v"
+opts_ld09="-o -T -D -H -i -S -A -P -Z -l -L -C -O -s -y -d -m -M -t -r -v"
 keys_ar09="r q d x t p m a b i c u o s v l"
 opts_objdump09="-n -s -o"
 opts_objcopy09="-O -n -T -D -p -v -d -r"

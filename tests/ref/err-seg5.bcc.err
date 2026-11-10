@@ -1,0 +1,1 @@
+ld09: err-seg5.ld: __seg5DL: LOC5 isn't in one place: define it in the script

@@ -2,6 +2,18 @@ crt0            +crt0.o
 main            +main.o
 control         +control.o
 ptr             +ptr.o
+Section         Address  Size     Load
+.text           00001000 0000025c
+    00001000 00000015 crt0.o(LOC0)
+    00001018 00000034 main.o(LOC0)
+    0000104c 00000121 control.o(LOC0)
+    00001170 000000ce ptr.o(LOC0)
+    00001240 0000001b ptr.o(LOC1)
+.data           0000125c 0000004c
+    0000125c 0000001a ptr.o(LOC3)
+    00001278 00000008 main.o(COMMON3)
+    00001280 00000028 ptr.o(COMMON3)
+
                 crt0                  stop  0  00001013  r
                 crt0                 __end  3  000012a8  R
                 crt0                    go  0  00001010  r

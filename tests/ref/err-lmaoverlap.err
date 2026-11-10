@@ -1,0 +1,1 @@
+ld09: err-lmaoverlap.ld:5: the load addresses of sections .text and .data overlap

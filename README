@@ -15,7 +15,7 @@ The tools
 
 	bcc09		the compiler driver: runs the passes below, and links
 	as09		the assembler
-	ld09		the linker
+	ld09		the linker, with linker scripts (as GNU ld's, smaller)
 	ar09		the librarian
 	objdump09	dumps object files and executables (also installed
 			as nm09 and size09)

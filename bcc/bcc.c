@@ -462,6 +462,7 @@ void validate_link_opt(char *option)
 	case 'z':		/* unmapped zero page */
 	case 'd':		/* Make a headerless outfile */
 	case 'y':		/* Use a newer symbol table */
+	case 'Z':		/* orphan input sections are errors */
 		if (option[2] != 0 && option[2] != '-')
 			err = 1;
 		break;
@@ -473,6 +474,8 @@ void validate_link_opt(char *option)
 	case 'H':		/* heap top address */
 	case 'l':		/* library name */
 	case 'o':		/* output file name */
+	case 'S':		/* linker script */
+	case 'A':		/* symbol definition for the script */
 		break;
 	}
 	if (err) {

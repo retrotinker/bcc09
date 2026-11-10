@@ -549,6 +549,55 @@ char *fname, *aname, *name;
 	putstrn("");
 }
 
+/* a location counter, named as in linker scripts: LOC0 to LOC15 */
+PRIVATE void putloc(seg)
+int seg;
+{
+	putstr("LOC");
+	if (seg >= 10)
+		putbyte('1');
+	putbyte('0' + seg % 10);
+}
+
+PRIVATE void putmodule(fname, aname)
+char *fname;
+char *aname;
+{
+	putstr(fname);
+	if (aname) {
+		putstr("(");
+		putstr(aname);
+		putstr(")");
+	}
+}
+
+/* initialized data (bytes or relocations) in a module's counter that a
+   linker script puts in a NOLOAD section, which isn't written */
+PUBLIC void noload_data(fname, aname, seg, sectname)
+char *fname;
+char *aname;
+int seg;
+char *sectname;
+{
+	++errcount;
+	refer();
+	putmodule(fname, aname);
+	putstr(": ");
+	putloc(seg);
+	putstr(" has initialized data, but ");
+	putstr(sectname ? sectname : "its section");
+	putstrn(" is NOLOAD");
+}
+
+PUBLIC void warning(message)
+char *message;
+{
+	++warncount;
+	refer();
+	putstr("warning: ");
+	putstrn(message);
+}
+
 PRIVATE void refer()
 {
 	stderr_out();
@@ -596,12 +645,14 @@ PUBLIC void usage()
 	putstr(refname);
 #ifdef REL_OUTPUT
 	errexit("\
- [-Mdimrstvy[-]] [-llib_extension] [-o outfile] [-Ccrtfile]\n\
-       [-Llibdir] [-Olibfile] [-Ttextaddr] [-Ddataaddr] [-Hheapsize] infile...");
+ [-MPZdimrstvy[-]] [-llib_extension] [-o outfile] [-Ccrtfile]\n\
+       [-Llibdir] [-Olibfile] [-Ttextaddr] [-Ddataaddr] [-Hheapsize]\n\
+       [-S script] [-A sym=value] infile...");
 #else
 	errexit("\
- [-Mdimstvy[-]] [-llib_extension] [-o outfile] [-Ccrtfile]\n\
-       [-Llibdir] [-Olibfile] [-Ttextaddr] [-Ddataaddr] [-Hheapsize] infile...");
+ [-MPZdimstvy[-]] [-llib_extension] [-o outfile] [-Ccrtfile]\n\
+       [-Llibdir] [-Olibfile] [-Ttextaddr] [-Ddataaddr] [-Hheapsize]\n\
+       [-S script] [-A sym=value] infile...");
 #endif
 }
 

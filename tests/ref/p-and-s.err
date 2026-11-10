@@ -1,0 +1,4 @@
+ld09: -P shows the default script, which -S replaces
+usage: ld09 [-MPZdimrstvy[-]] [-llib_extension] [-o outfile] [-Ccrtfile]
+       [-Llibdir] [-Olibfile] [-Ttextaddr] [-Ddataaddr] [-Hheapsize]
+       [-S script] [-A sym=value] infile...

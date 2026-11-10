@@ -1,0 +1,1 @@
+ld09: orphan.ld: segs.o(LOC5) isn't placed by the script

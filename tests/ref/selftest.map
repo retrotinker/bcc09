@@ -12,13 +12,39 @@ fparith         +libc.a(fparith.o)
 fpcmp           +libc.a(fpcmp.o)
 fppush          +libc.a(fppush.o)
 fpconv          +libc.a(fpconv.o)
+Section         Address  Size     Load
+.text           00001000 00001334
+    00001000 0000003c simcrt0.o(LOC0)
+    0000103c 000006aa selftest.o(LOC0)
+    000016e8 00000121 control.o(LOC0)
+    0000180c 00000049 switch.o(LOC0)
+    00001858 000000ce ptr.o(LOC0)
+    00001928 000000b6 float.o(LOC0)
+    000019e0 0000001e ../prefix.tmp/share/bcc09/libc.a:laddsub.o(LOC0)
+    00001a00 00000027 ../prefix.tmp/share/bcc09/libc.a:lcmp.o(LOC0)
+    00001a28 000002da ../prefix.tmp/share/bcc09/libc.a:fpcore.o(LOC0)
+    00001d04 000002b0 ../prefix.tmp/share/bcc09/libc.a:fpops.o(LOC0)
+    00001fb4 0000009b ../prefix.tmp/share/bcc09/libc.a:fparith.o(LOC0)
+    00002050 0000010c ../prefix.tmp/share/bcc09/libc.a:fpcmp.o(LOC0)
+    0000215c 00000095 ../prefix.tmp/share/bcc09/libc.a:fppush.o(LOC0)
+    000021f4 000000d6 ../prefix.tmp/share/bcc09/libc.a:fpconv.o(LOC0)
+    000022cc 0000004a selftest.o(LOC1)
+    00002318 0000001b ptr.o(LOC1)
+.data           00002334 00000088
+    00002334 00000025 selftest.o(LOC3)
+    0000235c 0000001a ptr.o(LOC3)
+    00002378 0000000c float.o(LOC3)
+    00002384 00000008 selftest.o(COMMON3)
+    0000238c 00000028 ptr.o(COMMON3)
+    000023b4 00000008 float.o(COMMON3)
+
              simcrt0                clear2  0  00001013  r
              simcrt0               _putnum  0  00001038  R
              simcrt0                  stop  0  0000102b  r
              simcrt0                  init  0  00001016  r
              simcrt0                io_out  0  0000ff00  a
-             simcrt0              __seg5DH  5  000023bc  R
-             simcrt0              __seg5DL  5  000023bc  R
+             simcrt0              __seg5DH  3  000023bc  R
+             simcrt0              __seg5DL  3  000023bc  R
              simcrt0                 __end  3  000023bc  R
              simcrt0                    go  0  00001028  r
              simcrt0              _putchar  0  00001032  R

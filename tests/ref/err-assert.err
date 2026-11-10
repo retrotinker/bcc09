@@ -1,0 +1,1 @@
+ld09: rom-nokeep.ld:42: the vector table must be 16 bytes

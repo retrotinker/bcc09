@@ -47,6 +47,14 @@ struct modstruct		/* module table entry format */
 				/* 00 = 0, 01 = 1, 10 = 2, 11 = 4 */
     struct symstruct **symparray;	/* ^array of ptrs to referenced syms */
     struct modstruct *modnext;	/* next module in order of initial reading */
+    bin_off_t segaddr[NSEG];	/* address of this module's part of each seg */
+    bin_off_t comaddr[NSEG];	/* address of its common blocks in each seg */
+    bin_off_t comsize[NSEG];	/* size of its common blocks in each seg */
+    bin_off_t segfadj[NSEG];	/* file offset - address, for each seg */
+    bin_off_t segpad[NSEG];	/* padding after its part of each seg */
+    char segfill[NSEG];		/* byte for that padding */
+    char segnoload[NSEG];	/* its part of the seg isn't written */
+    char *segsect[NSEG];	/* the output section it is in (script) */
     char segsize[1];		/* up to 64 size bytes begin here */
 };				/* careful with sizeof( struct modstruct )!! */
 
@@ -117,6 +125,8 @@ void redefined P((char *name, char *message, char *archentry,
 void interseg P((char *fname, char *aname, char *name));
 void reserved P((char *name));
 void size_error P((int seg, bin_off_t count, bin_off_t size));
+void noload_data P((char *fname, char *aname, int seg, char *sectname));
+void warning P((char *message));
 void undefined P((char *name));
 void usage P((void));
 void version_msg P((void));

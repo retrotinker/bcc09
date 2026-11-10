@@ -1,0 +1,22 @@
+romstart        +romstart.o
+vectors         +vectors.o
+Memory region   Origin   Length   Used
+ROM             0000e000 00001ff0 00000011
+VEC             0000fff0 00000010 00000010
+RAM             00000080 00000080 00000002
+
+Section         Address  Size     Load
+.text           0000e000 0000000f
+    0000e000 0000000f romstart.o(LOC0)
+.data           00000080 00000002 0000e00f
+    00000080 00000002 romstart.o(LOC3)
+.bss            00000082 00000000 (NOLOAD)
+.vectors        0000fff0 00000010
+    0000fff0 00000010 vectors.o(LOC2)
+
+            romstart          __data_start  3  00000080  R
+            romstart           __data_load  3  0000e00f  R
+            romstart           __stack_top  3  000000ff  R
+            romstart                 reset  0  0000e000  R N
+            romstart            __data_end  3  00000082  R
+            romstart              greeting  3  00000080  r

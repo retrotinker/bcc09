@@ -1,0 +1,1 @@
+ld09: err-region.ld:4: section .text doesn't fit in memory region SMALL: it's 81 bytes too big

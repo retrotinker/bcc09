@@ -1,0 +1,28 @@
+segs            +segs.o
+helper          +helper.o
+Section         Address  Size     Load
+.text           00001000 0000002e
+    00001000 00000021 segs.o(LOC0)
+    00001021 00000003 segs.o(LOC1)
+    00001024 00000006 helper.o(LOC0)
+    0000102a 00000004 helper.o(COMMON0)
+.data           0000102e 0000001f
+    0000102e 00000010 segs.o(LOC3)
+    0000103e 00000003 segs.o(LOC5)
+    00001041 00000005 segs.o(LOC15)
+    00001046 00000007 helper.o(LOC3)
+.bss            0000104d 00000014 (NOLOAD)
+    0000104d 00000014 helper.o(COMMON3)
+
+                segs                  far5  5  0000103e  r
+                segs               message  3  0000102e  r
+                segs                 local  0  0000101f  r
+                segs                 start  0  00001000  R N
+                segs                  last  f  00001041  r
+                segs                  fast  1  00001021  r
+              helper                 help2  0  00001029  r
+              helper                helper  0  00001024  R
+              helper                 table  3  00001046  R
+              helper               codecom  0  0000102a  R C
+              helper                   buf  3  0000104d  R C
+              helper               counter  3  0000105d  R C

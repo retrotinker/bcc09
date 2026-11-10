@@ -53,6 +53,8 @@ ln -s "$top/libc/libc.a" "$top/libc/include" "$top/libc/crt0.o" \
 	"$top/libc/crtflex.o" "$top/libc/libflex.a" \
 	"$prefix/share/bcc09/"
 LIBDIR=$prefix/share/bcc09
+# (the same, relative to $out, for links whose maps name the library)
+LIBREL=../prefix.tmp/share/bcc09
 # (relative to $out, where everything runs: the compiler's output names
 # the headers it read, so an absolute path would make the results
 # depend on where the source tree is)
@@ -194,6 +196,136 @@ link nomain	-T0x1000 control.o
 link helpers-lc	-T0x1000 crt0.o helpmain.o arith.o long.o float.o struct.o \
 		calls.o -L"$LIBDIR" -lc
 
+# linker scripts (ld09 -S), with the scripts and sources in
+# tests/scripts (copied here, so messages name them without a path):
+# ld01's tests, from mc6801-tools, for the 6809
+for f in "$tests"/scripts/*; do
+	cp "$f" .
+done
+for f in segs helper usesym page romcrt romvec romstart vectors noload \
+	 mainent; do
+	"$AS" -o $f.o $f.s > /dev/null 2>&1 || echo "$f.s doesn't assemble"
+done > scripts-as.result
+link custom	-m -M -S custom.ld usesym.o segs.o helper.o
+link custom-A	-m -M -S custom.ld -A __heap_top=0x6000 -A extra=7 \
+		usesym.o segs.o helper.o
+"$OD" -n custom.out > custom.nm	# __heap_top: a long script symbol
+link orphan	-m -M -S orphan.ld segs.o helper.o
+link orphan-Z	-Z -S orphan.ld segs.o helper.o
+link orphan2	-m -M -S orphan2.ld segs.o helper.o
+for f in syntax undef overlap range both settle entry unknown; do
+	link err-$f -S err-$f.ld segs.o helper.o
+done
+link err-onepage -S err-onepage.ld page.o
+
+# a ROM: MEMORY, AT>, NOLOAD, KEEP, FILL, BYTE, WORD, ASSERT, INCLUDE,
+# the __name_load symbols, and S-record and Intel hex output; and ld09(1)'s
+# example
+link rom	-m -M -S rom.ld romcrt.o romvec.o segs.o helper.o
+link rom-srec	-S rom-srec.ld romcrt.o romvec.o segs.o helper.o
+link rom-ihex	-S rom-ihex.ld romcrt.o romvec.o segs.o helper.o
+link example	-m -M -S example.ld romstart.o vectors.o
+sed -n '/^ENTRY(reset)/,/^}/p' example.ld > example.script
+{ sed -n '/^ENTRY(reset)/,/^}/p' "$top/doc/man/ld09.1" | sed 's/\\-/-/g' |
+	cmp -s - example.script &&
+	echo "ok   example.ld is ld09(1)'s example" ||
+	echo "DIFF example.ld and ld09(1)'s example"
+} > example.result
+rm -f example.script
+link bss	-m -M -S bss.ld segs.o helper.o
+link err-assert	-S rom-nokeep.ld romcrt.o romvec.o segs.o helper.o
+for f in at-aout region noregion lmaoverlap; do
+	link err-$f -S err-$f.ld segs.o helper.o
+done
+
+# initialized data in a NOLOAD section, which isn't written, is an
+# error (once for each module and counter); reserved space isn't, and
+# BYTE or WORD there is a script error
+link err-noload	-S err-noload.ld noload.o
+link noload-ok	-m -M -S noload-ok.ld noload.o
+link err-noload-byte	-S err-noload-byte.ld noload.o
+
+# EXCLUDE_FILE: the ROM with the vector table's section after .text,
+# which excludes it, gives the same output as rom.ld; input that a
+# section excludes and nothing else takes is an orphan, placed after a
+# section that takes all files; and two syntax errors
+link rom-excl	-m -M -S rom-excl.ld romcrt.o romvec.o segs.o helper.o
+if cmp -s rom.out rom-excl.out; then
+	echo "ok   rom-excl.out is the same as rom.out"
+else
+	echo "DIFF rom-excl.out and rom.out"
+fi > excl.result
+link excl-orphan	-m -M -S excl-orphan.ld segs.o helper.o
+for f in excl1 excl2; do
+	link err-$f -S err-$f.ld segs.o helper.o
+done
+
+# a C program with a script that names only the sections: ld09 provides
+# the symbols libc's start-up code and objcopy09 need, and it runs; with
+# segment 5 (the init functions) split, __seg5DL can't be provided
+run splitprog.bcc "$BCC" -Mi -o splitprog.out -X-Ssplit.ld splitprog.c
+"$OD" -n splitprog.out | grep ' __[be]\| __seg5\| __end' > splitprog.nm
+"$OC" -O srec splitprog.out splitprog.srec > /dev/null 2>&1
+"$SIM" splitprog.srec > splitprog.run 2>&1
+echo $? > splitprog.run.rc
+rm -f splitprog.out splitprog.srec
+run err-seg5.bcc "$BCC" -Mi -o err-seg5.out -X-Serr-seg5.ld splitprog.c
+rm -f err-seg5.out
+# no ENTRY: _main
+link mainent	-m -M mainent.o
+
+# the default script, as -P prints it, and linking with it: the output
+# must be the same as without a script, with or without the options it
+# was printed for (as bcc09's targets link: -Mo with -i, at 0)
+"$LD" -P > default.ld 2> default.err
+echo $? > default.rc
+"$LD" -P -S custom.ld > p-and-s.out 2> p-and-s.err
+echo $? > p-and-s.rc
+roundtrip() {
+	rt=rt-$1	# (link() uses $name)
+	shift
+	link "$rt" "$@" $objs
+	"$LD" -P "$@" > "$rt-P.ld"
+	link "$rt-P" -S "$rt-P.ld" "$@" $objs
+	link "$rt-Ponly" -S "$rt-P.ld" $flags $objs
+	for v in P Ponly; do
+		if cmp -s "$rt.out" "$rt-$v.out" &&
+		   cmp -s "$rt.map" "$rt-$v.map" &&
+		   cmp -s "$rt.rc" "$rt-$v.rc"; then
+			echo "ok   $rt-$v"
+		else
+			echo "DIFF $rt-$v"
+		fi
+		rm -f "$rt-$v.out" "$rt-$v.map" "$rt-$v.err" "$rt-$v.rc"
+	done >> roundtrip.result
+	rm -f "$rt.out" "$rt.map" "$rt.err" "$rt.rc" "$rt-P.ld"
+}
+rm -f roundtrip.result
+objs="segs.o helper.o" flags="-m -M"
+roundtrip segs -m -M -T0
+roundtrip segs-TD -m -M -T1000 -D8000
+flags="-m -M -i"
+roundtrip segs-i -m -M -i -T1000
+flags="-m -M"
+roundtrip segs-H -m -M -Te000 -H100
+flags="-d"
+roundtrip segs-d -d -Te000
+flags="-m -M"
+roundtrip segs-odd -m -M -T1001 -D8003
+objs="page.o"
+roundtrip page -m -M -T0
+objs="crt0.o main.o control.o ptr.o"
+roundtrip prog -m -M -T1000
+# and as bcc09 links for sim6809 (-Mi) and OS-9 (-Mo, with -i)
+"$BCC" -c -o hello-rt.o hello.c > /dev/null 2>&1
+"$BCC" -Mo -c -o hello-rt-Mo.o hello.c > /dev/null 2>&1
+objs="-L$LIBDIR -Csim hello-rt.o -lc -lsim"
+roundtrip hello-Mi -m -M -T100
+flags="-m -M -i"
+objs="-L$LIBDIR -Cos9 hello-rt-Mo.o -los9"
+roundtrip hello-Mo -m -M -i
+rm -f hello-rt.o hello-rt-Mo.o
+
 # objdump09 (and nm09 and size09, which are the same program) on
 # object files and executables
 for f in crt0 modes main long; do
@@ -233,7 +365,7 @@ rm -f nodata.os9 bad.out
 # so its exit status is the number of failed checks; once as compiled,
 # and once with every module compiled with -O
 selfobjs="simcrt0.o selftest.o control.o switch.o ptr.o float.o"
-link selftest	-m -M -T0x1000 $selfobjs -L"$LIBDIR" -lc
+link selftest	-m -M -T0x1000 $selfobjs -L"$LIBREL" -lc
 "$OC" -O srec selftest.out selftest.srec
 "$SIM" -n 1000000 selftest.srec > selftest.run 2>&1
 echo $? > selftest.run.rc
@@ -579,6 +711,13 @@ rm -f notarget.out
 # the copied sources aren't results
 for f in "$tests"/src/*; do
 	rm -f "$(basename "$f")"
+done
+for f in "$tests"/scripts/*; do
+	rm -f "$(basename "$f")"
+done
+for f in segs helper usesym page romcrt romvec romstart vectors noload \
+	 mainent; do
+	rm -f $f.o
 done
 rm -rf "$prefix"
 

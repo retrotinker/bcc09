@@ -3,7 +3,7 @@
 ld09 \- linker for the Motorola 6809
 .SH SYNOPSIS
 .B ld09
-.RB [ \-Mdimstvy [ \- ]]
+.RB [ \-MZdimstvy [ \- ]]
 .RB [ \-o
 .IR output ]
 .RB [ \-T\c
@@ -12,6 +12,10 @@ ld09 \- linker for the Motorola 6809
 .IR address ]
 .RB [ \-H\c
 .IR size ]
+.RB [ \-S
+.IR script ]
+.RB [ \-A
+.IR symbol = value ]
 .RB [ \-L\c
 .IR dir ]
 .RB [ \-C\c
@@ -21,6 +25,15 @@ ld09 \- linker for the Motorola 6809
 .RB [ \-O\c
 .IR file ]
 .IR file ...
+.br
+.B ld09 \-P
+.RB [ \-di ]
+.RB [ \-T\c
+.IR address ]
+.RB [ \-D\c
+.IR address ]
+.RB [ \-H\c
+.IR size ]
 .br
 .B ld09 \-r \-o
 .I archive
@@ -49,38 +62,16 @@ member, is left out if nothing needs it.
 A library is searched only for what is undefined when it is read, so
 libraries come after the files that use them.
 .PP
-Of the 16 segments
-.RB ( LOC
-0 to 15 in
-.BR as09 (1)),
-0 and 1 are code, placed at the text address; 2 (the direct page,
-which must fit in one 256-byte page) and 3 (the data, then the BSS)
-are placed after the code, or at the data address; 4 to 15 are stored
-after the code, each where its
-.BI __seg n DL
-symbol says.
+A linker script says where everything goes: which parts of which
+modules go into each output section, where the sections are, and
+symbols to define.
+Without
+.BR \-S ,
 .B ld09
-defines symbols for the program to find its parts:
-.B __btext
-and
-.B __etext
-(the code's start and end),
-.B __bdata
-and
-.B __edata
-(the data's),
-.B __end
-(the BSS's end),
-.B __heap_top
-(the end plus
-.BR \-H 's
-size), and
-.BI __seg n DL\c
-,
-.BI __seg n DH
-(segment
-.IR n 's
-start and end).
+uses a built-in default script, which gives the layout under SEGMENTS;
+.B \-P
+prints it, as a start for one's own.
+See LINKER SCRIPTS.
 .SH OPTIONS
 .TP
 .BI \-o " output"
@@ -105,12 +96,53 @@ The addresses and the size are hexadecimal, with or without a
 and
 .B \-T0x3000
 are the same).
+With a script,
+.B \-T
+and
+.B \-D
+move its sections named
+.B .text
+and
+.BR .data .
 .TP
 .B \-i
 Separate code and data: the data is linked at 0 (or at
 .BR \-D 's
 address) instead of after the code, as OS-9's programs reach their data
 through a register.
+.TP
+.BI \-S " script"
+Link as the linker script in the file
+.I script
+says, rather than as the default script does.
+.TP
+.BI \-A " symbol" = value
+Define
+.IR symbol ,
+as if the script began with
+.IB symbol " = " value ;\c
+\&: the script can use it, and it takes the place of the script's
+.B PROVIDE
+of the same symbol.
+.I value
+is an expression, written as in a script.
+.TP
+.B \-P
+Print the default script, for the
+.BR \-T ,
+.BR \-D ,
+.BR \-H ,
+.B \-i
+and
+.B \-d
+given, and exit.
+Linking with it
+.RB ( \-S )
+gives the same executable as linking without a script.
+No files are needed.
+.TP
+.B \-Z
+Make input that the script doesn't place an error (see Orphans).
 .TP
 .BI \-l name
 Link the library
@@ -148,7 +180,8 @@ Write the code and data alone, with no a.out header (and no symbols).
 Print the modules linked.
 .TP
 .B \-M
-Print the symbols linked.
+Print the layout (each output section, with its address, size and load
+address, and the input sections in it), then the symbols linked.
 .TP
 .B \-t
 Trace the files and modules as they are read.
@@ -169,12 +202,465 @@ A flag option is turned off by following it with
 .BR \- ,
 as in
 .BR \-y\- .
+.SH SEGMENTS
+This is the default script's layout.
+Of the 16 segments
+.RB ( LOC
+0 to 15 in
+.BR as09 (1)),
+0 and 1 are the code, placed at the text address.
+The data follows the code, or is at the data address
+.RB ( \-D ,
+or 0 with
+.BR \-i ,
+after the code is padded to a multiple of 16 bytes): segment 2 (the
+direct page, moved to the start of the next 256-byte page if it would
+cross one), then 3 (the data, then the BSS) to 15.
+Each segment is followed by its common blocks
+.RB ( COMM ,
+each rounded up to a multiple of 4 bytes), and each module's part of a
+segment is padded to a multiple of 4 bytes.
+The initialized data ends with the last segment that has any; the
+common blocks after it are the a.out's BSS, not in the file.
+.PP
+.B ld09
+defines symbols for the program to find its parts:
+.B __btext
+and
+.B __etext
+(the code's start and end),
+.B __bdata
+and
+.B __edata
+(the data's),
+.B __end
+(the BSS's end),
+.B __heap_top
+(the end plus
+.BR \-H 's
+size),
+.BI __seg n DL
+and
+.BI __seg n DH
+(segment
+.IR n 's
+start and end,
+.I n
+a hexadecimal digit),
+.BI __seg n CL
+and
+.BI __seg n CH
+(its common blocks').
+.BR __btext ,
+.BR __etext ,
+.BR __bdata ,
+.B __edata
+and
+.B __end
+are always in the executable's symbol table (unless
+.BR \-s ),
+where
+.BR objcopy09 (1)
+finds the load addresses.
+.SH LINKER SCRIPTS
+A script is a list of commands.
+Comments are written
+.B /* ... */
+or start with
+.BR # .
+For example, a program in ROM at $E000, with its initialized data
+stored in the ROM after the code but run in RAM at $0080 (where the
+start-up code copies it), and the vector table at $FFF0:
+.PP
+.RS
+.nf
+ENTRY(reset)
+OUTPUT_FORMAT(srec)
+
+MEMORY
+{
+    ROM (rx) : ORIGIN = 0xE000, LENGTH = 0x1FF0
+    VEC (r)  : ORIGIN = 0xFFF0, LENGTH = 16
+    RAM (rw) : ORIGIN = 0x0080, LENGTH = 128
+}
+
+SECTIONS
+{
+    .text :
+    {
+        *(LOC0 LOC1)
+    } > ROM = 0xFF
+
+    .data :
+    {
+        __data_start = .;
+        *(LOC3)
+        __data_end = .;
+    } > RAM AT> ROM
+
+    .bss (NOLOAD) :
+    {
+        *(COMMON)
+    } > RAM
+
+    .vectors :
+    {
+        KEEP(vectors.o(LOC2))
+    } > VEC
+
+    __stack_top = ORIGIN(RAM) + LENGTH(RAM) - 1;
+    __data_load = LOADADDR(.data);
+
+    ASSERT(SIZEOF(.vectors) == 16, "vector table must be 16 bytes")
+}
+.fi
+.RE
+.SS Commands
+.TP
+.BI ENTRY( symbol )
+Start the program at
+.IR symbol ,
+before any
+.B ENTRY
+in the object files.
+.TP
+.BI OUTPUT_FORMAT( format )
+.B aout
+(the default);
+.BR binary ,
+the code and data alone as with
+.BR \-d ,
+covering the load addresses from the lowest to the highest used;
+.BR srec ,
+Motorola S-records; or
+.BR ihex ,
+Intel hex.
+S-records and Intel hex have one run of records for each section
+written, at its load address, without the gaps between sections, and
+the entry point in the end record; the S-records' header holds the
+output file's name.
+.TP
+.BI MEMORY " { " "name " [( attributes )] " : ORIGIN = " "expr" ", LENGTH = " "expr ... " }
+Define memory regions, such as ROM and RAM.
+The attributes, such as
+.BR rx ,
+are only shown in the
+.B \-M
+layout.
+.TP
+.BI FILL( byte )
+The byte for gaps, where a section doesn't set its own (0 by default).
+.TP
+.BI ASSERT( expression ", \(dq" message \(dq)
+Stop with
+.I message
+if
+.I expression
+is 0 once the layout is complete.
+The modules that define its symbols are linked.
+.TP
+.BI "INCLUDE \(dq" file \(dq
+Read another script here (also inside
+.BR SECTIONS ).
+.TP
+.BI SECTIONS " { ... }"
+Output sections and symbol assignments, in order.
+.TP
+.IB symbol " = " expression ;
+Define a symbol.
+.TP
+.BI PROVIDE( symbol " = " expression );
+Define it only if a linked module imports it and no module defines it.
+.TP
+.BI HIDDEN( symbol " = " expression );
+Define a symbol that only the script can use.
+.SS Output sections
+.nf
+\fIname\fP [\fIaddress\fP] [(NOLOAD)] : [AT(\fIlma\fP)] [ALIGN(\fIn\fP)] [SUBALIGN(\fIn\fP)]
+    { \fIstatements\fP } [> \fIregion\fP] [AT> \fIregion\fP] [= \fIfill\fP]
+.fi
+.PP
+Without an
+.IR address ,
+a section placed in a region
+.RI ( "> region" )
+starts at the region's next free address, and another starts at the
+current address
+.RB ( . ),
+where the section before it ended.
+A section that doesn't fit in its region is an error.
+.PP
+A section is stored at its load address, which is its address unless
+.B AT
+gives another, or
+.B AT>
+allocates it from a region: initialized data that runs in RAM, for
+one, can be stored in ROM after the code, and copied by the start-up
+code.
+Separate load addresses need the
+.BR binary ,
+.B srec
+or
+.B ihex
+format.
+.PP
+A
+.B NOLOAD
+section takes up addresses but isn't written.
+It may only hold space reserved with
+.B RMB
+and common blocks: a module's initialized data, or
+.B BYTE
+or
+.BR WORD ,
+in one is an error, since it would be lost.
+.B = fill
+sets the byte for the gaps in the section.
+.B ALIGN
+rounds the start up to a multiple of
+.IR n .
+.B SUBALIGN
+pads each input section in it to a multiple of
+.I n
+bytes.
+.PP
+The statements in a section, in order:
+.TP
+.IB file ( sections )
+Add the matching input sections.
+.TP
+.BI ONEPAGE " { statements }"
+Keep the contents in one 256-byte page (as for a direct page): if they
+would end on a later page than they start, they move to the start of the
+next page.
+.TP
+.IB symbol " = " expression ";\fR, \fP" PROVIDE ", " HIDDEN
+Define symbols, often with
+.BR . ,
+the current address.
+.TP
+.BI ". = " expression ;
+Move the current address forward, filling the gap with the fill byte.
+.TP
+.BI KEEP( file ( sections ))
+Add input sections as
+.IB file ( sections )
+does, and link their modules even if nothing refers to them.
+.TP
+.BI BYTE( expression "); WORD(" expression );
+Put a byte, or a 16-bit word (high byte first), in the section.
+.TP
+.BI FILL( byte );
+Use
+.I byte
+for the gaps that follow.
+.TP
+.BI ASSERT( expression ", \(dq" message \(dq);
+As at the top level, but with
+.B .
+as here.
+.SS Input sections
+Each linked module has two input sections for each segment
+.IR n :
+.BI LOC n\c
+, its code and data, and
+.BI COMMON n\c
+, its common blocks.
+.B .text
+means
+.BR LOC0 ,
+.B .data
+means
+.B LOC3
+(which also holds as09's
+.BR .BSS ),
+and
+.B COMMON
+means all the common blocks.
+.PP
+.I file
+matches the object file's name, with or without its directory; a
+library's members are named
+.IB library : member\c
+\&.
+Both
+.I file
+and the section names may have the wildcards
+.B *
+and
+.BR ? .
+Each input section goes to the first statement that matches it.
+A statement adds its input sections in the order of the modules, and
+each module's in the order of the segments.
+.PP
+A statement can start with
+.BI EXCLUDE_FILE( "file ..." )\c
+, naming files (patterns, as above) that it doesn't take input from,
+also inside
+.BR KEEP :
+.B EXCLUDE_FILE(vectors.o) *(LOC0 LOC1)
+takes segments 0 and 1 of every module but
+.BR vectors.o ,
+so that a later section can place it.
+.SS Orphans
+Input that no statement matches is added, with a warning, at the end of
+the last output section for its kind (segments 0 and 1, or the others)
+that takes input from all files
+.RB ( * ,
+without
+.BR EXCLUDE_FILE ),
+or else the last section for its kind.
+.B \-Z
+makes it an error.
+.SS Expressions
+Expressions have C's operators, and numbers written as in C (with
+.B 0x
+for hexadecimal, a leading 0 for octal), or with
+.B $
+for hexadecimal; a
+.B K
+after a number multiplies it by 1024.
+The functions are
+.BI ADDR( section )\c
+,
+.BI SIZEOF( section )\c
+,
+.BI LOADADDR( section )\c
+,
+.BI ALIGN( n )
+(the current address rounded up),
+.BI ALIGN( expression ", " n )\c
+,
+.BI DEFINED( symbol )\c
+,
+.BI ORIGIN( region )\c
+,
+.BI LENGTH( region )\c
+,
+.B MAX
+and
+.BR MIN .
+A symbol may be used before it is defined: the linker repeats the layout
+until nothing changes.
+.SS Symbols
+The symbols a script defines are absolute, and satisfy imports from any
+segment.
+A plain assignment to a symbol that a module also defines is an error.
+.PP
+Where a script doesn't assign them,
+.B ld09
+provides
+.B __btext
+and
+.B __etext
+(the a.out text's start and end),
+.B __bdata
+(its data's start),
+.B __edata
+(the end of the initialized data) and
+.B __end
+(the end of the data, BSS included), and writes them in the symbol
+table, for
+.BR objcopy09 (1).
+It also provides
+.BI __seg n DL\c
+,
+.BI __seg n DH\c
+,
+.BI __seg n CL
+and
+.BI __seg n CH
+if a module imports them: the start and end of where segment
+.IR n 's
+input (or its common blocks) went, which must be in one place.
+.PP
+So a script for a C program needn't define anything for the C library.
+Its start-up code clears the memory from
+.B __edata
+to
+.B __end
+(so only uninitialized data, such as the common blocks, goes there), and
+calls the init functions, the addresses in segment 5, from
+.B __seg5DL
+to
+.BR __seg5DH :
+segment 5 needs an input statement of its own, as
+.B *(LOC5)
+(a statement adds its input module by module, so in
+.B *(LOC3 LOC5)
+each module's segment 5 would follow its segment 3).
+.PP
+For each output section, the linker also provides
+.BI __ name _start\c
+,
+.BI __ name _end
+and
+.BI __ name _load
+(its load address), with the name's leading dot dropped, if a module
+imports them: start-up code can copy
+.B .data
+from
+.B __data_load
+to
+.BR __data_start ,
+for one.
+.SS a.out output
+The output sections up to the first one that can take input from
+segments 2 to 15 are the a.out's text, and the rest its data.
+The executable has separate code and data if the data doesn't start
+where the text ends.
+Uninitialized data at the end of the data, such as a
+.B NOLOAD
+section, is the a.out's BSS: it isn't in the file.
+The a.out header's total memory reaches
+.B __heap_top
+if the script sets it.
+.SH DIAGNOSTICS
+Input that a script doesn't place is reported with a warning, as in
+\(lqsegs.o(LOC5) isn't placed by the script; adding it to .data\(rq.
+Initialized data in a module's segment that a script puts in a
+.B NOLOAD
+section is an error, reported once for each module and segment, as in
+\(lqnoload.o: LOC4 has initialized data, but .bss is NOLOAD\(rq.
+A script's errors name its file and line.
 .SH EXIT STATUS
-0 if the link succeeded, 1 otherwise (an undefined symbol, a file that
-can't be read).
+0 if the link succeeded; 1 after an error such as an undefined symbol;
+2 after an error that stops the link at once, such as a file that can't
+be read, or a script's error.
+.SH EXAMPLES
+A program for a monitor, loaded at $4000:
+.PP
+.RS
+.nf
+ld09 \-T4000 \-o prog.out \-L/usr/share/bcc09 \-C0 prog.o \-lc \-lsa
+.fi
+.RE
+.PP
+The default script, as a start for one's own, and a link with it
+(through
+.BR bcc09 (1),
+which passes the script with
+.BR \-X ):
+.PP
+.RS
+.nf
+ld09 \-P \-T3000 > prog.ld
+bcc09 \-Me \-o prog \-X\-Sprog.ld prog.c
+.fi
+.RE
 .SH SEE ALSO
 .BR bcc09 (1),
 .BR as09 (1),
 .BR ar09 (1),
 .BR objdump09 (1),
 .BR objcopy09 (1)
+.PP
+The bcc09 User's Manual
+.RI ( manual.pdf ).
+.SH HISTORY
+Derived from
+.B ld86
+in Bruce Evans' C compiler, as the dev86 package has it.
+The linker scripts come from
+.B ld01
+in the mc6801-tools project.

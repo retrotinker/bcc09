@@ -7,6 +7,7 @@
 #include "byteord.h"
 #include "type.h"
 #include "globvar.h"
+#include "script.h"
 
 #define MAX_LIBS	(NR_STDLIBS + 5)
 #define NR_STDLIBS	1
@@ -75,6 +76,7 @@ char **argv;
 	static char libsuffix[] = ".a";
 	char *outfilename;
 	char *tfn;
+	char *scriptfile = NUL_PTR;
 	int icount = 0;
 
 	ioinit(argv[0]);
@@ -101,6 +103,8 @@ char **argv;
 			case 'm':	/* print modules linked */
 			case 's':	/* strip symbols */
 			case 'd':	/* Make a headerless outfile */
+			case 'P':	/* print the default linker script */
+			case 'Z':	/* orphan input sections are errors */
 			case 'y':	/* Use a newer symbol table */
 				if (arg[2] == 0)
 					flag[(int)arg[1]] = TRUE;
@@ -108,6 +112,18 @@ char **argv;
 					flag[(int)arg[1]] = FALSE;
 				else
 					usage();
+				break;
+			case 'S':	/* linker script */
+				if (arg[2] == 0 && ++argn >= argc)
+					usage();
+				if (scriptfile != NUL_PTR)
+					use_error("only one -S is allowed");
+				scriptfile = arg[2] == 0 ? argv[argn] : arg + 2;
+				break;
+			case 'A':	/* define a symbol */
+				if (arg[2] == 0 && ++argn >= argc)
+					usage();
+				script_define(arg[2] == 0 ? argv[argn] : arg + 2);
 				break;
 			case 'C':	/* startfile name */
 				tfn = buildname(crtprefix, arg + 2, crtsuffix);
@@ -133,6 +149,7 @@ char **argv;
 			case 'T':	/* text base address */
 				if (arg[2] == 0 && ++argn >= argc)
 					usage();
+				text_base_given = 1;
 				errno = 0;
 				if (arg[2] == 0)
 					text_base_value =
@@ -187,8 +204,19 @@ char **argv;
 				usage();
 			}
 	}
+	if (data_base_value && !flag['d'])
+		flag['i'] = TRUE;
+
+	if (flag['P']) {
+		/* print the default script, as it would be used */
+		if (scriptfile != NUL_PTR)
+			use_error("-P shows the default script, which -S replaces");
+		script_print_default(flag['i'], flag['d']);
+		exit(0);
+	}
 	if (icount == 0)
 		usage();
+	script_orphan_error = flag['Z'];
 
 #ifdef BUGCOMPAT
 	if (icount == 1 && flag['r']) {
@@ -208,8 +236,15 @@ char **argv;
 	if (headerless)
 		flag['s'] = 1;
 
-	if (data_base_value && !flag['d'])
-		flag['i'] = TRUE;
+	if (scriptfile != NUL_PTR)
+		script_read(scriptfile);
+	else
+		script_use_default(flag['i'], headerless);
+	if (script_binary) {
+		headerless = 1;
+		flag['s'] = 1;
+	}
+	script_set_entry();
 
 	linksyms(flag['r']);
 	if (outfilename == NUL_PTR)
@@ -217,8 +252,10 @@ char **argv;
 	write_elks(outfilename, flag['i'], flag['s'], flag['y']);
 	if (flag['m'])
 		dumpmods();
-	if (flag['M'])
+	if (flag['M']) {
+		script_dump_layout();
 		dumpsyms();
+	}
 	flusherr();
 	return errcount ? 1 : 0;
 }

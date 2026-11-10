@@ -22,7 +22,7 @@ DEFS	=-DREL_OUTPUT
 # NATIVE=-DA_OUT_INCL='"a_out_local.h"' 
 
 OBJS= dumps.o io.o ld.o readobj.o table.o typeconv.o linksyms.o mkar.o \
-      writex86.o
+      writex86.o script.o srec.o
 
 all: ld09 objchop catimage objdump09 objcopy09
 
@@ -54,6 +54,8 @@ clean realclean clobber:
 
 $(OBJS): align.h bindef.h byteord.h config.h const.h globvar.h obj.h \
 	 syshead.h type.h x86_aout.h
+ld.o linksyms.o script.o writex86.o: script.h
+script.o srec.o: srec.h
 
 .c.o:
 	$(CC) $(ALL_CFLAGS) $(DEFS) -c $< -o $@
