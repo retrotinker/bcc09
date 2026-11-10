@@ -182,7 +182,23 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   agree (the root), then `/` and SS.DevNm's name (`D1`, bit 7 ending it). sim6809 1.2.0
   emulates these (made for it: start directory = root of device `H0`, inode LSNs);
   `os9path.c` runs on both and prints paths without the device, so one reference fits.
-- Next: faster floating point.
+- Floating point made faster (2026-11-10; `tests/fpbench.sh` times each operation on
+  sim6809 with `--cycles`: double + 1706 cycles, * 4265, / 8075; float + 2470, * 3202,
+  / 8802, from 2293, 5000, 14183, 5443, 7884 and 17303): `__fpf2d`/`__fpd2f` in
+  `fpcore.s` convert normal floats and doubles on their bits (the rest through
+  records), so float arithmetic, done in double, costs little more; unpacking and
+  packing a double shift the mantissa as they copy it; add shifts the smaller operand
+  instead of swapping records; `__fprsh` of 64 bits or more leaves just the sticky bit;
+  multiplication leaves out trailing bytes of 0 (a float's: 9 byte products, not 49)
+  and runs each row through an unrolled `mrow`, entered by length (`leax mrow,pc`, for
+  `-Mo`); division makes 55 quotient bits, from 7-byte mantissas (an unpacked
+  record's last byte is 0, which `__fpmul`/`__fpdiv` rely on: only `arith` calls
+  them), collected a byte at a time. 458 bytes more code. Tried and dropped: division
+  against 8 pre-shifted divisors (1000 cycles less, 80 bytes more stack: the
+  Vectrex's RAM is 874 bytes). A random stress check against the host's arithmetic
+  (12,000 cases, -Mi and -Mo) found nothing `fptest` doesn't; `gen-fpdata.py` gained
+  short-mantissa products and conversion ties decided by the last bit.
+- Next: see TODO.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such

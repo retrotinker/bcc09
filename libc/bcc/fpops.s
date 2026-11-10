@@ -69,29 +69,28 @@ ad1:	cmpb	#2
 	rts
 ad2:	tsta
 	beq	copy		; 0 + x
-; both finite: the one at Y gets the larger exponent
+; both finite: the one with the smaller exponent is shifted right by the
+; difference, and the result has the larger
 	ldd	EXP,y
 	subd	EXP,x
 	bge	ad3
-	ldb	#12		; swap the records
-	pshs	b
-ad2a:	lda	,x
-	ldb	,y
-	sta	,y+
-	stb	,x+
-	dec	,s
-	bne	ad2a
-	leas	1,s
-	leax	-12,x
-	leay	-12,y
-	ldd	EXP,y
-	subd	EXP,x
-ad3:	tsta			; line up the other one: shift it right
-	beq	ad3a		; by the difference
+	nega			; X's is larger: shift Y's
+	negb
+	sbca	#0
+	tsta
+	beq	ad2b
+	ldb	#255
+ad2b:	lbsr	__fprsh
+	ldd	EXP,x
+	std	EXP,y
+	bra	ad4
+ad3:	tsta			; Y's is larger: shift X's
+	beq	ad3a
 	ldb	#255
 ad3a:	exg	x,y
 	lbsr	__fprsh
 	exg	x,y
+ad4:
 	lda	SGN,y
 	cmpa	SGN,x
 	bne	ad5
@@ -207,7 +206,9 @@ mu3:	tst	CLS,y		; (and 0 * x)
 	bne	mu4
 	rts
 ; both finite: the 56-bit mantissas (the bytes but the last, which is 0
-; in a record just unpacked) multiply to 112 bits, in 14 bytes at 0,S
+; in a record just unpacked) multiply to 112 bits, in 14 bytes at 0,S.
+; Their trailing bytes of 0 (all but 3 of a float's, say) are left out:
+; byte i of Y's times byte j of X's adds to the word at byte i + j.
 mu4:	ldd	EXP,y		; the product's leading 1 is at bit 60
 	addd	EXP,x		; or 61 of its top 64 bits
 	addd	#2
@@ -223,35 +224,46 @@ mu4:	ldd	EXP,y		; the product's leading 1 is at bit 60
 	std	8,s
 	std	10,s
 	std	12,s
-	lda	#7		; each byte of one, times the other
-	pshs	a		; 0,S: count; the product from 1,S
-	leay	MAN+6,y		; Y: the one byte, the last first
-	leau	1+12,s		; U: where its product with the other's
-mu5:	ldx	15,s		; last byte goes (the word at U)
-	leax	MAN+6,x		; X: each of the other's bytes
-	ldb	#7
-	pshs	b		; 0,S: count
-mu6:	lda	,y
-	ldb	,x
+	leax	MAN+7,x		; X, Y: the last bytes that aren't 0 (the
+mu4a:	tst	,-x		; first one has the leading 1)
+	beq	mu4a
+	leay	MAN+7,y
+mu4b:	tst	,-y
+	beq	mu4b
+	tfr	x,d		; U: the word for their product
+	subd	14,s
+	pshs	d
+	tfr	y,d
+	subd	18,s
+	addd	,s++
+	leau	d,s
+	leau	-2*MAN,u
+	ldd	16,s		; 4,S: where Y's mantissa begins
+	addd	#MAN
+	pshs	d
+	pshs	x		; 2,S: X's last byte
+	tfr	x,d		; 0,S: where in mrow to start: past one
+	subd	18,s		; block for each byte of X's left out
+	negb
+	addb	#MAN+6
+	lda	#MROW
 	mul
-	addd	,u
-	std	,u
-	bcc	mu8
-	pshs	u		; carry up
-mu7:	leau	-1,u
-	inc	,u
-	beq	mu7
+	leax	mrow,pc
+	leax	d,x
+	pshs	x
+mu5:	lda	,y		; a row: one byte of Y's times X's
+	beq	mu8		; (none if it is 0)
+	pshs	u
+	ldx	4,s
+	leax	1,x		; (X and U one past, for ,-X and ,-U)
+	leau	1,u
+	jsr	[2,s]
 	puls	u
-mu8:	leax	-1,x
-	leau	-1,u
-	dec	,s
-	bne	mu6
-	leas	1,s
+mu8:	leau	-1,u		; the next row: one place up
 	leay	-1,y
-	leau	6,u		; (one place up from where it began)
-	dec	,s
-	bne	mu5
-	leas	1,s
+	cmpy	4,s
+	bhs	mu5
+	leas	6,s
 	ldy	16,s		; the top 8 bytes are the mantissa, and the
 	ldd	,s		; rest sticky
 	std	MAN,y
@@ -274,6 +286,73 @@ mu8:	leax	-1,x
 mu9:	leas	14,s
 	puls	y,x,u
 	lbra	__fpnorm
+
+; mrow: the byte at Y times X's bytes, from X - 1 down, each product added
+; to the word at U - 1, U going down a byte each time (and a carry out
+; of it going up); entered at a block of MROW bytes for each byte to do
+MROW	equ	13
+mrow:
+	lda	,y
+	ldb	,-x
+	mul
+	addd	,-u
+	std	,u
+	bcc	mr1
+	bsr	mcarry
+mr1:
+	lda	,y
+	ldb	,-x
+	mul
+	addd	,-u
+	std	,u
+	bcc	mr2
+	bsr	mcarry
+mr2:
+	lda	,y
+	ldb	,-x
+	mul
+	addd	,-u
+	std	,u
+	bcc	mr3
+	bsr	mcarry
+mr3:
+	lda	,y
+	ldb	,-x
+	mul
+	addd	,-u
+	std	,u
+	bcc	mr4
+	bsr	mcarry
+mr4:
+	lda	,y
+	ldb	,-x
+	mul
+	addd	,-u
+	std	,u
+	bcc	mr5
+	bsr	mcarry
+mr5:
+	lda	,y
+	ldb	,-x
+	mul
+	addd	,-u
+	std	,u
+	bcc	mr6
+	bsr	mcarry
+mr6:
+	lda	,y
+	ldb	,-x
+	mul
+	addd	,-u
+	std	,u
+	bcc	mr7
+	bsr	mcarry
+mr7:	rts
+mcarry:	pshs	u
+mc1:	leau	-1,u
+	inc	,u
+	beq	mc1
+	puls	u,pc
 
 ; __fpdiv: Y = Y / X
 __fpdiv:
@@ -298,30 +377,29 @@ dv3:	tstb
 	lda	#2
 	sta	CLS,y
 	rts
+; both finite: the quotient a bit at a time, Y's mantissa the remainder.
+; The mantissas of records just unpacked end in a byte of 0 (and a
+; double's in 10 bits of 0), so only their first 7 bytes take part, and
+; the remainder's 8th stays 0.  55 bits of quotient are enough: 53 and a
+; round bit even when the first is 0, and the remainder, if not 0, is
+; sticky.  They go from bit 62 (the 7 of the first byte) to bit 8, a
+; byte at a time, from the carry: set for a 0 (a remainder less than the
+; divisor), clear for a 1 (no borrow from subtracting it), so each byte
+; is complemented when it is full.
 dv4:	tsta			; 0 / x
 	beq	dv1
-; both finite: 63 bits of quotient, at 0,S, one at a time; Y's mantissa
-; is the remainder
 	ldd	EXP,y
 	subd	EXP,x
 	std	EXP,y
-	clra
-	clrb
+	pshs	u
+	leas	-8,s		; the quotient, 8 bytes
+	lda	#1		; (the first byte's bit 7: 1, so 0 once
+	sta	,s		; complemented)
+	clr	7,s
+	leau	,s		; U: the byte being made
+	ldd	#$0707		; 0,S: bits left in it  1,S: bytes left
 	pshs	d
-	pshs	d
-	pshs	d
-	pshs	d		; 0,S: the quotient, 8 bytes
-	lda	#63
-	pshs	a		; 0,S: count; the quotient from 1,S
-dv5:	asl	8,s		; the quotient left 1
-	rol	7,s
-	rol	6,s
-	rol	5,s
-	rol	4,s
-	rol	3,s
-	rol	2,s
-	rol	1,s
-	lda	MAN,y		; if the remainder is less than the
+dv5:	lda	MAN,y		; if the remainder is less than the
 	cmpa	MAN,x		; divisor, a 0
 	bne	dv6
 	lda	MAN+1,y
@@ -341,29 +419,37 @@ dv5:	asl	8,s		; the quotient left 1
 	bne	dv6
 	lda	MAN+6,y
 	cmpa	MAN+6,x
-	bne	dv6
-	lda	MAN+7,y
-	cmpa	MAN+7,x
 dv6:	blo	dv7
-	ldd	MAN+6,y		; else a 1, and subtract it
-	subd	MAN+6,x
-	std	MAN+6,y
-	ldd	MAN+4,y
-	sbcb	MAN+5,x
-	sbca	MAN+4,x
-	std	MAN+4,y
-	ldd	MAN+2,y
-	sbcb	MAN+3,x
-	sbca	MAN+2,x
-	std	MAN+2,y
-	ldd	MAN,y
-	sbcb	MAN+1,x
+	ldd	MAN+5,y		; else a 1, and subtract it (which leaves
+	subd	MAN+5,x		; C clear)
+	std	MAN+5,y
+	ldd	MAN+3,y
+	sbcb	MAN+4,x
+	sbca	MAN+3,x
+	std	MAN+3,y
+	ldd	MAN+1,y
+	sbcb	MAN+2,x
+	sbca	MAN+1,x
+	std	MAN+1,y
+	lda	MAN,y
 	sbca	MAN,x
-	std	MAN,y
-	inc	8,s
-dv7:	lbsr	__fpml1		; the remainder left 1
+	sta	MAN,y
+dv7:	rol	,u		; the bit, complemented
+	asl	MAN+6,y		; the remainder left 1
+	rol	MAN+5,y
+	rol	MAN+4,y
+	rol	MAN+3,y
+	rol	MAN+2,y
+	rol	MAN+1,y
+	rol	MAN,y
 	dec	,s
 	bne	dv5
+	com	,u+		; a byte done
+	lda	#8
+	sta	,s
+	dec	1,s
+	bne	dv5
+	leas	2,s
 	lda	MAN,y		; anything left is sticky
 	ora	MAN+1,y
 	ora	MAN+2,y
@@ -371,13 +457,9 @@ dv7:	lbsr	__fpml1		; the remainder left 1
 	ora	MAN+4,y
 	ora	MAN+5,y
 	ora	MAN+6,y
-	ora	MAN+7,y
 	beq	dv8
-	lda	#1
-	ora	8,s
-	sta	8,s
-dv8:	leas	1,s
-	puls	d
+	inc	7,s
+dv8:	puls	d
 	std	MAN,y
 	puls	d
 	std	MAN+2,y
@@ -385,4 +467,5 @@ dv8:	leas	1,s
 	std	MAN+4,y
 	puls	d
 	std	MAN+6,y
+	puls	u
 	lbra	__fpnorm

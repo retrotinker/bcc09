@@ -182,7 +182,9 @@ There is no 64-bit integer type.
 * **Floating point** is in software, exact: every operation gives the
   correctly rounded result IEEE 754 calls for, the same as a host's
   hardware, with infinities, NaNs and denormals. `float` arithmetic is done
-  in `double`, and rounded when it is stored.
+  in `double`, and rounded when it is stored. On a CoCo (0.89 MHz) a
+  `double` addition takes about 2 ms, a multiplication 5 ms and a division
+  9 ms; `float`'s about 3, 4 and 10 ms.
 * **Constants:** with a 16-bit `int`, a decimal constant over 32767 is a
   `long`, as C says; write `40000U` for an `unsigned int`.
 * **What C leaves undefined** is as follows: signed division truncates

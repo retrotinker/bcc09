@@ -21,8 +21,7 @@
 	export	Fcompf
 	export	Ftstd
 	export	Ftstf
-	import	__fpuf
-	import	__fppd
+	import	__fpf2d
 
 ; Z is set if the double at X is a NaN
 isnan:	lda	,x
@@ -124,17 +123,14 @@ Fcompd:	pshs	y
 	tsta
 	jmp	,x
 
-Fcompf:	pshs	u,y		; the float as a double, at 12,S
-	leas	-20,s
+Fcompf:	pshs	y		; the float as a double, at 0,S
+	leas	-8,s
 	leay	,s
-	lbsr	__fpuf
+	lbsr	__fpf2d
 	leax	12,s
-	lbsr	__fppd
-	leay	12,s
-	leax	26,s
 	lbsr	compare
-	leas	20,s
-	puls	u,y
+	leas	8,s
+	puls	y
 	puls	x
 	leas	8,s
 	tsta

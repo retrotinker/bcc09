@@ -468,6 +468,23 @@ X; they change D, X and CC, and must leave Y and U as they were:
   Fpostincd ... Fpostdecf     the same, pushing the old value (a float
                               as dtof pushes one)
 
+How long they take, in cycles on average, with the compiler's code
+around each call (tests/fpbench.sh measures it on sim6809; a CoCo runs
+895,000 cycles a second):
+
+  double: + 1,700  * 4,300  / 8,100  < 370   to long 880, from 760
+  float:  + 2,500  * 3,200  / 8,800          to double 340, from 300
+
+Most of the time goes to the operands' records (bcc/fpcore.s): each is
+unpacked to a sign, an exponent and a 64-bit mantissa, worked on, and
+packed again.  Some things are done faster than that: a normal float
+becomes a double, and a double whose exponent a normal float has
+becomes a float, from their bits alone (__fpf2d and __fpd2f); a
+multiplication leaves out the bytes of 0 at the end of either mantissa
+(so floats' take 9 byte products of the 49); and a division makes 55
+bits of quotient, enough for a double's 53 and a round bit, the
+remainder making the sticky bit.
+
 Behavior C leaves undefined: signed division truncates toward zero and
 the remainder has the sign of the dividend (as C99 requires); division
 by zero doesn't trap (see bcc/idiv.s and bcc/ldiv.s); shift counts of

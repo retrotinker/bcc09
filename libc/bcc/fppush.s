@@ -25,10 +25,8 @@
 	export	Fnegf
 	export	Fpullf
 	export	dtof
-	import	__fpud
-	import	__fpuf
-	import	__fppd
-	import	__fppf
+	import	__fpf2d
+	import	__fpd2f
 
 ; make room for 8 bytes under the caller's return address: at 2,S once
 ; this returns
@@ -52,26 +50,16 @@ cpd:	ldd	,x
 	rts
 
 ; the float at X, as a double, there
-cvf:	pshs	u,y		; 0,S: a record  12,S: U, Y  16,S: return
-	leas	-12,s		; addresses  20,S: the room
-	leay	,s
-	lbsr	__fpuf
-	leax	20,s
-	lbsr	__fppd
-	leas	12,s
-	puls	u,y
-	rts
+cvf:	pshs	y		; 0,S: Y  2,S, 4,S: return addresses
+	leay	6,s		; 6,S: the room
+	lbsr	__fpf2d
+	puls	y,pc
 
 ; the double at X, as a float, there
-cvd:	pshs	u,y
-	leas	-12,s
-	leay	,s
-	lbsr	__fpud
-	leax	20,s
-	lbsr	__fppf
-	leas	12,s
-	puls	u,y
-	rts
+cvd:	pshs	y
+	leay	6,s
+	lbsr	__fpd2f
+	puls	y,pc
 
 Fpushd:	bsr	room
 	bsr	cpd
@@ -108,15 +96,11 @@ Fpulld:	ldd	2,s
 	leas	8,s
 	jmp	,x
 
-Fpullf:	pshs	u,y,x		; 0,S: a record  12,S: X  14,S: Y, U
-	leas	-12,s		; 18,S: return address  20,S: the double
-	leax	20,s
-	leay	,s
-	lbsr	__fpud
-	ldx	12,s
-	lbsr	__fppf
-	leas	12,s
-	puls	u,y,x
+Fpullf:	pshs	y		; 0,S: Y  2,S: return address  4,S: the
+	tfr	x,y		; double
+	leax	4,s
+	lbsr	__fpd2f
+	puls	y
 	puls	x
 	leas	8,s
 	jmp	,x
