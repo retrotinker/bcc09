@@ -44,7 +44,7 @@ char **argv;
 	int ar, i;
 	char *p;
 	static char Usage[] =
-	    "Usage: cpp -E -0 -Dxxx -Uxxx -Ixxx infile -o outfile";
+	    "Usage: cpp -E -Dxxx -Uxxx -Ixxx infile -o outfile";
 
 #ifdef LC_CTYPE
 	setlocale(LC_CTYPE, "");
@@ -68,22 +68,13 @@ char **argv;
 				dialect = DI_KNR;
 				break;
 
-				/* Some options for describing the code generator. */
-			case '0':
-				define_macro("__BCC__");
-				define_macro("__AS386_16__");
-				define_macro("__8086__");
-				break;
-			case '3':
-				define_macro("__BCC__");
-				define_macro("__AS386_32__");
-				define_macro("__i386__");
-				break;
+				/* Some options for describing the code generator
+				   (the macros cc1's own preprocessor defines). */
 			case 'c':
 				define_macro("__CALLER_SAVES__");
 				break;
 			case 'f':
-				define_macro("__FIRST_ARG_IN_AX__");
+				define_macro("__FIRST_ARG_IN_X__");
 				break;
 			case 'O':
 				define_macro("__OPTIMISED__");
