@@ -634,6 +634,16 @@ first definition read is used.
 A library member that isn't linked doesn't count, so a program can have
 its own version of a library function.
 .PP
+A symbol imported under a different location counter from the one it is
+defined in (or has a common block in) is reported with a warning, such as
+\(lqcounter is imported under LOC0 in main.o, but defined in LOC3 in
+vars.o\(rq: the link uses the definition (or the common block),
+whichever module is read first, as an import's counter is only what its
+module assumed.
+An absolute definition (an
+.BR EQU )
+satisfies an import under any counter, with no warning.
+.PP
 \(lq_x is imported in the direct page (LOC2) by use.o, but def.o has it in
 LOC3\(rq: a C module declares
 .B "extern __direct int x"

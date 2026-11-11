@@ -1,0 +1,12 @@
+commlib         +libcomm.a(commlib.o)
+commseg         +commseg.o
+Section         Address  Size     Load
+.text           00001000 00000008
+    00001000 00000001 ./libcomm.a:commlib.o(LOC0)
+    00001004 00000004 commseg.o(LOC0)
+.data           00001008 00000004
+    00001008 00000004 ./libcomm.a:commlib.o(COMMON3)
+
+             commlib                  junk  0  00001000  R
+             commlib                shared  3  00001008  R C
+             commseg                 start  0  00001004  R N

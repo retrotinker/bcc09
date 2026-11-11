@@ -78,7 +78,12 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   text; 2 in one page, then 3 to 15, in the data; each module's part padded to 4, common
   blocks rounded to 4), not 2.0's (no `.bss` = LOC4: as09's `.BSS` is counter 3). Left
   out: ld01's page-zero check of one-byte relocations (the 6809's DP makes any page
-  right) and its import-counter change. Beyond ld01: where a script doesn't assign
+  right). ld01's import-counter rule came over 2026-11-11 (`BAREIMPORT`, `DEFINES`,
+  `import_counter()`): a bare import under another segment than its definition, common
+  block (as ld01 has it since mc6801-tools PR 73) or absolute value, is satisfied by
+  it whichever comes first, with a warning unless absolute; before, with the import
+  read first, the symbol was undefined. The direct page's error (`direct_import()`)
+  is checked first. `imp-ab`/`imp-ba`, `comm-seg`/`comm-seg2` test it. Beyond ld01: where a script doesn't assign
   them, ld09 provides `__btext`, `__etext`, `__bdata`, `__edata` and `__end` from the
   a.out layout (always in the symbol table, for objcopy09) and, if imported,
   `__segnDL`/`DH`/`CL`/`CH` from where segment n's input went (an error if it isn't in
@@ -368,7 +373,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 835 reference
+  `tests/src/` with this tree's tools and compare every result with the 851 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

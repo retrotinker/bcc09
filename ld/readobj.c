@@ -53,6 +53,13 @@ PRIVATE struct modstruct *modlast;	/* data for last module */
 #define HASSTORAGE(flags, value) \
 	(!((flags) & A_MASK) && ((flags) & E_MASK \
 				  || ((flags) & I_MASK && (value) != 0)))
+/* an import with no size (not a common block), and what can satisfy one:
+   a definition (absolute too) or a common block (ld01's rule) */
+#define BAREIMPORT(flags, value) \
+	(((flags) & (E_MASK | I_MASK | SA_MASK)) == I_MASK && (value) == 0)
+#define DEFINES(flags, value) \
+	((flags) & E_MASK || (((flags) & (E_MASK | I_MASK | SA_MASK)) == I_MASK \
+			      && (value) != 0))
 
 FORWARD long readarheader P((char **parchentry));
 FORWARD unsigned readfileheader P((void));
@@ -237,6 +244,40 @@ char *archentry;
 					      filename, archentry,
 					      flags & SEGM_MASK);
 				goto define;
+			}
+			if ((flags ^ symptr->flags) & (A_MASK | SEGM_MASK)
+			    && ((BAREIMPORT(flags, symdptr->dvalue)
+				 && DEFINES(symptr->flags, symptr->value))
+				|| (BAREIMPORT(symptr->flags, symptr->value)
+				    && DEFINES(flags, symdptr->dvalue)))) {
+				/*
+				   an import and the definition (or a common
+				   block), in different segments or one
+				   absolute: an import's segment, and its being
+				   relocatable, are only what the importing
+				   module assumed, so the definition wins,
+				   whichever module comes first; a relocatable
+				   definition in another segment is worth a
+				   warning (ld01's rule; the direct page's, an
+				   error, is above)
+				 */
+				if (DEFINES(flags, symdptr->dvalue)) {
+					if (!(flags & A_MASK))
+						import_counter(symname,
+						    symptr->flags & SEGM_MASK,
+						    symptr->modptr->filename,
+						    symptr->modptr->archentry,
+						    flags & SEGM_MASK, filename,
+						    archentry);
+					goto define;	/* replace the import */
+				}
+				if (!(symptr->flags & A_MASK))
+					import_counter(symname, flags & SEGM_MASK,
+					    filename, archentry,
+					    symptr->flags & SEGM_MASK,
+					    symptr->modptr->filename,
+					    symptr->modptr->archentry);
+				continue;	/* keep the definition */
 			}
 			if ((flags ^ symptr->flags) & (A_MASK | SEGM_MASK)) {
 				redefinition(symptr,

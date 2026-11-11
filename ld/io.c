@@ -575,6 +575,33 @@ int seg;
 	putstrn("");
 }
 
+/* a symbol imported under one location counter and defined (or held as a
+   common block) in another: the definition is used, but the importer
+   assumed the other (ld01's warning) */
+PUBLIC void import_counter(name, iseg, ifname, ianame, dseg, dfname, daname)
+char *name;
+int iseg;
+char *ifname;
+char *ianame;
+int dseg;
+char *dfname;
+char *daname;
+{
+	++warncount;
+	refer();
+	putstr("warning: ");
+	putstr(name);
+	putstr(" is imported under ");
+	putloc(iseg);
+	putstr(" in ");
+	putmodule(ifname, ianame);
+	putstr(", but defined in ");
+	putloc(dseg);
+	putstr(" in ");
+	putmodule(dfname, daname);
+	putstrn("");
+}
+
 /* initialized data (bytes or relocations) in a module's counter that a
    linker script puts in a NOLOAD section, which isn't written */
 PUBLIC void noload_data(fname, aname, seg, sectname)

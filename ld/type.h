@@ -126,6 +126,8 @@ void redefined P((char *name, char *message, char *filename,
 void reserved P((char *name));
 void size_error P((int seg, bin_off_t count, bin_off_t size));
 void noload_data P((char *fname, char *aname, int seg, char *sectname));
+void import_counter P((char *name, int iseg, char *ifname, char *ianame,
+			int dseg, char *dfname, char *daname));
 void direct_import P((char *name, char *impfname, char *impaname,
 		       char *deffname, char *defaname, int seg));
 void warning P((char *message));

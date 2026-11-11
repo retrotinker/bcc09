@@ -227,7 +227,24 @@ done
 link comm-quiet	-m -M -T1000 commmain.o -L. -lcomm
 link comm-need	-m -M -T1000 commneed.o -L. -lcomm
 link comm-ref	-m -M -T1000 commref.o -L. -lcomm
-rm -f commmain.o commneed.o commref.o commlib.o libcomm.a
+# an import under another counter than the member's common block (a bare
+# import's counter is only what its module assumed): the common block
+# wins, with a warning naming both counters, read first or last (with
+# the import first, the symbol was undefined)
+"$AS" -o commseg.o commseg.s > /dev/null 2>&1
+link comm-seg	-m -M -T1000 -L. -lcomm commseg.o
+link comm-seg2	-m -M -T1000 commseg.o -L. -lcomm
+rm -f commmain.o commneed.o commref.o commlib.o commseg.o libcomm.a
+# an import under another counter than its definition (impuse.s,
+# impdef.s), and of an EQU constant: the definitions win, either order,
+# with a warning for the variable (ld01's rule; before, with the import
+# first, the symbol was undefined)
+for f in impuse impdef; do
+	"$AS" -o $f.o $f.s > /dev/null 2>&1
+done
+link imp-ab	-m -M -T1000 impuse.o impdef.o
+link imp-ba	-m -M -T1000 impdef.o impuse.o
+rm -f impuse.o impdef.o
 # a variable a module imports in the direct page (C's extern __direct),
 # which another defines elsewhere: an error, whichever is read first
 for f in directuse directdef; do

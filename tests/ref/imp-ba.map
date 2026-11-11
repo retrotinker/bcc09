@@ -1,0 +1,11 @@
+impdef          +impdef.o
+impuse          +impuse.o
+Section         Address  Size     Load
+.text           00001000 00000008
+    00001000 00000007 impuse.o(LOC0)
+.data           00001008 00000004
+    00001008 00000001 impdef.o(LOC3)
+
+              impdef                  SIZE  0  00000040  A
+              impdef               counter  3  00001008  R
+              impuse              impstart  0  00001000  R N
