@@ -883,6 +883,11 @@ rm -f simcrt0-path.o
 
 run notarget.bcc "$BCC" -Mu -o notarget.out hello.c
 rm -f notarget.out
+# cc1's -c- and -f- (callee saves, the first argument on the stack) are
+# errors: libc and its helpers are built with the 6809's conventions
+run ccsave.bcc "$BCC" -C-c- -c -o ccsave.o hello.c
+run ccarg.bcc "$BCC" -C-f- -c -o ccarg.o hello.c
+rm -f ccsave.o ccarg.o
 
 # the copied sources aren't results
 for f in "$tests"/src/*; do

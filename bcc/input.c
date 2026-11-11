@@ -514,6 +514,13 @@ char *argv[];
 					flag[(int)arg[1]] = FALSE;
 				else
 					usage();
+				/* the 6809's conventions are fixed: libc and its
+				   helpers are built with them, and callee-saves
+				   code isn't right (it doesn't restore U and Y) */
+				if (arg[1] == 'c' && arg[2] == '-')
+					fatalerror("-c- isn't supported: on the 6809, callers always save registers");
+				if (arg[1] == 'f' && arg[2] == '-')
+					fatalerror("-f- isn't supported: on the 6809, the first argument always goes in a register");
 				if (arg[1] == '0')	/* flag 0 is negative logic flag 3 */
 					flag['3'] = TRUE + FALSE - flag['0'];
 				break;
@@ -811,9 +818,9 @@ PRIVATE void usage()
 {
 	fatalerror(
 #ifdef BUILTIN_CPP
-			  "usage: cc1 [-cdfptw[-]] [-Ddefine] [-Iincdir] [-Uundef] [-o outfile] [infile]"
+			  "usage: cc1 [-cf] [-dptw[-]] [-Ddefine] [-Iincdir] [-Uundef] [-o outfile] [infile]"
 #else
-			  "usage: cc1 [-cdfltw[-]] [-o outfile] [infile]"
+			  "usage: cc1 [-cf] [-dltw[-]] [-o outfile] [infile]"
 #endif
 	    );
 }

@@ -88,6 +88,11 @@ runs
 .BR \-c ", " \-f
 Callers save registers, and the first argument goes in a register:
 always so for the 6809.
+.B \-c\-
+and
+.B \-f\-
+(callee saves, the first argument on the stack) are errors: the C
+library and its helpers are built for these conventions.
 .TP
 .B \-E
 Preprocess only.
