@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.13.2
+Version:        0.13.3
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -90,6 +90,12 @@ cp -p libc/math/README README.libm
 %doc doc/manual.pdf doc/basic.pdf
 
 %changelog
+* Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.3-1
+- dev86's leftovers removed: bcc09's -z and -Q (they always failed),
+  cpp's x86 -0 and -3 (and its -f defines __FIRST_ARG_IN_X__), cc1's
+  inline-assembly output routines, the MS-DOS, EDOS and Minix host code
+- The C and assembly they compile to is the same
+
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.2-1
 - copt: rules see what the ones before them made (bcc09 runs it with
   -b4), and three more rules: smaller code with -O (libc 349 bytes)

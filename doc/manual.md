@@ -85,7 +85,7 @@ and what each program needs are always added.
 On Fedora, `make rpm` builds the RPM packages from `bcc09.spec`, with
 *PREFIX* `/usr`, in `rpmbuild/`: `bcc09`, and `bcc09-doc` (noarch) with this
 manual and "bcc09 for BASIC Programmers" as PDFs, from the release's tag
-(`v0.13.2`), or from the last commit if that isn't tagged yet. `make srpm`
+(`v0.13.3`), or from the last commit if that isn't tagged yet. `make srpm`
 builds the source package alone.
 
 # Getting started
