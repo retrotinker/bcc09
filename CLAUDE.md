@@ -253,6 +253,15 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `doc/basic.pdf`, committed and packaged. `tests/run.sh` compiles and links every
   complete program in it (a ```c block with `main()`: `basic.result`), so change the
   guide's programs with the library. It is original text, not CMOC's guide's.
+- The manual's chapter 10, "Questions and answers" (added 2026-11-11; TODO's FAQ), answers
+  the questions a newcomer hits: a `-Me` program without `-X-T` is linked at 0 (on
+  BASIC's variables), CR line ends, trying programs on sim6809, 16-bit `int` and
+  constants, unsigned `char`, which C (C89, `//`, `_Bool`; no declarations after
+  statements, none in `for`, no `inline`), registers and `-O`, sizes (measured, `-Me -O`
+  at $3000: empty 124 bytes, `write()` 308, `puts()` 1.8K, `printf()` 4.3K, of a double
+  10K), speed, PEEK/POKE, `asm` (its CHROUT example ran in XRoar), interrupts (no
+  keyword: assembly, FIRQ saves only PC and CC), the heap, data elsewhere, debugging.
+  Re-check it when what it states changes.
 - `doc/manual.md` is the user's manual (added 2026-11-09); `make docs` (`doc/mkmanual.sh`:
   pandoc, its man reader for the pages, which are its Appendix A, and xelatex, with
   `doc/tex/footnotehyper.sty` from plm09) makes `doc/manual.pdf`, which is committed.

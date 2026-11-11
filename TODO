@@ -1,4 +1,3 @@
-- Add a FAQ
 - Continue removing unused options and correcting documentation
 - Ditto for any remaining x86isms
 - Consolidate ld/rel_aout.h and ld/x86_aout.h (as bcc_aout.h?)
@@ -7,9 +6,6 @@
 - Add support for Color TRSDOS (i.e. Disk EDTASM) environment?
 - Add code generation option for 6309
 - Implement more/better copt rules
-- Opt-in direct-page variables: a way to choose them, start-up code that
-  sets DP to their page, and DP restored around the ROM's and BIOS's
-  routines (see bcc/sc.h)
 - For hysterical reasons, change a.out magic to $201e (i.e. BRA $1E)?
 - Include heap start (i.e. U reg) in environment for OS-9 (e.g. "HEAPSTART=0x6E00")
 - Plenty more...
