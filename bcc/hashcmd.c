@@ -144,6 +144,7 @@ PRIVATE void asmcontrol()
 	}
 #endif
 	outnstr(";BCC_ENDASM");
+	asmseg();
 }
 
 /* warningcntl() - process #warning */

@@ -15,19 +15,18 @@
  *
  * The cartridge's header, with the title the BIOS shows before it runs
  * the program, is libvec.a's ("BCC09") unless the program has one of its
- * own: an assembly file, linked with the program (bcc09 -Mv game.c
- * title.s), such as
+ * own, in segment 12: in C, asm() outside a function, such as
  *
- *	loc	12
- *	export	__vec_header
- * __vec_header:
- *	fcc	"g GCE 2026"	; "g GCE", then the year shown
- *	fcb	$80
- *	fdb	$FD0D		; the music: Music1, the BIOS's
- *	fcb	$F8,$50,$20,$D0	; height, width, Y, X of the title
- *	fcc	"MY GAME"	; in capitals
- *	fcb	$80
- *	fcb	0		; (the end of the header)
+ *	asm("loc 12", "export __vec_header", "__vec_header:",
+ *	    "fcc \"g GCE 2026\"",	("g GCE", then the year shown)
+ *	    "fcb $80",
+ *	    "fdb $FD0D",		(the music: Music1, the BIOS's)
+ *	    "fcb $F8,$50,$20,$D0",	(height, width, Y, X of the title)
+ *	    "fcc \"MY GAME\"",		(in capitals)
+ *	    "fcb $80,0");		(the end of the header)
+ *
+ * or the same lines in an assembly file linked with the program (bcc09
+ * -Mv game.c title.s)
  *
  * Written for bcc09.  Like the rest of libc, it is distributed under the
  * GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -78,7 +77,8 @@ void Print_Str_yx(char *p);	/* p is y, x, then the string */
 void Print_List(char *list);	/* y, x and string after y, x and string,
 				   until a y of 0 */
 void Print_Ships(int ship, int n, int y, int x);  /* the n ships left (up
-				   to 9), as the character ship, at y, x */
+				   to 9), as the character ship ($68 is
+				   one), at y, x */
 
 /* scores: 6 characters (the number, blanks before it) and $80, so
    Print_Str_d() prints one: char score[7] */

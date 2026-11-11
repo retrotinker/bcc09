@@ -8,6 +8,7 @@
 #include "gencode.h"
 #include "label.h"
 #include "output.h"
+#include "parse.h"
 #include "reg.h"
 #include "scan.h"
 #include "sizes.h"
@@ -31,6 +32,7 @@
 # define outstrseg() outop0str("LOC\t1\n")
 # define INITSEG 5	/* the start-up code's table of init functions */
 # define outinitseg() outop0str("LOC\t5\n")
+# define NOSEG 15	/* not known: after assembly code */
 
 FORWARD void clr P((store_pt reg));
 FORWARD bool_pt lowregisDreg P((void));
@@ -409,6 +411,15 @@ char *name;
 {
 	outccname(name);
 	outcommon();
+}
+
+/* after assembly code outside a function, which may have changed the
+   segment: the next cseg(), dseg() or the others says which it wants */
+
+PUBLIC void asmseg()
+{
+	if (level == GLBLEVEL)
+		segment = NOSEG;
 }
 
 /* set code segment */

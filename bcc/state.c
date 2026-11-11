@@ -246,6 +246,7 @@ PUBLIC void doasm()
 				break;
 		}
 		outnstr(";BCC_ENDASM");
+		asmseg();
 		if (sym == RPAREN)
 			nextsym();
 		semicolon();

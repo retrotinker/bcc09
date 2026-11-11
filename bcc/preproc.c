@@ -134,8 +134,10 @@ PRIVATE void asmcontrol()
 #endif
 	if (orig_cppmode)
 		outnstr("#endasm");
-	else
+	else {
 		outnstr(";BCC_ENDASM");
+		asmseg();
+	}
 }
 
 PUBLIC void checknotinif()

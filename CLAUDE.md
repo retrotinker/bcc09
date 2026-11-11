@@ -178,8 +178,12 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     area above), stack at `__stack_top` $CBEA. `crtvec` sets S and DP $D0, copies data,
     clears BSS, init functions, main; it imports `__vec_header` in segment 12 (ld09
     matches an import with a definition in the same segment only), which links libvec's
-    default header ("BCC09") or a program's own module (`vectrex.h` shows one;
-    `vectitle.s`; no warning, since the ld09 change). libvec: `_exit` (stops), wrappers
+    default header ("BCC09") or a program's own module (`vectrex.h` shows one, in C
+    with a file-scope `asm()`; or `vectitle.s`; no warning, since the ld09 change).
+    cc1 forgets which segment it is in after assembly code outside a function
+    (`asmseg()`, 2026-11-11: a header's `loc 12` had put the next data in it;
+    `asmseg.c`); inside a function, the asm must put it back. Print_Ships's ship is
+    character $68 ($6E is a striped block). libvec: `_exit` (stops), wrappers
     named as the BIOS routines (`Wait_Recal`, `Moveto_d(y, x)`, `Print_Str_d(y, x, s)`
     with `\200`-ended strings...; addresses from the common VECTREX.INC, written fresh:
     the gcc6809 tutorial's `vectrex.h` is GPLv3), each setting DP $D0 ($C8 for
@@ -397,7 +401,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 855 reference
+  `tests/src/` with this tree's tools and compare every result with the 864 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

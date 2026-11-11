@@ -64,6 +64,7 @@ void cseg P((void));
 void defnulls P((uoffset_T nullcount));
 label_no defstr P((char *sptr, char *stop, bool_pt dataflag));
 bool_pt diveasy P((value_t divisor, bool_pt uflag));
+void asmseg P((void));
 void dpseg P((void));
 void dseg P((void));
 void equ P((char *name, char *string));

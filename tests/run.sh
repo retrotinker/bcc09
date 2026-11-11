@@ -123,7 +123,7 @@ echo $? > cpp-E.rc
 # peephole optimizer (-O); then object files
 csrc="arith calls cbtest chartest control float helpmain long longops main
       maltest ops pftest proto ptr sadd selftest sftest siotest stdtest strtest
-      struct switch vatest direct"
+      struct switch vatest direct asmseg"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c

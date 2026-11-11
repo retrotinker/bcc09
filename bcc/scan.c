@@ -436,6 +436,7 @@ PUBLIC void nextsym()
 		dumplocs();
 		cppscan(1);
 		outnstr(";BCC_ENDASM");
+		asmseg();
 	} else
 		while (TRUE) {	/* exit with short, fast returns */
 			reglineptr = lineptr;
