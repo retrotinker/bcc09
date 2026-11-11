@@ -13,6 +13,24 @@
 	.text
 	export	___os9call
 
+; the system calls' codes
+F$Exit	equ	$06
+I$Open	equ	$84
+I$Create	equ	$83
+I$Close	equ	$8f
+I$ReadLn	equ	$8b
+I$WritLn	equ	$8c
+I$Seek	equ	$88
+I$GetStt	equ	$8d
+I$SetStt	equ	$8e
+I$Delete	equ	$87
+I$Read	equ	$89
+I$MakDir	equ	$85
+I$ChgDir	equ	$86
+F$Mem	equ	$07
+F$Fork	equ	$03
+F$Wait	equ	$04
+
 RCC	equ	0		; struct os9regs
 RA	equ	1
 RB	equ	2
@@ -54,52 +72,37 @@ ___os9call:
 	puls	x
 	puls	u,y,pc
 
-; each: SWI2, the call's code, RTS (in the order of os9/os9.h)
-stubs:	swi2
-	fcb	$06		; 0: F$Exit
+; each: the system call (OS9: SWI2 and its code), RTS (in the order of
+; os9/os9.h)
+stubs:	os9	F$Exit		; 0
 	rts
-	swi2
-	fcb	$84		; 1: I$Open
+	os9	I$Open		; 1
 	rts
-	swi2
-	fcb	$83		; 2: I$Create
+	os9	I$Create		; 2
 	rts
-	swi2
-	fcb	$8f		; 3: I$Close
+	os9	I$Close		; 3
 	rts
-	swi2
-	fcb	$8b		; 4: I$ReadLn
+	os9	I$ReadLn		; 4
 	rts
-	swi2
-	fcb	$8c		; 5: I$WritLn
+	os9	I$WritLn		; 5
 	rts
-	swi2
-	fcb	$88		; 6: I$Seek
+	os9	I$Seek		; 6
 	rts
-	swi2
-	fcb	$8d		; 7: I$GetStt
+	os9	I$GetStt		; 7
 	rts
-	swi2
-	fcb	$8e		; 8: I$SetStt
+	os9	I$SetStt		; 8
 	rts
-	swi2
-	fcb	$87		; 9: I$Delete
+	os9	I$Delete		; 9
 	rts
-	swi2
-	fcb	$89		; 10: I$Read
+	os9	I$Read		; 10
 	rts
-	swi2
-	fcb	$85		; 11: I$MakDir
+	os9	I$MakDir		; 11
 	rts
-	swi2
-	fcb	$86		; 12: I$ChgDir
+	os9	I$ChgDir		; 12
 	rts
-	swi2
-	fcb	$07		; 13: F$Mem
+	os9	F$Mem		; 13
 	rts
-	swi2
-	fcb	$03		; 14: F$Fork
+	os9	F$Fork		; 14
 	rts
-	swi2
-	fcb	$04		; 15: F$Wait
+	os9	F$Wait		; 15
 	rts

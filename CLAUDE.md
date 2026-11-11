@@ -277,6 +277,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   and `-f` set them). Honored, `-f-` makes plausible code that libc (and `va_start`)
   can't call, and `-c-` pushes U and Y and never restores them; neither is worth a
   second libc. `ccsave.bcc` and `ccarg.bcc` test the messages.
+- as09's `OS9 code` (added 2026-11-10; `mos9()`, routine `OS9CALL`, in page 1 as `SWI2`
+  is) is an OS-9 system call: `SWI2` and the code, a byte, absolute; and a symbol may
+  have `$` after its first character (`getsym()`), as OS-9's do (`I$WritLn`).
+  `libc/os9/call.s`'s stubs use both (the same code; its equates are in the objects'
+  symbols, as `RCC` and the others were). `os9op.s` and `os9err.s` test them.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
@@ -284,7 +289,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 756 reference
+  `tests/src/` with this tree's tools and compare every result with the 763 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

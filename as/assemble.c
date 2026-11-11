@@ -71,6 +71,7 @@ PRIVATE pfv rout_table[] = {
 	msstak,			/* S-stack      (PSHS, PULS) */
 	mswap,			/* TFR, EXG */
 	mustak,			/* U-stack      (PSHU,PULU) */
+	mos9,			/* OS9: SWI2 and a system call's code */
 };
 
 FORWARD void asline P((void));

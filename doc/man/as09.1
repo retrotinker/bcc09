@@ -110,6 +110,13 @@ or
 is a comment.
 Upper and lower case are the same in operations and register names, but
 not in symbols.
+A symbol is letters, digits,
+.BR _ ,
+.B .\&
+and, after the first character,
+.BR $ ,
+as OS-9's names have it
+.RB ( I$WritLn ).
 .PP
 Numbers are decimal,
 .RB $ hex
@@ -152,6 +159,17 @@ or
 for one relative to the program counter, and
 .BI [ ... ]
 for one indirect.
+.PP
+Besides the 6809's instructions,
+.BI OS9 " code"
+is an OS-9 system call, as OS-9's own assembler has it:
+.B SWI2
+and the call's code, a byte
+.RB ( "OS9 I$WritLn" ,
+with
+.B I$WritLn
+.B EQU
+.BR $8C ).
 .SS "Pseudo-operations"
 .TP
 .BR .TEXT ", " .DATA ", " .BSS ", " LOC " \fIn\fR"

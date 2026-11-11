@@ -464,6 +464,19 @@ PUBLIC void minher()
 	++mcount;
 }
 
+/* OS9 n: an OS-9 system call, SWI2 (page 1 $3F) and the call's code n, as
+   OS-9's own assembler has it */
+
+PUBLIC void mos9()
+{
+	mcount += 0x2;
+	expres();
+	if (pass2) {
+		chkabs();
+		checkdatabounds();
+	}
+}
+
 /* short branches */
 
 PUBLIC void mshort()

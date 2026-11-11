@@ -65,7 +65,8 @@ enum
     SHORT,			/* short branches */
     SSTAK,			/* S-stack (PSHS, PULS) */
     SWAP,			/* TFR, EXG */
-    USTAK			/* U-stack (PSHU,PULU) */
+    USTAK,			/* U-stack (PSHU,PULU) */
+    OS9CALL			/* OS9: SWI2 and a system call's code */
 };
 
 /* Special opcodes. */

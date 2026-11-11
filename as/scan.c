@@ -134,8 +134,10 @@ advance:
 		intconst();
 		return;
 	case IDENT:
-		/* walk to end of identifier - magic INTCONST is max of INT, IDENT */
-		while (symofchar[(unsigned char)*reglineptr] <= INTCONST)
+		/* walk to end of identifier - magic INTCONST is max of INT, IDENT;
+		   and $ after the first character, as in OS-9's I$WritLn */
+		while (symofchar[(unsigned char)*reglineptr] <= INTCONST
+		       || *reglineptr == '$')
 			++reglineptr;
 		lineptr = reglineptr;
 		gsymptr = lookup();

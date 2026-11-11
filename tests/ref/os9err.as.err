@@ -1,0 +1,11 @@
+00006 0000 103F     00  	os9	$100
+*****                                       ^data out of bounds
+00007 0003 103F     00  	os9	ext
+*****                                      ^absolute expression required
+00008 0006 103F     0C  	os9	here
+*****                                       ^absolute expression required
+00009 0009 103F     00  	os9	F$None
+*****                                   ^unbound label
+
+00004 errors
+00000 warnings

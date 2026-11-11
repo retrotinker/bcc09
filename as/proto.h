@@ -69,6 +69,7 @@ void mlong P((void));
 void msstak P((void));
 void mswap P((void));
 void mustak P((void));
+void mos9 P((void));
 
 void getcomma P((void));
 void mshort P((void));

@@ -539,7 +539,9 @@ addresses.
   `FCB`, `FDB`, `FCC`, `RMB`, `EQU`), `export` and `import` for symbols
   shared between modules, `.text`, `.data` and `.bss`, conditionals and
   macros. Numbers are `$` or `0x` hex, `%` binary, decimal, or octal with a
-  leading 0.
+  leading 0. `OS9 code` is an OS-9 system call (`SWI2` and the code), and
+  symbols may have `$` after the first character, as OS-9's names do:
+  `OS9 I$WritLn`, with `I$WritLn EQU $8C`.
 * **`ld09`**, the linker: links object files and libraries into an
   executable (an a.out file), loading only the modules something refers
   to. `-T` gives the code's address (hexadecimal), `-i` puts the data at 0

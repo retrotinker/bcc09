@@ -1,0 +1,24 @@
+00001                   ; os9op.s - OS9, an OS-9 system call: SWI2 and the call's code, as OS-9's
+00002                   ; own assembler writes it; names with $ (after the first character), as
+00003                   ; OS-9's are; a code defined after its use; and SWI2 and FCB, the same
+00004                   
+00005 0000              	.text
+00006                   	export	os9op
+00007             008C  I$WritLn	equ	$8C
+00008             0006  F$Exit	equ	6
+00009                   
+00010 0000 103F     8C  os9op:	os9	I$WritLn
+00011 0003 103F     06  	os9	F$Exit
+00012 0006 103F     15  	os9	F$Time
+00013 0009 103F     12  	os9	$10+2
+00014 000C 103F         	swi2
+00015 000E          8C  	fcb	$8C
+00016 000F   39         	rts
+00017             0015  F$Time	equ	$15
+
+Symbols:
+F$Exit                      0 0006 A   F$Time                      0 0015 A   
+I$WritLn                    0 008C A   os9op                       0 0000 R E 
+
+00000 errors
+00000 warnings

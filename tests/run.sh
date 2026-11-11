@@ -134,9 +134,12 @@ run syntax.cc "$BCC" -S -o syntax.s syntax.c
 rm -f syntax.s
 
 # the assembler: object file, listing and symbol file
-for f in crt0 modes regtest simcrt0; do
+for f in crt0 modes regtest simcrt0 os9op; do
 	run $f.as "$AS" -o $f.o -l $f.lst -s $f.sym $f.s
 done
+# OS9's errors
+run os9err.as "$AS" -o os9err.o os9err.s
+rm -f os9err.o
 # the compiler's output, assembled with a listing (-u, as bcc09 runs as09)
 run main.as "$AS" -u -o main-as.o -l main.lst main.s
 if cmp -s main.o main-as.o; then

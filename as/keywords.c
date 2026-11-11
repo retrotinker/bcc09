@@ -254,6 +254,7 @@ PUBLIC char page1ops[] = {
 	3, 'S', 'T', 'S', ALTER, 0xCF,
 	3, 'S', 'T', 'Y', ALTER, 0x8F,
 	4, 'S', 'W', 'I', '2', INHER, 0x3F,
+	3, 'O', 'S', '9', OS9CALL, 0x3F,
 	0			/* end of page 1 ops */
 };
 
