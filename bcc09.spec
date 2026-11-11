@@ -87,7 +87,7 @@ cp -p libc/math/README README.libm
 
 %files doc
 %license COPYING libc/COPYING.LIB
-%doc doc/manual.pdf doc/basic.pdf
+%doc doc/manual.pdf doc/basic.pdf doc/rocks.c
 
 %changelog
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.4-1

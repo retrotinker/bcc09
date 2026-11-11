@@ -443,10 +443,29 @@ mame vectrex -cart hello.bin
 * **The end:** `_exit()` stops, with the status in D.
 
 The header is `libvec.a`'s, with the title "BCC09", unless the program
-has its own: `vectrex.h` shows one, an assembly file of a few lines,
-linked with the program (`bcc09 -Mv -o game.bin game.c title.s`). For
-another layout, copy `vectrex.ld`, change it, and link with `-X-S` and
-the copy.
+has its own, in segment 12: a few lines of assembly, in C with `asm()`
+outside a function, as `vectrex.h` shows,
+
+```c
+asm("loc 12", "export __vec_header", "__vec_header:",
+    "fcc \"g GCE 2026\"", "fcb $80",    /* "g GCE", the year */
+    "fdb $FD0D",                        /* the music: Music1 */
+    "fcb $F8,$50,$20,$E0",              /* height, width, y, x */
+    "fcc \"MY GAME\"", "fcb $80,0");    /* the title */
+```
+
+or in an assembly file linked with the program (`bcc09 -Mv -o game.bin
+game.c title.s`). For another layout, copy `vectrex.ld`, change it, and
+link with `-X-S` and the copy.
+
+`doc/rocks.c` (installed with the documentation) is a small game,
+three hundred lines of C: rocks drift across the screen, and the ship
+turns, thrusts and fires at them. It shows a frame's work (the score
+and ships left, the ship turned with `Rot_VL_ab` and drawn as a list,
+the shots as dots, the rocks at two scales), the joystick and buttons,
+explosions' sounds, `Select_Game`, scores and a high score, and
+positions in fixed point, whose high bytes are the screen's coordinates
+so that the screen wraps by itself. It makes a 2K cartridge.
 
 ## OS-9 (`-Mo`)
 

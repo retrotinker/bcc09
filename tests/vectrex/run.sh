@@ -5,14 +5,16 @@
 # MAME's vectrex runs after the BIOS's title screen (with the default
 # header); run.lua stops it when it reaches _exit's loop, and prints its
 # exit status and its results[], read from RAM, which must be the same
-# as ./expected.
+# as ./expected.  Then doc/rocks.c, the example game, is played by
+# rocks.lua (shooting, crashing, a second game), which prints the score,
+# the high score and the lives, which must be as ./expected-rocks.
 #
 # Optional (make check-vectrex): it needs mame and the Vectrex's BIOS:
 # $VECTREX_ROM (an 8K image, used as exec_rom.bin; by default
 # ~/vectrex/bnz17/SYSTEM.IMG), or MAME's own vectrex ROM set.  MAME runs
 # without a window or sound, keeps the files it saves in the scratch
-# directory, and is stopped after 3000 frames if the program hasn't
-# finished.
+# directory, and is stopped after 3000 frames (8000 for the game) if
+# the program hasn't finished.
 
 top=$(cd "$(dirname "$0")/../.." && pwd)
 dir=$top/tests/vectrex
@@ -61,11 +63,35 @@ STOP=$stop RESULTS=$results timeout 300 mame vectrex $rompath \
 	-snapshot_directory snap -state_directory sta \
 	-autoboot_script "$dir/run.lua" > mame.log 2>&1
 grep -E '^(stopped|not stopped|results)' mame.log > xvec.result
+status=0
 if cmp -s "$dir/expected" xvec.result; then
 	echo "ok   vectrex"
-	exit 0
+else
+	echo "FAIL vectrex:"
+	diff "$dir/expected" xvec.result
+	tail -5 mame.log
+	status=1
 fi
-echo "FAIL vectrex:"
-diff "$dir/expected" xvec.result
-tail -5 mame.log
-exit 1
+
+# the example game
+BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Mv -O -o rocks.bin -X-M \
+	"$top/doc/rocks.c" > rocks.map || exit 1
+addr() {
+	grep -a " $1 " rocks.map | awk '{ print substr($4, 5) }'
+}
+FRAME=$(addr _frame) SCORE=$(addr _score) HIGH=$(addr _high) \
+LIVES=$(addr _lives) timeout 600 mame vectrex $rompath \
+	-cart rocks.bin -video none -sound none -nothrottle -skip_gameinfo \
+	-cfg_directory cfg -nvram_directory nvram -diff_directory diff \
+	-snapshot_directory snap -state_directory sta \
+	-autoboot_script "$dir/rocks.lua" > rocks.log 2>&1
+grep -E '^(rocks|not done)' rocks.log > rocks.result
+if cmp -s "$dir/expected-rocks" rocks.result; then
+	echo "ok   vectrex rocks"
+else
+	echo "FAIL vectrex rocks:"
+	diff "$dir/expected-rocks" rocks.result
+	tail -5 rocks.log
+	status=1
+fi
+exit $status

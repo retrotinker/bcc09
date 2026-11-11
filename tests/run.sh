@@ -845,6 +845,11 @@ run vec.bcc "$BCC" -Mv -o vectest.bin vectest.c
 run vectitle.bcc "$BCC" -Mv -o vectitle.bin vectest.c vectitle.s
 od -An -c -N26 vectitle.bin > vectitle.img
 rm -f vectitle.bin
+# doc/rocks.c, the example game (played in MAME by make check-vectrex):
+# its header, from asm() in C, at $0000, with its title
+run rocks.bcc "$BCC" -Mv -O -o rocks.bin "$top/doc/rocks.c"
+od -An -c -N24 rocks.bin > rocks.img
+rm -f rocks.bin
 # __direct variables in a cartridge: vecdp.c runs with DP $C8, their page,
 # and the BIOS still gets its own
 run vecdp.bcc "$BCC" -Mv -o vecdp.srec -X-Svecsrec.ld vecdp.c

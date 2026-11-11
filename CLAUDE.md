@@ -212,6 +212,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     them in MAME, `results[7]` $113F: bits for the score, the high score, a rotation,
     the sound (Sound_Byte's copy, Clear_Sound's mixer), the explosion's end, and
     Select_Game's 1 player, game 1 (high byte) on the real BIOS.
+    `doc/rocks.c` (2026-11-11; in bcc09-doc) is an example game (asteroids: turn,
+    thrust, fire; 8.8 positions whose high bytes wrap the screen; 2K): `make check`
+    builds it (`rocks.img`, its header from `asm()`), and `check-vectrex` plays it
+    with `rocks.lua` (MAME's `:BUTTONS` and `:CONTR1X`/`Y` fields; shoot 1500
+    frames, crash to GAME OVER, restart: `expected-rocks`, deterministic).
   - The others (`-Mu`, `-Mb`) can't link yet (`notarget` uses `-Mu`).
 - OS-9's data model (begun 2026-11-08): `-Mo` passes `cc1 -u`, which is `-p`
   (position-independent code: functions and string constants `,PCR`, calls `LBSR`) with
@@ -401,7 +406,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 864 reference
+  `tests/src/` with this tree's tools and compare every result with the 867 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
