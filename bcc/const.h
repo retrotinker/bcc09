@@ -56,5 +56,4 @@
 #define PRIVATE static
 #define PUBLIC
 
-/* #define C_CODE	* Don't use assembler outstr() function. */
 

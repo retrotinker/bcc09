@@ -259,7 +259,6 @@ char *oname;
 PUBLIC void outbyte(c)
 int c;
 {
-#if C_CODE || __AS09__ + __AS386_16__ + __AS386_32__ != 1
 	register char *outp;
 
 	outp = outbufptr;
@@ -267,16 +266,6 @@ int c;
 	outbufptr = outp;
 	if (outp >= outbuftop)
 		flushout();
-#else /* !C_CODE etc */
-
-#if __AS09__
-# asm
-	TFR X, D
-	    LDX _outbufptr, PC
-	    STB, X + STX _outbufptr, PC CMPX _outbuftop, PC LBHS CALL.FLUSHOUT
-# endasm
-#endif				/* __AS09__ */
-#endif				/* C_CODE etc */
 }
 /* print comma */ PUBLIC void outcomma()
 {
@@ -487,7 +476,6 @@ offset_T num;
 PUBLIC void outstr(s)
 char *s;
 {
-#if C_CODE || __AS09__ + __AS386_16__ + __AS386_32__ != 1
 	register char *outp;
 	register char *rs;
 
@@ -502,32 +490,6 @@ char *s;
 		}
 	}
 	outbufptr = outp;
-#else /* !C_CODE etc */
-
-#if __AS09__
-# asm
-	LEAU, X
-	    LDX _outbuftop, PC
-	    PSHS X
-	    LDX _outbufptr, PC
-	    BRA OUTSTR.NEXT
-	    CALL.FLUSHOUT
-	    PSHS U, B
-	    STX _outbufptr, PC
-	    LBSR _flushout
-	    LDX _outbufptr, PC
-	    LDY _outbuftop, PC
-	    PULS B, U, PC
-	    OUTSTR.LOOP
-	    STB, X +
-	    CMPX, S
-	    BLO OUTSTR.NEXT
-	    BSR CALL.FLUSHOUT
-	    STY, S
-	    OUTSTR.NEXT LDB, U + BNE OUTSTR.LOOP STX _outbufptr, PC LEAS 2, S
-# endasm
-#endif /* __AS09__ */
-#endif /* C_CODE etc */
 }
 
 /* print tab */
