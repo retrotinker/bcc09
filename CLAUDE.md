@@ -261,7 +261,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   at $3000: empty 124 bytes, `write()` 308, `puts()` 1.8K, `printf()` 4.3K, of a double
   10K), speed, PEEK/POKE, `asm` (its CHROUT example ran in XRoar), interrupts (no
   keyword: assembly, FIRQ saves only PC and CC), the heap, data elsewhere, debugging.
-  Re-check it when what it states changes.
+  Re-check it when what it states changes. `FAQ.md`, at the top, is the chapter on its
+  own (a heading, then the chapter as it is): `doc/mkfaq.sh` makes it (`make docs`),
+  `faq.result` checks it is in step with the manual (`mkfaq.sh -c`). Change the manual,
+  not FAQ.md. The next release adds `FAQ.md` to the spec's `%doc` (not before: `make
+  rpm` builds from the tag `v0.13.0`, whose tarball hasn't it).
 - `doc/manual.md` is the user's manual (added 2026-11-09); `make docs` (`doc/mkmanual.sh`:
   pandoc, its man reader for the pages, which are its Appendix A, and xelatex, with
   `doc/tex/footnotehyper.sty` from plm09) makes `doc/manual.pdf`, which is committed.
@@ -340,7 +344,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 834 reference
+  `tests/src/` with this tree's tools and compare every result with the 835 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

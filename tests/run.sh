@@ -692,6 +692,13 @@ for f in basic[0-9]*.c; do
 	fi
 	rm -f $f basic.out basic.err
 done > basic.result
+# FAQ.md is the manual's chapter "Questions and answers" on its own
+# (doc/mkfaq.sh makes it): it must be what the manual has now
+if "$top/doc/mkfaq.sh" -c; then
+	echo "ok   FAQ.md is the manual's chapter 10"
+else
+	echo "DIFF FAQ.md isn't the manual's chapter 10: run make docs"
+fi > faq.result
 # coco.h's functions: cls(), locate(), joystk(), inkey(), peek(), poke()
 run cocotest.bcc "$BCC" -Me -o cocotest.out -X-T0x3000 loader.s cocotest.c
 "$OC" -O srec cocotest.out cocotest.srec

@@ -42,7 +42,11 @@ check-vectrex: all
 
 # the user's manual, doc/manual.pdf (with pandoc and xelatex): run after
 # changing doc/manual.md or a man page, and commit the PDF
-docs: doc/manual.pdf doc/basic.pdf
+docs: doc/manual.pdf doc/basic.pdf FAQ.md
+
+# the FAQ, the manual's chapter "Questions and answers" on its own
+FAQ.md: doc/manual.md doc/mkfaq.sh
+	doc/mkfaq.sh
 
 doc/manual.pdf: doc/manual.md doc/man/*.1 doc/mkmanual.sh doc/tex/*.sty
 	doc/mkmanual.sh
