@@ -1,6 +1,6 @@
 Name:           bcc09
-Version:        0.11.2
-Release:        3%{?dist}
+Version:        0.12.0
+Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
 # The tools are dev86's (GPL-2.0-or-later; ar09 GPL-1.0-or-later); libc is
@@ -90,6 +90,13 @@ cp -p libc/math/README README.libm
 %doc doc/manual.pdf doc/basic.pdf
 
 %changelog
+* Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.12.0-1
+- libc: %%a and %%A in printf, as glibc prints them
+- libc: faster floating point (float arithmetic 2 to 2.5 times as fast,
+  double division 1.8 times), every result the same
+- ld09: a common block is no reason to load another module (FLEX
+  programs with files 10K smaller, programs with math.h 7K)
+
 * Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.11.2-3
 - bcc09 recommends bcc09-doc, the PDF manuals
 

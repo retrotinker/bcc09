@@ -29,9 +29,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 
 ## Layout
 
-- Version 0.11.2 (released 2026-11-10; `VERSION` in the Makefile, and `bcc09.spec`);
+- Version 0.12.0 (released 2026-11-10; `VERSION` in the Makefile, and `bcc09.spec`);
   0.8.0 (2026-11-09) was the first release since v0.1 (2014), then 0.9.0, 0.10.0,
-  0.11.0 and 0.11.1. 0.9.0 and later have a
+  0.11.0, 0.11.1 and 0.11.2. 0.9.0 and later have a
   GitHub release with the RPMs (bcc09, bcc09-doc) and source RPM attached (`gh release create`).
   The PDF manuals are in the noarch subpackage `bcc09-doc` (since 0.11.2-2), which
   `bcc09` Recommends (same version-release; 0.11.2-3), so dnf installs it unless told not
