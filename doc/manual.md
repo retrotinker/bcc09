@@ -427,8 +427,13 @@ mame vectrex -cart hello.bin
     * text: `Print_Str_d`, `Print_Str_yx`, `Print_List`, `Print_Ships`;
     * scores (6 characters and `$80`): `Clear_Score`, `Add_Score_a`,
       `Add_Score_d`, `New_High_Score`;
-    * the controllers (`Read_Btns`, `Joy_Digital`), sound
-      (`Init_Music_chk`, `Do_Sound`) and `Random`.
+    * the controllers: `Read_Btns`, `Read_Btns_Mask` (buttons that repeat
+      while held), `Joy_Digital`, `Joy_Analog`, and `Select_Game`, the
+      BIOS's screen for choosing the players and the game;
+    * sound: tunes (`Init_Music_chk`, `Do_Sound`; the BIOS's own are
+      `Music1` to `MusicD`), the sound chip's registers (`Sound_Byte`,
+      `Sound_Bytes`, `Clear_Sound`), and explosions (`Explosion_Snd`);
+    * and `Random`.
 
   Coordinates are -128 to 127, y first; a list's counts are the BIOS's
   (one less than the lines, where `vectrex.h` says so); the BIOS's

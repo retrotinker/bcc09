@@ -89,12 +89,25 @@ void New_High_Score(char *score, char *high);  /* high = score, if higher */
 
 /* the controllers */
 unsigned Read_Btns();		/* buttons pressed since the last call */
-void Joy_Digital();		/* the joysticks, into Vec_Joy_1_X... */
+unsigned Read_Btns_Mask(int mask);  /* the same, but a button whose bit is
+				   clear in mask counts again while held */
+void Joy_Digital();		/* the joysticks, into Vec_Joy_1_X...: <0,
+				   0 or >0 */
+void Joy_Analog();		/* the same, how far: -128 to 127 (needs
+				   Vec_Misc_Count 0 before) */
+void Select_Game(int players, int games);  /* the BIOS's screen for
+				   choosing them: Vec_Num_Players,
+				   Vec_Num_Game (from 1) */
 
 /* sound: set Vec_Music_Flag to 1, then in each frame call
    Init_Music_chk(tune) before Wait_Recal() and Do_Sound() after it */
 void Init_Music_chk(void *tune);
 void Do_Sound();
+void Sound_Byte(int reg, int value);	/* a register of the sound chip */
+void Sound_Bytes(char *list);	/* reg, value pairs, until a reg of $FF */
+void Clear_Sound();		/* quiet; silence after Do_Sound() */
+void Explosion_Snd(char *parms); /* each frame, after Vec_Expl_Flag = $80
+				   starts one; then Do_Sound() */
 
 int Random();			/* 0 to 255 */
 
@@ -118,9 +131,24 @@ int Random();			/* 0 to 255 */
 #define Vec_Pattern	__VEC_U8(0xC829)  /* the dashes of Draw_Pat_VL_a */
 #define Vec_Text_HW	(*(unsigned *)0xC82A)  /* text height and width */
 #define Vec_Music_Flag	__VEC_U8(0xC856)  /* 1: start; $80: playing; 0 */
+#define Vec_Expl_Flag	__VEC_U8(0xC867)  /* $80: start an explosion */
+#define Vec_Num_Players	__VEC_U8(0xC879)  /* Select_Game()'s choices */
+#define Vec_Num_Game	__VEC_U8(0xC87A)
 #define VIA_t1_cnt_lo	__VEC_U8(0xD004)  /* the scale of moves and lines */
 
-/* the BIOS's tune */
+/* the BIOS's tunes */
 #define Music1		((void *)0xFD0D)
+#define Music2		((void *)0xFD1D)
+#define Music3		((void *)0xFD81)
+#define Music4		((void *)0xFDD3)
+#define Music5		((void *)0xFE38)
+#define Music6		((void *)0xFE76)
+#define Music7		((void *)0xFEC6)
+#define Music8		((void *)0xFEF8)
+#define Music9		((void *)0xFF26)
+#define MusicA		((void *)0xFF44)
+#define MusicB		((void *)0xFF62)
+#define MusicC		((void *)0xFF7A)
+#define MusicD		((void *)0xFF8F)
 
 #endif

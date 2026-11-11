@@ -17,6 +17,13 @@ Clear_Score dp C8
 Add_Score_a 19 [     0] dp C8
 Add_Score_d 1234 [     0] dp C8
 New_High_Score [     0] [   100] dp C8
+Read_Btns dp D0
+Joy_Digital dp D0
+Select_Game 02 04 dp D0
+Sound_Byte 07 3E dp D0
+Sound_Bytes 07,38 08,0F dp D0
+Clear_Sound dp D0
+Explosion_Snd 19 3F 00 02 dp C8
 Intensity_a C8 dp D0
-Intensity_a 07 dp D0
+Intensity_a 3F dp D0
 sim6809: instruction limit (2000000) reached, in _exit's loop

@@ -112,7 +112,8 @@ CB_OBJS	= sa/_exit.o cb/rom.o cb/disk.o cb/dskcon.o cb/coco.o cb/sound.o \
 ROM_OBJS = rom/_exit.o cb/rom.o cb/disk.o cb/dskcon.o cb/coco.o cb/sound.o \
 	   cb/tone.o $(CB_SYS_OBJS)
 VEC_OBJS = vec/_exit.o vec/header.o vec/draw.o vec/input.o vec/sound.o \
-	   vec/random.o vec/lists.o vec/text.o vec/score.o
+	   vec/random.o vec/lists.o vec/text.o vec/score.o \
+	   vec/input2.o vec/sound2.o
 FLEX_SYS_OBJS = flex/write.o flex/read.o flex/isatty.o flex/lseek.o \
 	  flex/close.o flex/__flex_files.o
 FLEX_OBJS = flex/flex.o flex/start.o flex/file.o $(FLEX_SYS_OBJS)

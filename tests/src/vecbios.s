@@ -5,7 +5,11 @@
 ; $33, for the program to pass on.  The fixed intensities and
 ; Print_Str_yx fall into Intensity_a and Print_Str_d, as the BIOS's do;
 ; the list routines print the list as they would read it; Rot_VL_ab
-; writes $77 at U, Clear_Score "     0", for the program to check
+; writes $77 at U, Clear_Score "     0", for the program to check.
+; Read_Btns_Mask and Joy_Analog do what the BIOS's do before falling into
+; Read_Btns and Joy_Digital (Vec_Btn_State &= A; Vec_Misc_Count less 1);
+; Select_Game chooses its A players and game B, Explosion_Snd prints its
+; parameters (and DP: $C8)
 ;
 ; (After an ORG, as09's labels are absolute, though the bytes are placed
 ; from the segment's start: so it is linked at 0, and run.sh keeps only
@@ -20,10 +24,19 @@ PATTERN	equ	$C829		; Vec_Pattern
 bios:
 	org	$F192
 	jmp	s_wait		; $F192 Wait_Recal
-	org	$F1BA
+	org	$F1B4
+	anda	$C80F		; $F1B4 Read_Btns_Mask (into Read_Btns)
+	sta	$C80F
 	jmp	s_btns		; $F1BA Read_Btns
-	org	$F1F8
+	org	$F1F5
+	dec	MISCCNT		; $F1F5 Joy_Analog (into Joy_Digital)
 	jmp	s_joy		; $F1F8 Joy_Digital
+	org	$F256
+	jmp	s_sbyte		; $F256 Sound_Byte
+	org	$F272
+	jmp	s_clrsn		; $F272 Clear_Sound
+	org	$F27D
+	jmp	s_sbyts		; $F27D Sound_Bytes
 	org	$F289
 	jmp	s_sound		; $F289 Do_Sound
 	org	$F29D
@@ -72,6 +85,8 @@ bios:
 	jmp	s_rot		; $F610 Rot_VL_ab
 	org	$F687
 	jmp	s_music		; $F687 Init_Music_chk
+	org	$F7A9
+	jmp	s_selg		; $F7A9 Select_Game
 	org	$F84F
 	jmp	s_clrsc		; $F84F Clear_Score
 	org	$F85E
@@ -80,8 +95,10 @@ bios:
 	jmp	s_addsd		; $F87C Add_Score_d
 	org	$F8D8
 	jmp	s_hisc		; $F8D8 New_High_Score
+	org	$F92E
+	jmp	s_expl		; $F92E Explosion_Snd
 
-	org	$F900
+	org	$F940
 s_wait:	ldx	#m_wait
 	bra	noargs
 s_reset: ldx	#m_reset
@@ -324,6 +341,37 @@ ps4:	lda	#']
 	sta	IO_OUT
 	rts
 
+; sound and the start screen
+s_sbyte: ldx	#m_sbyte	; Sound_Byte: A, B
+	jmp	yx
+s_clrsn: ldx	#m_clrsn	; Clear_Sound
+	jmp	noargs
+s_sbyts: ldx	#m_sbyts	; Sound_Bytes: the pairs at U, to a
+	jsr	pname		; negative register
+sb1:	lda	,u+
+	bmi	sb2
+	jsr	phexa
+	lda	#',
+	sta	IO_OUT
+	lda	,u+
+	jsr	phexa2
+	bra	sb1
+sb2:	jmp	pdpnl
+s_selg:	std	$C879		; Select_Game: A, B, chosen
+	ldx	#m_selg
+	jmp	yx
+s_expl:	ldx	#m_expl		; Explosion_Snd: the 4 bytes at U
+	jsr	pname
+	lda	,u
+	jsr	phexa
+	lda	1,u
+	jsr	phexa
+	lda	2,u
+	jsr	phexa
+	lda	3,u
+	jsr	phexa
+	jmp	pdpnl
+
 ; pname: the name at X, to its 0 (keeping A)
 pname:	pshs	a
 pn1:	lda	,x+
@@ -402,6 +450,16 @@ m_addsa: fcc	"Add_Score_a"
 m_addsd: fcc	"Add_Score_d"
 	fcb	0
 m_hisc:	fcc	"New_High_Score"
+	fcb	0
+m_sbyte: fcc	"Sound_Byte"
+	fcb	0
+m_clrsn: fcc	"Clear_Sound"
+	fcb	0
+m_sbyts: fcc	"Sound_Bytes"
+	fcb	0
+m_selg:	fcc	"Select_Game"
+	fcb	0
+m_expl:	fcc	"Explosion_Snd"
 	fcb	0
 m_dot:	fcc	"Dot_d"
 	fcb	0

@@ -193,11 +193,21 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     `Dot_List` (Vec_Misc_Count + 1 dots), `Rot_VL_ab` (64 to a turn, anticlockwise:
     16 takes 0,64 to 64,0); text.s: `Print_Str_yx`, `Print_List` (U; ends at a y of
     0), `Print_Ships`; score.s (no DP: they jump): `Clear_Score`, `Add_Score_a`
-    (binary, to 99), `Add_Score_d` (BCD), `New_High_Score`. `vecbios.s` stands in for
-    each (its routines at $F900 now, past $F8D8; the fixed intensities and
-    `Print_Str_yx` fall into Intensity_a and Print_Str_d as the BIOS's do);
-    `veclist.c` calls each; `xvec.c` uses them in MAME, `results[7]` 7 for the
-    score, the high score and a rotation on the real BIOS.
+    (binary, to 99), `Add_Score_d` (BCD), `New_High_Score`; input2.s (apart from
+    input.s, so programs that don't call them don't carry them): `Read_Btns_Mask`
+    (Vec_Btn_State &= mask, then Read_Btns), `Joy_Analog` (DEC Vec_Misc_Count into
+    Joy_Digital), `Select_Game` (A players, B games; Vec_Num_Players/Game from 1,
+    ends by itself); sound2.s: `Sound_Byte` (A reg, B value, copy at $C800+reg),
+    `Sound_Bytes` (U pairs to a negative reg), `Clear_Sound` (the BIOS's leaves
+    registers 13-0 at 1, not 0, its Sound_Byte returning B 1, and the music
+    buffer's mixer $3F: silent after Do_Sound), `Explosion_Snd` (DP $C8, U the 4
+    bytes; Vec_Expl_Flag $80 starts one); `Music1`-`MusicD` in vectrex.h.
+    `vecbios.s` stands in for each (its routines at $F940 now, past $F92E; the fixed
+    intensities, `Print_Str_yx`, `Read_Btns_Mask` and `Joy_Analog` fall into the
+    routines after them as the BIOS's do); `veclist.c` calls each; `xvec.c` uses
+    them in MAME, `results[7]` $113F: bits for the score, the high score, a rotation,
+    the sound (Sound_Byte's copy, Clear_Sound's mixer), the explosion's end, and
+    Select_Game's 1 player, game 1 (high byte) on the real BIOS.
   - The others (`-Mu`, `-Mb`) can't link yet (`notarget` uses `-Mu`).
 - OS-9's data model (begun 2026-11-08): `-Mo` passes `cc1 -u`, which is `-p`
   (position-independent code: functions and string constants `,PCR`, calls `LBSR`) with
