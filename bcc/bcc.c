@@ -476,7 +476,6 @@ void validate_link_opt(char *option)
 	case 'm':		/* print modules linked */
 	case 's':		/* strip symbols */
 	case 't':		/* trace modules linked */
-	case 'z':		/* unmapped zero page */
 	case 'd':		/* Make a headerless outfile */
 	case 'y':		/* Use a newer symbol table */
 	case 'Z':		/* orphan input sections are errors */
@@ -717,7 +716,6 @@ char **argv;
 				case 'M':
 				case 'O':
 				case 'P':
-				case 'Q':
 					pflag = argv[ar] + 1;
 					used_arg = 0;
 					break;
@@ -758,10 +756,6 @@ char **argv;
 
 				case 'L':
 					append_option(argv[ar], 'l');
-					break;
-
-				case 'Q':
-					append_option(argv[ar], 'c');
 					break;
 
 				case 'O':
