@@ -174,8 +174,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   functions (`read`/`write` through `I$ReadLn`/`I$WritLn`, with no newline translation:
   decided 2026-11-09, OS-9's lines end with CR; files; `unlink`). `run.sh`
   runs `-Mo` code under `simcrt0.s` with U 0, and modules under `sim6809 --os9`
-  (`os9io.c`, `os9dir.c`, `os9path.c`, and eight programs that must run as with `-Mi`: `os9.result`),
-  and `make check-nitros9` runs the same eleven on real NitrOS-9 Level 2 (all the same, since
+  (`os9io.c`, `os9dir.c`, `os9path.c`, and nine programs that must run as with `-Mi`: `os9.result`),
+  and `make check-nitros9` runs the same twelve on real NitrOS-9 Level 2 (all the same, since
   2026-11-09). The heap grows after the data area with `F$Mem` (`os9/sbrk.c`; crt0
   keeps `__dbase`/`__dtop`), and the stack has the data area's rest (`objcopy09 -d`).
   `mkdir`, `chdir`, `opendir`/`readdir`/`rewinddir`/`closedir` (`sys/stat.h`,
@@ -294,8 +294,15 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   (-Ms under `dploader.s`, which calls with DP $5A and checks it comes back), `dpcb.c`
   (-Me with the stand-in ROM and disk), `flexdp.c`, `vecdp.c` (DP $C8, the BIOS $D0),
   `romdp.c` (`rom.ld`: a common block in its page); `xcoco.c` and `xdisk.c` use
-  `__direct` variables on the real ROMs (`make check-xroar`). Still to do: `-Mo` (`<name`,
-  DP = the data area's page), the manual.
+  `__direct` variables on the real ROMs (`make check-xroar`). `-Mo`: with data through
+  U, cc1 reaches a `__direct` variable's value as `<name` too (`dpdirect` in
+  `outnnadr()`; its address stays `LEAX name,U`, and `[name,U]`, the 6809 having no
+  direct indirect; plain `-p` keeps PC-relative data), since the default layout puts
+  segment 2 first in the data area (offsets 0-255, data at 0 with `-i`) and DP is the
+  data area's page (F$Fork's, and `crtos9` sets it from U); `-u`'s init functions store
+  through `label,U`, so they don't need DP. `dptest` runs as an OS-9 module, under
+  sim6809 and NitrOS-9 (`os9.result`, `check-nitros9`); `direct-u.s` is `direct.c`
+  with `-Mo`. Still to do: the manual.
 - cc1's `-c-` and `-f-` (callee saves, first argument on the stack) are errors (2026-11-10;
   they were accepted and ignored: `callersaves` and `arg1inreg` start TRUE and only `-c`
   and `-f` set them). Honored, `-f-` makes plausible code that libc (and `va_start`)
@@ -313,7 +320,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 808 reference
+  `tests/src/` with this tree's tools and compare every result with the 811 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -408,7 +415,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - `make check-nitros9` (`tests/nitros9/run.sh`, optional: needs `xroar`, toolshed's `os9`,
   a NitrOS-9 Level 2 boot disk, `$NITROS9_DISK` or `~/coco/nitros9.os9`, and the CoCo 3
   ROM, `$COCO3_ROM` or `/usr/share/mame/roms/coco3.rom`) boots NitrOS-9 on a CoCo 3 in
-  XRoar with the `-Mo` modules (`os9io`, `os9dir`, `os9path` and the eight of `os9.result`) on a blank
+  XRoar with the `-Mo` modules (`os9io`, `os9dir`, `os9path` and the nine of `os9.result`) on a blank
   disk in
   drive 1 (40 tracks, double sided, as the boot's `D1` is: the boot disk is full); the
   startup script runs each through `trun.c` (`F$Fork` and `F$Wait`; added 2026-11-09),

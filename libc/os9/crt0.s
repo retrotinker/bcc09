@@ -37,6 +37,9 @@
 
 start:	pshs	d,x,y		; 0,S: the parameters' length  2,S: them
 				; 4,S: the data area's end
+	tfr	u,d		; DP: the data area's page, as F$Fork sets
+	tfr	a,dp		; it (its __direct variables: cc1 -u reaches
+				; them as <name, segment 2 being first)
 	leay	__btext,pcr	; the module's header is just before the
 	leay	-13,y		; code; at 4 in it, where its name is
 	ldd	4,y

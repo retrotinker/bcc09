@@ -6,3 +6,4 @@ ok   fltcc runs the same as an OS-9 module
 ok   fpio runs the same as an OS-9 module
 ok   inttest runs the same as an OS-9 module
 ok   protoarg runs the same as an OS-9 module
+ok   dptest runs the same as an OS-9 module

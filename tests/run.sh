@@ -129,6 +129,9 @@ for f in $csrc; do
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
 	run $f.c.cc "$BCC" -c -o $f.o $f.c
 done
+# __direct variables with data through U (-Mo): their values as <name,
+# their addresses still name,U
+run direct-u.cc "$BCC" -Mo -S -o direct-u.s direct.c
 # compiler errors
 run syntax.cc "$BCC" -S -o syntax.s syntax.c
 rm -f syntax.s
@@ -622,7 +625,7 @@ os9run os9path
 mv os9path-os9.run os9path.run
 mv os9path-os9.run.rc os9path.run.rc
 rm -rf QA QF
-for f in hello pftest chartest sadd fltcc fpio inttest protoarg; do
+for f in hello pftest chartest sadd fltcc fpio inttest protoarg dptest; do
 	os9run $f
 	if cmp -s $f.run $f-os9.run &&
 	   cmp -s $f.run.rc $f-os9.run.rc; then

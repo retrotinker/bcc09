@@ -549,6 +549,7 @@ PRIVATE void outnnadr(adr)
 struct symstruct *adr;
 {
 	bool_t indflag;
+	bool_t dpdirect;
 
 	indflag = FALSE;
 	outtab();
@@ -592,6 +593,11 @@ struct symstruct *adr;
 		outcregname(LOCAL);
 		break;
 	case GLOBAL:
+		/* a __direct variable's value: <name (with data through U,
+		   DP is the data area's page, and segment 2 comes first in
+		   it); not its address, nor through it ([...]) */
+		dpdirect = adr->flags & DIRECTPAGE && adr->indcount != 0
+		    && !indflag && (!posindependent || datareg);
 		if (!posindependent) {
 			if (adr->indcount == 0) {
 				outimmed();
@@ -608,6 +614,11 @@ struct symstruct *adr;
 				bumplc();
 			}
 		}
+		else if (dpdirect) {
+			outdirectpage();
+			if (adr->flags & EXTERNAL)
+				dpimport(adr->name.namep);
+		}
 		if (adr->flags & LABELLED)
 			outlabel(adr->name.label);
 		else if (*adr->name.namep == 0) {	/* constant address */
@@ -620,7 +631,7 @@ struct symstruct *adr;
 				outplus();
 			outshex(adr->offset.offi);
 		}
-		if (posindependent) {
+		if (posindependent && !dpdirect) {
 			/* data through U, if it is (OS-9); code PC-relative */
 			outcregname(datareg && isdata(adr) ? INDREG1 : GLOBAL);
 			bumplc2();
