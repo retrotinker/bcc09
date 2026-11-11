@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.13.3
+Version:        0.13.4
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -90,6 +90,11 @@ cp -p libc/math/README README.libm
 %doc doc/manual.pdf doc/basic.pdf
 
 %changelog
+* Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.4-1
+- ld09: an import under another segment than its definition (or common
+  block, or EQU constant) is satisfied by it, whichever module is read
+  first, with a warning; with the import first, the symbol was undefined
+
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.3-1
 - dev86's leftovers removed: bcc09's -z and -Q (they always failed),
   cpp's x86 -0 and -3 (and its -f defines __FIRST_ARG_IN_X__), cc1's
