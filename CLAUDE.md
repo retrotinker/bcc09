@@ -246,6 +246,15 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `CLRA;CLRB` after `STD`; `PSHS D,X,U,Y;PULS D,X,U,Y` goes. libc 499 bytes smaller (of
   143K). cc1's output has none of the classic redundancies (a test after a load, a
   branch over a branch, TFR pairs); what's left needs to know which registers are live,
+  or whether two stack offsets overlap, which copt can't. Added 2026-11-11: bcc09 runs copt
+  with `-b4` (it passed none, so copt never looked back after a replacement, and a rule
+  never saw what an earlier one had made, e.g. the CLRA, CLRB the LDD #0 rule makes), and
+  copt's backing up counts only lines that aren't comments (cc1's `-S` output has a
+  source line and `;BCC_EOS` between instructions); new rules: a second CLRA, CLRB after
+  `PSHS D` (as after STD), `LDD #n` after `LDD #n; PSHS D`, and an unreachable BRA, LBRA or
+  JMP after RTS, `PULS ...,PC` or another BRA (cc1's jump over the else after a return).
+  libc 349 bytes smaller (57295 to 56946 of its code). Counted with scripts over libc's
+  and the tests' `-O -S` output: nothing else common is exactly removable.
   or whether two stack offsets overlap, which copt can't. The store/load rules take
   every address for memory (no `volatile`): the copt man page says so.
 - `doc/basic.md` is "bcc09 for BASIC Programmers" (added 2026-11-10): C taught from Color

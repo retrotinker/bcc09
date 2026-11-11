@@ -101,6 +101,49 @@ CLRA
 CLRB
 STD	%1
 
+## 0 pushed, then 0 loaded again: PSHS changes neither D nor the flags,
+## so the second CLRA, CLRB leaves them as the first did (as after STD,
+## above).  (D alone: D,%1 would match DP.)
+
+CLRA
+CLRB
+PSHS	D
+CLRA
+CLRB
+=
+CLRA
+CLRB
+PSHS	D
+
+## The same for a constant pushed and loaded again: LDD #n sets the
+## flags from n both times
+
+LDD	#%1
+PSHS	D
+LDD	#%1
+=
+LDD	#%1
+PSHS	D
+
+## A branch straight after a return, or after another branch, is never
+## run (a label would end the match): cc1 writes a return inside an if
+## as the function's exit, then its jump over the else
+
+RTS
+%[BRA|LBRA|JMP]1	%2
+=
+RTS
+
+PULS	%1,PC
+%[BRA|LBRA|JMP]2	%3
+=
+PULS	%1,PC
+
+%[BRA|LBRA]1	%2
+%[BRA|LBRA|JMP]3	%4
+=
+%1	%2
+
 ## Every register pushed and pulled straight back does nothing (the
 ## flags are untouched); as with LEAS 0,S below, the line after is kept
 

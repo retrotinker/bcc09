@@ -708,10 +708,6 @@ JSR	>_putchar
 ;BCC_EOS
 ; 140 			break;
 BRA	.29
-;BCC_EOS
-; 141 		}
-; 142 	 ;
-BRA	.29
 .2B:
 SUBB	#$63
 BEQ	.30
@@ -1199,8 +1195,6 @@ PSHS	D
 ; Debug: list int = const 1 (used reg = )
 LDD	#1
 PSHS	D
-; Debug: rootlist long = const $11170 (used reg = )
-LDD	#1
 LDX	#$1170
 ; Debug: func () long = lfirst+0 (used reg = )
 JSR	>_lfirst
@@ -1359,8 +1353,6 @@ JSR	>_putnum
 ; Debug: list int = const 1 (used reg = )
 LDD	#1
 PSHS	D
-; Debug: list int = const 1 (used reg = )
-LDD	#1
 PSHS	D
 ; Debug: rootlist int = const 3 (used reg = )
 LDX	#3
@@ -1549,8 +1541,6 @@ LEAS	2,S
 ; Debug: list int = const 1 (used reg = )
 LDD	#1
 PSHS	D
-; Debug: list int = const 1 (used reg = )
-LDD	#1
 PSHS	D
 ; Debug: rootlist int = const 2 (used reg = )
 LDX	#2

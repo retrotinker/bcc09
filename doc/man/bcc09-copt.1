@@ -24,7 +24,10 @@ reads assembly (the output of
 and replaces sequences of lines that a rule describes with that rule's
 replacement, file of rules after file of rules, writing the result.
 .B "bcc09 \-O"
-runs it with the 6809's rules, rules.6809, which make code smaller.
+runs it with the 6809's rules, rules.6809, which make code smaller,
+with
+.B \-b4
+(so that each rule sees what the ones before it made).
 It is Gero Kuhlmann's copt, from dev86.
 .SH OPTIONS
 .TP
@@ -54,7 +57,9 @@ Read the rules files from
 .BI \-b n
 After a replacement, go back
 .I n
-lines before trying the rules again.
+lines (not counting comments) before trying the rules again, so that a
+rule can match lines that include a replacement's (0 by default: then
+the rules go on from the replacement).
 .TP
 .BI \-h text
 Write

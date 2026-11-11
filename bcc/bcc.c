@@ -384,6 +384,8 @@ struct file_list *file;
 	command_reset();
 	newfilename(file, !do_as, 's', 1);
 	command_opt("-c;");
+	command_opt("-b4");	/* back up after a change, so rules see
+				   what the ones before them made */
 	command_opt(optim_rules);
 
 	command_opts('o');

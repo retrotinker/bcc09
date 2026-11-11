@@ -816,8 +816,11 @@ static void optimize(int backup)
 			if (memcmp(cur->text, ";BCC_", 5) == 0)
 				in_asm = (memcmp(cur->text + 5, "ASM", 3) == 0);
 		} else if ((lp = optline(cur)) != NULL && lp != cur->next) {
-			for (i = 0; i < backup && lp != NULL; i++)
-				lp = lp->prev;
+			/* back up over backup lines that aren't comments (which
+			   cc1 puts between them, and a match skips) */
+			for (i = 0; i < backup && lp != NULL; lp = lp->prev)
+				if (!lp->comment_flg)
+					i++;
 			if (lp == NULL)
 				lp = infile;
 		}

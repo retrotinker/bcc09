@@ -771,11 +771,6 @@ LEAS	2,S
 CLRA
 CLRB
 STD	5,S
-;BCC_EOS
-; 56 	for (i = 0; i < 100; i++)
-; Debug: eq int = const 0 to int i = [S+$D-6] (used reg = )
-CLRA
-CLRB
 STD	7,S
 ;BCC_EOS
 ;BCC_EOS

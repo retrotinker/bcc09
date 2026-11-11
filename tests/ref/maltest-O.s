@@ -538,8 +538,6 @@ LEAS	4,S
 ; Debug: list int = const $A (used reg = )
 LDD	#$A
 PSHS	D
-; Debug: list int = const $A (used reg = )
-LDD	#$A
 PSHS	D
 ; Debug: list int = const 1 (used reg = )
 LDD	#1
@@ -555,8 +553,6 @@ BEQ	.1B
 ; Debug: list int = const $14 (used reg = )
 LDD	#$14
 PSHS	D
-; Debug: list int = const $14 (used reg = )
-LDD	#$14
 PSHS	D
 ; Debug: list int = const 2 (used reg = )
 LDD	#2
@@ -748,8 +744,6 @@ BEQ	.2B
 ; Debug: list int = const $10 (used reg = )
 LDD	#$10
 PSHS	D
-; Debug: list int = const $10 (used reg = )
-LDD	#$10
 PSHS	D
 ; Debug: list int = const 3 (used reg = )
 LDD	#3
@@ -804,8 +798,6 @@ BEQ	.2F
 ; Debug: list int = const $10 (used reg = )
 LDD	#$10
 PSHS	D
-; Debug: list int = const $10 (used reg = )
-LDD	#$10
 PSHS	D
 ; Debug: list int = const 3 (used reg = )
 LDD	#3
@@ -1231,11 +1223,6 @@ STD	6,S
 CLRA
 CLRB
 STD	4,S
-;BCC_EOS
-; 147 	for (n = 0; n < 3000; n++) {
-; Debug: eq int = const 0 to int n = [S+$C-2] (used reg = )
-CLRA
-CLRB
 STD	$A,S
 ;BCC_EOS
 ;BCC_EOS
@@ -1771,12 +1758,6 @@ LEAS	-2,S
 CLRA
 CLRB
 STD	0,S
-;BCC_EOS
-; 206 
-; 207 	errno = 0;
-; Debug: eq int = const 0 to int = [errno+0] (used reg = )
-CLRA
-CLRB
 STD	>_errno
 ;BCC_EOS
 ; 208 	while ((p = malloc(100))!= 0) {

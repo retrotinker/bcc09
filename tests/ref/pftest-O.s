@@ -1205,8 +1205,6 @@ PSHS	D
 ; Debug: list int = const $12C (used reg = )
 LDD	#$12C
 PSHS	D
-; Debug: list int = const $12C (used reg = )
-LDD	#$12C
 PSHS	D
 ; Debug: rootlist * char = .60+0 (used reg = )
 LDX	#.60
@@ -1289,9 +1287,6 @@ LOC	0
 CLRA
 CLRB
 PSHS	D
-; Debug: list * void = const 0 (used reg = )
-CLRA
-CLRB
 PSHS	D
 ; Debug: list * void = const 0 (used reg = )
 CLRA
@@ -1314,8 +1309,6 @@ LOC	0
 ; Debug: list * void = const $1234 (used reg = )
 LDD	#$1234
 PSHS	D
-; Debug: list * void = const $1234 (used reg = )
-LDD	#$1234
 PSHS	D
 ; Debug: list * void = const $1234 (used reg = )
 LDD	#$1234
@@ -1374,12 +1367,7 @@ LEAS	2,S
 CLRA
 CLRB
 STD	6,S
-;BCC_EOS
-; 110 	ln = 0;
-; Debug: eq int = const 0 to long ln = [S+$2C-$2A] (used reg = )
-CLRA
-CLRB
-TFR	D,X
+LDX	#0
 STD	2,S
 STX	4,S
 ;BCC_EOS

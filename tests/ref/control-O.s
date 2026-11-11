@@ -105,12 +105,6 @@ LEAS	-6,S
 CLRA
 CLRB
 STD	0,S
-;BCC_EOS
-; 31 
-; 32 	for (i = 0; i < n; i++) {
-; Debug: eq int = const 0 to int i = [S+8-4] (used reg = )
-CLRA
-CLRB
 STD	4,S
 ;BCC_EOS
 ;BCC_EOS

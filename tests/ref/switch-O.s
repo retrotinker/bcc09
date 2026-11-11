@@ -41,10 +41,6 @@ PULS	Y,PC
 .9:
 LDX	#$42
 PULS	Y,PC
-;BCC_EOS
-; 13 	}
-; 14 	return -1;
-BRA	.1
 .3:
 SUBD	#1
 BLT	.1

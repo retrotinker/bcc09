@@ -871,10 +871,6 @@ CLRA
 STD	0,S
 ;BCC_EOS
 BRA	.29
-;BCC_EOS
-; 92 			}
-; 93 			putchar(r ? '1' : '0');
-BRA	.29
 .2B:
 SUBD	#0
 BLT	.54

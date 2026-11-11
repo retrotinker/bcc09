@@ -5177,11 +5177,6 @@ STB	>_s2+6
 CLRA
 CLRB
 STD	0,S
-;BCC_EOS
-; 181 	for (i = 0; i < 7; i++)
-; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
-CLRA
-CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
@@ -5297,11 +5292,6 @@ JSR	>_expect
 CLRA
 CLRB
 STD	0,S
-;BCC_EOS
-; 190 	for (i = 0; i < 300; i++)
-; Debug: eq int = const 0 to int i = [S+4-2] (used reg = )
-CLRA
-CLRB
 STD	2,S
 ;BCC_EOS
 ;BCC_EOS
