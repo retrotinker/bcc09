@@ -182,6 +182,12 @@ run libtest.ar "$AR" rc libtest.a control.o ptr.o
 	ar rc arone.a main.o
 	ar m arone.a main.o
 	echo "one member, m: $(ar t arone.a | tr '\n' ' ')"
+	# s: accepted (no symbol table: ld09 needs none); alone, only that
+	# the archive is there
+	ar rcs arone.a ptr.o
+	echo "rcs ptr: $(ar t arone.a | tr '\n' ' ')"
+	ar s arone.a; echo "s arone.a: status $?"
+	ar s nosuch.a > /dev/null; echo "s nosuch.a: status $?"
 	mkdir arx && cd arx && ar x ../arops.a
 	for f in main.o control.o ptr.o crt0.o; do
 		cmp -s $f ../$f && echo "x $f: the same" || echo "x $f: DIFFERS"

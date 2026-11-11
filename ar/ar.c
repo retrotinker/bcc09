@@ -30,7 +30,6 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "ar.h"
-#include "rel_aout.h"
 
 #if defined(__BCC__) || defined(__HP_cc)
 #define HAVE_RENAME
@@ -42,16 +41,6 @@
 #undef  HAVE_FSYNC
 #endif
 #define HAVE_TRAILING_SLASH_IN_NAME
-
-#ifdef	__GNUC__
-# ifndef alloca
-#  define	alloca	__builtin_alloca
-# endif
-#else
-# if defined(sparc) || defined(HAVE_ALLOCA_H)
-#  include <alloca.h>
-# endif
-#endif
 
 #ifdef	USG
 #define	bcopy(source, dest, size)	memcpy((dest), (source), (size))
@@ -82,21 +71,6 @@ struct member_desc {
 	   old archive, but rather where it will be in the modified archive.
 	   It is set up by write_archive.  */
 	unsigned int new_offset;	/* Offset of this member in new archive */
-
-	/* Symdef data for member.  Used only for files being inserted.  */
-	struct symdef *symdefs;
-	unsigned int nsymdefs;	/* Number of entries of symdef data.  */
-	unsigned int string_size;	/* Size of strings needed by symdef data.  */
-};
-
-/* Each symbol is recorded by something like this.  */
-
-struct symdef {
-	union {
-		unsigned long int stringoffset;
-		char *name;
-	} s;
-	unsigned long int offset;
 };
 
 /* Nonzero means it's the name of an existing member;
@@ -154,39 +128,6 @@ int lock_indesc;
 
 char **files;
 
-/* Nonzero means write a __.SYMDEF member into the modified archive.  */
-int symdef_flag;
-
-/* Nonzero means __.SYMDEF member exists in old archive.  */
-int symdef_exists;
-
-/* Nonzero means don't update __.SYMDEF unless the flag was given.  */
-int ignore_symdef;
-
-/* Total number of symdef entries we will have. */
-unsigned long int nsymdefs;
-
-/* Symdef data from old archive (set up only if we need it) */
-struct symdef *old_symdefs;
-
-/* Number of symdefs in remaining in old_symdefs.  */
-unsigned int num_old_symdefs;
-
-/* Number of symdefs old_symdefs had when it was read in.  */
-unsigned long int original_num_symdefs;
-
-/* String table from old __.SYMDEF member.  */
-char *old_strings;
-
-/* Size of old_strings */
-unsigned long int old_strings_size;
-
-/* String table to be written into __.SYMDEF member.  */
-char *new_strings;
-
-/* Size of new_strings */
-unsigned long int new_strings_size;
-
 /* An archive map is a chain of these structures.
   Each structure describes one member of the archive.
   The chain is in the same order as the members are.  */
@@ -197,13 +138,6 @@ struct mapelt {
 };
 
 struct mapelt *maplast;
-
-/* If nonzero, this is the map-element for the __.SYMDEF member
-   and we should update the time of that member just before finishing.  */
-struct mapelt *symdef_mapelt;
-
-/* Header that we wrote for the __.SYMDEF member.  */
-struct ar_hdr symdef_header;
 
 /* Name this program was run with. */
 char *program_name;
@@ -220,14 +154,10 @@ void scan();
 void extract_members();
 void extract_member();
 void print_contents();
-void write_symdef_member();
-void read_old_symdefs();
 void two_operations();
 void usage(), fatal(), error(), error3(), error_with_file();
 void perror_with_name(), pfatal_with_name();
 void write_archive();
-void touch_symdef_member();
-void update_symdefs();
 void delete_members(), move_members(), replace_members();
 void quick_append();
 char *basename();
@@ -250,13 +180,9 @@ extern char *concat(const char *s1, const char *s2, const char *s3);
 extern char *make_tempname(char *name);
 extern char *xmalloc(unsigned int size);
 extern char *xrealloc(char *ptr, unsigned int size);
-extern int filter_symbols(struct nlist *syms, unsigned int symcount);
 extern int insert_in_map(char *name, struct mapelt *map, struct mapelt *after);
 extern int main(int argc, char **argv);
 extern int move_in_map(char *name, struct mapelt *map, struct mapelt *after);
-extern int read_header_info(struct mapelt *mapelt, int desc, long int offset,
-			    long int *syms_offset, unsigned int *syms_size,
-			    long int *strs_offset, unsigned int *strs_size);
 extern struct mapelt *find_mapelt(struct mapelt *map, char *name);
 extern struct mapelt *find_mapelt_noerror(struct mapelt *map,
 					  register char *name);
@@ -273,7 +199,6 @@ extern void error_with_file(char *string, struct mapelt *mapelt);
 extern void extract_member(struct member_desc member, FILE * istream);
 extern void header_from_map(struct ar_hdr *header, struct mapelt *mapelt);
 extern void lock_for_update(void);
-extern void make_new_symdefs(struct mapelt *mapelt, int archive_indesc);
 extern void move_members(void);
 extern void mywrite(int desc, void *buf, int bytes, char *file);
 extern void perror_with_name(char *name);
@@ -282,15 +207,10 @@ extern void print_contents(struct member_desc member, FILE * istream);
 extern void print_descr(struct member_desc member, FILE * instream);
 extern void print_modes(int modes);
 extern void quick_append(void);
-extern void read_old_symdefs(struct mapelt *map, int archive_indesc);
 extern void replace_members(void);
-extern void touch_symdef_member(int outdesc, char *outname);
 extern void two_operations(void);
-extern void update_symdefs(struct mapelt *map, int archive_indesc);
 extern void usage(char *s1, int val);
 extern void write_archive(struct mapelt *map, int appendflag);
-extern void write_symdef_member(struct mapelt *mapelt, struct mapelt *map,
-				int outdesc, char *outname);
 #endif
 
 /* Output BYTES of data at BUF to the descriptor DESC.
@@ -319,6 +239,7 @@ int argc;
 char **argv;
 {
 	int i;
+	int sflag = 0;
 
 	operation = 0;
 	verbose = 0;
@@ -327,10 +248,6 @@ char **argv;
 	posname = 0;
 	postype = POS_DEFAULT;
 	preserve_dates = 0;
-	symdef_flag = 0;
-	symdef_exists = 0;
-	ignore_symdef = 0;
-	symdef_mapelt = 0;
 	files = 0;
 	lock_indesc = -1;
 
@@ -402,8 +319,8 @@ char **argv;
 				operation = REPLACE;
 				break;
 
-			case 's':
-				symdef_flag = 1;
+			case 's':	/* (a symbol table: ld09 needs none) */
+				sflag = 1;
 				break;
 
 			case 't':
@@ -431,10 +348,7 @@ char **argv;
 
 	}
 
-	if (operation == 0 && symdef_flag)
-		operation = REPLACE;
-
-	if (operation == 0)
+	if (operation == 0 && !sflag)
 		usage("no operation specified", 0);
 
 	i = 2;
@@ -450,14 +364,16 @@ char **argv;
 		usage("no archive specified", 0);
 	archive = argv[i++];
 
-	if (i < argc) {
-		files = &argv[i];
-		while (i < argc)
-			if (!strcmp(argv[i++], "__.SYMDEF")) {
-				ignore_symdef = 1;
-				break;
-			}
+	/* s alone (ranlib's job): no symbol table to write, as ld09 needs
+	   none; only that the archive is there */
+	if (operation == 0) {
+		if (access(archive, R_OK) < 0)
+			pfatal_with_name(archive);
+		exit(0);
 	}
+
+	if (i < argc)
+		files = &argv[i];
 
 	switch (operation) {
 	case EXTRACT:
@@ -483,7 +399,7 @@ char **argv;
 		break;
 
 	case REPLACE:
-		if (files != 0 || symdef_flag)
+		if (files != 0)
 			replace_members();
 		break;
 
@@ -574,12 +490,6 @@ int crflag;
 			    member_offset + sizeof(member_header);
 
 			member_desc.new_offset = 0;
-			member_desc.symdefs = 0;
-			member_desc.nsymdefs = 0;
-			member_desc.string_size = 0;
-
-			if (!ignore_symdef && !strcmp(name, "__.SYMDEF"))
-				symdef_exists = 1;
 
 			function(member_desc, arcstream);
 
@@ -939,76 +849,11 @@ int appendflag;
 		outname = archive;
 	}
 
-	/* If archive has or should have a __.SYMDEF member,
-	   compute the contents for it.  */
-
-	if (symdef_flag || symdef_exists) {
-		if (symdef_exists)
-			read_old_symdefs(map, indesc);
-		else {
-			struct mapelt *this = (struct mapelt *)
-			    xmalloc(sizeof(struct mapelt));
-			this->info.name = "__.SYMDEF";
-			this->info.offset = SARMAG;
-			this->info.data_offset = SARMAG + sizeof(struct ar_hdr);
-			this->info.new_offset = 0;
-			this->info.date = 0;
-			this->info.size = 0;
-			this->info.uid = 0;
-			this->info.gid = 0;
-			this->info.mode = 0666;
-			this->info.symdefs = 0;
-			this->info.nsymdefs = 0;
-			this->info.string_size = 0;
-			this->next = map;
-			map = this;
-			original_num_symdefs = 0;
-			old_strings_size = 0;
-		}
-
-		update_symdefs(map, indesc);
-	}
-
 	/* Copy the members into the output, either from the old archive
 	   or from specified files.  */
 
-	for (tail = map; tail != 0; tail = tail->next) {
-		if ((symdef_flag || symdef_exists) && tail->info.name
-		    && !strcmp(tail->info.name, "__.SYMDEF")
-#if 0
-		    && tail->info.date == 0
-#endif
-		    )
-			write_symdef_member(tail, map, outdesc, outname);
-		else
-			copy_out_member(tail, indesc, outdesc, outname);
-	}
-
-	if (symdef_mapelt != 0) {
-		/* Check for members whose data offsets weren't
-		   known when the symdef member was first written.  */
-		int doneany = 0;
-		for (tail = map; tail != 0; tail = tail->next)
-			if (tail->info.offset == 0) {
-				/* Fix up the symdefs.  */
-				register unsigned int i;
-				for (i = 0; i < tail->info.nsymdefs; ++i)
-					tail->info.symdefs[i].offset =
-					    tail->info.new_offset;
-				doneany = 1;
-			}
-		if (doneany) {
-			/* Some files had bad symdefs; rewrite the symdef member.  */
-			lseek(outdesc, symdef_mapelt->info.offset, 0);
-			write_symdef_member(symdef_mapelt, map, outdesc,
-					    outname);
-		}
-	}
-
-	/* Mark the __.SYMDEF member as up to date.  */
-
-	if (symdef_mapelt != 0)
-		touch_symdef_member(outdesc, outname);
+	for (tail = map; tail != 0; tail = tail->next)
+		copy_out_member(tail, indesc, outdesc, outname);
 
 	/* Install the new output under the intended name.  */
 
@@ -1144,32 +989,6 @@ char *outname;
 		mywrite(outdesc, "\n", 1, outname);
 }
 
-/* Update the time of the __.SYMDEF member; done when we updated
-   that member, just before we close the new archive file.
-   It is open on OUTDESC and its name is OUTNAME.  */
-
-void touch_symdef_member(outdesc, outname)
-int outdesc;
-char *outname;
-{
-	struct stat statbuf;
-	int i;
-
-	/* See what mtime the archive file has as a result of our writing it.  */
-	fstat(outdesc, &statbuf);
-
-	/* Advance member's time to that time.  */
-	bzero(symdef_header.ar_date, sizeof symdef_header.ar_date);
-	sprintf(symdef_header.ar_date, "%ld", statbuf.st_mtime);
-	for (i = 0; i < sizeof symdef_header.ar_date; i++)
-		if (symdef_header.ar_date[i] == 0)
-			symdef_header.ar_date[i] = ' ';
-
-	/* Write back this member's header with the new time.  */
-	if (lseek(outdesc, symdef_mapelt->info.new_offset, 0) >= 0)
-		mywrite(outdesc, &symdef_header, sizeof symdef_header, outname);
-}
-
 char *make_tempname(name)
 char *name;
 {
@@ -1203,13 +1022,8 @@ void delete_members()
 	lock_for_update();
 
 	if (files)
-		for (p = files; *p; p++) {
-			/* If user says to delete the __.SYMDEF member,
-			   don't make a new one to replace it.  */
-			if (!strcmp(*p, "__.SYMDEF"))
-				symdef_exists = 0;
+		for (p = files; *p; p++)
 			delete_from_map(*p, map);
-		}
 
 	write_archive(map->next, 0);
 }
@@ -1336,7 +1150,7 @@ void replace_members()
 			}
 
 	change_map = change_map->next;
-	if (!changed && (!symdef_flag || symdef_exists))
+	if (!changed)
 		/* Nothing changed.  */
 		close_archive();
 	else
@@ -1406,12 +1220,7 @@ struct mapelt *map, *after;
 	this->info.uid = status.st_uid;
 	this->info.gid = status.st_gid;
 	this->info.mode = status.st_mode;
-	/* Always place a __.SYMDEF member first in the archive, regardless
-	   of any position specifications.  */
-	if (!strcmp(name, "__.SYMDEF"))
-		this->next = map->next, map->next = this;
-	else
-		this->next = after->next, after->next = this;
+	this->next = after->next, after->next = this;
 
 	if (verbose)
 		printf("%c - %s\n", old == 0 ? 'a' : 'r', this->info.name);
@@ -1456,462 +1265,6 @@ void (*function) ();
 	fclose(arcstream);
 }
 
-/* Write the __.SYMDEF member from data in core.  OUTDESC and OUTNAME
-   are descriptor and name of file to write to.  */
-
-void write_symdef_member(mapelt, map, outdesc, outname)
-struct mapelt *mapelt;
-struct mapelt *map;
-int outdesc;
-char *outname;
-{
-	struct ar_hdr header;
-	struct mapelt *mapptr;
-	unsigned long int symdefs_size;
-
-	if (mapelt->info.name == 0)
-		/* This element was cancelled.  */
-		return;
-
-	header_from_map(&header, mapelt);
-
-	bcopy(&header, &symdef_header, sizeof header);
-
-	mywrite(outdesc, &header, sizeof(header), outname);
-
-	/* Write the number of symdefs.  */
-	symdefs_size = nsymdefs * sizeof(struct symdef);
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	md_number_to_chars(symdefs_size, sizeof symdefs_size,
-			   (unsigned char *)&symdefs_size);
-#endif
-	mywrite(outdesc, &symdefs_size, sizeof symdefs_size, outname);
-
-	/* Write symdefs surviving from old archive.  */
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	md_symdefs_to_chars((struct md_symdef *)old_symdefs, num_old_symdefs,
-			    (unsigned char *)old_symdefs);
-#endif
-	mywrite(outdesc, old_symdefs, num_old_symdefs * sizeof(struct symdef),
-		outname);
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	md_chars_to_symdefs((unsigned char *)old_symdefs,
-			    (struct md_symdef *)old_symdefs, num_old_symdefs);
-#endif
-
-	/* Write symdefs for new members.  */
-	for (mapptr = map; mapptr != 0; mapptr = mapptr->next)
-		if (mapptr->info.nsymdefs != 0) {
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-			md_symdefs_to_chars((struct md_symdef *)mapptr->info.
-					    symdefs, mapptr->info.nsymdefs,
-					    (unsigned char *)mapptr->info.
-					    symdefs);
-#endif
-			write(outdesc, mapptr->info.symdefs,
-			      mapptr->info.nsymdefs * sizeof(struct symdef));
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-			md_chars_to_symdefs((unsigned char *)mapptr->info.
-					    symdefs,
-					    (struct md_symdef *)mapptr->info.
-					    symdefs, mapptr->info.nsymdefs);
-#endif
-		}
-
-	/* Write the string table size.  */
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	md_number_to_chars(new_strings_size, sizeof new_strings_size,
-			   (unsigned char *)&new_strings_size);
-#endif
-	mywrite(outdesc, &new_strings_size, sizeof new_strings_size, outname);
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	new_strings_size =
-	    md_chars_to_number((unsigned char *)&new_strings_size,
-			       sizeof new_strings_size);
-#endif
-
-	/* Write the string table.  */
-	mywrite(outdesc, new_strings, new_strings_size, outname);
-
-	if (mapelt->info.size & 1)
-		mywrite(outdesc, "", 1, outname);
-}
-
-void read_old_symdefs(map, archive_indesc)
-struct mapelt *map;
-int archive_indesc;
-{
-	struct mapelt *mapelt;
-	char *data;
-	int val;
-	int symdefs_size;
-
-	mapelt = find_mapelt_noerror(map, "__.SYMDEF");
-	if (!mapelt)
-		abort();	/* Only call here if an old one exists */
-
-	data = (char *)xmalloc(mapelt->info.size);
-	lseek(archive_indesc, mapelt->info.data_offset, 0);
-	val = read(archive_indesc, data, mapelt->info.size);
-
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	symdefs_size = md_chars_to_number((unsigned char *)data,
-					  sizeof symdefs_size);
-#else
-	symdefs_size = *(unsigned long int *)data;
-#endif
-	original_num_symdefs = symdefs_size / sizeof(struct symdef);
-	old_symdefs = (struct symdef *)(data + sizeof(symdefs_size));
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	md_chars_to_symdefs((unsigned char *)old_symdefs,
-			    (struct md_symdef *)old_symdefs,
-			    original_num_symdefs);
-#endif
-	old_strings = ((char *)(old_symdefs + original_num_symdefs)
-		       + sizeof(symdefs_size));
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	old_strings_size
-	    = md_chars_to_number((unsigned char *)(old_symdefs
-						   + original_num_symdefs),
-				 sizeof old_strings_size);
-#else
-	old_strings_size
-	    = *(unsigned long int *)(old_symdefs + original_num_symdefs);
-#endif
-}
-
-/* Read various information from the header of an object file.
-   Return 0 for failure or 1 for success.  */
-
-int
-read_header_info(mapelt, desc, offset, syms_offset, syms_size, strs_offset,
-		 strs_size)
-struct mapelt *mapelt;
-int desc;
-long int offset;
-long int *syms_offset;
-unsigned int *syms_size;
-long int *strs_offset;
-unsigned int *strs_size;
-{
-	struct exec hdr;
-	int len;
-
-	lseek(desc, offset, 0);
-#ifdef HEADER_SEEK_FD
-	HEADER_SEEK_FD(desc);
-#endif
-
-	len = read(desc, (char *)&hdr, sizeof hdr);
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	md_chars_to_hdr((unsigned char *)&hdr, &hdr);
-#endif
-	if (len == sizeof hdr && !N_BADMAG(hdr)) {
-		*syms_offset = N_SYMOFF(hdr);
-		*syms_size = hdr.a_syms;
-		*strs_offset = N_STROFF(hdr);
-		lseek(desc, N_STROFF(hdr) + offset, 0);
-		if (read(desc, (char *)strs_size, sizeof *strs_size) !=
-		    sizeof *strs_size) {
-			error_with_file("failure reading string table size in ",
-					mapelt);
-			return 0;
-		}
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-		*strs_size = md_chars_to_number((unsigned char *)strs_size,
-						sizeof *strs_size);
-#endif
-		return 1;
-	}
-
-	error_with_file("bad format (not an object file) in ", mapelt);
-	return 0;
-}
-
-/* Create the info.symdefs for a new member
-   by reading the file it is coming from.  */
-
-void make_new_symdefs(mapelt, archive_indesc)
-struct mapelt *mapelt;
-int archive_indesc;
-{
-	int indesc;
-	char *name = mapelt->info.name;
-	long int syms_offset, strs_offset;
-	unsigned int syms_size, strs_size;
-	struct nlist *symbols;
-	int symcount;
-	char *strings;
-	register unsigned int i;
-	unsigned long int offset;
-
-	if (name == 0)
-		/* Deleted member.  */
-		abort();
-
-	if (mapelt->info.offset != 0) {
-		indesc = archive_indesc;
-		lseek(indesc, mapelt->info.data_offset, 0);
-		offset = mapelt->info.data_offset;
-	} else {
-		indesc = open(mapelt->info.name, 0, 0);
-		if (indesc < 0) {
-			perror_with_name(mapelt->info.name);
-			return;
-		}
-		offset = 0;
-	}
-
-	if (!read_header_info
-	    (mapelt, indesc, offset, &syms_offset, &syms_size, &strs_offset,
-	     &strs_size)) {
-		if (mapelt->info.offset == 0)
-			close(indesc);
-		return;
-	}
-
-	/* Number of symbol entries in the file.  */
-	symcount = syms_size / sizeof(struct nlist);
-	/* Allocate temporary space for the symbol entries.  */
-	symbols = (struct nlist *)alloca(syms_size);
-	/* Read in the symbols.  */
-	lseek(indesc, syms_offset + offset, 0);
-	if (read(indesc, (char *)symbols, syms_size) != syms_size) {
-		error_with_file("premature end of file in symbols of ", mapelt);
-		if (mapelt->info.offset == 0)
-			(void)close(indesc);
-		return;
-	}
-#ifdef HOST_TARGET_ENDIANESS_DIFFERS
-	md_chars_to_nlist((unsigned char *)symbols, symbols, symcount);
-#endif
-
-	/* The string table size includes the size word.  */
-	if (strs_size < sizeof(strs_size)) {
-		error_with_file("bad string table size in ", mapelt);
-		if (mapelt->info.offset == 0)
-			(void)close(indesc);
-		return;
-	}
-	strs_size -= sizeof(strs_size);
-
-	/* Allocate permanent space for the string table.  */
-	strings = (char *)xmalloc(strs_size);
-
-	/* Read in the strings.  */
-	lseek(indesc, offset + strs_offset + sizeof strs_size, 0);
-	if (read(indesc, strings, strs_size) != strs_size) {
-		error_with_file("premature end of file in strings of ", mapelt);
-		if (mapelt->info.offset == 0)
-			(void)close(indesc);
-		return;
-	}
-
-	if (indesc != archive_indesc)
-		(void)close(indesc);
-
-	/* Discard the symbols we don't want to mention; compact the rest down.  */
-	symcount = filter_symbols(symbols, symcount);
-
-	mapelt->info.symdefs = (struct symdef *)
-	    xmalloc(symcount * sizeof(struct symdef));
-	mapelt->info.nsymdefs = symcount;
-	mapelt->info.string_size = 0;
-
-	for (i = 0; i < symcount; ++i) {
-		unsigned long int stroff =
-		    symbols[i].n_un.n_strx - sizeof(strs_size);
-		char *symname = strings + stroff;
-		if (stroff > strs_size) {
-			char buf[100];
-			sprintf(buf,
-				"ridiculous string offset %lu in symbol %u of ",
-				stroff + sizeof(strs_size), i);
-			error_with_file(buf, mapelt);
-			return;
-		}
-		mapelt->info.symdefs[i].s.name = symname;
-		mapelt->info.string_size += strlen(symname) + 1;
-	}
-}
-
-/* Choose which symbol entries to mention in __.SYMDEF;
-   compact them downward to get rid of the rest.
-   Return the number of symbols left.  */
-
-int filter_symbols(syms, symcount)
-struct nlist *syms;
-unsigned int symcount;
-{
-	struct nlist *from, *to;
-	struct nlist *end = syms + symcount;
-
-	for (to = from = syms; from < end; ++from)
-		if ((from->n_type & N_EXT)
-		    && (from->n_type != N_EXT || from->n_value != 0))
-			*to++ = *from;
-
-	return to - syms;
-}
-
-/* Update the __.SYMDEF data before writing a new archive.  */
-
-void update_symdefs(map, archive_indesc)
-struct mapelt *map;
-int archive_indesc;
-{
-	struct mapelt *tail;
-	int pos;
-	register unsigned int i;
-	unsigned int len;
-	struct symdef *s;
-	unsigned long int deleted_strings_size = 0;
-
-	nsymdefs = original_num_symdefs;
-	num_old_symdefs = original_num_symdefs;
-	new_strings_size = old_strings_size;
-
-	if (nsymdefs != 0) {
-		/* We already had a __.SYMDEF member, so just update it.  */
-
-		/* Mark as canceled any old symdefs for members being deleted.  */
-
-		for (tail = map; tail != 0; tail = tail->next) {
-			if (tail->info.name == 0) {
-				/* Old member being deleted.  Delete its symdef entries too.  */
-				for (i = 0; i < original_num_symdefs; i++)
-					if (old_symdefs[i].offset ==
-					    tail->info.offset) {
-						old_symdefs[i].offset = 0;
-						--nsymdefs;
-						deleted_strings_size
-						    += strlen(old_strings
-							      +
-							      old_symdefs[i].s.
-							      stringoffset) + 1;
-					}
-			}
-		}
-
-		/* Compactify old symdefs.  */
-		{
-			register unsigned int j = 0;
-			for (i = 0; i < num_old_symdefs; ++i) {
-				if (j != i)
-					old_symdefs[j] = old_symdefs[i];
-				if (old_symdefs[i].offset != 0)
-					++j;
-			}
-			num_old_symdefs -= i - j;
-		}
-
-		/* Create symdef data for any new members.  */
-		for (tail = map; tail != 0; tail = tail->next) {
-			if (tail->info.offset != 0
-			    || tail->info.name == 0
-			    || !strcmp(tail->info.name, "__.SYMDEF"))
-				continue;
-			make_new_symdefs(tail, archive_indesc);
-			nsymdefs += tail->info.nsymdefs;
-			new_strings_size += tail->info.string_size;
-		}
-	} else {
-		/* Create symdef data for all existing members.  */
-
-		for (tail = map; tail != 0; tail = tail->next) {
-			if (tail->info.name == 0
-			    || !strcmp(tail->info.name, "__.SYMDEF"))
-				continue;
-			make_new_symdefs(tail, archive_indesc);
-			nsymdefs += tail->info.nsymdefs;
-			new_strings_size += tail->info.string_size;
-		}
-	}
-
-	new_strings_size -= deleted_strings_size;
-	old_strings_size -= deleted_strings_size;
-
-	/* Now we know the size of __.SYMDEF,
-	   so assign the positions of all the members.  */
-
-	tail = find_mapelt_noerror(map, "__.SYMDEF");
-	tail->info.size = (sizeof(nsymdefs) + (nsymdefs * sizeof(struct symdef))
-			   + sizeof(new_strings_size) + new_strings_size);
-	symdef_mapelt = tail;
-
-	pos = SARMAG;
-	for (tail = map; tail != 0; tail = tail->next) {
-		if (tail->info.name == 0)
-			/* Ignore deleted members.  */
-			continue;
-		tail->info.new_offset = pos;
-		pos += sizeof(struct ar_hdr) + tail->info.size;
-		if (tail->info.size & 1)
-			++pos;
-	}
-
-	/* Now update the offsets in the symdef data
-	   to be the new offsets rather than the old ones.  */
-
-	for (tail = map; tail != 0; tail = tail->next) {
-		if (tail->info.name == 0)
-			continue;
-		if (tail->info.symdefs == 0)
-			/* Member without new symdef data.
-			   Check the old symdef data; it may be included there. */
-			for (i = 0; i < num_old_symdefs; i++) {
-				if (old_symdefs[i].offset == tail->info.offset)
-					old_symdefs[i].offset =
-					    tail->info.new_offset;
-		} else
-			for (i = 0; i < tail->info.nsymdefs; i++)
-				tail->info.symdefs[i].offset =
-				    tail->info.new_offset;
-	}
-
-	/* Generate new, combined string table and put each string's offset into the
-	   symdef that refers to it.  Note that old symdefs ref their strings by
-	   offsets into old_strings but new symdefs contain addresses of strings.  */
-
-	new_strings = (char *)xmalloc(new_strings_size);
-	pos = 0;
-
-	/* Write the strings of the old symdefs and update the structures
-	   to contain indices into the string table instead of strings.  */
-	for (i = 0; i < num_old_symdefs; i++) {
-		strcpy(new_strings + pos,
-		       old_strings + old_symdefs[i].s.stringoffset);
-		old_symdefs[i].s.stringoffset = pos;
-		pos += strlen(new_strings + pos) + 1;
-	}
-	if (pos < old_strings_size) {
-		unsigned int d = old_strings_size - pos;
-		/* Correct the string table size.  */
-		new_strings_size -= d;
-		/* Correct the size of the `__.SYMDEF' member,
-		   since it contains the string table.  */
-		symdef_mapelt->info.size -= d;
-	} else if (pos > old_strings_size)
-		fatal("Old archive's string size was %u too small.",
-		      (void *)(pos - old_strings_size));
-
-	for (tail = map; tail != 0; tail = tail->next)
-		if (tail->info.symdefs) {
-			len = tail->info.nsymdefs;
-			s = tail->info.symdefs;
-
-			for (i = 0; i < len; i++) {
-				strcpy(new_strings + pos, s[i].s.name);
-				s[i].s.stringoffset = pos;
-				pos += strlen(new_strings + pos) + 1;
-			}
-		}
-	if (pos != new_strings_size)
-		fatal("internal error: inconsistency in new_strings_size", 0);
-}
-
-/* Print error message and usage message, and exit.  */
-
 void usage(s1, val)
 char *s1;
 int val;
@@ -1920,7 +1273,7 @@ int val;
 	sprintf(vbuf, "%d", val);
 	error(s1, vbuf);
 	fprintf(stderr, "\
-Usage: %s [d|m|p|q|r|t|x [[abi [position-name] [cilouv]] archive file...\n", program_name);
+Usage: %s [d|m|p|q|r|t|x [[abi [position-name] [cilosuv]] archive file...\n", program_name);
 	exit(1);
 }
 

@@ -8,7 +8,7 @@ CFLAGS	?=-O
 LDFLAGS	?=
 ALL_CFLAGS=-std=gnu89 $(CFLAGS)
 DEFS	=
-OBJS= ar.o alloca.o
+OBJS= ar.o
 
 all: ar09
 
@@ -20,14 +20,7 @@ install: ar09
 	install -m 755 ar09 $(DESTDIR)$(LIBDIR)
 
 clean realclean clobber:
-	rm -f *.o ar09 ar rel_aout.h
-
-$(OBJS): rel_aout.h
-
-rel_aout.h:
-	test -f rel_aout.h || \
-	{ rm -f rel_aout.h ; ln -s ../ld/rel_aout.h . ; } || \
-	ln ../ld/rel_aout.h .
+	rm -f *.o ar09 ar
 
 .c.o:
 	$(CC) $(ALL_CFLAGS) $(DEFS) -c $< -o $@

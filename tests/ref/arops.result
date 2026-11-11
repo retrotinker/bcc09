@@ -9,6 +9,9 @@ m main: control.o crt0.o ptr.o main.o
 m main (already last): control.o crt0.o ptr.o main.o 
 mb ptr main crt0: control.o main.o crt0.o ptr.o 
 one member, m: main.o 
+rcs ptr: main.o ptr.o 
+s arone.a: status 0
+s nosuch.a: status 1
 x main.o: the same
 x control.o: the same
 x ptr.o: the same

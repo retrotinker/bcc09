@@ -73,12 +73,12 @@ With
 give the files the dates the members have.
 .TP
 .B s
-Meant to write a symbol table into the archive, as the member
-__.SYMDEF: it can't read
-.BR as09 's
-objects, so the table is empty.
+Accepted and ignored:
 .B ld09
-doesn't need one (it reads every member's symbols), and ignores it.
+needs no symbol table in an archive (it reads every member's symbols).
+Alone, as
+.BR ranlib 's
+job, it only checks that the archive is there.
 .TP
 .B v
 Say what is done to each member.
