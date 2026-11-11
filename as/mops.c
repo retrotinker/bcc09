@@ -453,12 +453,6 @@ PUBLIC void getcomma()
 
 /* inherent ops */
 
-/* for I80386 */
-/* AAA, AAS, CLC, CLD, CLI, CLTS, CMC, CMPSB, DAA, DAS, HLT, INTO, INSB, */
-/* INVD, */
-/* LAHF, LEAVE, LOCK, LODSB, MOVSB, NOP, OUTSB, REP, REPE, REPNE, REPNZ, */
-/* REPZ, SAHF, SCASB, STC, STD, STI, STOSB, WAIT, WBINVD */
-
 PUBLIC void minher()
 {
 	++mcount;
