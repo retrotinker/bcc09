@@ -858,6 +858,19 @@ awk 'substr($0, 1, 2) == "S1" && substr($0, 5, 4) >= "F000"' vecbios.srec |
 echo $? > vecdp.run.rc
 sed -i "s/ reached at PC=$stop\$/ reached, in _exit's loop/" vecdp.run
 rm -f vecdp.srec vecdp-map.srec vecdp.map vecdp-all.srec
+# the list, text and score functions (veclist.c): what each BIOS routine
+# gets, and DP, with the program's ($C8) back after each
+run veclist.bcc "$BCC" -Mv -o veclist.srec -X-Svecsrec.ld veclist.c
+"$BCC" -Mv -o veclist-map.srec -X-Svecsrec.ld -X-M veclist.c > veclist.map 2>&1
+start=$(grep -a ' crt0 *start ' veclist.map | awk '{ print substr($4, 5) }')
+stop=$(grep -a ' __exit ' veclist.map | awk '{ print $4 }')
+stop=$(printf '%04X' $((0x$stop + 2)))
+awk 'substr($0, 1, 2) == "S1" && substr($0, 5, 4) >= "F000"' vecbios.srec |
+	cat - veclist.srec > veclist-all.srec
+"$SIM" -n 2000000 --entry "0x$start" veclist-all.srec > veclist.run 2>&1
+echo $? > veclist.run.rc
+sed -i "s/ reached at PC=$stop\$/ reached, in _exit's loop/" veclist.run
+rm -f veclist.srec veclist-map.srec veclist.map veclist-all.srec
 rm -f vecsrec.ld vectest.srec vectest-map.srec vectest.map vecbios.o \
 	vecbios.out vecbios.srec vectest-all.srec vectest.bin
 # and Disk BASIC's files: cbdisk.s stands in for its ROM at $C000, with

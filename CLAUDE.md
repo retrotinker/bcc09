@@ -185,6 +185,19 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     the gcc6809 tutorial's `vectrex.h` is GPLv3), each setting DP $D0 ($C8 for
     `Init_Music_chk`); as09's `INCLUDE` is relative to the current directory, so each
     module has its own equates. No read/write, so no stdio. Defines `__VECTREX__`.
+    More of the BIOS (2026-11-11), each routine's conventions read off the BIOS itself
+    (traced on sim6809 with the image, and checked in MAME): `Intensity_1F/3F/5F/7F`,
+    `Moveto_d_7F` (draw.s); lists.s: `Draw_VL_a` (A = lines - 1), `Draw_VLcs` (count,
+    scale, lines), `Draw_VLp` (pattern, y, x; a positive pattern ends it, so dashes are
+    negative), `Mov_Draw_VL_a` (a move, then A lines), `Draw_Pat_VL_a` (Vec_Pattern),
+    `Dot_List` (Vec_Misc_Count + 1 dots), `Rot_VL_ab` (64 to a turn, anticlockwise:
+    16 takes 0,64 to 64,0); text.s: `Print_Str_yx`, `Print_List` (U; ends at a y of
+    0), `Print_Ships`; score.s (no DP: they jump): `Clear_Score`, `Add_Score_a`
+    (binary, to 99), `Add_Score_d` (BCD), `New_High_Score`. `vecbios.s` stands in for
+    each (its routines at $F900 now, past $F8D8; the fixed intensities and
+    `Print_Str_yx` fall into Intensity_a and Print_Str_d as the BIOS's do);
+    `veclist.c` calls each; `xvec.c` uses them in MAME, `results[7]` 7 for the
+    score, the high score and a rotation on the real BIOS.
   - The others (`-Mu`, `-Mb`) can't link yet (`notarget` uses `-Mu`).
 - OS-9's data model (begun 2026-11-08): `-Mo` passes `cc1 -u`, which is `-p`
   (position-independent code: functions and string constants `,PCR`, calls `LBSR`) with
@@ -374,7 +387,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 851 reference
+  `tests/src/` with this tree's tools and compare every result with the 855 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

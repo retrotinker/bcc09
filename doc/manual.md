@@ -414,14 +414,25 @@ mame vectrex -cart hello.bin
 * **Start-up:** the start-up code sets the stack and DP (`$D0`, where the
   BIOS's routines want it), copies the initialized data to RAM, clears
   the BSS, and calls the init functions and `main`.
-* **The BIOS:** `vectrex.h` declares its routines for drawing
-  (`Wait_Recal`, `Intensity_a`, `Moveto_d`, `Draw_Line_d`, `Dot_d`,
-  `Draw_VLc`, `Print_Str_d`, `Reset0Ref`), the controllers (`Read_Btns`,
-  `Joy_Digital`), sound (`Init_Music_chk`, `Do_Sound`) and `Random`, with
-  the names Vectrex programmers know, and its variables (`Vec_Btn_State`,
-  `Vec_Joy_1_X`, `VIA_t1_cnt_lo` for the scale, and others). Coordinates
-  are -128 to 127, y first; the BIOS's strings are in capitals and end
-  with `\200` (`$80`), not 0.
+* **The BIOS:** `vectrex.h` declares its routines, with the names
+  Vectrex programmers know, and its variables (`Vec_Btn_State`,
+  `Vec_Joy_1_X`, `VIA_t1_cnt_lo` for the scale, and others):
+    * drawing: `Wait_Recal`, `Intensity_a` (and `Intensity_1F` to `_7F`),
+      `Reset0Ref`, `Moveto_d` (and `Moveto_d_7F`), `Draw_Line_d`, `Dot_d`;
+    * lists, a whole shape in one call, which is much faster than a call
+      for each line: `Draw_VLc`, `Draw_VL_a`, `Draw_VLcs` (with its own
+      scale), `Draw_VLp` (each line drawn, dashed or moved),
+      `Mov_Draw_VL_a`, `Draw_Pat_VL_a`, `Dot_List`, and `Rot_VL_ab` to
+      rotate one (64 to a turn);
+    * text: `Print_Str_d`, `Print_Str_yx`, `Print_List`, `Print_Ships`;
+    * scores (6 characters and `$80`): `Clear_Score`, `Add_Score_a`,
+      `Add_Score_d`, `New_High_Score`;
+    * the controllers (`Read_Btns`, `Joy_Digital`), sound
+      (`Init_Music_chk`, `Do_Sound`) and `Random`.
+
+  Coordinates are -128 to 127, y first; a list's counts are the BIOS's
+  (one less than the lines, where `vectrex.h` says so); the BIOS's
+  strings are in capitals and end with `\200` (`$80`), not 0.
 * **No other I/O:** `read()` and `write()` aren't there, so neither is
   stdio.
 * **The end:** `_exit()` stops, with the status in D.

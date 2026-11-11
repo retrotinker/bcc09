@@ -1,8 +1,10 @@
 /* run as a Vectrex cartridge in MAME (see run.sh): built by bcc09 -Mv,
    whose start-up code copies the initialized data from the ROM to RAM
    and clears the BSS; draws a frame 100 times (text, a line, a dot, a
-   vector list), reading the buttons and joystick; puts its checks in
-   results[], which run.sh reads from RAM, and stops with status 42 */
+   vector list; and with the list, text and score functions: a pattern
+   list, a rotated one, dots, a text list, the ships left, the score),
+   reading the buttons and joystick; puts its checks in results[], which
+   run.sh reads from RAM, and stops with status 42 */
 
 #include <vectrex.h>
 
@@ -10,6 +12,15 @@ int count = 3;
 char word[] = "INITIALIZED";
 char bss[32];
 signed char box[] = { 3, 0, 20, 20, 0, 0, -20, -20, 0 };
+signed char shape[] = { 0, -10, -10, -1, 20, 0, -1, 0, 20,
+			(signed char)0xAA, -20, 0, -1, 0, -20, 1 };
+signed char arrow[] = { 0, 30 };	/* rotated a quarter turn each time */
+signed char turned[2];
+signed char dots[] = { 0, 0, 5, 5, 5, -5 };
+char texts[] = { 90, -100, 'L', 'I', 'S', 'T', 0x80,
+		 80, -100, 'O', 'F', ' ', 'T', 'W', 'O', 0x80, 0 };
+char score[7];
+char high[] = "   100\200";
 unsigned results[8];
 
 int main()
@@ -38,9 +49,26 @@ int main()
 		Reset0Ref();
 		Moveto_d(-40, -40);
 		Draw_VLc(box);
+		Reset0Ref();
+		Moveto_d(40, 40);
+		Draw_VLp(shape);
+		Reset0Ref();
+		Rot_VL_ab(16, 0, arrow, turned);
+		Draw_VL_a(0, turned);
+		Reset0Ref();
+		Moveto_d(-80, 60);
+		Dot_List(2, dots);
+		Reset0Ref();
+		Print_List(texts);
+		Reset0Ref();
+		Print_Ships(0x6E, 3, -110, -100);
 		Read_Btns();
 		Joy_Digital();
 	}
+	Clear_Score(score);
+	Add_Score_a(25, score);
+	Add_Score_d(0x1234, score);	/* 1259 */
+	New_High_Score(score, high);
 	results[0] = 0x6809;
 	results[1] = count;
 	results[2] = word[0];
@@ -48,5 +76,8 @@ int main()
 	results[4] = Vec_Loop_Count - start;	/* 100 frames */
 	results[5] = Random() < 256;
 	results[6] = Vec_Joy_1_X + 0x100;	/* centred: 0x100 */
+	results[7] = (score[2] == '1' && score[5] == '9')
+	    + 2 * (high[2] == '1' && high[5] == '9')
+	    + 4 * (turned[0] == 30 && turned[1] == 0);	/* 7 */
 	return 42;
 }

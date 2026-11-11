@@ -1,0 +1,22 @@
+Intensity_a 1F dp D0
+Intensity_a 3F dp D0
+Intensity_a 5F dp D0
+Intensity_a 7F dp D0
+Moveto_d_7F FB 09 dp D0
+Draw_VL_a 02 0A,F6 14,EC 1E,E2 dp D0
+Mov_Draw_VL_a 02 0A,F6 14,EC 1E,E2 dp D0
+Draw_VLcs 01 40 05,06 07,08 dp D0
+Draw_VLp 00 0B,0C FF 0D,0E AA 0F,10 01 dp D0
+Draw_Pat_VL_a 01 F0 0A,F6 14,EC dp D0
+Dot_List 01 01,02 03,04 dp D0
+Rot_VL_ab 10 01 01,02 03,04 dp D0
+Print_Str_d 05 06 YX dp D0
+Print_List 14,E2 ONE EC,E2 TWO dp D0
+Print_Ships 66 03 10E0 dp D0
+Clear_Score dp C8
+Add_Score_a 19 [     0] dp C8
+Add_Score_d 1234 [     0] dp C8
+New_High_Score [     0] [   100] dp C8
+Intensity_a C8 dp D0
+Intensity_a 07 dp D0
+sim6809: instruction limit (2000000) reached, in _exit's loop
