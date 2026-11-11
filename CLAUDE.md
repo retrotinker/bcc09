@@ -61,7 +61,14 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   8-character names); `objdump09 -n` joins them.
 - `ld/` builds `ld09` (linker), `objdump09` (also installed as `nm09` and `size09`) and
   `objcopy09` (`objcopy.c`, `srec.c`). objcopy09 writes binary, srec, ihex, cas, wav,
-  decb, ddos, os9 and flex (FLEX .CMD; added 2026-11-09) output. `objcopy01` in `retrotinker/mc6801-tools` is derived from it;
+  decb, ddos, os9 and flex (FLEX .CMD; added 2026-11-09) output. Data linked apart from the
+  code, above it or below (`-D`): srec, ihex, decb and flex write each part at its
+  address; binary, cas, wav and ddos are one block, so `-p` (`flatten()`, added
+  2026-11-11) makes one image in a temporary file, from the lower address to the end
+  of the higher, zeros between (overlap, or more than 64K, an error); without it cas,
+  wav and ddos refuse, saying so. `-p` with the data below used to seek back from the
+  start and write a 4 GB (sparse) file. `prog-L` (-T0x4000 -D0x1000) tests it; a
+  low-data `-Me` program from a `-p` cassette ran in XRoar. `objcopy01` in `retrotinker/mc6801-tools` is derived from it;
   bug fixes made there should be brought back here.
 - ld09's linker scripts (`-S`, `-A`, `-P`, `-Z`; added 2026-11-09) are ld01's
   (mc6801-tools): `ld/script.c`, and `writex86.c`'s layout driven by it, brought over
@@ -324,7 +331,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 811 reference
+  `tests/src/` with this tree's tools and compare every result with the 834 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

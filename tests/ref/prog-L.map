@@ -1,0 +1,37 @@
+crt0            +crt0.o
+main            +main.o
+control         +control.o
+ptr             +ptr.o
+Section         Address  Size     Load
+.text           00004000 00000260
+    00004000 00000015 crt0.o(LOC0)
+    00004018 00000034 main.o(LOC0)
+    0000404c 00000121 control.o(LOC0)
+    00004170 000000ce ptr.o(LOC0)
+    00004240 0000001b ptr.o(LOC1)
+.data           00001000 0000004c
+    00001000 0000001a ptr.o(LOC3)
+    0000101c 00000008 main.o(COMMON3)
+    00001024 00000028 ptr.o(COMMON3)
+
+                crt0                  stop  0  00004013  r
+                crt0                 __end  3  0000104c  R
+                crt0                    go  0  00004010  r
+                crt0               __edata  3  0000101c  R
+                crt0                 clear  0  00004007  r
+                crt0                 start  0  00004000  R N
+                main                 _main  0  00004018  R
+                main               _result  3  0000101c  R C
+             control             _gotoloop  0  0000413d  R
+             control                _loops  0  0000409f  R
+             control               _select  0  0000404c  R
+                 ptr              _strlen1  0  00004170  R
+                 ptr                 _grid  3  00001024  R C
+                 ptr                 _copy  0  0000418a  R
+                 ptr                   _ip  3  00001018  R
+                 ptr                  _tab  3  00001000  R
+                 ptr                 _msgs  3  00001012  R
+                 ptr                  _sum  0  000041a4  R
+                 ptr                  _buf  3  0000103c  R C
+                 ptr                 _ptrs  0  000041cc  R
+                 ptr                  _msg  3  00001010  R

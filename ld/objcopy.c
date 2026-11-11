@@ -212,6 +212,50 @@ void write_zeroes(FILE *ofd, unsigned int bsize)
 	}
 }
 
+/* -p, for the formats of one block (binary, cas, wav, ddos): a program
+   whose data isn't just after its code (above it, or below) as one image
+   in a temporary file, from the lower of their addresses to the end of
+   the higher, with zeros between; header and the addresses become those
+   of a program of that image's code alone, loaded at its start */
+FILE *flatten(FILE *ifd, struct exec *header)
+{
+	FILE *tfd;
+	uint32_t tlo, thi, dlo, dhi, lo, hi;
+
+	tlo = textaddr ? textaddr : textstart;
+	thi = tlo + header->a_text;
+	dlo = dataaddr ? dataaddr : datastart;
+	dhi = dlo + header->a_data;
+	if (header->a_data == 0 || dlo == thi)
+		return ifd;		/* (nothing to fill) */
+	if (dlo < thi && tlo < dhi)
+		fatal("The code and the data overlap");
+	lo = tlo < dlo ? tlo : dlo;
+	hi = thi > dhi ? thi : dhi;
+	if (hi - lo > 0x10000)
+		fatal("The code and the data span more than 64K");
+
+	if ((tfd = tmpfile()) == NULL)
+		fatal("Cannot make a temporary file");
+	write_zeroes(tfd, hi - lo);
+	if (fseek(ifd, A_TEXTPOS(*header), 0) < 0 || fseek(tfd, tlo - lo, 0) < 0)
+		fatal("Cannot seek to start of text");
+	write_file(ifd, tfd, header->a_text);
+	if (fseek(ifd, A_DATAPOS(*header), 0) < 0 || fseek(tfd, dlo - lo, 0) < 0)
+		fatal("Cannot seek to start of data");
+	write_file(ifd, tfd, header->a_data);
+	rewind(tfd);
+
+	header->a_hdrlen = 0;		/* (the image starts the file) */
+	header->a_text = hi - lo;
+	header->a_data = 0;
+	header->a_flags &= ~A_SEP;
+	textaddr = textstart = lo;
+	textend = datastart = hi;
+	dataaddr = 0;
+	return tfd;
+}
+
 void raw_output(FILE *ifd, FILE *ofd, struct exec header)
 {
 	if (!textaddr)
@@ -313,7 +357,7 @@ void ddos_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	if ((header.a_flags & A_SEP) &&
 	    (dataaddr || datastart != textend))
-		fatal("Dragon DOS does not support split text/data");
+		fatal("Dragon DOS does not support split text/data (-p fills the gap)");
 
 	binsize = header.a_text + header.a_data;
 
@@ -617,7 +661,7 @@ void cas_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	if ((header.a_flags & A_SEP) &&
 	    (dataaddr || datastart != textend))
-		fatal("Color BASIC does not support split text/data");
+		fatal("Color BASIC does not support split text/data (-p fills the gap)");
 
 	blockdata[0] = 0x55;
 
@@ -766,7 +810,7 @@ void wav_output(FILE *ifd, FILE *ofd, struct exec header)
 
 	if ((header.a_flags & A_SEP) &&
 	    (dataaddr || datastart != textend))
-		fatal("Color BASIC does not support split text/data");
+		fatal("Color BASIC does not support split text/data (-p fills the gap)");
 
 	if (fwrite(wavhdr, 1, sizeof(wavhdr), ofd) != sizeof(wavhdr))
 		fatal("Error writing WAV header to outfile");
@@ -939,6 +983,12 @@ int main(int argc, char *argv[])
 		for (i = 0; i < strlen(objname); i++)
 			objname[i] = toupper(objname[i]);
 	}
+
+	/* -p: one image, for a format of one block */
+	if (padoutput && (header.a_flags & A_SEP) &&
+	    (outform == BINARY || outform == DDOS_BIN || outform == CAS ||
+	     outform == WAV))
+		ifd = flatten(ifd, &header);
 
 	switch(outform) {
 	case BINARY:

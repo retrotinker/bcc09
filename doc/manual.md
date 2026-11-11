@@ -626,6 +626,12 @@ addresses.
 | `os9` | an OS-9 program module |
 | `flex` | a FLEX command (`.CMD`) |
 
+A program's data needn't follow its code: `ld09 -D` (or a linker script)
+can put it elsewhere, above the code or below it. `srec`, `ihex`, `decb`
+and `flex` write the two parts where they go. `binary`, `cas`, `wav` and
+`ddos` hold one block, so they need `-p`, which writes one image from the
+lower address to the end of the higher, with zeros between.
+
 Appendix A has each program's options in full.
 
 ## Linker scripts

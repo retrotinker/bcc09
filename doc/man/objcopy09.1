@@ -31,7 +31,9 @@ The form to write:
 .RS
 .TP
 .B binary
-The bytes alone (the default): the code, then the data.
+The bytes alone (the default): the code, then the data (with
+.BR \-p ,
+each at its place).
 .TP
 .B srec
 Motorola S-records: S0 (holding the name), S1, and S9 with the entry
@@ -46,7 +48,9 @@ address and bytes, a second for data linked apart from the code, and
 the entry point.
 .TP
 .B ddos
-A DragonDOS binary file (code and data together).
+A DragonDOS binary file (code and data together: one block, so data
+linked apart from the code needs
+.BR \-p ).
 .TP
 .B cas
 A Color BASIC cassette image, for CLOADM: a name block (the name, up to
@@ -54,6 +58,9 @@ A Color BASIC cassette image, for CLOADM: a name block (the name, up to
 address), data blocks, and an end block, each after a leader.
 For the CoCo and the Dragon, and for emulators (XRoar's
 .BR \-load\-tape ).
+A machine-language file is one block of memory, so data linked apart
+from the code needs
+.BR \-p .
 .TP
 .B wav
 The same, as the sound a cassette recorder plays to the machine
@@ -93,8 +100,16 @@ default the address it was linked at).
 .B \-p
 With
 .BR binary ,
-pad the gap between the code and the data with zeros, so that the data
-is at its address's place in the file.
+.BR ddos ,
+.B cas
+or
+.BR wav ,
+for a program whose data isn't just after its code (above it or below
+it), write one image, from the lower of their addresses to the end of
+the higher, the gap between them zeros: so each is at its address's
+place, and the file loads at the lower address (the entry point is
+still the program's).
+Code and data that overlap, or span more than 64K, are an error.
 .TP
 .BI \-v " revision"
 With

@@ -197,6 +197,7 @@ link prog-lib	-m -M -T0x1000 -L. crt0.o main.o -ltest
 link prog-s	-s -T0x1000 crt0.o main.o control.o ptr.o
 link prog-d	-d -T0x1000 crt0.o main.o control.o ptr.o
 link prog-D	-m -M -T0x1000 -D0x4000 crt0.o main.o control.o ptr.o
+link prog-L	-m -M -T0x4000 -D0x1000 crt0.o main.o control.o ptr.o
 link prog-0	-T0 crt0.o main.o control.o ptr.o
 # a symbol a library member defines again: no warning if the member
 # isn't linked (a program's own version of a library function); a
@@ -409,6 +410,18 @@ run os9-nodata.oc "$OC" -O os9 -n Prog prog-0.out nodata.os9
 run badformat.oc "$OC" -O nosuch prog.out bad.out
 run badaddr.oc "$OC" -T 0x10000 prog.out bad.out
 rm -f nodata.os9 bad.out
+# objcopy09: the data below the code (prog-L.out, -T0x4000 -D0x1000):
+# S-records and DECB, a block each; and with -p, the formats of one
+# block (binary, cas, ddos) hold one image from the data's address, the
+# gap zeros; without -p, cas refuses; and code and data that overlap
+run prog-Lsrec.oc "$OC" -O srec -n PROG prog-L.out prog-L.srec
+run prog-Ldecb.oc "$OC" -O decb prog-L.out prog-L.decb
+run prog-Lp.oc "$OC" -O binary -p prog-L.out prog-Lp.binary
+run prog-Lcas.oc "$OC" -O cas -p -n PROG prog-L.out prog-L.cas
+run prog-Lddos.oc "$OC" -O ddos -p prog-L.out prog-L.ddos
+run prog-Lnop.oc "$OC" -O cas -n PROG prog-L.out bad.out
+run overlap.oc "$OC" -O binary -p -T 0x1000 -D 0x1004 prog-D.out bad.out
+rm -f bad.out
 
 # programs run on sim6809: selftest.c calls code from control.c,
 # switch.c, ptr.c and float.c and checks the results against the host compiler's,
