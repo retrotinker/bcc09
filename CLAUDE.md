@@ -40,7 +40,14 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   isn't tagged), as plm09's do; the spec builds with `PREFIX=/usr`, runs `make check`
   in `%check`, and its License follows Fedora's dev86 (adding LGPL-2.0-only for bcc09's
   libc files and SunPro for fdlibm). `bcc09.rpmlintrc` filters what rpmlint says of a
-  cross toolchain's 6809 files. libc, the start-up files and the headers are in `$(PREFIX)/share/bcc09` (moved from
+  cross toolchain's 6809 files. `PREFIX` is `/usr/local` by default (2026-11-10; it was `/usr/local/bcc09`, and the
+  sub-Makefiles' own defaults, `/usr` and `/usr/local/bcc09`, are `/usr/local` too):
+  bcc09 compiles it in, so `make` and `make install` need the same one; nothing installed
+  clashes (all `*09`, passes in `libexec/bcc09`, `bcc09-*` pages). ld09's built-in
+  library directory stays dev86's `/usr/local/lib/m09/` (nothing there; searched after
+  every `-L`, and the driver always gives one): `share/bcc09` there would let a link
+  that can't find a library (in the tests, say) take an installed one instead.
+  libc, the start-up files and the headers are in `$(PREFIX)/share/bcc09` (moved from
   `lib/bcc09` 2026-11-09, for the package: they are no host's code), for every install
   and the tests' prefixes alike, since the compiler's output names the headers' paths. Every install takes `DESTDIR`; every Makefile takes
   `CFLAGS`/`LDFLAGS` from the environment (rpmbuild's) and adds what it needs

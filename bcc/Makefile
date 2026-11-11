@@ -3,7 +3,7 @@
 # $Id$
 #
 
-PREFIX=/usr
+PREFIX=/usr/local
 
 # CFLAGS and LDFLAGS may come from the environment (rpmbuild's)
 CFLAGS	?=-O

@@ -46,7 +46,7 @@ bcc09 builds on any Unix-like system with a C compiler and make:
 
 	make
 	make check
-	make install PREFIX=/usr/local/bcc09
+	make install
 
 "make check" runs the regression tests: the programs they build run on
 sim6809, a 6809 simulator (https://github.com/retrotinker/sim6809, 1.2.0
@@ -59,7 +59,10 @@ what each needs).
 
 "make install" puts the programs in PREFIX/bin, the passes in
 PREFIX/libexec/bcc09, the C library and its headers in
-PREFIX/share/bcc09, and the man pages in PREFIX/share/man.
+PREFIX/share/bcc09, and the man pages in PREFIX/share/man.  PREFIX is
+/usr/local unless both make and make install are given another (bcc09
+looks for its files where it was built to be installed): "make
+PREFIX=/opt/bcc09" and "make PREFIX=/opt/bcc09 install", say.
 
 On Fedora, "make rpm" builds the RPM packages (bcc09.spec, installed in
 /usr): bcc09, and bcc09-doc with the PDF manuals, in rpmbuild/; "make

@@ -1,6 +1,6 @@
 VERSION=0.12.0
 
-PREFIX=/usr/local/bcc09
+PREFIX=/usr/local
 MANDIR=$(PREFIX)/share/man
 
 DIRS=ar as bcc copt cpp ld unproto libc

@@ -54,7 +54,7 @@ bcc09 builds on any Unix-like system with a C compiler and `make`:
 ```
 make
 make check
-make install PREFIX=/usr/local/bcc09
+make install
 ```
 
 `make` builds the programs and the C library (which bcc09 compiles itself).
@@ -68,11 +68,13 @@ make install PREFIX=/usr/local/bcc09
   *PREFIX*`/share/bcc09`, and its headers in *PREFIX*`/share/bcc09/include`;
 * the manual pages in *PREFIX*`/share/man/man1`.
 
-*PREFIX* is `/usr/local/bcc09` by default. bcc09 finds its passes and
-library under the *PREFIX* it was built with, or under the directory the
-environment variable `BCC_PREFIX` names: so a build tree can be used without
-installing it, by pointing `BCC_PREFIX` at a directory of links to it, as
-the tests do.
+*PREFIX* is `/usr/local` by default. For another, give it to both `make`
+and `make install` (`make PREFIX=/opt/bcc09`, then
+`make PREFIX=/opt/bcc09 install`), since bcc09 finds its passes and library
+under the *PREFIX* it was built with, or under the directory the
+environment variable `BCC_PREFIX` names: so a build tree can be used
+without installing it, by pointing `BCC_PREFIX` at a directory of links to
+it, as the tests do.
 
 `make install` also takes `DESTDIR`, a directory to install into as if it
 were the root, for making packages: bcc09 still looks for its files under

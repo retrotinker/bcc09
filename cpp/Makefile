@@ -1,4 +1,4 @@
-PREFIX	=/usr
+PREFIX	=/usr/local
 LIBEXECDIR	=$(PREFIX)/libexec/bcc09
 
 # CFLAGS and LDFLAGS may come from the environment (rpmbuild's)

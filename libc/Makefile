@@ -2,7 +2,7 @@
 # librarian, and installed where bcc09 looks for it ($(PREFIX)/share/bcc09,
 # and the headers in $(PREFIX)/share/bcc09/include)
 
-PREFIX	=/usr/local/bcc09
+PREFIX	=/usr/local
 LIBDIR	=$(PREFIX)/share/bcc09
 
 # (TOP, this directory, also when OS-9's libc is built in os9obj)
