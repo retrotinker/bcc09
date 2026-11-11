@@ -1,5 +1,3 @@
-- Continue removing unused options and correcting documentation
-- Ditto for any remaining x86isms
 - Add support for Color TRSDOS (i.e. Disk EDTASM) environment?
 - Add code generation option for 6309
 - Implement more/better copt rules
