@@ -123,7 +123,7 @@ echo $? > cpp-E.rc
 # peephole optimizer (-O); then object files
 csrc="arith calls cbtest chartest control float helpmain long longops main
       maltest ops pftest proto ptr sadd selftest sftest siotest stdtest strtest
-      struct switch vatest"
+      struct switch vatest direct"
 for f in $csrc; do
 	run $f.cc "$BCC" -S -o $f.s $f.c
 	run $f-O.cc "$BCC" -O -S -o $f-O.s $f.c
@@ -132,6 +132,8 @@ done
 # compiler errors
 run syntax.cc "$BCC" -S -o syntax.s syntax.c
 rm -f syntax.s
+run directerr.cc "$BCC" -S -o directerr.s directerr.c
+rm -f directerr.s
 
 # the assembler: object file, listing and symbol file
 for f in crt0 modes regtest simcrt0 os9op; do
@@ -216,6 +218,14 @@ link comm-quiet	-m -M -T1000 commmain.o -L. -lcomm
 link comm-need	-m -M -T1000 commneed.o -L. -lcomm
 link comm-ref	-m -M -T1000 commref.o -L. -lcomm
 rm -f commmain.o commneed.o commref.o commlib.o libcomm.a
+# a variable a module imports in the direct page (C's extern __direct),
+# which another defines elsewhere: an error, whichever is read first
+for f in directuse directdef; do
+	"$BCC" -c -o $f.o $f.c > /dev/null 2>&1
+done
+link direct-ud	-T1000 directuse.o directdef.o
+link direct-du	-T1000 directdef.o directuse.o
+rm -f directuse.o directdef.o direct-ud.out direct-du.out
 if cmp -s prog.out prog-lib.out; then
 	echo "ok   prog-lib.out is the same as prog.out"
 else

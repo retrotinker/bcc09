@@ -599,9 +599,11 @@ struct symstruct *adr;
 			} else if (indflag) {
 				outextended();
 				bumplc2();
-			} else if (adr->flags & DIRECTPAGE)
+			} else if (adr->flags & DIRECTPAGE) {
 				outdirectpage();
-			else {
+				if (adr->flags & EXTERNAL)
+					dpimport(adr->name.namep);
+			} else {
 				outextended();
 				bumplc();
 			}

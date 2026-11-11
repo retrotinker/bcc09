@@ -265,13 +265,24 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   is `int`); `stdbool.h`'s `bool` is `cc1`'s `_Bool` (added 2026-11-08): an `unsigned char`
   type (`btype`) that every conversion makes 0 or 1 (`boolnode()` in `exptree.c` for
   assignments, casts, returns and initializers; `abop()` and `incdec()` for `op=`, `++`, `--`).
-- Direct-page objects are off (`DIRECTPAGE_BROKEN` in `bcc/sc.h`, since 60d57e48 in
-  2014): nothing makes one. BUGS said `&` of one gave `LEAX <_foo`; checked 2026-11-10
-  with them switched on, `&` gives `LDX #_foo` (`LEAX _foo,PC`/`,U` with `-p`/`-u`, which
-  don't use the direct page) in assignments, arguments, arithmetic, comparisons and
-  initializers, so the entry went (BUGS has none now). What's really missing is DP:
-  nothing sets it to segment 2's page, and the ROM (DP 0) and Vectrex BIOS ($D0) want
-  their own; opt-in direct-page variables are in TODO.
+- Direct-page variables (begun 2026-11-10, design approved: keyword `__direct`, OS-9
+  included): cc1's `__direct` (`DIRECTDECL`, `gvardirect` beside `gvarsc` in
+  `declare.c`, saved where it is) marks a global or static variable `DIRECTPAGE`
+  (`DIRECTPAGE_BROKEN` is gone): segment 2, reached as `<name` (initialized in `LOC 2`,
+  commons and local statics there too); errors for a function, typedef, parameter,
+  auto or register variable, and for `__direct` in only some declarations. The
+  `extern __direct` variables the code refers to are imported in `LOC 2`
+  (`dpimport()`/`dumpdpimports()` in `table.c`; only those referred to, since an
+  import links the definer), and ld09 makes an import in segment 2 that meets a
+  definition or common block elsewhere an error, either order (`direct_import()`,
+  `DIRECTIMPORT`/`HASSTORAGE` in `readobj.c`). The default layout already keeps
+  segment 2 in one page (`ONEPAGE`); `rom.ld` and `vectrex.ld` have `*(LOC2) *(COMMON2)`
+  in an `ONEPAGE` of their own. Probed in XRoar: Color, Extended, Disk (1.0, 1.1) and
+  Super Extended BASIC's and the Dragon's interrupt handlers don't use DP, so a program
+  may keep its own while it runs (DP 0 around ROM calls). Still to do: start-up code
+  setting DP (only if segment 2 isn't empty), libc's ROM/BIOS/FLEX calls keeping it,
+  `-Mo` (`<name`, DP = the data area's page), the manual. `direct.c`, `directerr.c`,
+  `direct-ud`/`direct-du` test it.
 - cc1's `-c-` and `-f-` (callee saves, first argument on the stack) are errors (2026-11-10;
   they were accepted and ignored: `callersaves` and `arg1inreg` start TRUE and only `-c`
   and `-f` set them). Honored, `-f-` makes plausible code that libc (and `va_start`)
@@ -289,7 +300,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 763 reference
+  `tests/src/` with this tree's tools and compare every result with the 783 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

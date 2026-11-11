@@ -21,6 +21,7 @@
 PRIVATE bool_t argsallowed;	/* nonzero to allow args in declarator */
 #define MAXPARAMS 32
 PRIVATE sym_t gvarsc;		/* sc flags of last identifier declared */
+PRIVATE bool_t gvardirect;	/* and if it was declared __direct */
 PRIVATE char gvar2name[2 + NAMESIZE];	/* space for structure keys and .. */
 
 #define gvarname (gvar2name + 2)	/* last identifier declared */
@@ -99,6 +100,7 @@ PRIVATE void declaf()
 #ifdef TESTING_PROTOTYPES
 	char ogvarname[NAMESIZE];
 	sym_t ogvarsc;
+	bool_t ogvardirect;
 	struct symstruct *ogvarsymptr;
 	struct typestruct *ogvartype;
 #endif
@@ -113,6 +115,7 @@ PRIVATE void declaf()
 #ifdef TESTING_PROTOTYPES
 		strcpy(ogvarname, gvarname);
 		ogvarsc = gvarsc;
+		ogvardirect = gvardirect;
 		ogvarsymptr = gvarsymptr;
 		ogvartype = gvartype;
 		if (declspec()) {
@@ -167,6 +170,7 @@ PRIVATE void declaf()
 		}
 		strcpy(gvarname, ogvarname);
 		gvarsc = ogvarsc;
+		gvardirect = ogvardirect;
 		gvarsymptr = ogvarsymptr;
 		gvartype = ogvartype;
 #endif /* TESTING_PROTOTYPES */
@@ -215,6 +219,7 @@ PRIVATE struct proto *declproto()
 {
 	char ogvarname[NAMESIZE];
 	sym_t ogvarsc;
+	bool_t ogvardirect;
 	struct symstruct *ogvarsymptr;
 	struct typestruct *ogvartype;
 	bool_t oargsallowed;
@@ -225,6 +230,7 @@ PRIVATE struct proto *declproto()
 
 	strcpy(ogvarname, gvarname);
 	ogvarsc = gvarsc;
+	ogvardirect = gvardirect;
 	ogvarsymptr = gvarsymptr;
 	ogvartype = gvartype;
 	oargsallowed = argsallowed;
@@ -265,6 +271,7 @@ PRIVATE struct proto *declproto()
 		proto->ptypes[i] = types[i];
 	strcpy(gvarname, ogvarname);
 	gvarsc = ogvarsc;
+	gvardirect = ogvardirect;
 	gvarsymptr = ogvarsymptr;
 	gvartype = ogvartype;
 	argsallowed = oargsallowed;
@@ -471,6 +478,7 @@ PRIVATE bool_pt declspec()
 	unsigned nunsigned;
 
 	gvarsc = NULLDECL;
+	gvardirect = FALSE;
 	gvartype = itype;
 	nsigned = nunsigned = ntype = nsc = 0;
 	while (TRUE) {
@@ -539,6 +547,10 @@ PRIVATE bool_pt declspec()
 			gvarsc = sym;
 			nextsym();
 			break;
+		case DIRECTDECL:
+			gvardirect = TRUE;
+			nextsym();
+			break;
 		case TYPEDEFNAME:
 			if (ntype != 0)
 				goto break2;
@@ -587,6 +599,8 @@ break2:
 		if (nsc > 1)
 			error("multiple storage classes in declaration");
 	}
+	if (gvardirect && ntype == 0)
+		ntype = 1;
 	if (ntype > 1)
 		error("multiple types in declaration");
 	return nsc > 0 || ntype > 0;
@@ -597,6 +611,7 @@ break2:
 PRIVATE struct typestruct *declsu()
 {
 	sym_t ogvarsc;
+	bool_t ogvardirect;
 	offset_T soffset;
 	offset_T struclength;
 	sym_t susym;
@@ -623,6 +638,7 @@ PRIVATE struct typestruct *declsu()
 		multidecl(structype->tname);
 	nextsym();
 	ogvarsc = gvarsc;
+	ogvardirect = gvardirect;
 	struclength = soffset = 0;
 	typelist = NULL;
 	while (sym != RBRACE && sym != EOFSYM) {
@@ -639,6 +655,7 @@ PRIVATE struct typestruct *declsu()
 	    structype->alignmask;
 	rbrace();
 	gvarsc = ogvarsc;
+	gvardirect = ogvardirect;
 	return structype;
 }
 
@@ -815,16 +832,17 @@ PRIVATE void idecllist()
 			}
 			if (gvarsc == NULLDECL)
 				gvarsymptr->flags &= ~EXTERNAL;
+			if (gvartype->constructor != FUNCTION
+			    && !gvardirect != !(gvarsymptr->flags & DIRECTPAGE))
+				error2error(gvarname,
+				    " is __direct in only some of its declarations");
 		} else if (level == GLBLEVEL
 			   || gvartype->constructor == FUNCTION
 			   || gvarsc == EXTERNDECL) {
 			gvarsymptr = addglb(gvarname, gvartype);
-#if !defined(DIRECTPAGE_BROKEN)	/* FIXME: This does not seem right for most potential uses... */
-#ifdef DIRECTPAGE		/* make all global scalar and pointer variables DIRECTPAGE */
-			if (!(gvartype->constructor & ~POINTER))
-				gvarsymptr->flags = DIRECTPAGE;
-#endif
-#endif
+			if (gvardirect && gvartype->constructor != FUNCTION
+			    && gvarsc != TYPEDEFDECL)
+				gvarsymptr->flags |= DIRECTPAGE;
 			if (gvarsc == EXTERNDECL)
 				gvarsymptr->flags |= EXTERNAL;
 		} else {
@@ -836,10 +854,23 @@ PRIVATE void idecllist()
 				    (softsp & gvartype->alignmask) -
 				    gvartype->typesize;
 		}
+		/* __direct: a variable, global or static */
+		if (gvardirect) {
+			if (gvartype->constructor == FUNCTION)
+				error2error(gvarname, ": a function can't be __direct");
+			else if (gvarsc == TYPEDEFDECL)
+				error("a typedef can't be __direct");
+			else if (gvarsymptr->level != GLBLEVEL
+				 && gvarsc != STATICDECL && gvarsc != EXTERNDECL)
+				error2error(gvarname,
+				    ": __direct needs static or extern here");
+		}
 		if (gvarsc == STATICDECL) {
 			gvarsymptr->flags &= ~EXTERNAL;
 			gvarsymptr->flags |= STATIC;
 			if (gvarsymptr->level != GLBLEVEL) {
+				if (gvardirect)
+					gvarsymptr->flags |= DIRECTPAGE;
 				gvarsymptr->storage = GLOBAL;
 				gvarsymptr->offset.offlabel = getlabel();
 				/* must leave gvarsymptr->name.label alone */
@@ -1160,6 +1191,7 @@ PUBLIC struct typestruct *typename()
 {
 	char ogvarname[NAMESIZE];
 	sym_t ogvarsc;
+	bool_t ogvardirect;
 	struct symstruct *ogvarsymptr;
 	struct typestruct *ogvartype;
 	struct typestruct *type;
@@ -1170,6 +1202,7 @@ PUBLIC struct typestruct *typename()
 	/* and the sizeof in an array size expression */
 	strcpy(ogvarname, gvarname);
 	ogvarsc = gvarsc;
+	ogvardirect = gvardirect;
 	ogvarsymptr = gvarsymptr;
 	ogvartype = gvartype;
 	if (declspec()) {
@@ -1181,6 +1214,7 @@ PUBLIC struct typestruct *typename()
 		type = NULL;
 	strcpy(gvarname, ogvarname);
 	gvarsc = ogvarsc;
+	gvardirect = ogvardirect;
 	gvarsymptr = ogvarsymptr;
 	gvartype = ogvartype;
 	return type;

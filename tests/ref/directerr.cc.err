@@ -1,0 +1,7 @@
+directerr.c:5.17: error: f: a function can't be __direct
+directerr.c:6.26: error: a typedef can't be __direct
+directerr.c:8.10: error: mixed is __direct in only some of its declarations
+directerr.c:10.26: error: other is __direct in only some of its declarations
+directerr.c:13.15: error: a: __direct needs static or extern here
+directerr.c:15.20: error: autov: __direct needs static or extern here
+directerr.c:16.28: error: regv: __direct needs static or extern here

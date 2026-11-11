@@ -1,0 +1,1 @@
+ld09: error: _dvar is imported in the direct page (LOC2) by directuse.o, but directdef.o has it in LOC3

@@ -148,6 +148,7 @@ enum scan_states
     REGDECL,
     STATICDECL,
     TYPEDEFDECL,
+    DIRECTDECL,
 
     ASMSYM,
     BREAKSYM,

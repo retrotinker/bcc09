@@ -57,6 +57,7 @@ void addconst P((offset_T offset, store_pt reg));
 void adjlc P((offset_T offset, store_pt reg));
 void andconst P((offset_T offset));
 void bssseg P((void));
+void dpimport P((char *name));
 label_no casejump P((void));
 void common P((char *name));
 void cseg P((void));

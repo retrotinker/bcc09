@@ -27,10 +27,17 @@ SECTIONS
         *(LOC0 LOC1)
     } > ROM
 
-    /* segment 5, the init functions, in a statement of its own */
+    /* the direct page (C's __direct variables, and their common blocks)
+       in one page, first; segment 5, the init functions, in a statement
+       of its own */
     .data :
     {
-        *(LOC2 LOC3 LOC4)
+        ONEPAGE
+        {
+            *(LOC2)
+            *(COMMON2)
+        }
+        *(LOC3 LOC4)
         *(LOC5)
         *(LOC6 LOC7 LOC8 LOC9 LOC1?)
         __edata = .;

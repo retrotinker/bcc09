@@ -573,6 +573,30 @@ char *aname;
 	}
 }
 
+/* a symbol a module imports in the direct page (counter 2: a C variable
+   declared __direct), which another defines (or has a common block of) in
+   another counter: the importer's direct addresses would be wrong */
+PUBLIC void direct_import(name, impfname, impaname, deffname, defaname, seg)
+char *name;
+char *impfname;
+char *impaname;
+char *deffname;
+char *defaname;
+int seg;
+{
+	++errcount;
+	refer();
+	putstr("error: ");
+	putstr(name);
+	putstr(" is imported in the direct page (LOC2) by ");
+	putmodule(impfname, impaname);
+	putstr(", but ");
+	putmodule(deffname, defaname);
+	putstr(" has it in ");
+	putloc(seg);
+	putstrn("");
+}
+
 /* initialized data (bytes or relocations) in a module's counter that a
    linker script puts in a NOLOAD section, which isn't written */
 PUBLIC void noload_data(fname, aname, seg, sectname)

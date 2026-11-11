@@ -43,6 +43,17 @@ PRIVATE struct redef *redefs, **redeftail = &redefs;
 FORWARD void redefinition P((struct symstruct *symptr, char *message));
 PRIVATE struct modstruct *modlast;	/* data for last module */
 
+/* the direct page's counter (C's __direct variables), and an import there
+   (no size: not a common block); a definition, or a common block, which
+   has storage (but not an absolute value, which may be in any page) */
+#define DPSEG 2
+#define DIRECTIMPORT(flags, value) \
+	(((flags) & (E_MASK | I_MASK | A_MASK | SA_MASK)) == I_MASK \
+	 && (value) == 0 && ((flags) & SEGM_MASK) == DPSEG)
+#define HASSTORAGE(flags, value) \
+	(!((flags) & A_MASK) && ((flags) & E_MASK \
+				  || ((flags) & I_MASK && (value) != 0)))
+
 FORWARD long readarheader P((char **parchentry));
 FORWARD unsigned readfileheader P((void));
 FORWARD void readmodule P((char *filename, char *archentry));
@@ -206,6 +217,27 @@ char *archentry;
 				flags &=
 				    ~(flags_t) SEGM_MASK | (symptr->
 							    flags & SEGM_MASK);
+			/* an import in the direct page (a C __direct variable)
+			   and the symbol elsewhere: an error, whichever comes
+			   first (the symbol, not the import, is kept) */
+			if (DIRECTIMPORT(flags, symdptr->dvalue)
+			    && HASSTORAGE(symptr->flags, symptr->value)
+			    && (symptr->flags & SEGM_MASK) != DPSEG) {
+				direct_import(symname, filename, archentry,
+					      symptr->modptr->filename,
+					      symptr->modptr->archentry,
+					      symptr->flags & SEGM_MASK);
+				continue;
+			}
+			if (DIRECTIMPORT(symptr->flags, symptr->value)
+			    && HASSTORAGE(flags, symdptr->dvalue)
+			    && (flags & SEGM_MASK) != DPSEG) {
+				direct_import(symname, symptr->modptr->filename,
+					      symptr->modptr->archentry,
+					      filename, archentry,
+					      flags & SEGM_MASK);
+				goto define;
+			}
 			if ((flags ^ symptr->flags) & (A_MASK | SEGM_MASK)) {
 				redefinition(symptr,
 					     " with different segment or relocatability");
@@ -221,6 +253,7 @@ char *archentry;
 				continue;
 		} else
 			symptr = addsym(symname);
+	      define:
 		symptr->modptr = modlast;
 		symptr->value = symdptr->dvalue;
 		symptr->flags = flags;

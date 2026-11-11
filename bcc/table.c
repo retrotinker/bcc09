@@ -30,7 +30,7 @@
 #define MAXEXPR 500
 #endif
 #define MAXLOCAL 100
-#define NKEYWORDS 39
+#define NKEYWORDS 40
 #ifdef NOFLOAT
 #define NSCALTYPES 11
 #else
@@ -94,6 +94,7 @@ PRIVATE struct keywordstruct keywords[NKEYWORDS] = {
 	{"static", STATICDECL,},
 
 	{"typedef", TYPEDEFDECL,},
+	{"__direct", DIRECTDECL,},
 
 	{"asm", ASMSYM,},
 	{"break", BREAKSYM,},
@@ -146,6 +147,7 @@ PRIVATE struct typedatastruct scaltypes[NSCALTYPES] = {
 #endif
 };
 
+FORWARD void dumpdpimports P((void));
 FORWARD struct symstruct *addkeyword P((char *name, sym_pt code));
 FORWARD void heapcorrupterror P((void));
 
@@ -382,10 +384,46 @@ PUBLIC void dumpglbs()
 				outnhex(type->typesize);
 			}
 	dumpinits();	/* (with data through U) */
+	dumpdpimports();
 	if (printf_fp)
 		globl("__xfpcvt");
 	if (scanf_fp)
 		globl("__xfptvc");
+}
+
+/* the external __direct variables the code refers to (as <name), imported
+   in the direct page's segment, so that ld09 can tell if a module defines
+   one elsewhere (when its declarations here say __direct and its
+   definition doesn't); only those referred to, since an import links the
+   module that defines it */
+
+#define MAXDPIMPORTS 64
+PRIVATE char *dpimports[MAXDPIMPORTS];
+PRIVATE int ndpimports;
+
+PUBLIC void dpimport(name)
+char *name;
+{
+	int i;
+
+	for (i = 0; i < ndpimports; ++i)
+		if (dpimports[i] == name)
+			return;
+	if (ndpimports < MAXDPIMPORTS)	/* (beyond, only the check is lost) */
+		dpimports[ndpimports++] = name;
+}
+
+PRIVATE void dumpdpimports()
+{
+	struct symstruct *symptr;
+	int i;
+
+	for (i = 0; i < ndpimports; ++i)
+		if ((symptr = findlorg(dpimports[i])) != NULL
+		    && symptr->flags & EXTERNAL && symptr->flags & DIRECTPAGE) {
+			dpseg();
+			import(dpimports[i]);
+		}
 }
 
 /* dumplocs() - define offsets of current locals */

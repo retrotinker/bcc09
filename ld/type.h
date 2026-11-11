@@ -127,6 +127,8 @@ void interseg P((char *fname, char *aname, char *name));
 void reserved P((char *name));
 void size_error P((int seg, bin_off_t count, bin_off_t size));
 void noload_data P((char *fname, char *aname, int seg, char *sectname));
+void direct_import P((char *name, char *impfname, char *impaname,
+		       char *deffname, char *defaname, int seg));
 void warning P((char *message));
 void undefined P((char *name));
 void usage P((void));
