@@ -31,8 +31,10 @@ prototypes into the K&R C the compiler reads, keeping their types),
 cc1 (the compiler) and copt (the peephole optimizer, with -O).
 
 The C it compiles is C89 with prototypes, less const and volatile (which
-the headers define away), plus _Bool; char is unsigned, int is 16 bits,
-long 32, float and double IEEE single and double precision.  The C
+the headers define away), plus _Bool, and __direct for variables in the
+6809's direct page (a byte smaller and a cycle faster to reach); char is
+unsigned, int is 16 bits, long 32, float and double IEEE single and
+double precision.  The C
 library has string.h, ctype.h, stdlib.h (with malloc), stdarg.h, stdio.h
 (printf and scanf as glibc's, floating point formats included), math.h
 (Sun's fdlibm), stdint.h, stdbool.h, and the system functions each

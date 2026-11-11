@@ -46,6 +46,29 @@ all (but U under
 the data's).
 The C library's README describes the conventions in full.
 .PP
+A global or static variable declared
+.B __direct
+goes in segment 2, which
+.BR ld09 (1)
+keeps in one page, and is reached as
+.BI < name
+(with
+.BR \-u ,
+too; its address is still
+.BI # name
+or
+.IB name ,U\c
+); the start-up code sets DP to that page.
+It can't be a function, typedef, parameter, or automatic or register
+variable, and must be
+.B __direct
+in all of a variable's declarations or none.
+The
+.B extern __direct
+variables the code refers to are imported in segment 2, so that
+.BR ld09 (1)
+refuses to link a module that defines one elsewhere.
+.PP
 Its own preprocessor
 .RB ( \-E )
 is what

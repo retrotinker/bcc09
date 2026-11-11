@@ -218,8 +218,16 @@ The data follows the code, or is at the data address
 or 0 with
 .BR \-i ,
 after the code is padded to a multiple of 16 bytes): segment 2 (the
-direct page, moved to the start of the next 256-byte page if it would
-cross one), then 3 (the data, then the BSS) to 15.
+direct page: C's
+.B __direct
+variables, and their common blocks; moved to the start of the next
+256-byte page if it would cross one, and an error if it is larger than
+a page), then 3 (the data, then the BSS) to 15.
+A symbol imported in segment 2 (as the compiler imports an
+.B "extern __direct"
+variable) that another module defines, or has a common block of, in
+another segment is an error: the importer's one-byte addresses would be
+wrong.
 Each segment is followed by its common blocks
 .RB ( COMM ,
 each rounded up to a multiple of 4 bytes), and each module's part of a
@@ -625,6 +633,15 @@ A symbol defined in two linked modules is reported with a warning, as in
 first definition read is used.
 A library member that isn't linked doesn't count, so a program can have
 its own version of a library function.
+.PP
+\(lq_x is imported in the direct page (LOC2) by use.o, but def.o has it in
+LOC3\(rq: a C module declares
+.B "extern __direct int x"
+and another defines
+.B "int x"
+(not
+.BR __direct ):
+an error.
 .PP
 Input that a script doesn't place is reported with a warning, as in
 \(lqsegs.o(LOC5) isn't placed by the script; adding it to .data\(rq.

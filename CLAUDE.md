@@ -265,7 +265,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   is `int`); `stdbool.h`'s `bool` is `cc1`'s `_Bool` (added 2026-11-08): an `unsigned char`
   type (`btype`) that every conversion makes 0 or 1 (`boolnode()` in `exptree.c` for
   assignments, casts, returns and initializers; `abop()` and `incdec()` for `op=`, `++`, `--`).
-- Direct-page variables (begun 2026-11-10, design approved: keyword `__direct`, OS-9
+- Direct-page variables (2026-11-10/11, design approved: keyword `__direct`, OS-9
   included): cc1's `__direct` (`DIRECTDECL`, `gvardirect` beside `gvarsc` in
   `declare.c`, saved where it is) marks a global or static variable `DIRECTPAGE`
   (`DIRECTPAGE_BROKEN` is gone): segment 2, reached as `<name` (initialized in `LOC 2`,
@@ -302,7 +302,11 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   data area's page (F$Fork's, and `crtos9` sets it from U); `-u`'s init functions store
   through `label,U`, so they don't need DP. `dptest` runs as an OS-9 module, under
   sim6809 and NitrOS-9 (`os9.result`, `check-nitros9`); `direct-u.s` is `direct.c`
-  with `-Mo`. Still to do: the manual.
+  with `-Mo`. Documented (phase d): the manual's "Direct-page variables" (rules, each
+  target's DP, a program's own ROM calls and C interrupt handlers), the calling
+  conventions (DP is kept) and segments, `bcc09-cc1(1)`, `ld09(1)` (segment 2 and the
+  error), `libc/README`'s DP paragraph, README, and the BASIC guide's "Faster
+  variables" (its program is compiled by `basic.result`).
 - cc1's `-c-` and `-f-` (callee saves, first argument on the stack) are errors (2026-11-10;
   they were accepted and ignored: `callersaves` and `arg1inreg` start TRUE and only `-c`
   and `-f` set them). Honored, `-f-` makes plausible code that libc (and `va_start`)

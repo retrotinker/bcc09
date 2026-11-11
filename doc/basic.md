@@ -576,6 +576,34 @@ int main()
 numbers every time the program runs, unless you start it somewhere else
 with `srand()`: a good start is the time the player takes to press a key.
 
+## Faster variables
+
+The 6809 has a *direct page*: 256 bytes of memory it can reach with a
+one-byte address, quicker than anywhere else. Color BASIC keeps its own
+busiest variables there, in page 0. A C program can put its own there by
+declaring them `__direct` (two underscores), outside any function:
+
+```c
+#include <stdio.h>
+
+__direct int i, total;
+
+int main()
+{
+	for (i = 0; i < 100; i++)
+		total += i;
+	printf("TOTAL %d\r", total);
+	return 0;
+}
+```
+
+Each use of `i` or `total` is then a byte smaller and a little faster.
+Keep it for the variables a program uses most, such as a game's
+positions and counters: all of them together must fit in the 256 bytes.
+They get a page of their own, not BASIC's, and the library gives the ROM
+page 0 back whenever it calls it. If you call the ROM's routines from
+machine language yourself, see the bcc09 manual first.
+
 ## What C doesn't have yet
 
 bcc09 has no `PLAY`, `LINE`, `CIRCLE` or `PMODE` for you: C programs make

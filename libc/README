@@ -157,6 +157,24 @@ linker pads the segment with, are skipped).  A target's library has _exit; and r
 write, close, lseek, isatty and open if the target has a way to do I/O,
 which is what stdio needs.
 
+DP: a program's __direct variables are in segment 2, which the linker
+keeps in one page, and cc1 reaches them as <name.  Before the init
+functions, each target's start-up code sets DP to their page
+(__seg2DL's), if there are any (__seg2DL to __seg2CH isn't empty), so a
+program without them keeps the DP it was started with.  The library's
+calls into the system give it the DP it wants, and the program's back
+after: Color BASIC's ROM routines (POLCAT, CHROUT, JOYIN, DSKCON, and
+the SOUND loop's SNDTON) DP 0; FLEX's routines the DP FLEX started the
+program with (crtflex saves it in __sysdp); the Vectrex BIOS's $D0
+($C8 for its music).  sa's crt0 saves the caller's DP (in __sysdp) for
+_exit() to give back.  OS-9's DP is the data area's page (F$Fork's;
+crtos9 sets it from U too), where segment 2 comes first: -u code reaches
+__direct variables as <name too.  BASIC's interrupt handlers don't use
+DP (probed in XRoar on Color, Extended, Disk 1.0 and 1.1, Super
+Extended BASIC and the Dragon's ROMs), so a program may keep its own
+between calls; but a C interrupt handler mustn't use __direct variables,
+since DP may be 0 when it comes.
+
 sa is for a program loaded and called by something it can return to,
 such as Color BASIC's EXEC, a monitor or a debugger.  It runs on the
 stack its loader gave it: crt0 saves S, and _exit() puts the status in
@@ -255,7 +273,9 @@ a module of the program's own that defines __vec_header in segment 12
 takes the place of (include/vectrex.h shows one); _exit() (vec/_exit.s),
 which stops; and C functions for the BIOS's routines, named as Vectrex
 programmers know them (vec/draw.s, input.s, sound.s, random.s), which
-put their arguments in the registers the routines want and set DP.
+put their arguments in the registers the routines want and set DP,
+calling them and giving the caller's DP back after (a program's
+__direct variables are in page $C8).
 There is no read() or write(), so no stdio.  "make check" runs a
 cartridge on sim6809 with tests/src/vecbios.s standing in for the BIOS,
 printing each call; "make check-vectrex" runs tests/vectrex/xvec.c in

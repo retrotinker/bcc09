@@ -199,6 +199,67 @@ The preprocessor defines `__BCC__`, `__6809__`, `__STDC__` (unless `-kr`),
 and a macro for the target: `__CB__`, `__OS9__`, `__FLEX__` and
 `__FLEX9__`, `__STANDALONE_`, or `__SIM6809__`.
 
+## Direct-page variables
+
+A global or `static` variable declared `__direct` goes in the direct page,
+the 256 bytes DP points at, where the 6809 reaches it with a one-byte
+address: each use is a byte smaller and a cycle faster (`LDD <count`
+rather than `LDD >count`). Use it for the variables a program uses most.
+
+```c
+__direct int count;
+__direct unsigned char x, y;
+static __direct char line[32];
+extern __direct int score;	/* in a header */
+```
+
+* **Any type** may be `__direct`: scalars, pointers, arrays, structures. A
+  function, a `typedef`, a parameter, or an automatic or `register`
+  variable can't be; a `static` one in a function can.
+* **One page:** all of a program's `__direct` variables together must fit
+  in 256 bytes, or the link fails.
+* **Every declaration** of a variable must say `__direct`, or none: the
+  compiler checks it within a file, and `ld09` across modules (a module
+  that declares `extern __direct int x` and one that defines `int x` won't
+  link).
+* **`&`** of one is its whole address, as for any variable.
+
+The start-up code sets DP to the variables' page, only if the program has
+any: a program without them keeps the DP it was started with. The C library
+gives each system the DP it wants when it calls it, and the program's back
+after:
+
+* **Color BASIC, Disk BASIC, the Dragon** (`-Me`, `-Mr`): the ROM's routines
+  get DP 0, as they need. BASIC's interrupt handlers don't use DP (checked
+  on Color, Extended, Disk and Super Extended BASIC and the Dragon's ROMs),
+  so the program can keep its own while it runs. `exit()` gives BASIC its
+  DP back.
+* **FLEX** (`-Mf`): FLEX's routines get the DP FLEX started the program
+  with.
+* **Vectrex** (`-Mv`): the BIOS's routines get $D0 ($C8 for the music), as
+  before; the program's own DP is $C8, where `vectrex.ld` puts the data.
+* **OS-9** (`-Mo`): DP is the data area's page, which F$Fork sets, and the
+  `__direct` variables are the first 256 bytes of the data area.
+
+Two things are the program's own to look after, when it has `__direct`
+variables:
+
+* **Its assembly that calls the ROM** must set DP to 0 first, and back
+  after:
+
+```
+        pshs    dp
+        clra
+        tfr     a,dp            ; DP 0, for the ROM
+        lda     #'A
+        jsr     [$a002]         ; CHROUT
+        puls    dp              ; the program's DP again
+```
+
+* **An interrupt handler written in C** mustn't use `__direct` variables:
+  DP may be 0 when the interrupt comes, in the middle of a call into the
+  ROM.
+
 # Targets
 
 bcc09's `-M` option chooses what a program is for. Each target has its own
@@ -483,8 +544,10 @@ argument. The result:
 | `double` | D, X, Y and U (high word in D; in memory, as `PSHS D,X,U,Y` leaves them) |
 
 The caller saves the registers it needs: a function may change them all
-(but U under `-Mo`, where it points at the data). A function name in C is
-the assembler's name with an underscore before it: `main` is `_main`.
+(but U under `-Mo`, where it points at the data, and DP, which a function
+must leave as it found it: in a program with `__direct` variables it is
+their page). A function name in C is the assembler's name with an
+underscore before it: `main` is `_main`.
 
 A function with a variable argument list gets, in place of `...`, an `int`
 parameter named `__va_alist`, which `stdarg.h`'s `va_start` uses: the first
@@ -520,7 +583,8 @@ keep Y and U, the long ones U. The C library's README lists them all.
 ## Init functions and segments
 
 The assembler's 16 segments (`LOC` 0 to 15) are placed by the linker: 0
-and 1 are code, 3 the data and then the BSS (`.data` and `.bss`). A module
+and 1 are code, 2 the direct page (C's `__direct` variables, kept within
+one page), 3 the data and then the BSS (`.data` and `.bss`). A module
 can have a function run before `main` by putting its address in segment 5:
 
 ```
