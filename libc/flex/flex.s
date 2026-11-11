@@ -27,43 +27,54 @@ PUTCHR	equ	$cd18
 	export	___flex_inch
 	export	___flex_putchr
 	export	___flex_fms
+	.bss			; crt0 defines it there, so import it there
+	import	__sysdp
+	.text
 
 __exit:
 	pshs	x		; the status, the first argument
+	lda	__sysdp		; FLEX's DP again
+	tfr	a,dp
 	jsr	FMSCLS
 	puls	d
 	jmp	WARMS
 
 ; fcb is in X, a above the return address
 ___flex_fms:
-	pshs	d,y,u		; 6,S: return  8,S: a
-	lda	9,s
+	pshs	d,dp,y,u	; 7,S: return  9,S: a
+	lda	__sysdp		; FLEX's DP, for the call
+	tfr	a,dp
+	lda	10,s
 	jsr	FMS		; (keeps B, X, Y and U)
 	bne	fmserr
 	tfr	a,b
 	clra
 	tfr	d,x
-	puls	d,y,u,pc
+	puls	d,dp,y,u,pc
 fmserr:	ldb	1,x		; the error, negated
 	clra
 	coma
 	comb
 	addd	#1
 	tfr	d,x
-	puls	d,y,u,pc
+	puls	d,dp,y,u,pc
 
 ___flex_inch:
-	pshs	d,y,u
+	pshs	d,dp,y,u
+	lda	__sysdp		; FLEX's DP, for the call
+	tfr	a,dp
 	jsr	INCH		; A: the character
 	tfr	a,b
 	clra
 	tfr	d,x
-	puls	d,y,u,pc
+	puls	d,dp,y,u,pc
 
 ; c is in X
 ___flex_putchr:
-	pshs	d,x,y,u
+	pshs	d,dp,x,y,u
+	lda	__sysdp		; FLEX's DP, for the call
+	tfr	a,dp
 	tfr	x,d
 	tfr	b,a		; the character, in A
 	jsr	PUTCHR
-	puls	d,x,y,u,pc
+	puls	d,dp,x,y,u,pc

@@ -279,10 +279,23 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   segment 2 in one page (`ONEPAGE`); `rom.ld` and `vectrex.ld` have `*(LOC2) *(COMMON2)`
   in an `ONEPAGE` of their own. Probed in XRoar: Color, Extended, Disk (1.0, 1.1) and
   Super Extended BASIC's and the Dragon's interrupt handlers don't use DP, so a program
-  may keep its own while it runs (DP 0 around ROM calls). Still to do: start-up code
-  setting DP (only if segment 2 isn't empty), libc's ROM/BIOS/FLEX calls keeping it,
-  `-Mo` (`<name`, DP = the data area's page), the manual. `direct.c`, `directerr.c`,
-  `direct-ud`/`direct-du` test it.
+  may keep its own while it runs (DP 0 around ROM calls). Each start-up file (`sa`,
+  `sim`, `rom`, `flex`, `vec`) sets DP to segment 2's page before the init functions,
+  only if `__seg2DL` to `__seg2CH` isn't empty, so programs without `__direct` keep the
+  DP they started with; `sa` (and `flex`) save the caller's in `__sysdp`, and `sa`'s
+  `_exit` (libcb's too) gives it back. libc's calls keep the program's DP: `cb/rom.s`
+  (POLCAT, CHROUT), `coco.s` (JOYIN) and `dskcon.s` call the ROM with DP 0 (`tone.s`
+  already did); FLEX's (`flex.s`, and `_exit`'s FMSCLS/WARMS) with `__sysdp`; the
+  Vectrex wrappers `jsr` the BIOS with $D0 ($C8 for music) and `puls dp,pc` (they
+  `jmp`ed, leaving $D0: a program with `__direct` runs with $C8). cc1's `defstr()` kept a
+  `__direct` char array's string in segment 3 (fixed: it stays in 2). `cbrom.s` and
+  `cbdisk.s` print `#` if called with DP not 0. Tests: `direct.c` (cc1's output),
+  `directerr.c`, `direct-ud`/`direct-du` (ld09), `dptest.c` (-Mi, and -O), `dpret.c`
+  (-Ms under `dploader.s`, which calls with DP $5A and checks it comes back), `dpcb.c`
+  (-Me with the stand-in ROM and disk), `flexdp.c`, `vecdp.c` (DP $C8, the BIOS $D0),
+  `romdp.c` (`rom.ld`: a common block in its page); `xcoco.c` and `xdisk.c` use
+  `__direct` variables on the real ROMs (`make check-xroar`). Still to do: `-Mo` (`<name`,
+  DP = the data area's page), the manual.
 - cc1's `-c-` and `-f-` (callee saves, first argument on the stack) are errors (2026-11-10;
   they were accepted and ignored: `callersaves` and `arg1inreg` start TRUE and only `-c`
   and `-f` set them). Honored, `-f-` makes plausible code that libc (and `va_start`)
@@ -300,7 +313,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 783 reference
+  `tests/src/` with this tree's tools and compare every result with the 808 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -411,7 +424,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   script (also as bcc09 links `-Mi` and `-Mo`) give the same output and map as without.
   `splitprog.c` with `split.ld` (code at $0E00, data at $6000, no symbols defined)
   runs on sim6809, its init functions found through the provided `__seg5DL`.
-- Twenty test programs are built again with `-O` and must run the same
+- Twenty-one test programs are built again with `-O` and must run the same
   (`optimize.result`), which checks the copt rules.
 - `pathlen.result`: as09 assembles a file of a 250-character name (it stopped at 64
   characters, and overflowed a buffer for a long module name: fixed 2026-11-09, found

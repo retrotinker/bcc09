@@ -85,9 +85,11 @@ fill1:	sta	,x+
 ; joystk(n): joystick value n, 0 to 63 (BASIC's JOYSTK: 0 and 1 the
 ; right joystick's x and y, 2 and 3 the left one's), read now
 _joystk:
-	pshs	x
+	pshs	dp,x
+	clra			; (DP 0 for the ROM)
+	tfr	a,dp
 	jsr	[JOYIN]
-	puls	x
+	puls	dp,x
 	ldb	POTVAL,x
 	clra
 	tfr	d,x

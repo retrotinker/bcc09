@@ -1,0 +1,7 @@
+Intensity_a C8 dp D0
+Wait_Recal dp D0
+Intensity_a C8 dp D0
+Moveto_d 05 50 dp D0
+Init_Music_chk FD0D dp C8
+Intensity_a C8 dp D0
+sim6809: instruction limit (2000000) reached, in _exit's loop

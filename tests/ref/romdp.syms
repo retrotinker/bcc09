@@ -1,0 +1,3 @@
+               romdp                 _init  2  00000600  R
+               romdp                 _word  2  00000602  R
+               romdp                  _bss  2  00000609  R C

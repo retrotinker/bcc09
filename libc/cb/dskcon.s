@@ -27,24 +27,26 @@ DSKPAR	equ	$c006		; (where its parameters are)
 
 ; op is in X; drive, track, sector and buf are above the return address
 ___cb_dskcon:
-	pshs	d,y,u		; 6,S: return  8,S: drive  10,S: track
-	ldu	DSKPAR		;   12,S: sector  14,S: buf
+	pshs	d,dp,y,u	; 7,S: return  9,S: drive  11,S: track
+	ldu	DSKPAR		;   13,S: sector  15,S: buf
 	tfr	x,d
 	stb	,u		; DCOPC
-	lda	9,s
+	lda	10,s
 	sta	1,u		; DCDRV
-	lda	11,s
+	lda	12,s
 	sta	2,u		; DCTRK
-	lda	13,s
+	lda	14,s
 	sta	3,u		; DSEC
-	ldd	14,s
+	ldd	15,s
 	std	4,u		; DCBPT
+	clra			; DP 0 for the ROM
+	tfr	a,dp
 	jsr	[DSKCON]
 	ldu	DSKPAR
 	ldb	6,u		; DCSTA
 	clra
 	tfr	d,x
-	puls	d,y,u,pc
+	puls	d,dp,y,u,pc
 
 ___cb_hasdisk:
 	ldx	#0

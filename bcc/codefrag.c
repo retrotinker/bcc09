@@ -481,9 +481,10 @@ bool_pt dataflag;
 		return holdstr(sptr, stop);
 #endif
 	oldsegment = segment;
-	if (dataflag)
-		dseg();
-	else {
+	if (dataflag) {
+		if (segment != DPSEG)	/* (a __direct array's stays there) */
+			dseg();
+	} else {
 		segment = STRSEG;	/* could use dseg() */
 		outstrseg();	/* this brings strings together */
 	}

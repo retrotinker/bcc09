@@ -522,6 +522,15 @@ for f in crtret crtexit crtatexit; do
 	echo $? > $f.run.rc
 	rm -f $f.srec
 done
+# dpret.c has __direct variables, so its start-up code sets DP to their
+# page; dploader.s calls it with DP $5A, which it must give back (98 if
+# not): exit status 42
+run dpret.bcc "$BCC" -o dpret.out -X-T0x1000 dploader.s dpret.c
+"$OC" -O srec dpret.out dpret.srec
+entry=$("$OD" -n dpret.out | awk '$3 == "loader" { print $1 }')
+"$SIM" -n 1000000 --entry "0x$entry" dpret.srec > dpret.run 2>&1
+echo $? > dpret.run.rc
+rm -f dpret.srec
 
 # programs for the sim6809 target (bcc09 -Mi), built by bcc09 alone and
 # run as the simulator runs them, with f.in as the input if there is
@@ -537,9 +546,10 @@ done
 # runs math.h's functions; inttest.c checks stdint.h and stdbool.h (cc1's
 # _Bool); protoarg.c passes arguments of other types to prototyped
 # functions; gltest.c reads gltest.in with getline() and getdelim();
-# and a target with no start-up code yet can't be linked
+# dptest.c uses __direct variables (DP their page); and a target with no
+# start-up code yet can't be linked
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 atexitio; do
+	 atexitio dptest; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -749,6 +759,15 @@ run rom.bcc "$BCC" -Mr -o romtest.rom romtest.c
 { echo "$(wc -c < romtest.rom) bytes"
   od -An -tx1 -N4 romtest.rom
   tail -c 4 romtest.rom | od -An -tx1; } > romtest.img
+# __direct variables in a cartridge: romdp.c, with DP their page, in RAM,
+# both the initialized ones and a common block (not in .bss's COMMON)
+run romdp.bcc "$BCC" -Mr -o romdp.srec -X-Sromsrec.ld romdp.c
+grep -v '^S[059]' cbrom.srec | cat - romdp.srec > romdp-rom.srec
+"$SIM" -n 2000000 --entry 0xC000 romdp-rom.srec < /dev/null > romdp.run 2>&1
+"$BCC" -Mr -o romdp-map.srec -X-Sromsrec.ld -X-M romdp.c 2>&1 |
+	awk '$2 == "_init" || $2 == "_bss" || $2 == "_word"' > romdp.syms
+sed -i 's/ reached at PC=[0-9A-F]*$/ reached/' romdp.run
+rm -f romdp.srec romdp-rom.srec romdp-map.srec
 rm -f romsrec.ld romtest.srec romtest-rom.srec romtest.rom
 
 # a Vectrex cartridge (bcc09 -Mv): vectrex.ld, with S-record output,
@@ -780,6 +799,19 @@ run vec.bcc "$BCC" -Mv -o vectest.bin vectest.c
 run vectitle.bcc "$BCC" -Mv -o vectitle.bin vectest.c vectitle.s
 od -An -c -N26 vectitle.bin > vectitle.img
 rm -f vectitle.bin
+# __direct variables in a cartridge: vecdp.c runs with DP $C8, their page,
+# and the BIOS still gets its own
+run vecdp.bcc "$BCC" -Mv -o vecdp.srec -X-Svecsrec.ld vecdp.c
+"$BCC" -Mv -o vecdp-map.srec -X-Svecsrec.ld -X-M vecdp.c > vecdp.map 2>&1
+start=$(grep -a ' crt0 *start ' vecdp.map | awk '{ print substr($4, 5) }')
+stop=$(grep -a ' __exit ' vecdp.map | awk '{ print $4 }')
+stop=$(printf '%04X' $((0x$stop + 2)))
+awk 'substr($0, 1, 2) == "S1" && substr($0, 5, 4) >= "F000"' vecbios.srec |
+	cat - vecdp.srec > vecdp-all.srec
+"$SIM" -n 2000000 --entry "0x$start" vecdp-all.srec > vecdp.run 2>&1
+echo $? > vecdp.run.rc
+sed -i "s/ reached at PC=$stop\$/ reached, in _exit's loop/" vecdp.run
+rm -f vecdp.srec vecdp-map.srec vecdp.map vecdp-all.srec
 rm -f vecsrec.ld vectest.srec vectest-map.srec vectest.map vecbios.o \
 	vecbios.out vecbios.srec vectest-all.srec vectest.bin
 # and Disk BASIC's files: cbdisk.s stands in for its ROM at $C000, with
@@ -796,6 +828,18 @@ grep -hv '^S[059]' cbrom.srec cbdisk.srec | cat - cbfile.srec > cbfile-rom.srec
 "$SIM" -n 100000000 --entry "0x$entry" cbfile-rom.srec < /dev/null \
 	> cbfile.run 2>&1
 echo $? > cbfile.run.rc
+# __direct variables in a Color BASIC program: dpcb.c prints, reads a
+# line, reads the joysticks and writes and reads a file, with DP the
+# variables' page between the calls into the ROM (cbrom.s and cbdisk.s
+# print # if one is called with another)
+run dpcb.bcc "$BCC" -Me -o dpcb.out -X-T0x3000 loader.s dpcb.c
+"$OC" -O srec dpcb.out dpcb.srec
+entry=$("$OD" -n dpcb.out | awk '$3 == "loader" { print $1 }')
+grep -hv '^S[059]' cbrom.srec cbdisk.srec | cat - dpcb.srec > dpcb-rom.srec
+"$SIM" -n 100000000 --entry "0x$entry" dpcb-rom.srec < dpcb.in \
+	> dpcb.run 2>&1
+echo $? > dpcb.run.rc
+rm -f dpcb.srec dpcb-rom.srec
 rm -f cbrom.o cbrom.out cbrom.srec cbtest.srec cbtest-rom.srec cbdisk.o \
 	cbdisk.out cbdisk.srec cbfile.srec cbfile-rom.srec
 
@@ -810,6 +854,13 @@ run flexio.bcc "$BCC" -Mf -o flexio.out -X-T0x1000 flexio.c
 	> flexio.run 2>&1
 echo $? > flexio.run.rc
 rm -f FLEXIO.CMD
+# __direct variables in a FLEX command: flexdp.c checks that FLEX's calls
+# give DP (the variables' page) back
+run flexdp.bcc "$BCC" -Mf -o flexdp.out -X-T0x1000 flexdp.c
+"$OC" -O flex flexdp.out FLEXDP.CMD
+"$SIM" -n 50000000 --flex FLEXDP.CMD < flexdp.in > flexdp.run 2>&1
+echo $? > flexdp.run.rc
+rm -f FLEXDP.CMD
 # and FLEX's files: flexfile.c under sim6809, whose FMS keeps each file's
 # sectors' data in a host file (here); the four files it leaves (TEXT.TXT,
 # BIN.DAT, DRV.TXT, LOWER.TXT) are results too, and must be what FLEX
@@ -838,7 +889,8 @@ for f in ops longops fptest strtest stdtest maltest vatest; do
 	fi
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
-for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest; do
+for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
+	 dptest; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null

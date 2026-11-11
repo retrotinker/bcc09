@@ -21,6 +21,9 @@
 	loc	5		; (and these in segment 5)
 	import	__seg5DL
 	import	__seg5DH
+	loc	2		; (and these in segment 2)
+	import	__seg2DL
+	import	__seg2CH
 
 	.text
 	entry	start
@@ -34,6 +37,12 @@ clear:	cmpx	#__end
 	clr	,x+
 	bra	clear
 clear2:
+	ldd	#__seg2CH	; DP: the direct page's (segment 2), if the
+	subd	#__seg2DL	; program has __direct variables
+	beq	nodp
+	ldd	#__seg2DL
+	tfr	a,dp
+nodp:
 	ldx	#__seg5DL	; the init functions
 init:	cmpx	#__seg5DH
 	bhs	go

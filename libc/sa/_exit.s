@@ -10,11 +10,14 @@
 
 	.bss			; crt0 defines it there, so import it there
 	import	__savesp
+	import	__sysdp
 
 	.text
 	export	__exit
 
 __exit:
+	lda	__sysdp		; the loader's DP again
+	tfr	a,dp
 	tfr	x,d		; the status, the first argument
 	lds	__savesp
 	rts

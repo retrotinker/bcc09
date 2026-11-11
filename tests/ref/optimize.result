@@ -18,3 +18,4 @@ ok   mtest runs the same with -O
 ok   inttest runs the same with -O
 ok   protoarg runs the same with -O
 ok   gltest runs the same with -O
+ok   dptest runs the same with -O

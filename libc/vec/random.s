@@ -12,8 +12,11 @@ B_Random	equ	$F517
 	export	_Random
 
 _Random:
+	pshs	dp		; DP $D0 for the BIOS (the caller's, put
+	lda	#$D0		; back after)
+	tfr	a,dp
 	jsr	B_Random
 	tfr	a,b
 	clra
 	tfr	d,x
-	rts
+	puls	dp,pc

@@ -17,18 +17,21 @@ B_Joy_Digital	equ	$F1F8
 ; has been pressed since the last call (bits 0-3 controller 1's buttons
 ; 1-4, bits 4-7 controller 2's); Vec_Btn_State has those held down
 _Read_Btns:
+	pshs	dp		; (the caller's DP, put back after)
 	lda	#$D0
 	tfr	a,dp
 	jsr	B_Read_Btns
 	tfr	a,b
 	clra
 	tfr	d,x
-	rts
+	puls	dp,pc
 
 ; Joy_Digital(): read the joysticks enabled in Vec_Joy_Mux_1_X and the
 ; others (1, 3, 5, 7 enable them; 0 doesn't) into Vec_Joy_1_X and the
 ; others: <0, 0 or >0 for left, centre or right (down, centre, up)
 _Joy_Digital:
+	pshs	dp
 	lda	#$D0
 	tfr	a,dp
-	jmp	B_Joy_Digital
+	jsr	B_Joy_Digital
+	puls	dp,pc

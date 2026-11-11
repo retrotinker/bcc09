@@ -7,7 +7,8 @@
 ; are kept in memory from $C100 (64K can't hold a whole disk); anything
 ; else gives DCSTA $10.  Its first call formats them: a FAT whose
 ; granules 32 to 35 (tracks 16 and 18, which Disk BASIC uses first) are
-; free and the rest marked used, and an empty directory.
+; free and the rest marked used, and an empty directory.  It prints # if
+; it is called with DP other than 0, as cbrom.s's routines do.
 
 DCOPC	equ	$ea
 DCDRV	equ	$eb
@@ -16,6 +17,7 @@ DSEC	equ	$ed
 DCBPT	equ	$ee
 DCSTA	equ	$f0
 DISK	equ	$c100		; tracks 16, 17 and 18
+IO_OUT	equ	$ff00		; the simulator's output
 TRACK	equ	18*256
 
 	.text
@@ -26,7 +28,12 @@ rom:	fcc	"DK"
 	fdb	DCOPC		; $C006
 
 dskcon:	pshs	d,x,y,u
-	tst	formatted
+	tfr	dp,a		; # if DP isn't 0
+	tsta
+	beq	dk0
+	lda	#'#
+	sta	IO_OUT
+dk0:	tst	formatted
 	bne	dk1
 	bsr	format
 dk1:	lda	#$10		; (an error, unless all is well)

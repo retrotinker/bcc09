@@ -3,15 +3,17 @@
    locate() (text printed where it puts the cursor, without a '\r'),
    inkey() (a key XRoar types), joystk() (each in 0-63) and sound()
    (middle C, for 2/15 seconds: it must come back, with the sound off);
-   returns 42 */
+   returns 42.  Its variables are __direct, so DP is their page but in
+   the calls into the ROM, which want 0 */
 
 #include <stdio.h>
 #include <coco.h>
 
+__direct int k, i, ok;
+
 int main()
 {
-	int k, i, ok = 1;
-
+	ok = 1;
 	cls(-1);
 	locate(0, 0);
 	printf("COCO.H");

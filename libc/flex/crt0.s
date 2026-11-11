@@ -20,11 +20,15 @@ MEMEND	equ	$cc2b		; FLEX's: the end of user memory
 	loc	5		; (and these in segment 5)
 	import	__seg5DL
 	import	__seg5DH
+	loc	2		; (and these in segment 2)
+	import	__seg2DL
+	import	__seg2CH
 
 	.text
 	entry	start
 	import	___flexstart
 	import	_exit
+	export	__sysdp
 
 start:	lds	MEMEND		; the stack, from the end of user memory
 	leas	1,s
@@ -34,6 +38,14 @@ clear:	cmpx	#__end
 	clr	,x+
 	bra	clear
 clear2:
+	tfr	dp,a		; the caller's DP, for _exit() (and FLEX's
+	sta	__sysdp		; calls)
+	ldd	#__seg2CH	; DP: the direct page's (segment 2), if the
+	subd	#__seg2DL	; program has __direct variables
+	beq	nodp
+	ldd	#__seg2DL
+	tfr	a,dp
+nodp:
 	ldx	#__seg5DL	; the init functions
 init:	cmpx	#__seg5DH
 	bhs	go
@@ -45,3 +57,6 @@ init:	cmpx	#__seg5DH
 	bra	init
 go:	jsr	___flexstart	; main's result, in X
 	jmp	_exit		; (exit()'s argument)
+
+	.bss
+__sysdp: .blkb	1		; FLEX's DP, for its calls (flex.s)

@@ -18,16 +18,17 @@ B_Init_Music_chk	equ	$F687
 ; Init_Music_chk(tune): start (or go on with) the tune, in the BIOS's
 ; music format (Music1, $FD0D, is the BIOS's own); it wants DP $C8
 _Init_Music_chk:
+	pshs	dp		; (the caller's DP, put back after)
 	tfr	x,u
 	lda	#$C8
 	tfr	a,dp
 	jsr	B_Init_Music_chk
-	lda	#$D0
-	tfr	a,dp
-	rts
+	puls	dp,pc
 
 ; Do_Sound(): send this frame's notes to the sound chip
 _Do_Sound:
+	pshs	dp
 	lda	#$D0
 	tfr	a,dp
-	jmp	B_Do_Sound
+	jsr	B_Do_Sound
+	puls	dp,pc

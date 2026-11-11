@@ -7,7 +7,8 @@
 ;   selects)
 ;
 ; Both keep every register but X, the result (the ROM routines are
-; documented to keep them, but this doesn't rely on it).
+; documented to keep them, but this doesn't rely on it), and call the ROM
+; with DP 0, as it wants (a program's may be its __direct variables').
 ;
 ; Written for bcc09.  Like the rest of libc, it is distributed under the
 ; GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -20,19 +21,23 @@ CHROUT	equ	$a002
 	export	___cb_chrout
 
 ___cb_polcat:
-	pshs	d,y,u
+	pshs	d,dp,y,u
+	clra
+	tfr	a,dp
 	jsr	[POLCAT]	; A: the key, Z set if none
 	bne	pckey
 	clra
 pckey:	tfr	a,b
 	clra
 	tfr	d,x		; the result, in X
-	puls	d,y,u,pc
+	puls	d,dp,y,u,pc
 
 ; c is in X
 ___cb_chrout:
-	pshs	d,x,y,u
+	pshs	d,dp,x,y,u
+	clra
+	tfr	a,dp
 	tfr	x,d
 	tfr	b,a		; the character, in A
 	jsr	[CHROUT]
-	puls	d,x,y,u,pc
+	puls	d,dp,x,y,u,pc

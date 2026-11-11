@@ -21,12 +21,16 @@
 	loc	5		; (and these in segment 5)
 	import	__seg5DL
 	import	__seg5DH
+	loc	2		; (and these in segment 2)
+	import	__seg2DL
+	import	__seg2CH
 
 	.text
 	entry	start
 	import	_main
 	import	_exit
 	export	__savesp
+	export	__sysdp
 
 start:	ldx	#__edata	; clear the BSS
 clear:	cmpx	#__end
@@ -34,6 +38,14 @@ clear:	cmpx	#__end
 	clr	,x+
 	bra	clear
 clear2:
+	tfr	dp,a		; the caller's DP, for _exit() (and FLEX's
+	sta	__sysdp		; calls)
+	ldd	#__seg2CH	; DP: the direct page's (segment 2), if the
+	subd	#__seg2DL	; program has __direct variables
+	beq	nodp
+	ldd	#__seg2DL
+	tfr	a,dp
+nodp:
 	ldx	#__seg5DL	; the init functions
 init:	cmpx	#__seg5DH
 	bhs	go
@@ -49,3 +61,4 @@ go:	sts	__savesp	; for _exit()
 
 	.bss
 __savesp: .blkb	2		; S on entry, for returning to the loader
+__sysdp: .blkb	1		; and DP

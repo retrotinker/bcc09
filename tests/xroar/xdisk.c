@@ -4,7 +4,8 @@
    writes BIG.DAT (more than two granules, then appended to) and checks
    it, writes OUT.TXT (lines ending with CR, for run.sh to compare), makes
    and deletes DEL.TXT, and checks the errors; prints the failed checks
-   and returns their number to BASIC */
+   and returns their number to BASIC.  failures is __direct, so DP is its
+   page but in the calls into the ROM (DSKCON, CHROUT), which want 0 */
 
 #include <stdio.h>
 #include <string.h>
@@ -12,7 +13,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int failures;
+__direct int failures;
 
 void ok(n, cond)
 int n, cond;
