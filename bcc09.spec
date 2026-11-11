@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.13.1
+Version:        0.13.2
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -90,6 +90,12 @@ cp -p libc/math/README README.libm
 %doc doc/manual.pdf doc/basic.pdf
 
 %changelog
+* Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.2-1
+- copt: rules see what the ones before them made (bcc09 runs it with
+  -b4), and three more rules: smaller code with -O (libc 349 bytes)
+- ar09: s is accepted and ignored (its symbol table was always empty)
+- dev86's x86 leftovers removed: ld09's DATASEGS, objchop, catimage
+
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.1-1
 - objcopy09: -p for data linked apart from the code, above it or below:
   binary -p wrote a 4 GB file when the data was below the code, and cas,
