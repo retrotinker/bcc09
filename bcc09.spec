@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.13.4
+Version:        0.14.0
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -95,6 +95,19 @@ cp -p libc/math/README README.libm
 %doc doc/manual.pdf doc/basic.pdf doc/vectrex.pdf doc/rocks.c
 
 %changelog
+* Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.14.0-1
+- libvec: more of the Vectrex BIOS from C: vector lists (Draw_VL_a,
+  Draw_VLcs, Draw_VLp, Mov_Draw_VL_a, Draw_Pat_VL_a, Dot_List,
+  Rot_VL_ab), text (Print_Str_yx, Print_List, Print_Ships), scores,
+  sound (Sound_Byte, Sound_Bytes, Clear_Sound, Explosion_Snd, the
+  BIOS's tunes), input (Read_Btns_Mask, Joy_Analog) and Select_Game
+- cc1: after assembly code outside a function, it says which segment
+  it is in again (a Vectrex header's loc 12 took the next data), so a
+  Vectrex header can be written in C
+- doc/vectrex.pdf: bcc09 for Vectrex Programmers, in bcc09-doc, with
+  doc/rocks.c, an example game (ISC license)
+- ld09, as09: more of dev86's leftovers removed (their output is the same)
+
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.4-1
 - ld09: an import under another segment than its definition (or common
   block, or EQU constant) is satisfied by it, whichever module is read

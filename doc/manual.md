@@ -87,7 +87,7 @@ On Fedora, `make rpm` builds the RPM packages from `bcc09.spec`, with
 *PREFIX* `/usr`, in `rpmbuild/`: `bcc09`, and `bcc09-doc` (noarch) with this
 manual, "bcc09 for BASIC Programmers" and "bcc09 for Vectrex Programmers"
 as PDFs, and the Vectrex example game, from the release's tag
-(`v0.13.4`), or from the last commit if that isn't tagged yet. `make srpm`
+(`v0.14.0`), or from the last commit if that isn't tagged yet. `make srpm`
 builds the source package alone.
 
 # Getting started
