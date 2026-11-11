@@ -185,6 +185,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   and `make check-nitros9` runs the same twelve on real NitrOS-9 Level 2 (all the same, since
   2026-11-09). The heap grows after the data area with `F$Mem` (`os9/sbrk.c`; crt0
   keeps `__dbase`/`__dtop`), and the stack has the data area's rest (`objcopy09 -d`).
+  TODO's "HEAPSTART in the environment" (2014, from before libc, beside two os9copy items
+  objcopy09 settled) was dropped 2026-11-11: crt0 keeps the data area's bounds and
+  `sbrk()` grows the heap, so nothing needs telling where it starts (`sbrk(0)` gives its end).
   `mkdir`, `chdir`, `opendir`/`readdir`/`rewinddir`/`closedir` (`sys/stat.h`,
   `dirent.h`; added 2026-11-09). Every call clears the registers it doesn't set
   (`OS9_CLEAR`): garbage in them made `I$MakDir` take nearly a whole disk. `rmdir` and
