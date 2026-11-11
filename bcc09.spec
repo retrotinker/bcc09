@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.12.0
+Version:        0.13.0
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -90,6 +90,16 @@ cp -p libc/math/README README.libm
 %doc doc/manual.pdf doc/basic.pdf
 
 %changelog
+* Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.0-1
+- Direct-page variables: cc1's __direct puts a global or static variable
+  in the 6809's direct page (a byte smaller and a cycle faster to reach);
+  the start-up code sets DP to its page, and libc's calls into Color
+  BASIC's ROM, FLEX, the Vectrex BIOS and OS-9 keep it; ld09 refuses
+  modules that disagree on a variable being __direct
+- as09: OS9, an OS-9 system call, and $ in symbols (I$WritLn)
+- cc1: -c- and -f- are errors (they were silently ignored)
+- make install puts bcc09 in /usr/local by default
+
 * Tue Nov 10 2026 John W. Linville <linville@tuxdriver.com> - 0.12.0-1
 - libc: %%a and %%A in printf, as glibc prints them
 - libc: faster floating point (float arithmetic 2 to 2.5 times as fast,
