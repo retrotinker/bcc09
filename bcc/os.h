@@ -4,19 +4,6 @@
 
 /*
   must have unix-near-compatible creat, open, read, write and close
-
-  source O/S's supported:
-    default:
-      *IX
-    special:
-      EDOS		(#define SOS_EDOS if required)
-      MSDOS		(#define SOS_MSDOS)
-  target O/S's supported:
-    default:
-      *IX
-      MSDOS
-    special:
-      EDOS		(#define TOS_EDOS)
 */
 
 /* defaults */
@@ -29,11 +16,3 @@
 #define isabspath(fnameptr, tempcptr) \
 	((*(tempcptr) = *(fnameptr)) == DIRCHAR)
 
-/* special */
-
-
-
-/* don't let names dealt with here affect anything outside this file */
-
-#undef SOS_EDOS
-#undef SOS_MSDOS

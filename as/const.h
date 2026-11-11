@@ -9,7 +9,6 @@
 
 #define MC6809			/* generate 6809 code */
 #define MNSIZE			/* allow byte size in mnemonic, e.g. "movb" */
-#undef SOS_EDOS			/* source OS is EDOS */
 
 /* defaults */
 

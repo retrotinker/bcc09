@@ -24,7 +24,7 @@
 #include "types.h"
 #include "proto.h"
 
-#if !defined(__STDC__) || defined(MSDOS)
+#if !defined(__STDC__)
 #include "sysproto.h"
 #endif
 

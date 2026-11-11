@@ -29,12 +29,6 @@
 # define OP1			/* logical operators only use 1 byte */
 # define POSINDEPENDENT		/* position indep code can (also) be gen */
 
-/* switches for source and target operating system dependencies */
-
-/*#define SOS_EDOS*/		/* source O/S is EDOS */
-/*#define SOS_MSDOS*/		/* source O/S is MSDOS */
-/*#define TOS_EDOS*/		/* target O/S is EDOS */
-
 
 /* switches for source machine dependencies */
 
