@@ -270,7 +270,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
-  as dev86's old `strcspn.c`) shouldn't be copied in.
+  as dev86's old `strcspn.c`) shouldn't be copied in. `doc/rocks.c`, the Vectrex
+  example game, is under the ISC license (decided 2026-11-11), so that a game can
+  start from it; the spec's `bcc09-doc` adds `AND ISC` to `%{bcc09_license}`.
 - `unproto` is built with `_PROTO_` too (added 2026-11-08): after every `()` it writes for a
   prototype (declarations, function pointer types, casts, typedefs, parameters), and
   after a prototyped heading's argument names, it writes `__proto(type name, ...)`, which

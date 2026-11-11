@@ -6,7 +6,8 @@ Summary:        C compiler, assembler, linker and C library for the Motorola 680
 # The tools are dev86's (GPL-2.0-or-later; ar09 GPL-1.0-or-later); libc is
 # dev86's (LGPL-2.0-or-later) with bcc09's own files (LGPL-2.0-only), and
 # its math functions are Sun's fdlibm (SunPro)
-License:        GPL-2.0-or-later AND GPL-1.0-or-later AND LGPL-2.0-or-later AND LGPL-2.0-only AND SunPro
+%global bcc09_license GPL-2.0-or-later AND GPL-1.0-or-later AND LGPL-2.0-or-later AND LGPL-2.0-only AND SunPro
+License:        %{bcc09_license}
 URL:            https://github.com/retrotinker/bcc09
 Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}.rpmlintrc
@@ -37,6 +38,8 @@ NitrOS-9, and FLEX.
 
 %package doc
 Summary:        Manuals for bcc09: the user's manual and bcc09 for BASIC Programmers
+# and doc/rocks.c, an example game, under the ISC license, to be copied
+License:        %{bcc09_license} AND ISC
 BuildArch:      noarch
 
 %description doc

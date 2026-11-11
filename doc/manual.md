@@ -465,7 +465,8 @@ and ships left, the ship turned with `Rot_VL_ab` and drawn as a list,
 the shots as dots, the rocks at two scales), the joystick and buttons,
 explosions' sounds, `Select_Game`, scores and a high score, and
 positions in fixed point, whose high bytes are the screen's coordinates
-so that the screen wraps by itself. It makes a 2K cartridge.
+so that the screen wraps by itself. It makes a 2K cartridge. It is under
+the ISC license, not the GPL, so a game of your own can start from it.
 
 ## OS-9 (`-Mo`)
 
