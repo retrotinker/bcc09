@@ -24,18 +24,12 @@ DEFS	=-DREL_OUTPUT
 OBJS= dumps.o io.o ld.o readobj.o table.o typeconv.o linksyms.o mkar.o \
       writex86.o script.o srec.o
 
-all: ld09 objchop catimage objdump09 objcopy09
+all: ld09 objdump09 objcopy09
 
 ld09: $(OBJS)
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) $(OBJS) -o $@
 
 objdump09: objdump86.c
-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) $< -o $@
-
-objchop: objchop.c
-	$(CC) $(ALL_CFLAGS) $(LDFLAGS) $< -o $@
-
-catimage: catimage.c
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) $< -o $@
 
 objcopy09: objcopy.c srec.c srec.h
@@ -50,7 +44,7 @@ install: ld09 objdump09 objcopy09
 	install -m 755 objcopy09 $(DESTDIR)$(LIBDIR)
 
 clean realclean clobber:
-	rm -f *.o ld09 objchop catimage objdump09 objcopy09
+	rm -f *.o ld09 objdump09 objcopy09
 
 $(OBJS): align.h bindef.h byteord.h config.h const.h globvar.h obj.h \
 	 syshead.h type.h x86_aout.h

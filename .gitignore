@@ -10,9 +10,7 @@ bcc/cc1
 copt/copt
 cpp/cpp
 ld/ar.h
-ld/catimage
 ld/ld09
-ld/objchop
 ld/objdump09
 ld/objcopy09
 unproto/unproto
