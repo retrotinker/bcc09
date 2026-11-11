@@ -325,15 +325,8 @@ PRIVATE void linkmod(struct modstruct *modptr)
 		case CM_OFFSET_RELOC:
 			noloadcheck(modptr, &reported);
 			offset = readsize(relocsize);
-			if (modify & R_MASK) {
-#ifndef DATASEGS
-				int m = (modify & SEGM_MASK);
-				if (curseg != m && m != SEGM_MASK)
-					interseg(modptr->filename,
-						 modptr->archentry, (char *)0);
-#endif
+			if (modify & R_MASK)
 				offset -= (spos + relocsize);
-			}
 			offset += modptr->segaddr[modify & SEGM_MASK];
 			offtocn(buf, offset, relocsize);
 			segwrite(buf, relocsize);
@@ -346,16 +339,8 @@ PRIVATE void linkmod(struct modstruct *modptr)
 								     S_MASK ? 2
 								     : 1))];
 			offset = readconvsize((unsigned)modify & OF_MASK);
-			if (modify & R_MASK) {
-#ifndef DATASEGS
-				int m = (symptr->flags & SEGM_MASK);
-				if (curseg != m && m != SEGM_MASK)
-					interseg(modptr->filename,
-						 modptr->archentry,
-						 symptr->name);
-#endif
+			if (modify & R_MASK)
 				offset -= (spos + relocsize);
-			}
 			offset += symptr->value;
 			offtocn(buf, offset, relocsize);
 			segwrite(buf, relocsize);

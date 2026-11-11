@@ -5,7 +5,7 @@ CFLAGS	?=-O
 LDFLAGS	?=
 # the version -v prints (VERSION, from the top-level Makefile)
 VERDEF=$(if $(VERSION),-DVERSION='"$(VERSION)"')
-ALL_CFLAGS=-std=gnu89 -DDATASEGS $(VERDEF) $(CFLAGS)
+ALL_CFLAGS=-std=gnu89 $(VERDEF) $(CFLAGS)
 
 # Will need some of these if you want native executables on non-Linux/i386
 # -DDETECTAOUT			# Turn on detection.
