@@ -416,7 +416,8 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   (and with it `__vscan`, `strtod`, `bignum` and the floating point helpers: 10K) for
   it; the math modules did the same to `mtest` (7K). A plain import that only a
   member's common satisfies still loads the member. `comm-quiet`, `comm-need` and
-  `comm-ref` test it. ld01 (mc6801-tools) has the same `linkrefs()`, and the bug: not fixed there yet.
+  `comm-ref` test it. ld01 (mc6801-tools) has the same `linkrefs()`, fixed the same way
+  (mc6801-tools PR 70).
 - Test programs run on `sim6809`, the sim6809 project's (`retrotinker/sim6809`, 1.2.0
   or later, which `run.sh` checks: 1.2.0's OS-9 directories, for `os9path.c`; `--os9`
   emulates OS-9's file, directory and `F$Mem` calls on the host, `--flex` puts

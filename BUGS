@@ -8,6 +8,7 @@ update the references (tests/run.sh -u) in the same commit, and remove
 the entry from this file.
 
 None are known.  (The entry that was here, that taking the address of a
-direct-page object gave "LEAX <_foo", described nothing cc1 does: it
-makes no direct-page objects, and with them switched on, & gives the
-address with LDX #_foo; see bcc/sc.h.)
+direct-page object gave "LEAX <_foo", described nothing cc1 does: a
+__direct variable's value is reached as <_foo, its address with
+LDX #_foo, or LEAX _foo,U with -Mo, as tests/ref/direct.s and
+direct-u.s show.)
