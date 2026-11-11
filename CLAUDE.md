@@ -29,9 +29,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 
 ## Layout
 
-- Version 0.13.0 (released 2026-11-11; `VERSION` in the Makefile, and `bcc09.spec`);
+- Version 0.13.1 (released 2026-11-11; `VERSION` in the Makefile, and `bcc09.spec`);
   0.8.0 (2026-11-09) was the first release since v0.1 (2014), then 0.9.0, 0.10.0,
-  0.11.0, 0.11.1, 0.11.2 and 0.12.0. 0.9.0 and later have a
+  0.11.0, 0.11.1, 0.11.2, 0.12.0 and 0.13.0. 0.9.0 and later have a
   GitHub release with the RPMs (bcc09, bcc09-doc) and source RPM attached (`gh release create`).
   The PDF manuals are in the noarch subpackage `bcc09-doc` (since 0.11.2-2), which
   `bcc09` Recommends (same version-release; 0.11.2-3), so dnf installs it unless told not
@@ -264,8 +264,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   Re-check it when what it states changes. `FAQ.md`, at the top, is the chapter on its
   own (a heading, then the chapter as it is): `doc/mkfaq.sh` makes it (`make docs`),
   `faq.result` checks it is in step with the manual (`mkfaq.sh -c`). Change the manual,
-  not FAQ.md. The next release adds `FAQ.md` to the spec's `%doc` (not before: `make
-  rpm` builds from the tag `v0.13.0`, whose tarball hasn't it).
+  not FAQ.md. The spec has it in `%doc` (since 0.13.1).
 - `doc/manual.md` is the user's manual (added 2026-11-09); `make docs` (`doc/mkmanual.sh`:
   pandoc, its man reader for the pages, which are its Appendix A, and xelatex, with
   `doc/tex/footnotehyper.sty` from plm09) makes `doc/manual.pdf`, which is committed.

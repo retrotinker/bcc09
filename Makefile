@@ -1,4 +1,4 @@
-VERSION=0.13.0
+VERSION=0.13.1
 
 PREFIX=/usr/local
 MANDIR=$(PREFIX)/share/man

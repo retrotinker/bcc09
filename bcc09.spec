@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.13.0
+Version:        0.13.1
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -64,7 +64,7 @@ cp -p libc/math/README README.libm
 
 %files
 %license COPYING libc/COPYING.LIB
-%doc README README.libc README.libm BUGS TODO
+%doc README FAQ.md README.libc README.libm BUGS TODO
 %{_bindir}/bcc09
 %{_bindir}/as09
 %{_bindir}/ld09
@@ -90,6 +90,12 @@ cp -p libc/math/README README.libm
 %doc doc/manual.pdf doc/basic.pdf
 
 %changelog
+* Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.1-1
+- objcopy09: -p for data linked apart from the code, above it or below:
+  binary -p wrote a 4 GB file when the data was below the code, and cas,
+  wav and ddos can now take such a program as one block
+- The manual answers common questions (chapter 10), also in FAQ.md
+
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.13.0-1
 - Direct-page variables: cc1's __direct puts a global or static variable
   in the 6809's direct page (a byte smaller and a cycle faster to reach);
