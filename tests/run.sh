@@ -715,6 +715,32 @@ for f in basic[0-9]*.c; do
 	fi
 	rm -f $f basic.out basic.err
 done > basic.result
+# and those in doc/vectrex.md (bcc09 for Vectrex Programmers), as
+# Vectrex cartridges; the others, functions alone, must compile, and its
+# assembly (a block that starts with a comment) must assemble
+awk 'mode == "" && /^```c$/ { n++; f = sprintf("vecdoc%02d.c", n)
+				 mode = "c"; next }
+     mode == "" && /^```$/ { mode = "first"; next }
+     mode != "" && /^```$/ { mode = ""; next }
+     mode == "first" { if (/^;/) { n++; f = sprintf("vecdoc%02d.s", n)
+				   mode = "s" } else mode = "other" }
+     mode == "c" || mode == "s" { print > f }' "$top/doc/vectrex.md"
+for f in vecdoc[0-9]*.[cs]; do
+	if [ "${f%.s}" != "$f" ]; then
+		cmd="$AS -o vecdoc.o $f"
+	elif grep -q 'main()' $f; then
+		cmd="$BCC -Mv -O -o vecdoc.bin $f"
+	else
+		cmd="$BCC -Mv -O -c -o vecdoc.o $f"
+	fi
+	if $cmd > vecdoc.err 2>&1; then
+		echo "ok   $f"
+	else
+		echo "FAIL $f:"
+		cat vecdoc.err
+	fi
+	rm -f $f vecdoc.bin vecdoc.o vecdoc.err
+done > vecdoc.result
 # FAQ.md is the manual's chapter "Questions and answers" on its own
 # (doc/mkfaq.sh makes it): it must be what the manual has now
 if "$top/doc/mkfaq.sh" -c; then

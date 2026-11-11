@@ -318,6 +318,16 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `doc/basic.pdf`, committed and packaged. `tests/run.sh` compiles and links every
   complete program in it (a ```c block with `main()`: `basic.result`), so change the
   guide's programs with the library. It is original text, not CMOC's guide's.
+- `doc/vectrex.md` is "bcc09 for Vectrex Programmers" (added 2026-11-11): C on the
+  Vectrex for those who know its BIOS and 6809 assembly (the cartridge's layout, the
+  header in C, types and `signed char`, `-S` output, `__direct` in page $C8 (more than
+  128 bytes move to $C9), the wrappers and their registers, a call's cost (counted:
+  `Moveto_d` about 90 cycles over assembly), frames, controls, sound, RAM (874 bytes;
+  constant tables in the ROM with `asm("loc 0", ...)`), speed, assembly modules, rocks.c,
+  MAME). `make docs` (`doc/mkvectrex.sh`) makes `doc/vectrex.pdf`, committed and in
+  bcc09-doc. `vecdoc.result` compiles each ```c block (with `main()`: linked `-Mv`;
+  else `-c`) and assembles each plain block that starts with `;`. Every program in it
+  was also run in MAME and looked at; do that again when changing one.
 - The manual's chapter 10, "Questions and answers" (added 2026-11-11; TODO's FAQ), answers
   the questions a newcomer hits: a `-Me` program without `-X-T` is linked at 0 (on
   BASIC's variables), CR line ends, trying programs on sim6809, 16-bit `int` and
@@ -408,7 +418,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 867 reference
+  `tests/src/` with this tree's tools and compare every result with the 868 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
