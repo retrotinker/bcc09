@@ -9,6 +9,7 @@
 B_Clear_Score	equ	$F84F
 B_Add_Score_a	equ	$F85E
 B_Add_Score_d	equ	$F87C
+B_Compare_Score	equ	$F8C7
 B_New_High_Score equ	$F8D8
 
 	.text
@@ -16,6 +17,7 @@ B_New_High_Score equ	$F8D8
 	export	_Add_Score_a
 	export	_Add_Score_d
 	export	_New_High_Score
+	export	_Compare_Score
 
 ; Clear_Score(score): "     0"
 _Clear_Score:
@@ -39,3 +41,13 @@ _Add_Score_d:
 _New_High_Score:
 	ldu	2,s
 	jmp	B_New_High_Score
+
+; Compare_Score(a, b): 0 if the scores are the same, 1 if a is higher,
+; 2 if b is
+_Compare_Score:
+	ldu	2,s
+	jsr	B_Compare_Score
+	tfr	a,b
+	clra
+	tfr	d,x
+	rts

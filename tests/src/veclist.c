@@ -6,8 +6,11 @@
    program's own ($C8, for its __direct variable) back after each call;
    Rot_VL_ab's destination and Clear_Score's score come back, as do
    Read_Btns_Mask's mask (in Vec_Btn_State), Select_Game's choices and
-   Joy_Analog's Vec_Misc_Count, which the last Intensity_a() shows (3F:
-   all six) */
+   Joy_Analog's Vec_Misc_Count, which the next to last Intensity_a()
+   shows (3F: all six); and the last (3F too) the scales lists2.s's
+   functions set, Print_Str_hwyx's Vec_Text_HW, Compare_Score's results
+   and Obj_Hit's and Obj_Will_Hit's, which vecbios.s does as the BIOS
+   does */
 
 #include <vectrex.h>
 
@@ -23,6 +26,11 @@ char score[7];
 char high[] = "   100\200";
 char regs[] = { 7, 0x38, 8, 0x0F, 0xFF };
 char expl[] = { 0x19, 0x3F, 0x00, 0x02 };
+signed char mvlc[] = { 2, 5, 6, 10, -10, 20, -20 };
+signed char mvlcs[] = { 1, 0x30, 7, 8, 9, 10, 11, 12 };
+signed char vlps[] = { 0x20, -1, 1, 2, 1 };
+char hw[] = { (char)0xF9, 0x48, 30, -40, 'H', 'W', 0x80 };
+char s500[] = "   500\200", s90[] = "    90\200";
 
 int getdp()
 {
@@ -31,6 +39,8 @@ int getdp()
 
 int main()
 {
+	int i, j;
+
 	frames = 1;
 	Intensity_1F();
 	Intensity_3F();
@@ -60,10 +70,28 @@ int main()
 	Sound_Bytes(regs);
 	Clear_Sound();
 	Explosion_Snd(expl);
+	Mov_Draw_VLc_a(mvlc);
+	Mov_Draw_VLcs(mvlcs);
+	i = VIA_t1_cnt_lo == 0x30;
+	Draw_VLp_FF(vlp);
+	i += 2 * (VIA_t1_cnt_lo == 0xFF);
+	Draw_VLp_7F(vlp);
+	i += 4 * (VIA_t1_cnt_lo == 0x7F);
+	Draw_VLp_scale(vlps);
+	i += 8 * (VIA_t1_cnt_lo == 0x20);
+	Print_Str_hwyx(hw);
+	i += 16 * (Vec_Text_HW == 0xF948);
+	i += 32 * (Compare_Score(s500, s90) == 1 &&
+		   Compare_Score(s90, s500) == 2 && Compare_Score(s90, s90) == 0);
+	j = Obj_Hit(10, 20, 14, 24, 5, 5) + 2 * !Obj_Hit(10, 20, 16, 20, 5, 5)
+	    + 4 * Obj_Hit(10, 20, 4, 15, 6, 5) + 8 * !Obj_Hit(10, 20, 10, 26, 5, 5)
+	    + 16 * Obj_Will_Hit(10, 20, 6, 0, 16, 20, 5, 5)
+	    + 32 * Obj_Hit(120, 0, 127, 0, 10, 1);	/* (held at 127) */
 	Intensity_a(getdp());		/* C8: the program's DP after all */
 	Intensity_a((rotated[0] == 0x77) + 2 * (score[5] == '0') + 4 * frames
 		    + 8 * (Vec_Btn_State == 0x0C) + 16 * (Vec_Misc_Count != 0)
 		    + 32 * (Vec_Num_Players == 2 && Vec_Num_Game == 4));
+	Intensity_a(i == 63 && j == 63 ? 0x3F : 0);
 	Vec_Misc_Count = 0;
 	return 0;
 }

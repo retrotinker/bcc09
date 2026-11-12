@@ -301,10 +301,11 @@ the default header (vec/header.s: "BCC09", with the BIOS's tune), which
 a module of the program's own that defines __vec_header in segment 12
 takes the place of (include/vectrex.h shows one); _exit() (vec/_exit.s),
 which stops; and C functions for the BIOS's routines, named as Vectrex
-programmers know them (vec/draw.s, lists.s, text.s, input.s, input2.s,
-sound.s, sound2.s, score.s, random.s), which put their arguments in
-the registers the routines want and set DP, calling them and giving the
-caller's DP back after (a program's __direct variables are in page $C8).
+programmers know them (vec/draw.s, lists.s, lists2.s, text.s, input.s,
+input2.s, sound.s, sound2.s, score.s, collide.s, random.s), which put
+their arguments in the registers the routines want and set DP, calling
+them and giving the caller's DP back after (a program's __direct
+variables are in page $C8).
 There is no read() or write(), so no stdio.  "make check" runs a
 cartridge on sim6809 with tests/src/vecbios.s standing in for the BIOS,
 printing each call; "make check-vectrex" runs tests/vectrex/xvec.c in

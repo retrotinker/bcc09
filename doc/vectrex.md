@@ -282,11 +282,18 @@ the routine's documentation gives them, y before x:
 | `Explosion_Snd` | `Explosion_Snd(parms)` | U = parms, DP `$C8` |
 | `Random` | `r = Random()` | the result: A |
 
-and `Intensity_1F` to `_7F`, `Moveto_d_7F`, `Draw_VLcs`, `Print_Str_yx`,
-`Print_List`, `Clear_Score`, `Add_Score_a`, `Add_Score_d`,
-`New_High_Score`, `Read_Btns_Mask`, `Joy_Analog`, `Select_Game`,
-`Do_Sound`, `Sound_Byte`, `Sound_Bytes` and `Clear_Sound`; `vectrex.h`
-says what each takes. Counts are the BIOS's: where it draws "n + 1
+and `Intensity_1F` to `_7F`, `Moveto_d_7F`, `Draw_VLcs`, `Mov_Draw_VLc_a`,
+`Mov_Draw_VLcs`, `Draw_VLp_FF`, `Draw_VLp_7F`, `Draw_VLp_scale`,
+`Print_Str_yx`, `Print_Str_hwyx`, `Print_List`, `Clear_Score`,
+`Add_Score_a`, `Add_Score_d`, `New_High_Score`, `Compare_Score`,
+`Read_Btns_Mask`, `Joy_Analog`, `Select_Game`, `Do_Sound`, `Sound_Byte`,
+`Sound_Bytes` and `Clear_Sound`; `vectrex.h` says what each takes.
+
+**Collisions:** `Obj_Hit(y1, x1, y2, x2, h, w)` gives 1 if the object at
+y2, x2 is within h (up or down) and w (left or right) of the one at y1,
+x1, the BIOS's box test; `Obj_Will_Hit(y1, x1, dy, dx, y2, x2, h, w)`
+tests where the first will be after moving by dy, dx. Neither needs the
+VIA, so they cost only the call. Counts are the BIOS's: where it draws "n + 1
 lines", n is one less than the lines, as in the routine.
 
 Strings for the BIOS are in capitals and end with `$80`, which C writes

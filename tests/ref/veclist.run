@@ -24,6 +24,13 @@ Sound_Byte 07 3E dp D0
 Sound_Bytes 07,38 08,0F dp D0
 Clear_Sound dp D0
 Explosion_Snd 19 3F 00 02 dp C8
+Mov_Draw_VL_a 02 05,06 0A,F6 14,EC dp D0
+Mov_Draw_VL_a 01 07,08 09,0A dp D0
+Draw_VLp 00 0B,0C FF 0D,0E AA 0F,10 01 dp D0
+Draw_VLp 00 0B,0C FF 0D,0E AA 0F,10 01 dp D0
+Draw_VLp FF 01,02 01 dp D0
+Print_Str_d 1E D8 HW dp D0
 Intensity_a C8 dp D0
+Intensity_a 3F dp D0
 Intensity_a 3F dp D0
 sim6809: instruction limit (2000000) reached, in _exit's loop

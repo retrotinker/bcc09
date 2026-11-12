@@ -214,6 +214,17 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
     them in MAME, `results[7]` $113F: bits for the score, the high score, a rotation,
     the sound (Sound_Byte's copy, Clear_Sound's mixer), the explosion's end, and
     Select_Game's 1 player, game 1 (high byte) on the real BIOS.
+    More (2026-11-12), read off the BIOS (its bytes, and traces in sim6809 with the
+    image at $E000 and the I/O block moved to $C000): collide.s `Obj_Hit` ($F8FF: Y y1,x1,
+    X y2,x2, A,B the box's half height and width; C a hit; sums held to 127/-128;
+    keeps every register; no DP) and `Obj_Will_Hit` ($F8F3: Y moved by U first);
+    lists2.s `Mov_Draw_VLc_a` ($F3AD: count from the list), `Mov_Draw_VLcs` ($F3B5),
+    `Draw_VLp_FF/_7F/_scale` ($F404/8/C: into Draw_VLp at $F40E); text.s
+    `Print_Str_hwyx` ($F373: Vec_Text_HW, kept); score.s `Compare_Score` ($F8C7: A 0
+    same, 1 X's higher, 2 U's). vecbios.s copies Compare_Score and the collision code
+    byte for byte, and falls through as the BIOS does for the rest; `veclist.c`'s last
+    Intensity_a (3F) checks them; `xvec.c`'s results[5] ($3F) on the real BIOS
+    (`VIA_t1_cnt_lo` reads the timer, not its latch, so a scale can't be read back).
     `doc/rocks.c` (2026-11-11; in bcc09-doc) is an example game (asteroids: turn,
     thrust, fire; 8.8 positions whose high bytes wrap the screen; 2K): `make check`
     builds it (`rocks.img`, its header from `asm()`), and `check-vectrex` plays it

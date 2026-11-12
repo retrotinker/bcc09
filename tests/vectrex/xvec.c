@@ -3,6 +3,8 @@
    and clears the BSS; draws a frame 100 times (text, a line, a dot, a
    vector list; and with the list, text and score functions: a pattern
    list, a rotated one, dots, a text list, the ships left, the score),
+   and one more with Print_Str_hwyx and Mov_Draw_VLcs; checks the
+   collision tests and Compare_Score on the real BIOS;
    reading the buttons and joystick and playing an explosion, after the
    BIOS's start screen (Select_Game(), left to end by itself); puts its
    checks in results[], which run.sh reads from RAM, and stops with
@@ -24,11 +26,14 @@ char texts[] = { 90, -100, 'L', 'I', 'S', 'T', 0x80,
 char score[7];
 char high[] = "   100\200";
 char boom[] = { 0x19, 0x3F, 0x00, 0x02 };
+char s500[] = "   500\200", s90[] = "    90\200";
+char hw[] = { (char)0xF9, 0x48, 30, -40, 'H', 'W', 0x80 };
+signed char mvlcs[] = { 1, 0x30, 7, 8, 9, 10, 11, 12 };
 unsigned results[8];
 
 int main()
 {
-	int i, clear = 1, snd;
+	int i, clear = 1, snd, hwok;
 	unsigned start;
 
 	for (i = 0; i < sizeof bss; ++i)
@@ -76,6 +81,12 @@ int main()
 		Explosion_Snd(boom);
 		Do_Sound();
 	}
+	Wait_Recal();			/* (the text and list, a frame) */
+	Reset0Ref();
+	Print_Str_hwyx(hw);
+	hwok = Vec_Text_HW == 0xF948;
+	Reset0Ref();
+	Mov_Draw_VLcs(mvlcs);
 	Clear_Score(score);
 	Add_Score_a(25, score);
 	Add_Score_d(0x1234, score);	/* 1259 */
@@ -84,8 +95,19 @@ int main()
 	results[1] = count;
 	results[2] = word[0];
 	results[3] = clear;
-	results[4] = Vec_Loop_Count - start;	/* 100 frames */
-	results[5] = Random() < 256;
+	results[4] = Vec_Loop_Count - start;	/* 101 frames */
+	/* Random()'s 1, the collision tests, Compare_Score, Print_Str_hwyx's
+	   Vec_Text_HW: 0x3F (Mov_Draw_VLcs's scale can't be read back:
+	   VIA_t1_cnt_lo reads the timer's count, not its latch) */
+	results[5] = (Random() < 256)
+	    + 2 * (Obj_Hit(10, 20, 14, 24, 5, 5) && !Obj_Hit(10, 20, 16, 20, 5, 5)
+		   && Obj_Hit(10, 20, 4, 15, 6, 5) && !Obj_Hit(10, 20, 10, 26, 5, 5)
+		   && Obj_Hit(120, 0, 127, 0, 10, 1))
+	    + 4 * Obj_Will_Hit(10, 20, 6, 0, 16, 20, 5, 5)
+	    + 8 * !Obj_Will_Hit(10, 20, -6, 0, 16, 20, 5, 5)
+	    + 16 * (Compare_Score(s500, s90) == 1 && Compare_Score(s90, s500) == 2
+		    && Compare_Score(s90, s90) == 0)
+	    + 32 * hwok;
 	results[6] = Vec_Joy_1_X + 0x100;	/* centred: 0x100 */
 	results[7] = (score[2] == '1' && score[5] == '9')
 	    + 2 * (high[2] == '1' && high[5] == '9')

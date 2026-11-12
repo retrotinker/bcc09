@@ -442,11 +442,15 @@ mame vectrex -cart hello.bin
     * lists, a whole shape in one call, which is much faster than a call
       for each line: `Draw_VLc`, `Draw_VL_a`, `Draw_VLcs` (with its own
       scale), `Draw_VLp` (each line drawn, dashed or moved),
-      `Mov_Draw_VL_a`, `Draw_Pat_VL_a`, `Dot_List`, and `Rot_VL_ab` to
-      rotate one (64 to a turn);
-    * text: `Print_Str_d`, `Print_Str_yx`, `Print_List`, `Print_Ships`;
+      `Mov_Draw_VL_a`, `Mov_Draw_VLc_a`, `Mov_Draw_VLcs`, `Draw_Pat_VL_a`,
+      `Draw_VLp_FF`, `Draw_VLp_7F`, `Draw_VLp_scale`, `Dot_List`, and
+      `Rot_VL_ab` to rotate one (64 to a turn);
+    * text: `Print_Str_d`, `Print_Str_yx`, `Print_Str_hwyx` (with its own
+      size), `Print_List`, `Print_Ships`;
     * scores (6 characters and `$80`): `Clear_Score`, `Add_Score_a`,
-      `Add_Score_d`, `New_High_Score`;
+      `Add_Score_d`, `New_High_Score`, `Compare_Score`;
+    * collisions: `Obj_Hit` (one object within a box around another) and
+      `Obj_Will_Hit` (after the first has moved);
     * the controllers: `Read_Btns`, `Read_Btns_Mask` (buttons that repeat
       while held), `Joy_Digital`, `Joy_Analog`, and `Select_Game`, the
       BIOS's screen for choosing the players and the game;

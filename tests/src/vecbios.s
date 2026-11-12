@@ -58,14 +58,21 @@ bios:
 	jmp	s_move		; $F312 Moveto_d
 	org	$F354
 	jmp	s_reset		; $F354 Reset0Ref
-	org	$F378
+	org	$F373
+	ldd	,u++		; $F373 Print_Str_hwyx (into Print_Str_yx)
+	std	$C82A		; (Vec_Text_HW)
 	ldd	,u++		; $F378 Print_Str_yx (into Print_Str_d)
 	jmp	s_print		; $F37A Print_Str_d
 	org	$F38A
 	jmp	s_plist		; $F38A Print_List
 	org	$F393
 	jmp	s_ships		; $F393 Print_Ships
-	org	$F3B9
+	org	$F3AD
+	lda	,x+		; $F3AD Mov_Draw_VLc_a (into Mov_Draw_VL_a)
+	bra	$F3B9
+	org	$F3B5
+	ldd	,x++		; $F3B5 Mov_Draw_VLcs (the scale, then into
+	stb	<$04		; Mov_Draw_VL_a)
 	jmp	s_movdr		; $F3B9 Mov_Draw_VL_a
 	org	$F3CE
 	jmp	s_vlc		; $F3CE Draw_VLc
@@ -75,7 +82,13 @@ bios:
 	jmp	s_vla		; $F3DA Draw_VL_a
 	org	$F3DF
 	jmp	s_line		; $F3DF Draw_Line_d
-	org	$F410
+	org	$F404
+	ldb	#$FF		; $F404 Draw_VLp_FF
+	bra	$F40E
+	ldb	#$7F		; $F408 Draw_VLp_7F
+	bra	$F40E
+	ldb	,x+		; $F40C Draw_VLp_scale
+	stb	<$04		; (the scale, into Draw_VLp)
 	jmp	s_vlp		; $F410 Draw_VLp
 	org	$F434
 	jmp	s_pat		; $F434 Draw_Pat_VL_a
@@ -93,8 +106,58 @@ bios:
 	jmp	s_addsa		; $F85E Add_Score_a
 	org	$F87C
 	jmp	s_addsd		; $F87C Add_Score_d
+	org	$F8C7		; $F8C7 Compare_Score, as the BIOS's: A 0
+	pshs	x,u		; the same, 1 X's higher, 2 U's
+	clra
+cs1:	ldb	,x+
+	bmi	cs2
+	cmpb	,u+
+	beq	cs1
+	bhi	cs3
+	inca
+cs3:	inca
+cs2:	puls	x,u,pc
 	org	$F8D8
 	jmp	s_hisc		; $F8D8 New_High_Score
+	org	$F8E5		; the collision tests, as the BIOS's
+	pshs	y		; $F8E5 Obj_Will_Hit_u: Y moved by U's y, x
+	pshs	a,b,x,y
+	ldd	4,s
+	adda	,u
+	addb	1,u
+oh1:	std	4,s
+	bra	oh2
+	pshs	y		; $F8F3 Obj_Will_Hit: Y moved by U
+	pshs	a,b,x,y
+	tfr	u,d
+	adda	4,s
+	addb	5,s
+	bra	oh1
+	pshs	y		; $F8FF Obj_Hit: X within A, B of Y?
+	pshs	a,b,x,y
+oh2:	tfr	s,x
+	clrb
+oh3:	abx
+	lda	4,x
+	adda	,x
+	bvc	oh4
+	lda	#$7F
+oh4:	cmpa	2,x
+	blt	oh6
+	lda	4,x
+	suba	,x
+	bvc	oh5
+	lda	#$80
+oh5:	cmpa	2,x
+	bgt	oh6
+	incb
+	cmpb	#2
+	blo	oh3
+	orcc	#$01		; C: a hit
+	bra	oh7
+oh6:	andcc	#$FE
+oh7:	puls	a,b,x,y
+	puls	y,pc
 	org	$F92E
 	jmp	s_expl		; $F92E Explosion_Snd
 

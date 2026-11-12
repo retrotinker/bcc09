@@ -66,6 +66,13 @@ void Draw_Pat_VL_a(int n, int pattern, signed char *list);  /* n + 1
 void Dot_List(int n, signed char *list);  /* n + 1 dots, each from the
 				      last (for Vec_Dot_Dwell); then
 				      the beam goes to the centre */
+void Mov_Draw_VLc_a(signed char *list);  /* n, a move by y, x, then
+				      n lines */
+void Mov_Draw_VLcs(signed char *list);  /* n, the scale, a move, then
+				      n lines */
+void Draw_VLp_FF(signed char *list);	/* Draw_VLp at scale $FF */
+void Draw_VLp_7F(signed char *list);	/* at $7F */
+void Draw_VLp_scale(signed char *list);  /* the scale, then the list */
 void Rot_VL_ab(int angle, int n, signed char *from, signed char *to);
 				   /* the n + 1 points at from, rotated by
 				      angle (64 a whole turn, anticlockwise),
@@ -74,6 +81,8 @@ void Rot_VL_ab(int angle, int n, signed char *from, signed char *to);
 /* text: strings for the BIOS are in capitals, ended by $80 */
 void Print_Str_d(int y, int x, char *s);  /* print s at y, x */
 void Print_Str_yx(char *p);	/* p is y, x, then the string */
+void Print_Str_hwyx(char *p);	/* p is height, width (Vec_Text_HW, kept),
+				   y, x, then the string */
 void Print_List(char *list);	/* y, x and string after y, x and string,
 				   until a y of 0 */
 void Print_Ships(int ship, int n, int y, int x);  /* the n ships left (up
@@ -86,6 +95,13 @@ void Clear_Score(char *score);	/* "     0" */
 void Add_Score_a(int n, char *score);	   /* add n, 0 to 99 */
 void Add_Score_d(unsigned bcd, char *score);  /* add bcd: $1234 is 1234 */
 void New_High_Score(char *score, char *high);  /* high = score, if higher */
+int Compare_Score(char *a, char *b);  /* 0 the same, 1 a higher, 2 b */
+
+/* collisions: object 2 within h (up or down) and w (left or right) of
+   object 1, a box the BIOS's sums hold to -128..127 */
+int Obj_Hit(int y1, int x1, int y2, int x2, int h, int w);
+int Obj_Will_Hit(int y1, int x1, int dy, int dx, int y2, int x2, int h,
+		 int w);	/* object 1 moved by dy, dx first */
 
 /* the controllers */
 unsigned Read_Btns();		/* buttons pressed since the last call */

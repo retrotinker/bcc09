@@ -6,11 +6,13 @@
 ; Written for bcc09.  Like the rest of libc, it is distributed under the
 ; GNU Library General Public License, version 2 (see COPYING.LIB).
 
+B_Print_Str_hwyx	equ	$F373
 B_Print_Str_yx	equ	$F378
 B_Print_List	equ	$F38A
 B_Print_Ships	equ	$F393
 
 	.text
+	export	_Print_Str_hwyx
 	export	_Print_Str_yx
 	export	_Print_List
 	export	_Print_Ships
@@ -18,6 +20,15 @@ B_Print_Ships	equ	$F393
 dpd0:	lda	#$D0
 	tfr	a,dp
 	rts
+
+; Print_Str_hwyx(p): p is the height and width (into Vec_Text_HW, which
+; keeps them), y, x, then the string
+_Print_Str_hwyx:
+	pshs	dp
+	bsr	dpd0
+	tfr	x,u
+	jsr	B_Print_Str_hwyx
+	puls	dp,pc
 
 ; Print_Str_yx(p): p is y, x, then the string (from the centre, as
 ; Print_Str_d)
