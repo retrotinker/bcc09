@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.15.0
+Version:        0.16.0
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -98,6 +98,19 @@ cp -p libc/math/README README.libm
 %doc doc/rocks.c doc/worm.c
 
 %changelog
+* Thu Nov 12 2026 John W. Linville <linville@tuxdriver.com> - 0.16.0-1
+- cc1: functions returning structures got their arguments wrong (the
+  first was lost, the rest read 2 bytes off); a structure as the first
+  argument didn't compile; a structure returned in a first argument
+  stayed on the stack
+- cc1: "e ? (void) 0 : f()" (as assert() is written) crashed it
+- Comparisons with a NaN are IEEE 754's: false but != (> and >= were
+  true)
+- libc: the rest of C89's library: assert.h, setjmp.h, signal.h,
+  locale.h, float.h, time.h (time() is OS-9's clock and FLEX's date),
+  abort, div, ldiv, getenv, system, strerror, perror, strcoll,
+  strxfrm, fgetpos, fsetpos, tmpnam, tmpfile, the multibyte functions
+
 * Thu Nov 12 2026 John W. Linville <linville@tuxdriver.com> - 0.15.0-1
 - cc1: chars are compared as C says, as ints: a signed char compared
   with a constant from 0 to 255 was compared unsigned ("c < 0" was
