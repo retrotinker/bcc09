@@ -90,7 +90,7 @@ On Fedora, `make rpm` builds the RPM packages from `bcc09.spec`, with
 manual and the guides for BASIC, Vectrex, OS-9 and FLEX programmers as PDFs,
 and
 the example games, from the release's tag
-(`v0.16.0`), or from the last commit if that isn't tagged yet. `make srpm`
+(`v0.16.1`), or from the last commit if that isn't tagged yet. `make srpm`
 builds the source package alone.
 
 # Getting started

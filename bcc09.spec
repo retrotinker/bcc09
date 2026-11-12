@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.16.0
+Version:        0.16.1
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -98,6 +98,14 @@ cp -p libc/math/README README.libm
 %doc doc/rocks.c doc/worm.c
 
 %changelog
+* Thu Nov 12 2026 John W. Linville <linville@tuxdriver.com> - 0.16.1-1
+- libc: rename() on OS-9 and Disk BASIC, which completes C89's library
+  on each system with files
+- unproto: a function returning a pointer to a function can be declared
+  and then defined with prototypes, and one returning a pointer to an
+  array compiles
+- cc1: & of an array that indexing gave (&tab[i] of int tab[3][4])
+
 * Thu Nov 12 2026 John W. Linville <linville@tuxdriver.com> - 0.16.0-1
 - cc1: functions returning structures got their arguments wrong (the
   first was lost, the rest read 2 bytes off); a structure as the first
