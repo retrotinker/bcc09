@@ -741,6 +741,39 @@ for f in vecdoc[0-9]*.[cs]; do
 	fi
 	rm -f $f vecdoc.bin vecdoc.o vecdoc.err
 done > vecdoc.result
+# and those in doc/os9.md (bcc09 for OS-9 Programmers), as OS-9
+# modules: its assembly first, which a program may call
+awk 'mode == "" && /^```c$/ { n++; f = sprintf("os9doc%02d.c", n)
+				 mode = "c"; next }
+     mode == "" && /^```$/ { mode = "first"; next }
+     mode != "" && /^```$/ { mode = ""; next }
+     mode == "first" { if (/^;/) { n++; f = sprintf("os9doc%02d.s", n)
+				   mode = "s" } else mode = "other" }
+     mode == "c" || mode == "s" { print > f }' "$top/doc/os9.md"
+{
+	for f in os9doc[0-9]*.s; do
+		if "$AS" -o ${f%.s}.o $f > os9doc.err 2>&1; then
+			echo "ok   $f"
+		else
+			echo "FAIL $f:"
+			cat os9doc.err
+		fi
+	done
+	for f in os9doc[0-9]*.c; do
+		if grep -q 'main(' $f; then
+			cmd="$BCC -Mo -O -o os9doc.out $f $(ls os9doc[0-9]*.o)"
+		else
+			cmd="$BCC -Mo -O -c -o os9doc.o $f"
+		fi
+		if $cmd > os9doc.err 2>&1; then
+			echo "ok   $f"
+		else
+			echo "FAIL $f:"
+			cat os9doc.err
+		fi
+	done
+} > os9doc.result
+rm -f os9doc[0-9]*.[cso] os9doc.out os9doc.o os9doc.err
 # FAQ.md is the manual's chapter "Questions and answers" on its own
 # (doc/mkfaq.sh makes it): it must be what the manual has now
 if "$top/doc/mkfaq.sh" -c; then

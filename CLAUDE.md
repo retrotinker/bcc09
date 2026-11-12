@@ -338,6 +338,18 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   bcc09-doc. `vecdoc.result` compiles each ```c block (with `main()`: linked `-Mv`;
   else `-c`) and assembles each plain block that starts with `;`. Every program in it
   was also run in MAME and looked at; do that again when changing one.
+- `doc/os9.md` is "bcc09 for OS-9 Programmers" (added 2026-11-11): C for OS-9 and
+  NitrOS-9 (a module: objcopy09, toolshed's `os9 copy`/`attr`/`ident`; code PIC, data
+  through U, static pointers set by init functions, `__direct`; argv and the exit
+  status; CR lines and `getdelim(..., '\r', ...)`; files (a new file is PR W R, the mode
+  ignored), directories; the data area, `-d`, the heap through F$Mem (Level 1: don't
+  count on malloc); system calls of one's own in assembly with as09's `OS9`, its
+  example `os9time` (F$Time)/`os9sleep` (F$Sleep) keeping U; what libc lacks: time,
+  getenv, signals, F$Fork). `make docs` (`doc/mkos9.sh`) makes `doc/os9.pdf`, in
+  bcc09-doc. `os9doc.result` assembles its assembly and compiles each ```c block,
+  linking those with `main()` (with the assembly) as `-Mo`. Its programs were run under
+  sim6809 --os9 and all of them (the clock too) on NitrOS-9 in XRoar (2026-11-11);
+  do that again when changing one.
 - The manual's chapter 10, "Questions and answers" (added 2026-11-11; TODO's FAQ), answers
   the questions a newcomer hits: a `-Me` program without `-X-T` is linked at 0 (on
   BASIC's variables), CR line ends, trying programs on sim6809, 16-bit `int` and
@@ -428,7 +440,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 872 reference
+  `tests/src/` with this tree's tools and compare every result with the 873 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
