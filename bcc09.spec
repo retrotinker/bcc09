@@ -16,7 +16,7 @@ BuildRequires:  gcc
 BuildRequires:  make
 # for %%check: the simulator the tests run their programs on
 # (https://github.com/retrotinker/sim6809)
-BuildRequires:  sim6809 >= 1.2.0
+BuildRequires:  sim6809 >= 1.3.0
 BuildRequires:  python3
 BuildRequires:  groff-base
 # the PDF manuals (installed with it unless left out)

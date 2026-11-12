@@ -19,8 +19,7 @@
 # null), and is stopped after 15 minutes if it hasn't finished.
 # NITROS9_KEEP=1 keeps the files (the disk, the outputs), and
 # NITROS9_PROGS="a b" runs only those programs.  ttime.c checks time()
-# there too (sim6809 has no F$Time), and trename.c rename() (sim6809 can't
-# write a directory).
+# there too (sim6809 has no F$Time), and trename.c rename().
 
 top=$(cd "$(dirname "$0")/../.." && pwd)
 dir=$top/tests/nitros9
@@ -126,7 +125,7 @@ for f in $progs; do
 	fi
 done
 # time(): F$Time, which sim6809 doesn't have (ttime.c), whatever the date;
-# and rename(), which sim6809 can't do (trename.c)
+# and rename() (trename.c, which make check runs under sim6809 too)
 for t in time:ttime rename:trename; do
 	f=${t#*:}
 	os9 copy $img,$f.run $f.run > /dev/null 2>&1 || : > $f.run

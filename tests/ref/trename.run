@@ -1,0 +1,12 @@
+rename ren1 ren2: 0 errno 0
+ren1 (none), ren2 one
+case: 0 errno 0
+Ren4 one
+onto ren3 (EEXIST 17): -1 errno 17
+none (ENOENT 2): -1 errno 2
+bad name (EINVAL 22): -1 errno 22
+another directory (EINVAL 22): -1 errno 22
+rdir/a rdir/b: 0 errno 0
+rdir/b c: 0 errno 0
+rdir/c in rdir, rdir/a (none)
+done

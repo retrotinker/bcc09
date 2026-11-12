@@ -763,7 +763,7 @@ which `LOADM` puts in their places.
 # Testing
 
 `make check` runs bcc09's regression tests: it compiles the test sources
-with this build's tools, runs the programs on sim6809 (1.2.0 or later,
+with this build's tools, runs the programs on sim6809 (1.3.0 or later,
 from <https://github.com/retrotinker/sim6809>, on `PATH` or named by
 `SIM6809`; for every target:
 Color BASIC with stand-ins for its ROMs, OS-9 modules and FLEX commands

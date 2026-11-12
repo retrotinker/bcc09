@@ -507,8 +507,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - rename() everywhere with files (2026-11-12): OS-9's (`os9/sys.c` L_rename, `I$Write`
   stub 17) rewrites the entry in the directory opened DIR.+UPDAT., as OS-9's rename
   does (same directory, OS-9 name characters, EEXIST/ENOENT/EINVAL; names compared
-  without case; the name field zeroed past its end); sim6809 can't open a directory
-  for update, so `tests/nitros9/trename.c` (`expected-rename`) tests it on NitrOS-9.
+  without case; the name field zeroed past its end); `tests/nitros9/trename.c` tests it
+  on NitrOS-9 (`expected-rename`) and, since sim6809 1.3.0 (which renames a host file
+  whose entry gets a new name in a directory opened DIR.+UPDAT.), in `make check`
+  (`trename.run`).
   Disk BASIC's (`cb/disk.c`) rewrites the 11-byte name, same drive; `cbfile.c`. With
   it C89's library is complete (but on sim6809 and the Vectrex, which have no files).
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
@@ -518,7 +520,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 931 reference
+  `tests/src/` with this tree's tools and compare every result with the 933 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs
@@ -539,15 +541,16 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   member's common satisfies still loads the member. `comm-quiet`, `comm-need` and
   `comm-ref` test it. ld01 (mc6801-tools) has the same `linkrefs()`, fixed the same way
   (mc6801-tools PR 70).
-- Test programs run on `sim6809`, the sim6809 project's (`retrotinker/sim6809`, 1.2.0
-  or later, which `run.sh` checks: 1.2.0's OS-9 directories, for `os9path.c`; `--os9`
+- Test programs run on `sim6809`, the sim6809 project's (`retrotinker/sim6809`, 1.3.0
+  or later, which `run.sh` checks: 1.2.0's OS-9 directories, for `os9path.c`, and
+  1.3.0's renaming through a directory, for `trename.c`; `--os9`
   emulates OS-9's file, directory and `F$Mem` calls on the host, `--flex` puts
   `--param` in FLEX's line buffer and emulates FMS on host files, and the trace's
   `CYC=` counts cycles), from `PATH` or `$SIM6809` (the Makefile exports
   `SIM6809 ?= sim6809`, as plm09's does); `run.sh` stops if it isn't there. bcc09 kept
   a copy of plm09's 0.4.6 in `tests/sim` until 2026-11-10, when sim6809 became a
   project of its own; 1.1.0 gave every result the same. The spec `BuildRequires:
-  sim6809 >= 1.2.0`, so a mock build needs its RPM in a repository (`createrepo_c` a
+  sim6809 >= 1.3.0`, so a mock build needs its RPM in a repository (`createrepo_c` a
   directory with it, and `mock --addrepo`), as plm09's does.
 - `tests/src/selftest.c` checks code from the other test
   sources against values from the host compiler and exits with the number of failures;

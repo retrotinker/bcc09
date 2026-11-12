@@ -30,10 +30,11 @@ if ! command -v "$SIM" > /dev/null 2>&1; then
 	     "https://github.com/retrotinker/sim6809 (or set SIM6809)" >&2
 	exit 2
 fi
-# (1.2.0 or later: os9path.c needs its OS-9 directories)
+# (1.3.0 or later: os9path.c needs its OS-9 directories, and trename.c
+# writing a directory to rename a file)
 case $("$SIM" --version 2>/dev/null | awk '{ print $2 }') in
-0.*|1.0.*|1.1.*|"")
-	echo "run.sh: $SIM is too old: the tests need sim6809 1.2.0 or" \
+0.*|1.0.*|1.1.*|1.2.*|"")
+	echo "run.sh: $SIM is too old: the tests need sim6809 1.3.0 or" \
 	     "later, from https://github.com/retrotinker/sim6809" >&2
 	exit 2 ;;
 esac
@@ -674,6 +675,14 @@ os9run os9path
 mv os9path-os9.run os9path.run
 mv os9path-os9.run.rc os9path.run.rc
 rm -rf QA QF
+# rename() (tests/nitros9/trename.c, which make check-nitros9 runs on
+# NitrOS-9 too): sim6809 1.3.0 renames a file whose entry gets a new name
+# in its directory, opened for update, as RBF does
+cp "$tests/nitros9/trename.c" .
+os9run trename
+mv trename-os9.run trename.run
+mv trename-os9.run.rc trename.run.rc
+rm -rf trename.c ren1.txt ren2.txt ren3.txt Ren4.txt rdir
 # fgetpos(), fsetpos(), perror(), tmpnam() and tmpfile() (c89file.c)
 # on files; no temporary file may be left
 os9run c89file

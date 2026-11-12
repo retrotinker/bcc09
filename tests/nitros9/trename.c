@@ -1,5 +1,5 @@
-/* trename: rename() on NitrOS-9, which sim6809 can't do (it doesn't open
-   directories for update): a file renamed, the old name gone and the new
+/* trename: rename() on NitrOS-9 (and under sim6809 1.3.0 or later, which
+   renames as RBF does: tests/run.sh): a file renamed, the old name gone and the new
    one reading what it held; a name found without regard to case; a file
    in a directory renamed by its path, and by its new name alone; and the
    errors: the new name there (EEXIST), the old one not (ENOENT), another
