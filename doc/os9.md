@@ -398,8 +398,10 @@ int main()
 * **There only as far as C needs:** signals, raised only by `raise()` and
   `abort()` (OS-9's own signals don't reach the program), and
   `getenv()`, which finds nothing.
-* **Not there:** starting other processes (`F$Fork` and `F$Wait`), and
-  `rename()`; write them in assembly, as above, if a program needs them.
+* **Not there:** starting other processes (`F$Fork` and `F$Wait`); write
+  them in assembly, as above, if a program needs them. (`rename()` is
+  there: it rewrites the name in the directory, as OS-9's `rename` does,
+  so the new name must be in the same directory.)
 * **Floating point** is in software, exact, and optional: a program that
   doesn't use it doesn't carry it, and one that prints a `double` carries
   about 6K more for it.

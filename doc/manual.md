@@ -333,8 +333,9 @@ stack.
   terminal does: the keys are shown as they are typed, the left arrow rubs
   out, and ENTER ends the line (with a CR). BREAK at the start of a line is
   the end of the input.
-* **Files,** with Disk BASIC on a CoCo: `open()` and `unlink()`, and
-  `read()`, `write()`, `lseek()` and `close()` on what `open()` gives, so
+* **Files,** with Disk BASIC on a CoCo: `open()`, `unlink()` and `rename()`
+  (on the same drive), and `read()`, `write()`, `lseek()` and `close()` on
+  what `open()` gives, so
   `fopen()` too. Names are `NAME.EXT` (or `NAME/EXT`), with `:D` for drive
   *D*. bcc09 reads and writes the disk's sectors through Disk BASIC's
   `DSKCON`, keeping the FAT and directory as Disk BASIC does: a new file is
@@ -510,7 +511,9 @@ aren't known until the program runs). `main` gets the command line's words
   terminal edits and echoes a line at a time; `read()` gives at most a
   line, up to its CR.
 * **Files:** `open()` (with `O_CREAT`, `O_EXCL`, `O_TRUNC` and
-  `O_APPEND`), `lseek()`, `unlink()`, `remove()`.
+  `O_APPEND`), `lseek()`, `unlink()`, `remove()`, and `rename()`, which
+  rewrites the name in the file's directory, as OS-9's `rename` does (the
+  new name in the same directory, and not there already).
 * **Directories:** `mkdir()`, `chdir()`, `rmdir()`, `getcwd()`, and
   `opendir()`, `readdir()`, `rewinddir()` and `closedir()` (`dirent.h`).
   OS-9 has no calls for `rmdir()` and `getcwd()`, which do what its `deldir`
@@ -601,9 +604,9 @@ so a program carries only what it uses.
   `tmpfile()`'s file is removed when it is closed, or at exit. FLEX can't
   open a file for update, so `tmpfile()` fails there.
 
-Only `rename()` is missing from C89's library, but on FLEX; nor does the
-library have the functions later C standards added, beyond those named
-here.
+That is all of C89's library (`rename()` renames a file in its directory,
+on each system with files), but for the functions later C standards
+added, beyond those named here.
 
 # Calling conventions and assembly
 

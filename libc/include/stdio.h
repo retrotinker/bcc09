@@ -121,7 +121,7 @@ extern size_t fwrite __P((__const void*, size_t, size_t, FILE*));
 
 extern FILE *fopen __P((__const char*, __const char*));
 extern int remove __P((__const char*));
-extern int rename __P((__const char*, __const char*));	/* (FLEX's) */
+extern int rename __P((__const char*, __const char*));	/* (not sim6809's) */
 extern FILE *fdopen __P((int, __const char*));
 extern FILE *freopen  __P((__const char*, __const char*, FILE*));
 extern FILE *__fopen __P((__const char*, int, FILE*, __const char*));

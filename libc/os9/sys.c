@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include "os9.h"
@@ -318,7 +319,7 @@ const char *name;
 }
 #endif
 
-#if defined(L_rmdir) || defined(L_getcwd)
+#if defined(L_rmdir) || defined(L_getcwd) || defined(L_rename)
 /* open the directory name for reading, as a directory: its path number,
    or -1 with errno set */
 static int
@@ -656,5 +657,152 @@ DIR *d;
 
    free(d);
    return close(fd);
+}
+#endif
+
+#ifdef L_rename
+/* OS-9 has no call to rename a file: as its rename does, rename() finds
+   the entry in the directory (opened for update, as a directory) and
+   writes the new name over the old (up to 29 characters, the last with
+   bit 7 set; RBF compares names without case).  new must be in the same
+   directory as old (EINVAL if not), a name OS-9 takes (letters, digits,
+   '.', '_' and '$'; EINVAL), and not there (EEXIST), as FLEX's rename()
+   wants.  An open file goes on as it was. */
+
+/* the last part of a path, and the length of what is before it */
+static const char *
+lastpart(path, dirlen)
+const char *path;
+int *dirlen;
+{
+   const char *p = strrchr(path, '/');
+
+   *dirlen = p ? p - path : 0;
+   return p ? p + 1 : path;
+}
+
+static int
+okname(s)
+const char *s;
+{
+   int n;
+
+   for (n = 0; s[n]; n++)
+      if (n >= 29 || !(isalnum((unsigned char) s[n]) || s[n] == '.' ||
+		       s[n] == '_' || s[n] == '$'))
+	 return 0;
+   return n > 0;
+}
+
+/* entry name (bit 7 on its last character) is s, but for case */
+static int
+samename(ent, s)
+unsigned char *ent;
+const char *s;
+{
+   int i;
+
+   for (i = 0; i < 29; i++)
+   {
+      if (s[i] == 0 || toupper(ent[i] & 0x7f) != toupper((unsigned char) s[i]))
+	 return 0;
+      if (ent[i] & 0x80)
+	 return s[i + 1] == 0;
+   }
+   return 0;
+}
+
+int
+rename(old, new)
+const char *old, *new;
+{
+   struct os9regs r;
+   unsigned char ent[32];
+   static char dir[256], path[256 + 30];
+   const char *oname, *nname;
+   int olen, nlen, p, n, n2, i, err;
+
+   oname = lastpart(old, &olen);
+   nname = lastpart(new, &nlen);
+   if (strchr(new, '/') && (nlen != olen || strncmp(old, new, olen) != 0)
+       || !okname(nname) || olen >= sizeof(dir))
+   {
+      errno = EINVAL;		/* (not in the same directory, or a bad name) */
+      return -1;
+   }
+   /* old's directory, and new's path in it */
+   if (olen == 0)
+      strcpy(dir, oname == old ? "." : "/");
+   else
+   {
+      memcpy(dir, old, olen);
+      dir[olen] = 0;
+   }
+   memcpy(path, old, oname - old);
+   strcpy(path + (oname - old), nname);
+   if (strcasecmp(oname, nname) != 0)	/* (another name: not there yet) */
+   {
+      OS9_CLEAR(&r);
+      r.a = 0x01;		/* READ., a file */
+      r.x = (unsigned) path;
+      __os9call(&r, OS9_OPEN);
+      if (OS9_FAILED(&r))
+      {
+	 OS9_CLEAR(&r);
+	 r.a = 0x81;		/* DIR. + READ., a directory */
+	 r.x = (unsigned) path;
+	 __os9call(&r, OS9_OPEN);
+      }
+      if (!OS9_FAILED(&r))
+      {
+	 closep(r.a);
+	 errno = EEXIST;
+	 return -1;
+      }
+   }
+   OS9_CLEAR(&r);
+   r.a = 0x83;			/* DIR. + UPDAT. */
+   r.x = (unsigned) dir;
+   __os9call(&r, OS9_OPEN);
+   if (OS9_FAILED(&r))
+   {
+      errno = __os9errno(r.b);
+      return -1;
+   }
+   p = r.a;
+   for (n = 0; nextent(p, ent); n++)
+      if (n >= 2 && ent[0] != 0 && samename(ent, oname))
+	 break;
+   if (!(n >= 2 && ent[0] != 0 && samename(ent, oname)))
+   {
+      closep(p);
+      errno = ENOENT;
+      return -1;
+   }
+   n2 = strlen(nname);
+   for (i = 0; i < 29; i++)
+      ent[i] = i < n2 ? nname[i] : 0;
+   ent[n2 - 1] |= 0x80;
+   OS9_CLEAR(&r);		/* back to the entry */
+   r.a = p;
+   r.x = (unsigned) ((long) n * 32 >> 16);
+   r.u = (unsigned) (n * 32);
+   __os9call(&r, OS9_SEEK);
+   if (!OS9_FAILED(&r))
+   {
+      OS9_CLEAR(&r);
+      r.a = p;
+      r.x = (unsigned) ent;
+      r.y = 32;
+      __os9call(&r, OS9_WRITE);
+   }
+   err = OS9_FAILED(&r) ? r.b : 0;
+   closep(p);
+   if (err)
+   {
+      errno = __os9errno(err);
+      return -1;
+   }
+   return 0;
 }
 #endif

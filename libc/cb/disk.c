@@ -1,5 +1,5 @@
 /* disk.c - Disk BASIC's files for the Color BASIC target (bcc09 -Me):
- * open() and unlink(), and the read(), write(), lseek() and close() of
+ * open(), unlink() and rename(), and the read(), write(), lseek() and close() of
  * the files open() opens (through __cb_files, cb.h), on the sectors that
  * Disk BASIC's DSKCON reads and writes (rom.s)
  *
@@ -650,4 +650,52 @@ const char *name;
    if (disk(WRITE, d, DIRTRACK, dsec, sec) < 0)
       return -1;
    return savefat(d);
+}
+
+/* the entry's name changed to new's, which must be on the same drive
+   (EINVAL if not) and not there (EEXIST), as FLEX's rename() wants; an
+   open file goes on as it was */
+int
+rename(old, new)
+const char *old, *new;
+{
+   unsigned char from[11], to[11];
+   int d, d2, dsec, dent, found;
+
+   if (!__cb_hasdisk())
+   {
+      errno = ENODEV;
+      return -1;
+   }
+   if (parse(old, from, &d) < 0 || parse(new, to, &d2) < 0)
+   {
+      errno = ENOENT;
+      return -1;
+   }
+   if (d != d2)
+   {
+      errno = EINVAL;
+      return -1;
+   }
+   if (opendrive(d) < 0)
+      return -1;
+   if (memcmp(from, to, 11) != 0)
+   {
+      if ((found = lookup(d, to, &dsec, &dent)) < 0)
+	 return -1;
+      if (found)
+      {
+	 errno = EEXIST;
+	 return -1;
+      }
+   }
+   if ((found = lookup(d, from, &dsec, &dent)) < 0)
+      return -1;
+   if (!found)
+   {
+      errno = ENOENT;
+      return -1;
+   }
+   memcpy(sec + dent * 32, to, 11);
+   return disk(WRITE, d, DIRTRACK, dsec, sec);
 }

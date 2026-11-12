@@ -4,4 +4,4 @@ dir: [OUT     .TXT] type 1 ascii ff first 35 last 21
 fat: 32=c1 33=ff 34=ff 35=ff
 dir: [BIG     .DAT] type 1 ascii ff first 32 last 10
 dir: [(deleted.] type 1 ascii ff first 35 last 1
-checks 30 failures 0
+checks 36 failures 0

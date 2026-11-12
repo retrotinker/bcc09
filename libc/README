@@ -87,8 +87,8 @@ Changes from dev86:
     scanf.c had no license, and its printf departed from the C standard
     (precision on integers, %X, # and %p); see stdio/printf.c and
     stdio/scanf.c
-What C89 has that libc doesn't: rename, but on FLEX.  The rest of C89
-is written for bcc09:
+All of C89's library is there.  What dev86's libc didn't have was
+written for bcc09:
 assert.h (stdlib/assert.c), setjmp.h (stdlib/setjmp.s: S, the return
 address and U), signal.h (stdlib/signal.c: raised only by raise(), the
 default _exit(128 + sig)), locale.h ("C" only), float.h, abort, div,
@@ -103,6 +103,11 @@ computed in longs (Hinnant's days_from_civil and civil_from_days);
 asctime and strftime format without printf.  time() is each target's:
 os9/time.c (F$Time), flex/time.c (the date at $CC0E: month, day, year of
 two digits, at midnight), and sa/time.c (-1: no clock) for the others.
+rename() on OS-9 (os9/sys.c) rewrites the name in the directory, opened
+for update (DIR. + UPDAT.), as OS-9's rename does: the new name in the
+same directory, not there already; sim6809 can't (it opens directories
+only to read), so tests/nitros9/trename.c tests it on NitrOS-9.  On Disk
+BASIC (cb/disk.c) it rewrites the entry's 11 bytes, on the same drive.
 tmpnam and tmpfile (stdio/tmpnam.c, its tmpnam module named tmpnm, as
 L_tmpnam is stdio.h's macro): TMPnnnnn names; tmpfile's file is removed
 when fclose(), or exit's closing of the streams, calls __stdio_closed
@@ -327,7 +332,7 @@ open file (FMSCLS).
 
 FLEX's files (flex/file.c) go through its File Management System, with a
 File Control Block from malloc for each: open(), unlink() and rename()
-(stdio.h; only FLEX has rename()), and read(), write(), lseek() and
+(stdio.h), and read(), write(), lseek() and
 close() on the descriptors open() gives (3 up; 4 at a time).  Names are
 [D.]NAME[.EXT] or NAME[.EXT][.D], made upper case.  FLEX writes a file
 only from its start, into a new one: O_WRONLY needs O_TRUNC (which

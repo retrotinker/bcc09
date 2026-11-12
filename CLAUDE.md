@@ -504,6 +504,13 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   heading is rewritten as `fpf_header` does, a declaration as a type). And cc1's
   `address()` takes `&tab[i]` (an array that indexing gave, which `indirec()` leaves as
   its address, indcount 0): it was "taking address of non-lvalue". `declarator.c`.
+- rename() everywhere with files (2026-11-12): OS-9's (`os9/sys.c` L_rename, `I$Write`
+  stub 17) rewrites the entry in the directory opened DIR.+UPDAT., as OS-9's rename
+  does (same directory, OS-9 name characters, EEXIST/ENOENT/EINVAL; names compared
+  without case; the name field zeroed past its end); sim6809 can't open a directory
+  for update, so `tests/nitros9/trename.c` (`expected-rename`) tests it on NitrOS-9.
+  Disk BASIC's (`cb/disk.c`) rewrites the 11-byte name, same drive; `cbfile.c`. With
+  it C89's library is complete (but on sim6809 and the Vectrex, which have no files).
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.

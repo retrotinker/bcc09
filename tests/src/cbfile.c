@@ -164,6 +164,26 @@ int main()
 		ok(30, open("TMP00000", O_RDONLY) == -1);
 	}
 
+	/* rename(): the entry's name; not onto a file that's there, nor to
+	   another drive; an open file goes on */
+	ok(31, rename("BIG.DAT", "HUGE.BIN") == 0 &&
+	   open("BIG.DAT", O_RDONLY) == -1 &&
+	   (fd = open("HUGE.BIN", O_RDONLY)) >= 3 && read(fd, buf, 4) == 4 &&
+	   memcmp(buf, "0123", 4) == 0);
+	ok(32, rename("HUGE.BIN", "BIG.DAT") == 0 && read(fd, buf, 2) == 2 &&
+	   memcmp(buf, "45", 2) == 0 && close(fd) == 0);
+	errno = 0;
+	ok(33, rename("BIG.DAT", "BIG.DAT") == 0);
+	fd = open("OTHER.TXT", O_WRONLY | O_CREAT, 0666);
+	close(fd);
+	errno = 0;
+	ok(34, rename("BIG.DAT", "OTHER.TXT") == -1 && errno == EEXIST);
+	errno = 0;
+	ok(35, rename("NONE.TXT", "NEW.TXT") == -1 && errno == ENOENT);
+	errno = 0;
+	ok(36, rename("BIG.DAT", "BIG.DAT:1") == -1 && errno == EINVAL);
+	unlink("OTHER.TXT");
+
 	printf("checks %d failures %d\r", checks, failures);
 	return failures;
 }
