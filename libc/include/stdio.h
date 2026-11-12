@@ -66,6 +66,8 @@ struct __stdio_file {
 typedef struct __stdio_file FILE;
 
 #define BUFSIZ	(256)
+#define FOPEN_MAX	8	/* (FLEX: 3 and 4 files) */
+#define FILENAME_MAX	128
 
 extern FILE stdin[1];
 extern FILE stdout[1];
@@ -125,6 +127,14 @@ extern FILE *__fopen __P((__const char*, int, FILE*, __const char*));
 extern int fseek __P((FILE*, long, int));
 extern long ftell __P((FILE*));
 extern void rewind __P((FILE*));
+typedef long fpos_t;
+extern int fgetpos __P((FILE*, fpos_t*));
+extern int fsetpos __P((FILE*, __const fpos_t*));
+
+/* "s: " (if s isn't NULL or empty), strerror(errno) and a new line (as
+   the system ends one: '\r' on Color BASIC and OS-9, "\r\n" on FLEX),
+   to stderr */
+extern void perror __P((__const char*));
 
 extern int fputs __P((__const char*, FILE*));
 extern int puts __P((__const char*));

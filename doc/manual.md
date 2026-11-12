@@ -555,10 +555,11 @@ are no files.
 
 # The C library
 
-The headers are `ctype.h`, `dirent.h`, `errno.h`, `fcntl.h`, `limits.h`,
-`malloc.h`, `math.h`, `stdarg.h`, `stdbool.h`, `stddef.h`, `stdint.h`,
-`stdio.h`, `stdlib.h`, `string.h`, `unistd.h`, `sys/stat.h` and
-`sys/types.h`, and the targets' own `coco.h` and `vectrex.h` (chapter 5). Most of the library is dev86's, fixed; the parts that
+The headers are `assert.h`, `ctype.h`, `dirent.h`, `errno.h`, `fcntl.h`,
+`float.h`, `limits.h`, `locale.h`, `malloc.h`, `math.h`, `setjmp.h`,
+`signal.h`, `stdarg.h`, `stdbool.h`, `stddef.h`, `stdint.h`, `stdio.h`,
+`stdlib.h`, `string.h`, `unistd.h`, `sys/stat.h` and `sys/types.h`, and the
+targets' own `coco.h` and `vectrex.h` (chapter 5). Most of the library is dev86's, fixed; the parts that
 needed it were written for bcc09. Each function is a module of its own,
 so a program carries only what it uses.
 
@@ -579,12 +580,19 @@ so a program carries only what it uses.
   come within `__heap_margin` bytes (256) of the stack pointer: a program
   that needs a deeper stack after filling its heap should raise it.
 
-What C89 has that the library doesn't yet: `assert.h`, `setjmp.h`,
-`signal.h`, `time.h`, `locale.h` and `float.h`; `abort()`, `getenv()`,
-`system()`, `div()` and `ldiv()`; `strerror()`, `perror()`, `strcoll()`
-and `strxfrm()`; `tmpfile()`, `tmpnam()`, `fgetpos()` and `fsetpos()`; the
-multibyte character functions; and `rename()` (but on FLEX). Nor does it
-have the functions later C standards added, beyond those named here.
+* **The rest of C89:** `assert()`, `setjmp()` and `longjmp()`, `float.h`,
+  `div()` and `ldiv()`, `strerror()` (the GNU C library's messages),
+  `perror()`, `fgetpos()` and `fsetpos()`. A failed `assert()` writes
+  `file:line: assertion failed: e`; it and `perror()` end their line as the
+  system does. Some are as little as the systems allow: signals are raised only by `raise()` and `abort()`
+  (whose default ends the program with status 134); there is no
+  environment (`getenv()` gives `NULL`) and no command processor
+  (`system(NULL)` is 0); and the only locale is `"C"`, whose characters
+  are a byte each (`MB_CUR_MAX` is 1; `wchar_t` is a `char`).
+
+What C89 has that the library doesn't yet: `time.h`, `tmpfile()`,
+`tmpnam()`, and `rename()` (but on FLEX). Nor does it have the functions
+later C standards added, beyond those named here.
 
 # Calling conventions and assembly
 

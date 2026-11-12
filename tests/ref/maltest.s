@@ -37,81 +37,119 @@
 ; 6 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/share/bcc09/include/stddef.h"
-; 10 # 17 "../prefix.tmp/share/bcc09/include/stdlib.h"
-; 17 extern int atoi () __proto(char *);
+; 10 # 18
+; 18 typedef char wchar_t;		 
 ;BCC_EOS
-; 18 extern long atol () __proto(char *);
+; 19 # 18 "../prefix.tmp/share/bcc09/include/stdlib.h"
+; 18 typedef struct { int quot, rem; } div_t;
 ;BCC_EOS
-; 19 extern long strtol () __proto(char *,char **,int);
 ;BCC_EOS
-; 20 extern unsigned long strtoul () __proto(char *,char **,int);
+; 19 typedef struct { long quot, rem; } ldiv_t;
 ;BCC_EOS
-; 21 extern double strtod () __proto(char *,char **);
 ;BCC_EOS
-; 22 extern double atof () __proto(char *);
+; 20 
+; 21 extern int atoi () __proto(char *);
 ;BCC_EOS
-; 23 
-; 24 extern int abs () __proto(int);
+; 22 extern long atol () __proto(char *);
 ;BCC_EOS
-; 25 extern long labs () __proto(long);
+; 23 extern long strtol () __proto(char *,char **,int);
 ;BCC_EOS
-; 26 
-; 27 extern int rand () __proto();
+; 24 extern unsigned long strtoul () __proto(char *,char **,int);
 ;BCC_EOS
-; 28 extern void srand () __proto(unsigned int);
+; 25 extern double strtod () __proto(char *,char **);
 ;BCC_EOS
-; 29 
-; 30 extern void qsort () __proto(void *,size_t,size_t,int (*)());
+; 26 extern double atof () __proto(char *);
 ;BCC_EOS
-; 31 extern void * bsearch 
-; 32 
-; 33 # 31
-; 31 
-; 32 () __proto(void *,void *,size_t,size_t
-; 33 # 31 "../prefix.tmp/share/bcc09/include/stdlib.h"
-; 31 ,
-; 32 int (*)());
+; 27 
+; 28 extern int abs () __proto(int);
+;BCC_EOS
+; 29 extern long labs () __proto(long);
+;BCC_EOS
+; 30 
+; 31 extern int rand () __proto();
+;BCC_EOS
+; 32 extern void srand () __proto(unsigned int);
 ;BCC_EOS
 ; 33 
-; 34 extern void * malloc () __proto(size_t);
+; 34 extern void qsort () __proto(void *,size_t,size_t,int (*)());
 ;BCC_EOS
-; 35 extern void * calloc () __proto(size_t,size_t);
+; 35 extern void * bsearch 
+; 36 
+; 37 # 35
+; 35 
+; 36 () __proto(void *,void *,size_t,size_t
+; 37 # 35 "../prefix.tmp/share/bcc09/include/stdlib.h"
+; 35 ,
+; 36 int (*)());
 ;BCC_EOS
-; 36 extern void * realloc () __proto(void *,size_t);
+; 37 
+; 38 extern void * malloc () __proto(size_t);
 ;BCC_EOS
-; 37 extern void free () __proto(void *);
+; 39 extern void * calloc () __proto(size_t,size_t);
 ;BCC_EOS
-; 38 
-; 39 extern int atexit () __proto(void (*)());
+; 40 extern void * realloc () __proto(void *,size_t);
 ;BCC_EOS
-; 40 extern void exit () __proto(int);
-;BCC_EOS
-; 41 extern void _exit () __proto(int);
+; 41 extern void free () __proto(void *);
 ;BCC_EOS
 ; 42 
-; 43  
-; 44 extern char * itoa () __proto(int);
+; 43 extern int atexit () __proto(void (*)());
 ;BCC_EOS
-; 45 extern char * ltoa () __proto(long);
+; 44 extern void exit () __proto(int);
 ;BCC_EOS
-; 46 extern char * ultoa () __proto(unsigned long);
+; 45 extern void _exit () __proto(int);
 ;BCC_EOS
-; 47 extern char * ltostr () __proto(long,int);
+; 46 extern void abort () __proto();		 
 ;BCC_EOS
-; 48 extern char * ultostr () __proto(unsigned long,int);
+; 47 
+; 48 extern div_t div () __proto(int,int);
 ;BCC_EOS
-; 49 # 5 "../prefix.tmp/share/bcc09/include/string.h"
+; 49 extern ldiv_t ldiv () __proto(long,long);
+;BCC_EOS
+; 50 
+; 51 
+; 52  
+; 53 extern char * getenv () __proto(char *);
+;BCC_EOS
+; 54 extern int system () __proto(char *);
+;BCC_EOS
+; 55 
+; 56  
+; 57 extern int mblen () __proto(char *,size_t);
+;BCC_EOS
+; 58 extern int mbtowc () __proto(wchar_t *,char *,size_t);
+;BCC_EOS
+; 59 extern int wctomb () __proto(char *,wchar_t);
+;BCC_EOS
+; 60 extern si
+; 60 ze_t mbstowcs () __proto(wchar_t *,char *,size_t);
+;BCC_EOS
+; 61 extern size_t wcstombs () __proto(char *,wchar_t *,size_t);
+;BCC_EOS
+; 62 
+; 63  
+; 64 extern char * itoa () __proto(int);
+;BCC_EOS
+; 65 extern char * ltoa () __proto(long);
+;BCC_EOS
+; 66 extern char * ultoa () __proto(unsigned long);
+;BCC_EOS
+; 67 extern char * ltostr () __proto(long,int);
+;BCC_EOS
+; 68 extern char * ultostr () __proto(unsigned long,int);
+;BCC_EOS
+; 69 # 5 "../prefix.tmp/share/bcc09/include/string.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
 ; 7 # 9 "../prefix.tmp/share/bcc09/include/string.h"
 ; 9 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
-; 6 # 10 "../prefix.tmp/share/bcc09/include/strin
-; 9 g.h"
+; 6 # 10 "../prefix.tmp/share/bcc09/include/string.h"
 ; 10 # 5 "../prefix.tmp/share/bcc09/include/stddef.h"
 ; 5  
-; 6 # 13 "../prefix.tmp/share/bcc09/include/string.h"
+; 6 # 11 "../prefix.tmp/share/bcc09/include/string.h"
+; 11 
+; 12 
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
@@ -172,12 +210,21 @@
 ;BCC_EOS
 ; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
-; 51 # 6 "../prefix.tmp/share/bcc09/include/errno.h"
+; 51 
+; 52 extern char * strerror () __proto(int);
+;BCC_EOS
+; 53  
+; 54 extern int strcmp  () __proto(char *,char *);
+;BCC_EOS
+; 55 extern size_t strxfrm () __proto(char *,char *,size_t);
+;BCC_EOS
+; 56 # 6 "../prefix.tmp/share/bcc09/include/errno.h"
 ; 6  
 ; 7 # 11
 ; 11 extern int errno;
 ;BCC_EOS
-; 12 # 5 "../prefix.tmp/share/bcc09/include/unistd.h"
+; 12 # 5 "../prefix.tmp/share/bcc09/include/uni
+; 4 std.h"
 ; 5  
 ; 6 # 6 "../prefix.tmp/share/bcc09/include/features.h"
 ; 6  
@@ -214,8 +261,7 @@
 ;BCC_EOS
 ; 37 extern unsigned int __heap_margin;
 ;BCC_EOS
-; 38 # 15 "maltest.
-; 14 c"
+; 38 # 15 "maltest.c"
 ; 15 extern int putchar();
 ;BCC_EOS
 ; 16 extern void putnum();
@@ -954,7 +1000,8 @@ _basics:
 ; Debug: eq * char = X+0 to * char q = [S+8-4] (used reg = )
 	STX	4,S
 ;BCC_EOS
-; 106 	ok(10,q != 0 && q[0] == 0 && q != p);
+; 106 	ok(10,q != 0 && q[0] == 0
+; 106  && q != p);
 ; Debug: ne int = const 0 to * char q = [S+8-4] (used reg = )
 	LDD	4,S
 		BEQ	.3E
@@ -1346,8 +1393,7 @@ _stress:
 	ADDD	#1
 	STD	4,S
 ;BCC_EOS
-; 157 	
-; 157 				continue;
+; 157 					continue;
 	JMP	.53
 ;BCC_EOS
 ; 158 				}
@@ -2079,7 +2125,8 @@ _heap:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 240 	ok(42,sbrk(-10)== start + 10 && sbrk(0)== start);
+; 240 	ok(42,sbrk
+; 240 (-10)== start + 10 && sbrk(0)== start);
 ; Debug: expression subtree swapping
 ; Debug: rootlist int = const -$A (used reg = )
 	LDX	#-$A

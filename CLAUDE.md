@@ -476,6 +476,18 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   others are pushed, so a structure a call in it returned stayed between them and the
   call: ROOTLISTOP now pops back to `lastargsp` (or its mark) once the argument is in
   X. `structret.c` (host-compared, -O, and -Mo by hand) tests them.
+- C89's library completed (2026-11-12, phase 1): assert.h (`__assert`; `__ASSERT_DECLARED`
+  so it can come again inside a function), setjmp.h (`stdlib/setjmp.s`: S, return
+  address, U; PIC), signal.h (`__sighandler_t` typedef: unproto can't give a function
+  returning a function pointer, defined with a prototype, the declaration's prototype;
+  raise() only; SIG_DFL `_exit(128 + sig)`; a handler is reset to SIG_DFL), locale.h
+  ("C"), float.h, abort (raise, then `_exit(134)`), div/ldiv, getenv (NULL), system
+  (NULL: 0, else -1), mb* (a char; `wchar_t` char), strerror (glibc's words: errno.h
+  has Linux's numbers), strcoll/strxfrm, perror, fgetpos/fsetpos. `__eol` per target
+  (`sa`/`sim`/`vec` "\n", `cb`/`os9` "\r", `flex` "\r\n") ends perror's and assert's
+  line. Tests: `c89test.c` (host-compared, -O, as an OS-9 module), `asserttest.c`
+  (status 134 after a SIGABRT handler returns), `c89file.c` (fgetpos on OS-9 files).
+  Writing them found cc1's struct-return and void-conditional bugs (fixed).
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
@@ -483,7 +495,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 900 reference
+  `tests/src/` with this tree's tools and compare every result with the 919 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

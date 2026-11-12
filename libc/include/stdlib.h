@@ -13,6 +13,10 @@
 #define EXIT_SUCCESS	0
 #define EXIT_FAILURE	1
 #define RAND_MAX	32767
+#define MB_CUR_MAX	1		/* (only the "C" locale's characters) */
+
+typedef struct { int quot, rem; } div_t;
+typedef struct { long quot, rem; } ldiv_t;
 
 extern int atoi __P ((__const char *));
 extern long atol __P ((__const char *));
@@ -39,6 +43,22 @@ extern void free __P ((void *));
 extern int atexit __P ((void (*)()));
 extern void exit __P ((int));
 extern void _exit __P ((int));
+extern void abort __P ((void));		/* raise(SIGABRT), then _exit(134) */
+
+extern div_t div __P ((int, int));
+extern ldiv_t ldiv __P ((long, long));
+
+/* no environment and no command processor on bcc09's systems: getenv()
+   gives NULL, and system(NULL) 0 (system(command) -1) */
+extern char * getenv __P ((__const char *));
+extern int system __P ((__const char *));
+
+/* multibyte characters: a char each, in the "C" locale */
+extern int mblen __P ((__const char *, size_t));
+extern int mbtowc __P ((wchar_t *, __const char *, size_t));
+extern int wctomb __P ((char *, wchar_t));
+extern size_t mbstowcs __P ((wchar_t *, __const char *, size_t));
+extern size_t wcstombs __P ((char *, __const wchar_t *, size_t));
 
 /* Not in the C standard, but in dev86's library */
 extern char * itoa __P ((int));

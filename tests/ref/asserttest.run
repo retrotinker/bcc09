@@ -1,0 +1,4 @@
+passed
+NDEBUG
+asserttest.c:31: assertion failed: n == 3
+SIGABRT handler: 6

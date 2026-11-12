@@ -37,7 +37,10 @@
 ; 6 # 5 "../prefix.tmp/share/bcc09/include/sys/types.h"
 ; 5  
 ; 6 # 10 "../prefix.tmp/share/bcc09/include/stddef.h"
-; 10 # 13 "../prefix.tmp/share/bcc09/include/string.h"
+; 10 # 18
+; 18 typedef char wchar_t;		 
+;BCC_EOS
+; 19 # 13 "../prefix.tmp/share/bcc09/include/string.h"
 ; 13  
 ; 14 extern size_t strlen () __proto(char* __str);
 ;BCC_EOS
@@ -98,7 +101,15 @@
 ;BCC_EOS
 ; 50 extern size_t strspn () __proto(char *,char *);
 ;BCC_EOS
-; 51 # 9 "strtest.c"
+; 51 
+; 52 extern char * strerror () __proto(int);
+;BCC_EOS
+; 53  
+; 54 extern int strcmp  () __proto(char *,char *);
+;BCC_EOS
+; 55 extern size_t strxfrm () __proto(char *,char *,size_t);
+;BCC_EOS
+; 56 # 9 "strtest.c"
 ; 9 extern int putchar();
 ;BCC_EOS
 ; 10 extern void putnum();
@@ -108,7 +119,8 @@
 ;BCC_EOS
 ; 13 
 ; 14 void say(s)
-; 15 char *s;
+; 15 ch
+; 15 ar *s;
 	EXPORT	_say
 _say:
 ;BCC_EOS
@@ -189,8 +201,7 @@ _ok:
 _sign:
 ;BCC_EOS
 ; 35 {
-; 36 	retur
-; 36 n n < 0 ? -1 : n > 0;
+; 36 	return n < 0 ? -1 : n > 0;
 	PSHS	X
 ; Debug: lt int = const 0 to int n = [S+2-2] (used reg = )
 	LDD	0,S
@@ -1751,7 +1762,8 @@ _searches:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 117 	ok(51,strchr(s,'z')== 0);
+; 117 	ok(5
+; 117 1,strchr(s,'z')== 0);
 ; Debug: list int = const $7A (used reg = )
 	LDD	#$7A
 	PSHS	D
@@ -1891,8 +1903,7 @@ _searches:
 	JSR	>_ok
 	LEAS	2,S
 ;BCC_EOS
-; 122 	ok(56,strrchr(s,0)== s + 12
-; 122 );
+; 122 	ok(56,strrchr(s,0)== s + 12);
 ; Debug: expression subtree swapping
 ; Debug: list int = const 0 (used reg = )
 	LDD	#0
@@ -3452,7 +3463,8 @@ _memories:
 	JSR	>_strcpy
 	LEAS	2,S
 ;BCC_EOS
-; 202 	memmove(buf2,buf,9);
+; 202 	memmo
+; 202 ve(buf2,buf,9);
 ; Debug: list unsigned int = const 9 (used reg = )
 	LDD	#9
 	PSHS	D
@@ -3555,13 +3567,12 @@ _memories:
 	JSR	>_memset
 	LEAS	4,S
 ;BCC_EOS
-; 209 	ok(100,memccpy(buf2,"abcdef",'c',6)== 
+; 209 	ok(100,memccpy(buf2,"abcdef",'c',6)== buf2 + 3);
 	LOC	1
 .140:
 	FCC	"abcdef"
 	FCB	0
 	LOC	0
-; 209 buf2 + 3);
 ; Debug: list unsigned int = const 6 (used reg = )
 	LDD	#6
 	PSHS	D

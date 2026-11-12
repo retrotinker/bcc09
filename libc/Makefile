@@ -77,6 +77,14 @@ ABS_OBJS = stdlib/abs.o stdlib/labs.o
 STRTOL_OBJS = stdlib/strtol.o stdlib/strtoul.o
 RAND_OBJS = stdlib/rand.o stdlib/srand.o
 GETDELIM_OBJS = stdio/getdelim.o stdio/getline.o
+DIV_OBJS = stdlib/div.o stdlib/ldiv.o
+GETENV_OBJS = stdlib/getenv.o stdlib/system.o
+MB_OBJS = stdlib/mblen.o stdlib/mbtowc.o stdlib/wctomb.o stdlib/mbstowcs.o \
+	  stdlib/wcstombs.o
+SIGNAL_OBJS = stdlib/signal.o stdlib/raise.o
+LOCALE_OBJS = stdlib/setlocale.o stdlib/localeconv.o
+STRCOLL_OBJS = string/strcoll.o string/strxfrm.o
+FGETPOS_OBJS = stdio/fgetpos.o stdio/fsetpos.o
 OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  bcc/laddsub.o bcc/llogic.o bcc/lcmp.o bcc/lunary.o \
 	  bcc/lincdec.o bcc/lshift.o bcc/lmul.o bcc/ldiv.o \
@@ -95,30 +103,34 @@ OBJS	= bcc/imul.o bcc/idiv.o bcc/ishift.o \
 	  string/memcpy.o $(STRING_OBJS) \
 	  string/strcspn.o string/strpbrk.o string/strsep.o \
 	  string/strspn.o string/strstr.o string/strtok.o \
-	  string/strcasecmp.o string/strncasecmp.o $(MATH_OBJS)
+	  string/strcasecmp.o string/strncasecmp.o $(MATH_OBJS) \
+	  $(DIV_OBJS) $(GETENV_OBJS) $(MB_OBJS) $(SIGNAL_OBJS) $(LOCALE_OBJS) \
+	  $(STRCOLL_OBJS) $(FGETPOS_OBJS) stdlib/abort.o stdlib/assert.o \
+	  stdlib/setjmp.o string/strerror.o stdio/perror.o
 
 HEADERS	= include/ctype.h include/errno.h include/fcntl.h \
 	  include/features.h include/stdio.h include/math.h \
 	  include/stdint.h include/stdbool.h include/dirent.h \
 	  include/limits.h include/malloc.h include/stdarg.h include/stddef.h \
 	  include/stdlib.h include/string.h include/sys/types.h include/sys/stat.h \
-	  include/unistd.h
+	  include/unistd.h include/assert.h include/setjmp.h include/signal.h \
+	  include/locale.h include/float.h
 
-SA_OBJS	= sa/_exit.o
+SA_OBJS	= sa/_exit.o sa/eol.o
 CB_SYS_OBJS = cb/write.o cb/read.o cb/isatty.o cb/lseek.o cb/close.o \
 	  cb/__cb_files.o
 CB_OBJS	= sa/_exit.o cb/rom.o cb/disk.o cb/dskcon.o cb/coco.o cb/sound.o \
-	  cb/tone.o $(CB_SYS_OBJS)
+	  cb/tone.o cb/eol.o $(CB_SYS_OBJS)
 ROM_OBJS = rom/_exit.o cb/rom.o cb/disk.o cb/dskcon.o cb/coco.o cb/sound.o \
-	   cb/tone.o $(CB_SYS_OBJS)
+	   cb/tone.o cb/eol.o $(CB_SYS_OBJS)
 VEC_OBJS = vec/_exit.o vec/header.o vec/draw.o vec/input.o vec/sound.o \
 	   vec/random.o vec/lists.o vec/text.o vec/score.o \
-	   vec/input2.o vec/sound2.o
+	   vec/input2.o vec/sound2.o vec/eol.o
 FLEX_SYS_OBJS = flex/write.o flex/read.o flex/isatty.o flex/lseek.o \
 	  flex/close.o flex/__flex_files.o
-FLEX_OBJS = flex/flex.o flex/start.o flex/file.o $(FLEX_SYS_OBJS)
+FLEX_OBJS = flex/flex.o flex/start.o flex/file.o flex/eol.o $(FLEX_SYS_OBJS)
 SIM_SYS_OBJS = sim/isatty.o sim/lseek.o sim/close.o sim/open.o
-SIM_OBJS = sim/_exit.o sim/read.o sim/write.o $(SIM_SYS_OBJS)
+SIM_OBJS = sim/_exit.o sim/read.o sim/write.o sim/eol.o $(SIM_SYS_OBJS)
 
 OS9_SYS_OBJS = os9/__os9errno.o os9/_exit.o os9/write.o os9/read.o \
 	  os9/open.o os9/close.o os9/lseek.o os9/isatty.o os9/unlink.o \
@@ -126,7 +138,7 @@ OS9_SYS_OBJS = os9/__os9errno.o os9/_exit.o os9/write.o os9/read.o \
 	  os9/readdir.o os9/rewinddir.o os9/closedir.o
 OS9_OBJS = $(filter-out stdlib/sbrk.o stdio/xfpcvt.o stdio/xfptvc.o,$(OBJS)) \
 	  os9/call.o os9/start.o os9/sbrk.o os9/xfpcvt.o os9/xfptvc.o \
-	  $(OS9_SYS_OBJS)
+	  os9/eol.o $(OS9_SYS_OBJS)
 OS9_DIRS = bcc ctype malloc stdio stdlib string math os9
 
 TARGETS	= crt0.o libsa.a libcb.a crtsim.o libsim.a crtos9.o libos9.a \
@@ -229,6 +241,20 @@ $(STRTOL_OBJS): stdlib/%.o: stdlib/strtol.c $(HEADERS) .bcc/stamp
 $(RAND_OBJS): stdlib/%.o: stdlib/rand.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 $(GETDELIM_OBJS): stdio/%.o: stdio/getdelim.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(DIV_OBJS): stdlib/%.o: stdlib/div.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(GETENV_OBJS): stdlib/%.o: stdlib/getenv.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(MB_OBJS): stdlib/%.o: stdlib/mb.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(SIGNAL_OBJS): stdlib/%.o: stdlib/signal.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(LOCALE_OBJS): stdlib/%.o: stdlib/locale.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(STRCOLL_OBJS): string/%.o: string/strcoll.c $(HEADERS) .bcc/stamp
+	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
+$(FGETPOS_OBJS): stdio/%.o: stdio/fgetpos.c $(HEADERS) .bcc/stamp
 	$(BCC) $(BCCFLAGS) -DL_$* -c -o $@ $<
 
 .SUFFIXES: .s .c .o

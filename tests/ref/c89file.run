@@ -1,0 +1,4 @@
+fgetpos 2
+then s
+fsetpos back: sr
+c89file.tmp: No such file or directory

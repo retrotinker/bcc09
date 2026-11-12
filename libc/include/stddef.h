@@ -13,6 +13,11 @@
 #define NULL ((void*)0)
 #endif
 
+#ifndef __WCHAR_T
+#define __WCHAR_T
+typedef char wchar_t;		/* (only the "C" locale's characters) */
+#endif
+
 #define offsetof(type, member)	((size_t)&((type *)0)->member)
 
 #endif /* __STDDEF_H */

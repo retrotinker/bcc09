@@ -592,10 +592,12 @@ rm -f dpret.srec
 # dptest.c uses __direct variables (DP their page); charcmp.c compares
 # signed and unsigned chars with constants and each other; nancmp.c
 # compares with a NaN; structret.c returns structures; voidcond.c
-# conditional expressions of type void; and a target with no
+# conditional expressions of type void; c89test.c checks the C89
+# functions libc added last; asserttest.c assert() and abort(); and a
+# target with no
 # start-up code yet can't be linked
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 atexitio dptest charcmp nancmp structret voidcond; do
+	 atexitio dptest charcmp nancmp structret voidcond c89test asserttest; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -605,13 +607,13 @@ for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest
 	rm -f $f.srec
 done
 # pftest.c, chartest.c, sadd.c, sftest.c, fltcc.c, fpio.c, mtest.c,
-# inttest.c, protoarg.c, gltest.c, charcmp.c, nancmp.c, structret.c and
-# voidcond.c must print the same with the host's compiler and C library (but for
+# inttest.c, protoarg.c, gltest.c, charcmp.c, nancmp.c, structret.c,
+# voidcond.c and c89test.c must print the same with the host's compiler and C library (but for
 # the count of checks, which differs); mtest.c with libc/math, the same
 # fdlibm code built on the host, without fused multiply-adds or builtins,
 # which must give the same results bit for bit
 for f in pftest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest charcmp \
-	 nancmp structret voidcond; do
+	 nancmp structret voidcond c89test; do
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
 	extra=
@@ -669,7 +671,13 @@ os9run os9path
 mv os9path-os9.run os9path.run
 mv os9path-os9.run.rc os9path.run.rc
 rm -rf QA QF
-for f in hello pftest chartest sadd fltcc fpio inttest protoarg dptest; do
+# fgetpos(), fsetpos() and perror() (c89file.c) on a file
+os9run c89file
+mv c89file-os9.run c89file.run
+mv c89file-os9.run.rc c89file.run.rc
+rm -f c89file.tmp
+for f in hello pftest chartest sadd fltcc fpio inttest protoarg dptest \
+	 c89test structret; do
 	os9run $f
 	if cmp -s $f.run $f-os9.run &&
 	   cmp -s $f.run.rc $f-os9.run.rc; then
@@ -1068,7 +1076,7 @@ for f in ops longops fptest strtest stdtest maltest vatest; do
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 dptest charcmp nancmp structret voidcond; do
+	 dptest charcmp nancmp structret voidcond c89test; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null

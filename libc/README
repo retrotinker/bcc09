@@ -87,10 +87,16 @@ Changes from dev86:
     scanf.c had no license, and its printf departed from the C standard
     (precision on integers, %X, # and %p); see stdio/printf.c and
     stdio/scanf.c
-What C89 has that libc doesn't yet: assert.h, setjmp.h, signal.h,
-time.h, locale.h and float.h; abort, getenv, system, div and ldiv;
-strerror, perror, strcoll and strxfrm; tmpfile, tmpnam, fgetpos and
-fsetpos; the multibyte character functions; and rename but on FLEX.
+What C89 has that libc doesn't yet: time.h, tmpfile, tmpnam, and
+rename but on FLEX.  The rest of C89 is written for bcc09:
+assert.h (stdlib/assert.c), setjmp.h (stdlib/setjmp.s: S, the return
+address and U), signal.h (stdlib/signal.c: raised only by raise(), the
+default _exit(128 + sig)), locale.h ("C" only), float.h, abort, div,
+ldiv, getenv (no environment: NULL), system (no command processor),
+the multibyte functions (a char each), strerror (glibc's messages),
+strcoll, strxfrm, perror, fgetpos and fsetpos.  perror() and assert()
+end their line with __eol, which each target's library defines: "\r"
+for Color BASIC and OS-9, "\r\n" for FLEX, "\n" for the others.
 
 Floating point in text: printf's %e, %f, %g and %a (and %E, %F, %G,
 %A), and strtod, atof and scanf's %a, %e, %f and %g, are exact, as the

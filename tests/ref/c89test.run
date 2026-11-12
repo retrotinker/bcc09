@@ -1,0 +1,60 @@
+div(7, 2) = 3 1
+div(-7, 2) = -3 -1
+div(7, -2) = -3 1
+div(-7, -2) = 3 -1
+div(0, 5) = 0 0
+div(32767, 3) = 10922 1
+div(-32767, 10) = -3276 -7
+ldiv(1000000, 7) = 142857 1
+ldiv(-1000000, 7) = -142857 -1
+ldiv(123456789, -1000) = -123456 789
+ldiv(-2147483647, 65536) = -32767 -65535
+strerror(0) = Success
+strerror(2) = No such file or directory
+strerror(4) = Interrupted system call
+strerror(5) = Input/output error
+strerror(9) = Bad file descriptor
+strerror(12) = Cannot allocate memory
+strerror(13) = Permission denied
+strerror(16) = Device or resource busy
+strerror(17) = File exists
+strerror(19) = No such device
+strerror(22) = Invalid argument
+strerror(24) = Too many open files
+strerror(25) = Inappropriate ioctl for device
+strerror(28) = No space left on device
+strerror(29) = Illegal seek
+strerror(33) = Numerical argument out of domain
+strerror(34) = Numerical result out of range
+strerror(39) = Directory not empty
+strerror(200) = Unknown error 200
+strerror(-1) = Unknown error -1
+perror: No such file or directory
+Numerical argument out of domain
+Success
+strcoll 1 1 0
+strxfrm 9 transform 21
+setjmp 0 v 0
+setjmp 1 v 1
+from depth 5: 50
+FLT_RADIX 2 FLT_ROUNDS 1
+FLT 24 6 -125 -37 128 38
+FLT 0x1.fffffep+127 0x1p-23 0x1p-126
+DBL 53 15 -1021 -307 1024 308
+DBL 0x1.fffffffffffffp+1023 0x1p-52 0x1p-1022
+DBL_EPSILON 1
+signal 1
+raise 0 caught 2
+again caught 4
+ignore 1
+raise 0 caught 4
+signal(0) 1
+setlocale C C 1
+localeconv [.] [] [] 1 1
+MB_CUR_MAX 1
+mblen 1 0 -1 0
+mbtowc 1 Q 0
+wctomb 1 Z 0
+mbstowcs, wcstombs 8 wide
+getenv 1
+checks system 0 -1 sizeof(wchar_t) 1 MB_LEN_MAX 1

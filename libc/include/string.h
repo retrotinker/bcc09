@@ -49,4 +49,9 @@ extern char * strtok __P ((char *, __const char *));
 extern size_t strcspn __P ((__const char *, __const char *));
 extern size_t strspn __P ((__const char *, __const char *));
 
+extern char * strerror __P ((int));
+/* the "C" locale's: strcoll() is strcmp(), strxfrm() a copy */
+extern int strcoll __P ((__const char *, __const char *));
+extern size_t strxfrm __P ((char *, __const char *, size_t));
+
 #endif
