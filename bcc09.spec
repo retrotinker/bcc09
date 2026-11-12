@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.16.1
+Version:        0.16.2
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -98,6 +98,10 @@ cp -p libc/math/README README.libm
 %doc doc/rocks.c doc/worm.c
 
 %changelog
+* Thu Nov 12 2026 John W. Linville <linville@tuxdriver.com> - 0.16.2-1
+- The tests need sim6809 1.3.0 (BuildRequires sim6809 >= 1.3.0), which
+  renames files as OS-9's RBF does, so make check tests OS-9's rename()
+
 * Thu Nov 12 2026 John W. Linville <linville@tuxdriver.com> - 0.16.1-1
 - libc: rename() on OS-9 and Disk BASIC, which completes C89's library
   on each system with files
