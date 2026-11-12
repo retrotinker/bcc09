@@ -457,6 +457,14 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   they were unsigned). `charcmp.c` checks every relation with constants on either
   side, variables, ints and pointers against the host's compiler (6642 checks), -O too.
   libc changed only in scanf (equivalent comparisons); Rocks' MAME game changed.
+- Comparisons with a NaN (fixed 2026-11-12; listed in BUGS for 0.15.0) are IEEE's:
+  every one false but `!=`. No one setting of CC can say that for signed branches
+  (`<` false needs N^V clear, `>=` false needs it set), so `fpcmp.s`'s helpers (and
+  `Ftstd`/`Ftstf`) set less N and C, equal Z, greater nothing, unordered C alone
+  (`flags`), and cc1's `floatcc()` (`cmplocal()`'s float path and `test()`'s) makes
+  `>` and `>=` BHI and BHS, which C makes false for a NaN; their opposites BLS and BLO
+  are true for one. `nancmp.c` checks every relation, both sides, floats, the
+  constant 0, and if/!/?: against the host.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
@@ -464,7 +472,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 893 reference
+  `tests/src/` with this tree's tools and compare every result with the 894 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

@@ -472,11 +472,12 @@ X; they change D, X and CC, and must leave Y and U as they were:
                               the result replaces the left one
   Faddf ... Fdivf             the same, with the float at X
   Fcomp, Fcompd, Fcompf       compare (popping as above, but pushing
-                              nothing) and set CC for signed branches;
-                              with a NaN, as if the left were greater
-                              (and unequal: one CC can't say that
-                              every comparison but != is false), so
-                              > and >= are true (see BUGS)
+                              nothing) and set CC: less N and C, equal
+                              Z, greater none, unordered (a NaN) C; the
+                              compiler branches with BLT and BLE for <
+                              and <=, BHI and BHS for > and >=, so
+                              every comparison with a NaN but != is
+                              false
   Ftstd, Ftstf                compare the double or float at X with 0
   Fpushd, Fpushf              push the double or float at X, as a
   Fnegd, Fnegf                double (negated)

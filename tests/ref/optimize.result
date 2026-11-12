@@ -20,3 +20,4 @@ ok   protoarg runs the same with -O
 ok   gltest runs the same with -O
 ok   dptest runs the same with -O
 ok   charcmp runs the same with -O
+ok   nancmp runs the same with -O

@@ -6,11 +6,12 @@
 ;   Ftstd   compare the double at X with 0
 ;   Ftstf   compare the float at X with 0
 ;
-; They set CC as comparing two signed numbers would, for the compiler's
-; signed branches (BLT, BGE, BEQ, ...): -0 equals +0.  A NaN compares
-; greater than anything, and unequal to everything (IEEE 754 says that
-; every comparison with a NaN but != is false, which one setting of CC
-; can't say).  Change D, X and CC; keep Y and U.
+; They set CC for the compiler's branches: less sets N and C, equal Z,
+; greater none of them, and unordered (a NaN on either side) C alone; V
+; is clear.  So BLT and BLE (signed) are false for a NaN, and the
+; compiler takes > and >= as BHI and BHS (unsigned), which C makes false
+; for one too: every comparison with a NaN but != is false, as IEEE 754
+; says.  -0 equals +0.  Change D, X and CC; keep Y and U.
 ;
 ; Written for bcc09.  Like the rest of libc, it is distributed under the
 ; GNU Library General Public License, version 2 (see COPYING.LIB).
@@ -58,14 +59,29 @@ iszero:	lda	,x
 	ora	7,x
 	rts
 
-; compare the doubles at X and Y: A = -1, 0 or 1 (X <, =, > Y)
+; CC from A: -1 less (N, C), 0 equal (Z), 1 greater (none), 2
+; unordered (C); V clear
+flags:	cmpa	#2
+	beq	fl2
+	tsta			; N and Z; V clear (C as it was)
+	bmi	fl1
+	andcc	#$fe		; equal, greater: not C
+	rts
+fl1:	orcc	#$01		; less: C too
+	rts
+fl2:	tsta			; unordered: not N, not Z
+	orcc	#$01		; C
+	rts
+
+; compare the doubles at X and Y: A = -1, 0 or 1 (X <, =, > Y), or 2 if
+; either is a NaN
 compare:
 	lbsr	isnan
-	beq	cm1
+	beq	cmn
 	exg	x,y
 	lbsr	isnan
 	exg	x,y
-	beq	cm1
+	beq	cmn
 	lbsr	iszero
 	bne	cm2
 	exg	x,y
@@ -78,6 +94,8 @@ cm2:	lda	,x
 	lda	,x		; the signs differ: the negative one is less
 	bmi	cmm
 cm1:	lda	#1
+	rts
+cmn:	lda	#2
 	rts
 cm0:	clra
 	rts
@@ -110,7 +128,7 @@ Fcomp:	pshs	y
 	puls	y
 	puls	x
 	leas	16,s
-	tsta
+	lbsr	flags
 	jmp	,x
 
 Fcompd:	pshs	y
@@ -120,7 +138,7 @@ Fcompd:	pshs	y
 	puls	y
 	puls	x
 	leas	8,s
-	tsta
+	lbsr	flags
 	jmp	,x
 
 Fcompf:	pshs	y		; the float as a double, at 0,S
@@ -133,21 +151,23 @@ Fcompf:	pshs	y		; the float as a double, at 0,S
 	puls	y
 	puls	x
 	leas	8,s
-	tsta
+	lbsr	flags
 	jmp	,x
 
 Ftstd:	lbsr	isnan
-	beq	ts1
+	beq	tsn
 	lbsr	iszero
 	beq	ts0
 	lda	,x
 	bmi	ts2
 ts1:	lda	#1
-	rts
+	lbra	flags
 ts2:	lda	#-1
-	rts
+	lbra	flags
 ts0:	clra
-	rts
+	lbra	flags
+tsn:	lda	#2
+	lbra	flags
 
 Ftstf:	lda	,x		; a NaN: all 1s in the exponent, and not 0
 	anda	#$7f
@@ -158,7 +178,7 @@ Ftstf:	lda	,x		; a NaN: all 1s in the exponent, and not 0
 	anda	#$7f
 	ora	2,x
 	ora	3,x
-	bne	ts1
+	bne	tsn
 tf1:	lda	,x
 	anda	#$7f
 	ora	1,x

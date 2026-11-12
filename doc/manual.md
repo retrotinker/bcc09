@@ -188,10 +188,8 @@ There is no 64-bit integer type.
   headers define them away, so a program that uses them must include one.
 * **Floating point** is in software, exact: every operation gives the
   correctly rounded result IEEE 754 calls for, the same as a host's
-  hardware, with infinities, NaNs and denormals. Comparisons with a NaN
-  are the exception: `<`, `<=`, `==` and `!=` give what IEEE says (false,
-  but true for `!=`), but `>` and `>=` are true, whichever side the NaN is
-  on; test for a NaN with `x != x`. `float` arithmetic is done
+  hardware, with infinities, NaNs and denormals; every comparison with a
+  NaN is false but `!=`, so `x != x` is true only for a NaN. `float` arithmetic is done
   in `double`, and rounded when it is stored. On a CoCo (0.89 MHz) a
   `double` addition takes about 2 ms, a multiplication 5 ms and a division
   9 ms; `float`'s about 3, 4 and 10 ms.

@@ -49,6 +49,7 @@ FORWARD void logandcond P((struct nodestruct * exp, label_no truelab,
 FORWARD void logorcond P((struct nodestruct * exp, label_no truelab,
 			  label_no falselab, bool_pt nojump));
 FORWARD void reduceconst P((struct symstruct * source));
+FORWARD void floatcc P((ccode_t * pcondtrue));
 FORWARD void scconst P((struct symstruct * source));
 FORWARD void test P((struct symstruct * target, ccode_t * pcondtrue));
 FORWARD void testcond P((struct nodestruct * exp, label_no truelab,
@@ -112,6 +113,7 @@ ccode_t *pcondtrue;
 	}
 	if (source->type->scalar & RSCALAR) {
 		floatop(EQOP, source, target);
+		floatcc(pcondtrue);
 		return;
 	}
 	if (source->storage == CONSTANT) {
@@ -446,6 +448,20 @@ struct symstruct *source;
 		    source->offset.offv <= MAXSCHTO ? sctype : itype;
 }
 
+/* after a floating point comparison: the helpers (fpcmp.s) set C for
+   less and for unordered (a NaN), N^V for less only, and Z for equal; so
+   < and <= are signed branches as usual, which are false for a NaN, and
+   > and >= unsigned ones (HI, HS), which C makes false for a NaN too, as
+   IEEE 754 wants; the opposites (LS, LO) are true for it */
+PRIVATE void floatcc(pcondtrue)
+ccode_t *pcondtrue;
+{
+	if (*pcondtrue == GT)
+		*pcondtrue = HI;
+	else if (*pcondtrue == GE)
+		*pcondtrue = HS;
+}
+
 PRIVATE void reduceconst(source)
 struct symstruct *source;
 {
@@ -470,6 +486,7 @@ ccode_t *pcondtrue;
 	}
 	if (target->type->scalar & RSCALAR) {
 		float1op(EQOP, target);
+		floatcc(pcondtrue);
 		return;
 	}
 	if (target->indcount != 0 ||
