@@ -588,8 +588,10 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   such as the headers' names in comments, comes between (fixed 2026-11-09).
 - `tests/src/cocotest.c` checks `coco.h` (`cb/coco.s`, added 2026-11-10: `inkey`, `cls`,
   `locate`, `joystk`, `peek`/`poke`) with `cbrom.s` (which has a JOYIN at $A00A giving
-  10, 20, 30, 40): the screen's bytes and CURPOS, and that `cls()` writes out stdout's
-  buffer first (`__stdio_flushout`, set by stdio). `tests/xroar/xcoco.c` checks it on
+  10, 20, 30, 40): the screen's bytes and CURPOS, and that `cls()`, and `inkey()`
+  (since 2026-11-11: a prompt before an `inkey()` loop never showed, in the BASIC
+  guide's game and Worm's title), write out stdout's buffer first (`__stdio_flushout`,
+  set by stdio). `tests/xroar/xcoco.c` checks it on
   the real ROMs (`expected-coco`). stdio flushes a line-buffered stream at `'\r'` too.
   `sound(tone, duration)` (added 2026-11-10): `cb/tone.s` is BASIC's SOUND loop copied
   instruction for instruction from the ROM (CoCo $A964, Dragon $BAB3: $7E, $FE, $7E,

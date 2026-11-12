@@ -10,8 +10,9 @@
  *	SOUND t, d		sound(t, d);
  *	PEEK(a), POKE a, v	peek(a), poke(a, v)
  *
- * cls() and locate() write out what stdio has buffered first, so that
- * it goes where the cursor was.
+ * cls(), locate() and inkey() write out what stdio has buffered first,
+ * so that it goes where the cursor was, and a prompt shows before the
+ * program waits for a key.
  *
  * Written for bcc09.  Like the rest of libc, it is distributed under the
  * GNU Library General Public License, version 2 (see COPYING.LIB).

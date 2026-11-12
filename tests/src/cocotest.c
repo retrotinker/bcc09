@@ -3,7 +3,8 @@
    the cursor (CURPOS, $0088) at the top left, after writing out what
    stdio has buffered; locate() sets CURPOS; joystk() reads JOYIN's
    values; inkey() gives a key (cbrom.s's POLCAT gives none every other
-   time); peek() and poke() */
+   time), after writing out what stdio has buffered (a prompt); peek()
+   and poke() */
 
 #include <stdio.h>
 #include <unistd.h>
@@ -44,8 +45,10 @@ int main()
 	printf("LOCATE 15, 31: %04X\r", CURPOS);
 	printf("JOYSTK %d %d %d %d\r", joystk(0), joystk(1), joystk(2),
 	       joystk(3));
+	printf("PROMPT,");		/* inkey() writes it out first */
 	while ((k = inkey()) == 0)
 		;
+	write(1, " THEN WRITE\r", 12);
 	printf("INKEY %c", k);
 	k = inkey();			/* (none, this time) */
 	printf(" THEN %d\r", k);

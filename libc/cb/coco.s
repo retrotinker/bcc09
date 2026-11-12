@@ -21,11 +21,15 @@ SCREEN	equ	$0400		; the text screen, 32 by 16
 	export	_locate
 	export	_joystk
 
-; inkey(): the key being pressed, or 0 if none (BASIC's INKEY$)
-_inkey:	jmp	___cb_polcat
+; inkey(): the key being pressed, or 0 if none (BASIC's INKEY$); what
+; stdout has buffered is written out first, so that a prompt without an
+; end of line shows before the program waits for a key
+_inkey:	bsr	flush
+	jmp	___cb_polcat
 
 ; flush: what printf() and the rest have buffered for stdout, before the
-; cursor moves (if the program uses stdio, which sets the hook)
+; cursor moves or a key is read (if the program uses stdio, which sets
+; the hook)
 flush:	ldx	___stdio_flushout
 	beq	fl2
 	jsr	,x
