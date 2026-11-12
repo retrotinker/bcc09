@@ -277,7 +277,7 @@ for f in "$tests"/scripts/*; do
 	cp "$f" .
 done
 for f in segs helper usesym page romcrt romvec romstart vectors noload \
-	 mainent; do
+	 mainent fullpage fullpage2; do
 	"$AS" -o $f.o $f.s > /dev/null 2>&1 || echo "$f.s doesn't assemble"
 done > scripts-as.result
 link custom	-m -M -S custom.ld usesym.o segs.o helper.o
@@ -291,6 +291,10 @@ for f in syntax undef overlap range both settle entry unknown; do
 	link err-$f -S err-$f.ld segs.o helper.o
 done
 link err-onepage -S err-onepage.ld page.o
+# a ONEPAGE that its contents fill to the end of the page stays there
+# ($1080 to $10FF); a byte more, and it moves to the next one
+link fullpage	-M -S fullpage.ld fullpage.o
+link fullpage2	-M -S fullpage.ld fullpage2.o
 
 # a ROM: MEMORY, AT>, NOLOAD, KEEP, FILL, BYTE, WORD, ASSERT, INCLUDE,
 # the __name_load symbols, and S-record and Intel hex output; and ld09(1)'s
@@ -1133,7 +1137,7 @@ for f in "$tests"/scripts/*; do
 	rm -f "$(basename "$f")"
 done
 for f in segs helper usesym page romcrt romvec romstart vectors noload \
-	 mainent; do
+	 mainent fullpage fullpage2; do
 	rm -f $f.o
 done
 rm -rf "$prefix"
