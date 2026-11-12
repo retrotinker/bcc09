@@ -49,6 +49,7 @@ FORWARD void logandcond P((struct nodestruct * exp, label_no truelab,
 FORWARD void logorcond P((struct nodestruct * exp, label_no truelab,
 			  label_no falselab, bool_pt nojump));
 FORWARD void reduceconst P((struct symstruct * source));
+FORWARD void scconst P((struct symstruct * source));
 FORWARD void test P((struct symstruct * target, ccode_t * pcondtrue));
 FORWARD void testcond P((struct nodestruct * exp, label_no truelab,
 			 label_no falselab, bool_pt nojump));
@@ -78,6 +79,13 @@ ccode_t *pcondtrue;
 
 	reduceconst(source);
 	reduceconst(target);
+	/* C compares a signed char as an int: with a constant that a signed
+	   char can hold, a byte comparison as signed chars gives the same; with
+	   a bigger one (reduceconst() made 128 to 255 chars), it must be ints */
+	if (source->storage == CONSTANT && target->type == sctype)
+		scconst(source);
+	if (target->storage == CONSTANT && source->type == sctype)
+		scconst(target);
 	sscalar = source->type->scalar;
 	tscalar = target->type->scalar;
 	if ((source->storage != CONSTANT &&
@@ -108,8 +116,11 @@ ccode_t *pcondtrue;
 	}
 	if (source->storage == CONSTANT) {
 		if (sscalar & CHAR) {
-			if (tscalar & CHAR)
-				*pcondtrue = unsigncc[(int)*pcondtrue];
+			if (tscalar & CHAR) {
+				if (source->type != sctype ||
+				    target->type != sctype)
+					*pcondtrue = unsigncc[(int)*pcondtrue];
+			}
 			else {
 				source->type = iscalartotype(sscalar);
 				sscalar = source->type->scalar;
@@ -422,6 +433,17 @@ bool_pt nojump;			/* NB if nonzero, is ~0 so complement is 0 */
 	jumpcond(exp->left.nodeptr, truelab, orlab, 0);
 	deflabel(orlab);
 	jumpcond(exp->right, truelab, falselab, nojump);
+}
+
+/* a constant compared with a signed char: a signed char if it can be
+   one, else an int (a long or a float stays as it is) */
+PRIVATE void scconst(source)
+struct symstruct *source;
+{
+	if (source->type->scalar & (CHAR | SHORT | INT) &&
+	    !(source->type->scalar & DLONG))
+		source->type = source->offset.offv >= MINSCHTO &&
+		    source->offset.offv <= MAXSCHTO ? sctype : itype;
 }
 
 PRIVATE void reduceconst(source)

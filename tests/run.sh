@@ -585,10 +585,11 @@ rm -f dpret.srec
 # runs math.h's functions; inttest.c checks stdint.h and stdbool.h (cc1's
 # _Bool); protoarg.c passes arguments of other types to prototyped
 # functions; gltest.c reads gltest.in with getline() and getdelim();
-# dptest.c uses __direct variables (DP their page); and a target with no
+# dptest.c uses __direct variables (DP their page); charcmp.c compares
+# signed and unsigned chars with constants and each other; and a target with no
 # start-up code yet can't be linked
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 atexitio dptest; do
+	 atexitio dptest charcmp; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -598,12 +599,12 @@ for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest
 	rm -f $f.srec
 done
 # pftest.c, chartest.c, sadd.c, sftest.c, fltcc.c, fpio.c, mtest.c,
-# inttest.c, protoarg.c and gltest.c must print the same with the host's
+# inttest.c, protoarg.c, gltest.c and charcmp.c must print the same with the host's
 # compiler and C library (but for the count of checks, which differs);
 # mtest.c with libc/math, the same
 # fdlibm code built on the host, without fused multiply-adds or builtins,
 # which must give the same results bit for bit
-for f in pftest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest; do
+for f in pftest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest charcmp; do
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
 	extra=
@@ -1060,7 +1061,7 @@ for f in ops longops fptest strtest stdtest maltest vatest; do
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 dptest; do
+	 dptest charcmp; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null

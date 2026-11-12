@@ -31,6 +31,8 @@ FORWARD void etreefull P((void));
 FORWARD void fixnode P((struct nodestruct * nodeptr));
 FORWARD bool_pt isconst0 P((struct nodestruct * nodeptr));
 FORWARD bool_pt isnodecharconst P((struct nodestruct * nodeptr));
+FORWARD void charcompare P((struct nodestruct * nodeptr));
+FORWARD bool_pt isintsigned P((struct typestruct * type));
 FORWARD void needint P((struct nodestruct * nodeptr));
 FORWARD void neednonstruct P((struct nodestruct * nodeptr));
 FORWARD void needscalar P((struct nodestruct * nodeptr));
@@ -162,6 +164,42 @@ register struct nodestruct *nodeptr;
 	return nodeptr->tag == LEAF &&
 	    (symptr = nodeptr->left.symptr)->storage == CONSTANT &&
 	    symptr->offset.offv == 0 && symptr->type->scalar & ISCALAR;
+}
+
+/* a comparison: C compares chars as ints, which the code generator does
+   in a byte for chars of the same signedness, and for a signed char and a
+   constant (cmplocal()); a signed char and an unsigned one, or an
+   unsigned char and a signed int that isn't a constant from 0 to 255,
+   must be compared as ints, so their chars are cast */
+PRIVATE void charcompare(nodeptr)
+struct nodestruct *nodeptr;
+{
+	struct nodestruct *left = nodeptr->left.nodeptr;
+	struct nodestruct *right = nodeptr->right;
+	struct typestruct *lt = left->nodetype, *rt = right->nodetype;
+
+	if ((lt->constructor | rt->constructor) & (POINTER | ARRAY | FUNCTION))
+		return;
+	if (lt->scalar & CHAR && rt->scalar & CHAR) {
+		if ((lt == sctype) != (rt == sctype) &&
+		    !isnodecharconst(left) && !isnodecharconst(right)) {
+			nodeptr->left.nodeptr = castnode(itype, left);
+			nodeptr->right = castnode(itype, right);
+		}
+	} else if (lt->scalar & CHAR && lt != sctype && isintsigned(rt) &&
+		   !isnodecharconst(right))
+		nodeptr->left.nodeptr = castnode(itype, left);
+	else if (rt->scalar & CHAR && rt != sctype && isintsigned(lt) &&
+		 !isnodecharconst(left))
+		nodeptr->right = castnode(itype, right);
+}
+
+/* a signed short or int */
+PRIVATE bool_pt isintsigned(type)
+struct typestruct *type;
+{
+	return type->scalar & (SHORT | INT) &&
+	    !(type->scalar & (UNSIGNED | CHAR | LONG | DLONG | RSCALAR));
 }
 
 PRIVATE bool_pt isnodecharconst(nodeptr)
@@ -912,6 +950,8 @@ struct nodestruct *nodeptr;
 			nodeptr->right = right = castnode(uitype, right);
 #endif
 		binconvert(nodeptr);
+		if (nodeptr->tag != LOGOROP && nodeptr->tag != LOGANDOP)
+			charcompare(nodeptr);
 		return redtype;
 
 	case COLONOP:

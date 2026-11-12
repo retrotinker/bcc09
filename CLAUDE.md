@@ -443,6 +443,18 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   have `$` after its first character (`getsym()`), as OS-9's do (`I$WritLn`).
   `libc/os9/call.s`'s stubs use both (the same code; its equates are in the objects'
   symbols, as `RCC` and the others were). `os9op.s` and `os9err.s` test them.
+- Comparisons of chars (fixed 2026-11-11, found by the docs review: `Vec_Joy_1_X < 0`
+  was never true, so Rocks couldn't turn left): C compares them as ints. cc1 compares
+  two chars of the same signedness in a byte, unsigned for plain/unsigned ones; a
+  constant of 0 to 255 is reduced to a (plain) char (`reduceconst()`), which made
+  `sc < 0` constant false and `sc < 1` unsigned. Now `cmplocal()` (`scconst()`) types a
+  constant against a signed char as a signed char if it fits (-128..127; a byte
+  comparison, signed), else an int (the char extended), and `charcompare()` in
+  `exptree.c` casts to int a signed char against an unsigned one (both), and an
+  unsigned char against a signed int that isn't a constant 0..255 (`u < -1`, `u < n`:
+  they were unsigned). `charcmp.c` checks every relation with constants on either
+  side, variables, ints and pointers against the host's compiler (6642 checks), -O too.
+  libc changed only in scanf (equivalent comparisons); Rocks' MAME game changed.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
@@ -450,7 +462,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 874 reference
+  `tests/src/` with this tree's tools and compare every result with the 880 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

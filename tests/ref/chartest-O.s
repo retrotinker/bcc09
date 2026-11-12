@@ -924,8 +924,7 @@ BNE	.14
 .16:
 ; Debug: logeq int = const -$7F to char s = [S+2-2] (used reg = )
 LDB	0,S
-SEX
-SUBD	#-$7F
+SUBB	#-$7F
 BNE	.14
 .15:
 LDB	#1
@@ -959,8 +958,7 @@ LDX	#$FF
 JSR	>_sc_low
 TFR	X,D
 ; Debug: logeq int = const -1 to char = B+0 (used reg = )
-SEX
-SUBD	#-1
+SUBB	#-1
 BNE	.18
 .19:
 LDB	#1
