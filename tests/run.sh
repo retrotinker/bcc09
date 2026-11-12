@@ -590,10 +590,11 @@ rm -f dpret.srec
 # _Bool); protoarg.c passes arguments of other types to prototyped
 # functions; gltest.c reads gltest.in with getline() and getdelim();
 # dptest.c uses __direct variables (DP their page); charcmp.c compares
-# signed and unsigned chars with constants and each other; and a target with no
+# signed and unsigned chars with constants and each other; nancmp.c
+# compares with a NaN (see BUGS); and a target with no
 # start-up code yet can't be linked
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 atexitio dptest charcmp; do
+	 atexitio dptest charcmp nancmp; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null

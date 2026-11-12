@@ -1,11 +1,13 @@
 libc for bcc09
 
-This will become the port of the dev86 C library.  So far it has:
+bcc09's C library, ported from dev86's, with the parts dev86 didn't
+have written for bcc09.  It has:
 
   include/  headers: ctype.h, dirent.h, errno.h, fcntl.h, limits.h,
             malloc.h, math.h, stdarg.h, stdbool.h, stddef.h, stdint.h,
             stdio.h, stdlib.h, string.h, unistd.h, sys/stat.h,
-            sys/types.h, features.h
+            sys/types.h, features.h; and the targets' coco.h and
+            vectrex.h
             (stdint.h: no 64-bit types; stdbool.h: cc1's _Bool)
   bcc/      run-time helpers that the compiler calls for int and long
             operations the 6809 can't do in a few instructions, and
@@ -28,8 +30,11 @@ This will become the port of the dev86 C library.  So far it has:
             compiled by bcc09
   sa/       the default target (see below)
   cb/       the Color BASIC target (see below)
+  rom/      the ROM cartridge target (see below), with cb/'s I/O
+  vec/      the Vectrex target (see below)
   sim/      the sim6809 target (see below)
-  os9/      the OS-9 target (see below)
+  os9/      the OS-9 target (see below); os9obj/ holds all of libc
+            built again for it (made by "make")
   flex/     the FLEX target (see below)
 
 "make" builds libc.a, and each target's start-up code and library, with
@@ -82,7 +87,10 @@ Changes from dev86:
     scanf.c had no license, and its printf departed from the C standard
     (precision on integers, %X, # and %p); see stdio/printf.c and
     stdio/scanf.c
-div and ldiv are still to come.
+What C89 has that libc doesn't yet: assert.h, setjmp.h, signal.h,
+time.h, locale.h and float.h; abort, getenv, system, div and ldiv;
+strerror, perror, strcoll and strxfrm; tmpfile, tmpnam, fgetpos and
+fsetpos; the multibyte character functions; and rename but on FLEX.
 
 Floating point in text: printf's %e, %f, %g and %a (and %E, %F, %G,
 %A), and strtod, atof and scanf's %a, %e, %f and %g, are exact, as the
@@ -303,7 +311,7 @@ open file (FMSCLS).
 
 FLEX's files (flex/file.c) go through its File Management System, with a
 File Control Block from malloc for each: open(), unlink() and rename()
-(stdio.h; only FLEX has it so far), and read(), write(), lseek() and
+(stdio.h; only FLEX has rename()), and read(), write(), lseek() and
 close() on the descriptors open() gives (3 up; 4 at a time).  Names are
 [D.]NAME[.EXT] or NAME[.EXT][.D], made upper case.  FLEX writes a file
 only from its start, into a new one: O_WRONLY needs O_TRUNC (which
@@ -312,9 +320,9 @@ and O_RDWR and O_APPEND aren't possible (EINVAL).  A file is text, whose
 runs of spaces FLEX stores compressed and whose NULs reading skips,
 unless it is opened with O_BINARY (fcntl.h; fopen()'s "b"): then the
 bytes are as they are, but read() gives the zeros that pad the last
-sector, since FLEX keeps a file's size only in sectors.  lseek() on a
-file open for reading rewinds and reads up to the place (not past the
-end).  "make check" runs programs under sim6809 --flex (with arguments,
+sector, since FLEX keeps a file's size only in sectors.  lseek() works
+on a file open for reading: forward, it reads up to the place (not past
+the end); back, it rewinds first.  "make check" runs programs under sim6809 --flex (with arguments,
 in its line buffer, and input; and FLEX's files, which its FMS keeps on
 the host as their sectors' data), and "make check-flex" runs them on
 Compusense FLEX for the Dragon 64 in XRoar (tests/flex), where the
@@ -465,9 +473,10 @@ X; they change D, X and CC, and must leave Y and U as they were:
   Faddf ... Fdivf             the same, with the float at X
   Fcomp, Fcompd, Fcompf       compare (popping as above, but pushing
                               nothing) and set CC for signed branches;
-                              a NaN compares greater than anything
+                              with a NaN, as if the left were greater
                               (and unequal: one CC can't say that
-                              every comparison but != is false)
+                              every comparison but != is false), so
+                              > and >= are true (see BUGS)
   Ftstd, Ftstf                compare the double or float at X with 0
   Fpushd, Fpushf              push the double or float at X, as a
   Fnegd, Fnegf                double (negated)
@@ -513,7 +522,14 @@ copies of the sign bit for a signed right shift; a floating value
 converted to an integer type it doesn't fit gives its low bits, or 0
 when far out of range (or infinite, or a NaN).
 
-The tests in tests/ (ops.c, longops.c, fptest.c, regtest.s, strtest.c, stdtest.c,
-maltest.c, vatest.c; crtret.c, crtexit.c and crtatexit.c for the default target;
-hello.c, echo.c, pftest.c, siotest.c, sftest.c, fltcc.c, fpio.c and mtest.c for the sim target; cbtest.c
-for the Color BASIC target) check all of this on sim6809.
+The tests in tests/ check all of this on sim6809, and tests/run.sh says
+what each does: among them ops.c, longops.c, fptest.c and regtest.s for
+the helpers; strtest.c, stdtest.c, maltest.c and vatest.c for the
+functions, also built with the host's library; crtret.c, crtexit.c and
+crtatexit.c for the start-up code; pftest.c, sftest.c, siotest.c,
+fltcc.c, fpio.c and mtest.c for stdio, floating point and math.h;
+cbtest.c, cocotest.c, soundtest.c and cbfile.c for Color BASIC and Disk
+BASIC; romtest.c for cartridges; vectest.c and veclist.c for the
+Vectrex; os9io.c, os9dir.c and os9path.c for OS-9; and flexio.c and
+flexfile.c for FLEX.  The make targets check-xroar, check-nitros9,
+check-flex and check-vectrex run them on the real systems.

@@ -7,7 +7,14 @@ wrong output: fixing the bug changes them, so check the new output and
 update the references (tests/run.sh -u) in the same commit, and remove
 the entry from this file.
 
-None are known.  (The entry that was here, that taking the address of a
+Comparisons with a NaN: IEEE 754 makes every comparison with a NaN
+false but !=, but bcc09's floating point compare helpers (Fcomp,
+Fcompd and Fcompf, in libc/bcc/fpcmp.s) set the condition codes as if
+the left operand were greater, so a > b and a >= b are true when either
+is a NaN; <, <=, == and != are right.  tests/ref/nancmp.run shows it
+(> and >= should be 0 on every line).
+
+No others are known.  (The entry that was here, that taking the address of a
 direct-page object gave "LEAX <_foo", described nothing cc1 does: a
 __direct variable's value is reached as <_foo, its address with
 LDX #_foo, or LEAX _foo,U with -Mo, as tests/ref/direct.s and

@@ -66,12 +66,13 @@ without `-O` (`bcc09-copt(1)`).
 
 **Why is my program so big?** Mostly `printf()`: its formatting is about
 4K, and floating point formats about 6K more, linked only when a program
-prints a `float` or `double`. For a CoCo program that prints one line:
+prints a `float` or `double`. For a CoCo program that prints one line
+(`HELLO, WORLD`; `-Me -O`, as `size09` counts it):
 
 | Using | Program size |
 |---|---|
 | nothing (`return 0`) | 124 bytes |
-| `write()` | 308 bytes |
+| `write()` | 320 bytes |
 | `puts()` | 1.8K |
 | `printf()` | 4.3K |
 | `printf()` of a `double` | 10K |

@@ -367,7 +367,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   BASIC's variables), CR line ends, trying programs on sim6809, 16-bit `int` and
   constants, unsigned `char`, which C (C89, `//`, `_Bool`; no declarations after
   statements, none in `for`, no `inline`), registers and `-O`, sizes (measured, `-Me -O`
-  at $3000: empty 124 bytes, `write()` 308, `puts()` 1.8K, `printf()` 4.3K, of a double
+  at $3000: empty 124 bytes, `write()` 320, `puts()` 1.8K, `printf()` 4.3K, of a double
   10K), speed, PEEK/POKE, `asm` (its CHROUT example ran in XRoar), interrupts (no
   keyword: assembly, FIRQ saves only PC and CC), the heap, data elsewhere, debugging.
   Re-check it when what it states changes. `FAQ.md`, at the top, is the chapter on its
@@ -464,7 +464,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 888 reference
+  `tests/src/` with this tree's tools and compare every result with the 893 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

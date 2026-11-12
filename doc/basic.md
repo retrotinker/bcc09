@@ -696,8 +696,9 @@ makes it longer and faster, until it runs into the wall or itself. It is
 about 200 lines, and uses what this guide has shown:
 
 * **The screen is the board.** The worm, the wall and the food are blocks
-  of colour in the text screen's memory, `CHR$(128 + 16 * colour + 15)`
-  as BASIC would print them, put there with `poke`. To find out what is
+  of colour in the text screen's memory, `CHR$(143 + 16 * (c - 1))` for
+  BASIC's colour c, 1 to 8, as BASIC would print them, put there with
+  `poke`. To find out what is
   ahead of the worm, the program `peek`s at it:
 
 ```c
@@ -813,5 +814,5 @@ with `OPEN "I",#1,"SCORES.DAT"` and `INPUT #1`.
 | `SOUND T, D` | `sound(t, d);` |
 | `RND(N)` | `rand() % n + 1` |
 | `INT(X)` | `floor(x)` (`math.h`) |
-| `ABS(X)`, `SQR(X)` | `abs(x)`, `sqrt(x)` |
+| `ABS(X)`, `SQR(X)` | `abs(n)` (an `int`) or `fabs(x)`, `sqrt(x)` (`math.h`) |
 | `END` | `return 0;` (in `main`) |

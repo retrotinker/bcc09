@@ -98,7 +98,7 @@ then the stack. The start-up code copies the data's initial values from
 the module to the data area, clears the BSS, and calls `main`.
 
 Most of those 5981 bytes are `printf`, about 4K. The same program with
-`write(1, "HELLO FROM C\r", 13)` instead is a module of 1197 bytes.
+`write(1, "HELLO FROM C\r", 13)` instead is a module of 1201 bytes.
 
 # How the code runs
 
@@ -109,7 +109,7 @@ every process, each with its own data area, which `F$Fork` gives the
 process with U pointing at it. bcc09's code for OS-9 is made for that:
 
 * **Calls and constants are relative to the PC:** `LBSR` for calls,
-  `LEAX label,PCR` for strings, so the code runs wherever it is loaded.
+  `LEAX label,PC` for strings, so the code runs wherever it is loaded.
 * **Variables are offsets from U:** the data area starts at offset 0,
   and a global `count` is `count,U`. U is never used for anything else.
 * **DP is the data area's page,** which `F$Fork` sets; the first 256
@@ -360,7 +360,7 @@ _os9sleep:
   takes U saves it first (`PSHS U` ... `PULS U`).
 * **DP must be the same too**, and any of the others may change.
 * **The code must be position-independent:** `LBSR` and `LEAX
-  label,PCR`, no absolute addresses of its own; its variables, if it has
+  label,PC`, no absolute addresses of its own; its variables, if it has
   any, are `name,U`.
 
 Assembled with the program (`bcc09 -Mo -O -o clock.out clock.c
@@ -398,7 +398,7 @@ int main()
   a program needs them.
 * **Floating point** is in software, exact, and optional: a program that
   doesn't use it doesn't carry it, and one that prints a `double` carries
-  about 10K for it.
+  about 6K more for it.
 
 # Testing
 

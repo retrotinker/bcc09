@@ -73,7 +73,7 @@ mame vectrex -cart hello.bin
 `-Mv` is the Vectrex target: the compiler, the start-up code, the library
 and the layout of a cartridge. `-O` runs the peephole optimizer, which
 makes the code smaller and faster. `hello.bin` is the cartridge's image,
-144 bytes for a program that does nothing; MAME shows the BIOS's title
+319 bytes (a program that does nothing is 144); MAME shows the BIOS's title
 screen, with the default title "BCC09" and the BIOS's tune, and then
 runs the program.
 
@@ -89,7 +89,8 @@ runs the program.
 | below `$CBEA` | RAM: the stack, growing down |
 | `$D000` | the VIA |
 
-The start-up code (`crtvec`) sets S to `$CBEA` and DP to `$D0`, copies the
+The start-up code (`crtvec`) sets S to `$CBEA` and DP to `$D0` (`$C8` with
+`__direct` variables: section 4.4), copies the
 initialized data from the ROM to the RAM, clears the BSS, and calls
 `main`. `main` should never return: if it does, the program stops in a
 loop.
@@ -244,9 +245,8 @@ after them, at `$C880`, with DP set to `$C8` while the program runs (the
 functions in `vectrex.h` still give the BIOS `$D0`, and `$C8` for the
 music, and put the program's back after). That leaves room for 128 bytes
 of them (a little less, as the linker rounds each module's up to a
-multiple of 4); if there are more, they all
-move to the next page, `$C9`, and the 128 bytes after the BIOS's variables
-go unused. A program without `__direct` variables keeps DP at `$D0`.
+multiple of 4); if there are more, they all move to the next page, `$C9`,
+and the 128 bytes after the BIOS's variables go unused. A program without `__direct` variables keeps DP at `$D0`.
 
 # The BIOS from C
 
@@ -354,8 +354,6 @@ int main()
 
 int main()
 {
-	unsigned b;
-
 	Vec_Joy_Mux_1_X = 1;	/* read joystick 1's X and Y */
 	Vec_Joy_Mux_1_Y = 3;
 	Vec_Joy_Mux_2_X = 0;	/* not joystick 2 */
@@ -363,8 +361,8 @@ int main()
 	for (;;) {
 		Wait_Recal();
 		Joy_Digital();
-		b = Read_Btns();
-		if (b & 0x08)		/* button 4 pressed */
+		Read_Btns();		/* (it sets Vec_Btn_State too) */
+		if (Vec_Btn_State & 0x08)	/* button 4 held down */
 			Intensity_a(0x7F);
 		else
 			Intensity_a(0x3F);

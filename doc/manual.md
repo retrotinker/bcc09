@@ -37,12 +37,12 @@ on a simulator and on real ROMs and systems in the XRoar emulator.
 This manual describes how to use it: building and installing it (chapter
 2), compiling a first program for each target (3), the C it compiles (4),
 each target (5), the C library (6), how compiled code calls functions, so
-that assembly can be written to work with it (7), and the tools (8).
+that assembly can be written to work with it (7), the tools (8), the tests
+(9), and answers to questions newcomers ask (10).
 For a gentler start, "bcc09 for BASIC Programmers" (`basic.pdf`) teaches
-C from Color BASIC; "bcc09 for Vectrex Programmers" (`vectrex.pdf`) is C on
-the Vectrex for those who know its BIOS and 6809 assembly, and "bcc09 for
-OS-9 Programmers" (`os9.pdf`) and "bcc09 for FLEX Programmers" (`flex.pdf`)
-C for each of those systems for those who know it.
+C from Color BASIC. "bcc09 for Vectrex Programmers" (`vectrex.pdf`), "bcc09
+for OS-9 Programmers" (`os9.pdf`) and "bcc09 for FLEX Programmers"
+(`flex.pdf`) show those who know each system how to program it in C.
 Appendix A is the reference: the manual pages of every program.
 
 bcc09 is free software. The compiler and tools are under the GNU General
@@ -188,7 +188,10 @@ There is no 64-bit integer type.
   headers define them away, so a program that uses them must include one.
 * **Floating point** is in software, exact: every operation gives the
   correctly rounded result IEEE 754 calls for, the same as a host's
-  hardware, with infinities, NaNs and denormals. `float` arithmetic is done
+  hardware, with infinities, NaNs and denormals. Comparisons with a NaN
+  are the exception: `<`, `<=`, `==` and `!=` give what IEEE says (false,
+  but true for `!=`), but `>` and `>=` are true, whichever side the NaN is
+  on; test for a NaN with `x != x`. `float` arithmetic is done
   in `double`, and rounded when it is stored. On a CoCo (0.89 MHz) a
   `double` addition takes about 2 ms, a multiplication 5 ms and a division
   9 ms; `float`'s about 3, 4 and 10 ms.
@@ -201,8 +204,9 @@ There is no 64-bit integer type.
   gives its low bits.
 
 The preprocessor defines `__BCC__`, `__6809__`, `__STDC__` (unless `-kr`),
-and a macro for the target: `__CB__`, `__OS9__`, `__FLEX__` and
-`__FLEX9__`, `__STANDALONE_`, or `__SIM6809__`.
+and a macro for the target: `__CB__` (and `__CBROM__` for a cartridge),
+`__OS9__`, `__FLEX__` and `__FLEX9__`, `__VECTREX__`, `__STANDALONE_`, or
+`__SIM6809__`.
 
 ## Direct-page variables
 
@@ -224,9 +228,10 @@ extern __direct int score;	/* in a header */
 * **One page:** all of a program's `__direct` variables together must fit
   in 256 bytes, or the link fails.
 * **Every declaration** of a variable must say `__direct`, or none: the
-  compiler checks it within a file, and `ld09` across modules (a module
-  that declares `extern __direct int x` and one that defines `int x` won't
-  link).
+  compiler checks it within a file. Across modules, `ld09` catches a module
+  that declares `extern __direct int x` linked with one that defines `int
+  x` (the first's one-byte addresses would be wrong); the other way round
+  links, and works, since a full address reaches the direct page too.
 * **`&`** of one is its whole address, as for any variable.
 
 The start-up code sets DP to the variables' page, only if the program has
@@ -241,8 +246,10 @@ after:
   DP back.
 * **FLEX** (`-Mf`): FLEX's routines get the DP FLEX started the program
   with.
-* **Vectrex** (`-Mv`): the BIOS's routines get $D0 ($C8 for the music), as
-  before; the program's own DP is $C8, where `vectrex.ld` puts the data.
+* **Vectrex** (`-Mv`): the BIOS's routines get $D0 ($C8 for the music); the
+  program's own DP is $C8, where `vectrex.ld` puts the variables, after the
+  BIOS's own, with room for 128 bytes (each module's rounded up to a
+  multiple of 4); more, and they all go to the next page, $C9.
 * **OS-9** (`-Mo`): DP is the data area's page, which F$Fork sets, and the
   `__direct` variables are the first 256 bytes of the data area.
 
@@ -274,7 +281,7 @@ files, the end of the program), which `bcc09` links with the C library:
 | Option | Target | Start-up, library | Output |
 |---|---|---|---|
 | `-Ms` | standalone (default) | `crt0.o`, `libsa.a` | any (`objcopy09`) |
-| `-Me` | Color BASIC, run with `EXEC` | `crt0.o`, `libcb.a` | `cas`, `wav`, `decb` |
+| `-Me` | Color BASIC, run with `EXEC` | `crt0.o`, `libcb.a` | `cas`, `wav`, `decb`, `ddos` |
 | `-Mr` | ROM cartridge (CoCo, Dragon) | `crtrom.o`, `librom.a`, `rom.ld` | the ROM's image |
 | `-Mv` | Vectrex cartridge | `crtvec.o`, `libvec.a`, `vectrex.ld` | the ROM's image |
 | `-Mo` | OS-9 program module | `crtos9.o`, `libos9.a` | `os9` |
@@ -312,9 +319,9 @@ while (getdelim(&line, &size, '\r', stdin) > 0)
 
 The program runs on the stack its loader gave it, and returns to it:
 `main`'s result (or `exit()`'s argument) is in D. It has no I/O: `read()`
-and `write()` aren't there. To give it I/O, write them (section 7), and
-link with `-x`, which leaves out the start-up code, and a start-up file of
-one's own.
+and `write()` aren't there. To give it I/O, write them for the hardware
+(section 7), and link them with the program; stdio needs `close()`,
+`isatty()` and `lseek()` as well (they may just return 0, 1 and -1).
 
 ## Color BASIC (`-Me`)
 
@@ -350,10 +357,11 @@ or 0), `cls(c)` (`CLS c`; -1 for plain `CLS`), `locate(row, col)` (where
 its pitches, with the duration in fifteenths of a second counted in
 periods of the tone, so that it works with the interrupts off), and
 `peek()` and `poke()`. stdout is written out at the end of
-each line (a `'\r'` as well as a `'\n'`), before input is read, and before
-`cls()` and `locate()` move the cursor.
+each line (a `'\r'` as well as a `'\n'`), before input is read, before
+`cls()` and `locate()` move the cursor, and before `inkey()` reads a key,
+so a prompt shows before the program waits.
 
-`doc/worm.c` (installed with the documentation) is a small game for
+`doc/worm.c` (in the `bcc09-doc` package, or bcc09's source) is a small game for
 `-Me`: a worm on the text screen, in blocks of colour `poke`d into the
 screen's memory and found again with `peek`, turned with the arrow keys
 through `inkey()`, with `sound()` and a score printed with `locate()`.
@@ -424,7 +432,8 @@ mame vectrex -cart hello.bin
   data and BSS from `$C880`, the stack below `$CBEA`. That is room for a
   game's variables, but not for stdio's buffers, and the heap is small.
 * **Start-up:** the start-up code sets the stack and DP (`$D0`, where the
-  BIOS's routines want it), copies the initialized data to RAM, clears
+  BIOS's routines want it, or `$C8` if the program has `__direct`
+  variables), copies the initialized data to RAM, clears
   the BSS, and calls the init functions and `main`.
 * **The BIOS:** `vectrex.h` declares its routines, with the names
   Vectrex programmers know, and its variables (`Vec_Btn_State`,
@@ -470,7 +479,7 @@ or in an assembly file linked with the program (`bcc09 -Mv -o game.bin
 game.c title.s`). For another layout, copy `vectrex.ld`, change it, and
 link with `-X-S` and the copy.
 
-`doc/rocks.c` (installed with the documentation) is a small game,
+`doc/rocks.c` (in the `bcc09-doc` package, or bcc09's source) is a small game,
 three hundred lines of C: rocks drift across the screen, and the ship
 turns, thrusts and fires at them. It shows a frame's work (the score
 and ships left, the ship turned with `Rot_VL_ab` and drawn as a list,
@@ -551,7 +560,7 @@ are no files.
 The headers are `ctype.h`, `dirent.h`, `errno.h`, `fcntl.h`, `limits.h`,
 `malloc.h`, `math.h`, `stdarg.h`, `stdbool.h`, `stddef.h`, `stdint.h`,
 `stdio.h`, `stdlib.h`, `string.h`, `unistd.h`, `sys/stat.h` and
-`sys/types.h`. Most of the library is dev86's, fixed; the parts that
+`sys/types.h`, and the targets' own `coco.h` and `vectrex.h` (chapter 5). Most of the library is dev86's, fixed; the parts that
 needed it were written for bcc09. Each function is a module of its own,
 so a program carries only what it uses.
 
@@ -572,8 +581,12 @@ so a program carries only what it uses.
   come within `__heap_margin` bytes (256) of the stack pointer: a program
   that needs a deeper stack after filling its heap should raise it.
 
-What is still to come: `div()` and `ldiv()`, and the functions of later
-C standards beyond those named here.
+What C89 has that the library doesn't yet: `assert.h`, `setjmp.h`,
+`signal.h`, `time.h`, `locale.h` and `float.h`; `abort()`, `getenv()`,
+`system()`, `div()` and `ldiv()`; `strerror()`, `perror()`, `strcoll()`
+and `strxfrm()`; `tmpfile()`, `tmpnam()`, `fgetpos()` and `fsetpos()`; the
+multibyte character functions; and `rename()` (but on FLEX). Nor does it
+have the functions later C standards added, beyond those named here.
 
 # Calling conventions and assembly
 
@@ -811,12 +824,13 @@ without `-O` (`bcc09-copt(1)`).
 
 **Why is my program so big?** Mostly `printf()`: its formatting is about
 4K, and floating point formats about 6K more, linked only when a program
-prints a `float` or `double`. For a CoCo program that prints one line:
+prints a `float` or `double`. For a CoCo program that prints one line
+(`HELLO, WORLD`; `-Me -O`, as `size09` counts it):
 
 | Using | Program size |
 |---|---|
 | nothing (`return 0`) | 124 bytes |
-| `write()` | 308 bytes |
+| `write()` | 320 bytes |
 | `puts()` | 1.8K |
 | `printf()` | 4.3K |
 | `printf()` of a `double` | 10K |

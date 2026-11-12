@@ -140,7 +140,6 @@ int main()
 	int n;
 
 	printf("YOUR NAME? ");
-	fflush(stdout);
 	n = getdelim(&line, &size, '\r', stdin);
 	if (n > 0) {
 		line[n - 1] = 0;	/* (the '\r') */
@@ -152,8 +151,8 @@ int main()
 
 `getline()` and `fgets()` stop at `'\n'`, which a line typed on FLEX
 doesn't have; `getdelim()` with `'\r'` reads a line. `stdout` is written
-out at the end of a line, before input is read, and when `fflush()` says
-so, as here, where the prompt has no line end.
+out at the end of a line, and before input is read, so the prompt, which
+has no line end, shows before the program waits for the name.
 
 # Files
 
@@ -297,7 +296,7 @@ assembly: `MEMEND` is `*(unsigned *)0xCC2B`.
   a date), `getenv()`, and exit statuses.
 * **Floating point** is in software, exact, and optional: a program that
   doesn't use it doesn't carry it, and one that prints a `double` carries
-  about 10K for it.
+  about 6K more for it.
 
 # Testing
 

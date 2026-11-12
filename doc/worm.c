@@ -38,7 +38,8 @@
 #define SCREEN	0x400		/* the text screen: 16 rows of 32 */
 #define WIDTH	32
 
-/* blocks of colour, as CHR$(128 + 16 * colour + 15) */
+/* blocks of colour, as CHR$(143 + 16 * (c - 1)) for BASIC's colour c,
+   1 to 8: c here is c - 1, 0 (green) to 7 (orange) */
 #define BLOCK(c)	(0x8F + 16 * (c))
 #define EMPTY	0x80		/* black */
 #define WALL	BLOCK(2)	/* blue */
@@ -152,8 +153,8 @@ void play()
 		PUT(worm[head], BODY);
 		worm[++head] = p;
 		PUT(p, HEAD);
-		if (grow)
-			--grow;
+		if (grow && (unsigned char)(head - tail) != 255)
+			--grow;		/* (the ring holds 256 at most) */
 		else
 			PUT(worm[tail++], EMPTY);
 	}
