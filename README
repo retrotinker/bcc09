@@ -116,10 +116,10 @@ how to write assembly for them, the tools and the tests, answers to
 common questions (chapter 10, also on its own in FAQ.md), and the man
 pages as an appendix ("make docs" makes it again from doc/manual.md).
 doc/basic.pdf, "bcc09 for BASIC Programmers", teaches C to those who
-know Color BASIC (from doc/basic.md), and doc/vectrex.pdf, "bcc09 for
-Vectrex Programmers", shows those who know the Vectrex's BIOS and 6809
-assembly how to write a cartridge in C (from doc/vectrex.md), with
-doc/rocks.c, an example game.  The man pages are in doc/man: bcc09(1),
+know Color BASIC (from doc/basic.md), with doc/worm.c, an example game,
+and doc/vectrex.pdf, "bcc09 for Vectrex Programmers", shows those who
+know the Vectrex's BIOS and 6809 assembly how to write a cartridge in C
+(from doc/vectrex.md), with doc/rocks.c, an example game.  The man pages are in doc/man: bcc09(1),
 as09(1), ld09(1), ar09(1), objdump09(1), objcopy09(1), and the passes'
 bcc09-cpp(1), bcc09-unproto(1), bcc09-cc1(1) and bcc09-copt(1) ("man -l
 doc/man/bcc09.1" reads one in place).  libc/README describes the C

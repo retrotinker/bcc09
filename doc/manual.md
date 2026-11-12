@@ -350,6 +350,13 @@ periods of the tone, so that it works with the interrupts off), and
 each line (a `'\r'` as well as a `'\n'`), before input is read, and before
 `cls()` and `locate()` move the cursor.
 
+`doc/worm.c` (installed with the documentation) is a small game for
+`-Me`: a worm on the text screen, in blocks of colour `poke`d into the
+screen's memory and found again with `peek`, turned with the arrow keys
+through `inkey()`, with `sound()` and a score printed with `locate()`.
+It is under the ISC license, and "bcc09 for BASIC Programmers" describes
+it.
+
 ## ROM cartridges (`-Mr`)
 
 A program in a cartridge's ROM, which the CoCo and the Dragon start by

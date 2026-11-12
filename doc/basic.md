@@ -686,6 +686,56 @@ bcc09 -Me -O -o guess -X-T0x3000 guess.c
 objcopy09 -O cas -n GUESS guess guess.cas
 ```
 
+# A game
+
+`worm.c`, which comes with bcc09's documentation (in
+`/usr/share/doc/bcc09-doc` from the RPM, or `doc/worm.c` in its source),
+is a game of the kind people wrote in BASIC and wished ran faster: a worm
+crawls across the screen, the arrow keys turn it, and each piece of food
+makes it longer and faster, until it runs into the wall or itself. It is
+about 200 lines, and uses what this guide has shown:
+
+* **The screen is the board.** The worm, the wall and the food are blocks
+  of colour in the text screen's memory, `CHR$(128 + 16 * colour + 15)`
+  as BASIC would print them, put there with `poke`. To find out what is
+  ahead of the worm, the program `peek`s at it:
+
+```c
+#define AT(p)	peek(SCREEN + (p))
+#define PUT(p, c)	poke(SCREEN + (p), (c))
+...
+		p = worm[head] + step;
+		if (AT(p) == FOOD) {
+			...
+		} else if (AT(p) != EMPTY) {
+			sound(20, 6);	/* the wall, or itself */
+			return;
+		}
+```
+
+* **One key a move,** with `inkey()`, as a BASIC game reads `INKEY$` once
+  each time round its loop. The arrow keys give 94 (up), 10 (down), 8
+  (left) and 9 (right), as in BASIC.
+* **The worm is an array** of the screen positions of its pieces, used as
+  a ring: the head is added at one end and the tail taken off the other,
+  and the indexes are `unsigned char`s, which count from 255 back to 0 by
+  themselves.
+* **The speed** is an empty `for` loop between moves, which gets shorter
+  as the worm grows; in C it has to be a long one (3500 times round, at
+  the start) to slow the worm down to about 8 moves a second.
+* **The score** is printed on the top line with `locate()` and `printf()`;
+  `fflush(stdout)` makes it appear without a `\r`.
+
+Build it as any other program, and put it on a cassette:
+
+```
+bcc09 -Me -O -o worm -X-T0x3000 worm.c
+objcopy09 -O cas -n WORM worm worm.cas
+```
+
+It is under the ISC license, not the GPL: change it, or start a game of
+your own from it.
+
 # Cartridges and disks
 
 **A ROM cartridge.** `bcc09 -Mr` makes a cartridge's image, which the CoCo

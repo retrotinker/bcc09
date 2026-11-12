@@ -757,6 +757,20 @@ grep -v '^S[059]' cbrom.srec | cat - cocotest.srec > cocotest-rom.srec
 	> cocotest.run 2>&1
 echo $? > cocotest.run.rc
 rm -f cocotest.srec cocotest-rom.srec
+# doc/worm.c, the example game, played with cbrom.s standing in for the
+# ROM (whose POLCAT gives no key every other call, and BREAK at the end
+# of the input: worm.in's keys come on every other move, so the worm
+# can't reach the food here; it turns up into the wall, ENTER plays
+# again, and the end of the input BREAKs that game and stops); what it
+# prints (the title, the scores, GAME OVER) must be the same.  make
+# check-xroar plays it on the real ROMs, eating, and checks the board.
+run worm.bcc "$BCC" -Me -O -o worm.out -X-T0x3000 loader.s "$top/doc/worm.c"
+"$OC" -O srec worm.out worm.srec
+entry=$("$OD" -n worm.out | awk '$3 == "loader" { print $1 }')
+grep -v '^S[059]' cbrom.srec | cat - worm.srec > worm-rom.srec
+"$SIM" -n 50000000 --entry "0x$entry" worm-rom.srec < worm.in > worm.run 2>&1
+echo $? > worm.run.rc
+rm -f worm.out worm.srec worm-rom.srec
 # coco.h's sound(), traced: its writes to the DAC ($FF20), counted, must
 # be $7E, $FE, $7E, $02 in turn, and each period (from a write to the
 # fourth after it, of the same tone, in B) must take BASIC's 100 + 20 *

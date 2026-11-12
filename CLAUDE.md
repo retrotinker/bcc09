@@ -270,9 +270,9 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 - Licensing: `libc/` is under the GNU Library GPL v2 (`libc/COPYING.LIB`), because it is
   linked into users' programs; the rest of bcc09 is GPL. Every libc source carries a
   notice saying so; new libc files should too, and code with no stated license (such
-  as dev86's old `strcspn.c`) shouldn't be copied in. `doc/rocks.c`, the Vectrex
-  example game, is under the ISC license (decided 2026-11-11), so that a game can
-  start from it; the spec's `bcc09-doc` adds `AND ISC` to `%{bcc09_license}`.
+  as dev86's old `strcspn.c`) shouldn't be copied in. `doc/rocks.c` and `doc/worm.c`,
+  the example games, are under the ISC license (decided 2026-11-11), so that a game
+  can start from them; the spec's `bcc09-doc` adds `AND ISC` to `%{bcc09_license}`.
 - `unproto` is built with `_PROTO_` too (added 2026-11-08): after every `()` it writes for a
   prototype (declarations, function pointer types, casts, typedefs, parameters), and
   after a prototyped heading's argument names, it writes `__proto(type name, ...)`, which
@@ -318,6 +318,16 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `doc/basic.pdf`, committed and packaged. `tests/run.sh` compiles and links every
   complete program in it (a ```c block with `main()`: `basic.result`), so change the
   guide's programs with the library. It is original text, not CMOC's guide's.
+  Its chapter "A game" describes `doc/worm.c` (2026-11-11; in bcc09-doc): a worm on
+  the text screen, semigraphic blocks `poke`d and `peek`ed (the screen is the board),
+  one `inkey()` a move, a ring of positions indexed by `unsigned char`, a delay loop
+  (32 cycles a turn: 3500 at the start). `make check-xroar` plays it on the four
+  machines: `-type` gives one key per POLCAT call, so per move ('.' no turn, `\n`
+  down, `\b` left); two foods, the wall, ENTER, BREAK, BREAK; the board at the 47th
+  `inkey` (`xrscreen.py -g` shows blocks as colour digits) and the exit screen
+  (`expected-worm`). `make check` runs it under cbrom.s (`worm.run`: the text it
+  prints), but that POLCAT's every-other-call "no key" makes only even moves turn, so
+  the worm can't reach the food there (a parity: odd columns, even rows).
 - `doc/vectrex.md` is "bcc09 for Vectrex Programmers" (added 2026-11-11): C on the
   Vectrex for those who know its BIOS and 6809 assembly (the cartridge's layout, the
   header in C, types and `signed char`, `-S` output, `__direct` in page $C8 (more than
@@ -418,7 +428,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 868 reference
+  `tests/src/` with this tree's tools and compare every result with the 872 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

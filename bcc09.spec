@@ -38,7 +38,8 @@ NitrOS-9, and FLEX.
 
 %package doc
 Summary:        Manuals for bcc09, with guides for BASIC and Vectrex programmers
-# and doc/rocks.c, an example game, under the ISC license, to be copied
+# and doc/rocks.c and doc/worm.c, example games, under the ISC license, to
+# be copied
 License:        %{bcc09_license} AND ISC
 BuildArch:      noarch
 
@@ -49,7 +50,7 @@ the C library, the calling conventions, the tools and the tests, with the
 manual pages as an appendix); bcc09 for BASIC Programmers, a guide to C
 for those who know the Color Computer's and Dragon's Color BASIC; and bcc09
 for Vectrex Programmers, C on the Vectrex for those who know its BIOS and
-6809 assembly, with an example game.
+6809 assembly; with an example game for each.
 
 %prep
 %autosetup
@@ -92,7 +93,7 @@ cp -p libc/math/README README.libm
 
 %files doc
 %license COPYING libc/COPYING.LIB
-%doc doc/manual.pdf doc/basic.pdf doc/vectrex.pdf doc/rocks.c
+%doc doc/manual.pdf doc/basic.pdf doc/vectrex.pdf doc/rocks.c doc/worm.c
 
 %changelog
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.14.0-1

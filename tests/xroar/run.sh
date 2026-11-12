@@ -6,8 +6,9 @@
 # types its input, and when it calls _exit a trap takes a snapshot, from
 # which xrscreen.py shows the text screen and xrcpu.py the registers.
 # Each machine's screen must be the same as ./expected, and the exit
-# status (X) 42.  Then coco.h, a ROM cartridge (-Mr), and Disk BASIC's
-# files (see below; needs toolshed's decb too).
+# status (X) 42.  Then coco.h, the example game doc/worm.c, a ROM
+# cartridge (-Mr), and Disk BASIC's files (see below; needs toolshed's
+# decb too).
 #
 # Optional (make check-xroar): it needs xroar, python3 and the machines'
 # ROMs (in ~/.xroar/roms, say); a machine whose ROM isn't there or
@@ -116,6 +117,58 @@ for m in $machines; do
 	if ! cmp -s "$dir/expected-coco" $m-coco.screen; then
 		echo "FAIL $m coco.h: the screen differs:"
 		diff "$dir/expected-coco" $m-coco.screen
+	fi
+done
+
+# doc/worm.c, the example game, played: XRoar types one key for each of
+# its moves (it reads one a move, as INKEY$), and the game is the same
+# every time (rand() seeded by the wait for the first key, which comes at
+# once): '.' goes on, newline (10) is down, backspace (8) left; it eats
+# two pieces of food, hits the wall, plays again, BREAKs that game and
+# stops.  The board when it first asks to play again (its 47th key) and
+# the screen at _exit must be the same as ./expected-worm, and the
+# status 0.
+BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Me -O -o worm -X-T0x3000 \
+	"$top/doc/worm.c" || exit 1
+"$top/ld/objcopy09" -O cas -n WORM worm worm.cas || exit 1
+"$top/ld/objcopy09" -O decb worm worm.bin || exit 1
+wexit_pc=$("$top/ld/objdump09" -n worm | awk '$3 == "__exit" { print $1 }')
+winkey_pc=$("$top/ld/objdump09" -n worm | awk '$3 == "_inkey" { print $1 }')
+moves=$(printf ' ............\n....\b..............................\r\003\003')
+for m in $machines; do
+	rm -f snap snap2
+	timeout 60 xroar -ui null -ao null -machine $m -no-ratelimit \
+		-load-tape worm.cas -type "$(printf 'CLOADM:EXEC\r')$moves" \
+		-trap pc=0x$winkey_pc -trap-range 47-47 -trap-snap snap \
+		-trap-timeout 0 -timeout 30 > $m-worm.log 2>&1
+	if grep -qiE "CRC32 INVALID|not found|no rom" $m-worm.log; then
+		echo "skip $m worm (its ROM isn't there or doesn't check)"
+		continue
+	fi
+	timeout 60 xroar -ui null -ao null -machine $m -no-ratelimit \
+		-load-tape worm.cas -type "$(printf 'CLOADM:EXEC\r')$moves" \
+		-trap pc=0x$wexit_pc -trap-snap snap2 -trap-timeout 0 \
+		-timeout 30 >> $m-worm.log 2>&1
+	if [ ! -f snap ] || [ ! -f snap2 ]; then
+		echo "FAIL $m worm: it didn't reach game over and _exit"
+		failed=$((failed + 1))
+		continue
+	fi
+	{ python3 "$dir/xrscreen.py" -g snap worm.bin 0x3000
+	  python3 "$dir/xrscreen.py" snap2 worm.bin 0x3000 | grep -v '^$'
+	} > $m-worm.screen
+	status=$(python3 "$dir/xrcpu.py" snap2 | awk '$1 == "0c:" { print $2 }')
+	if cmp -s "$dir/expected-worm" $m-worm.screen && [ "$status" = "0000" ]; then
+		echo "ok   $m worm"
+		continue
+	fi
+	failed=$((failed + 1))
+	if [ "$status" != "0000" ]; then
+		echo "FAIL $m worm: exit status $status, not 0000"
+	fi
+	if ! cmp -s "$dir/expected-worm" $m-worm.screen; then
+		echo "FAIL $m worm: the screen differs:"
+		diff "$dir/expected-worm" $m-worm.screen
 	fi
 done
 
