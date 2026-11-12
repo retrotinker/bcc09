@@ -42,7 +42,7 @@ check-vectrex: all
 
 # the user's manual, doc/manual.pdf (with pandoc and xelatex): run after
 # changing doc/manual.md or a man page, and commit the PDF
-docs: doc/manual.pdf doc/basic.pdf doc/vectrex.pdf doc/os9.pdf FAQ.md
+docs: doc/manual.pdf doc/basic.pdf doc/vectrex.pdf doc/os9.pdf doc/flex.pdf FAQ.md
 
 # the FAQ, the manual's chapter "Questions and answers" on its own
 FAQ.md: doc/manual.md doc/mkfaq.sh
@@ -62,6 +62,10 @@ doc/vectrex.pdf: doc/vectrex.md doc/mkvectrex.sh doc/tex/*.sty
 # and "bcc09 for OS-9 Programmers"
 doc/os9.pdf: doc/os9.md doc/mkos9.sh doc/tex/*.sty
 	doc/mkos9.sh
+
+# and "bcc09 for FLEX Programmers"
+doc/flex.pdf: doc/flex.md doc/mkflex.sh doc/tex/*.sty
+	doc/mkflex.sh
 
 # There is bound to be some more clever way to do this than copying
 # the "all" rule...

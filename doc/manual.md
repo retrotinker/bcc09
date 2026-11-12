@@ -41,8 +41,8 @@ that assembly can be written to work with it (7), and the tools (8).
 For a gentler start, "bcc09 for BASIC Programmers" (`basic.pdf`) teaches
 C from Color BASIC; "bcc09 for Vectrex Programmers" (`vectrex.pdf`) is C on
 the Vectrex for those who know its BIOS and 6809 assembly, and "bcc09 for
-OS-9 Programmers" (`os9.pdf`) C for OS-9 and NitrOS-9 for those who know the
-system.
+OS-9 Programmers" (`os9.pdf`) and "bcc09 for FLEX Programmers" (`flex.pdf`)
+C for each of those systems for those who know it.
 Appendix A is the reference: the manual pages of every program.
 
 bcc09 is free software. The compiler and tools are under the GNU General
@@ -87,7 +87,8 @@ and what each program needs are always added.
 
 On Fedora, `make rpm` builds the RPM packages from `bcc09.spec`, with
 *PREFIX* `/usr`, in `rpmbuild/`: `bcc09`, and `bcc09-doc` (noarch) with this
-manual and the guides for BASIC, Vectrex and OS-9 programmers as PDFs, and
+manual and the guides for BASIC, Vectrex, OS-9 and FLEX programmers as PDFs,
+and
 the example games, from the release's tag
 (`v0.14.0`), or from the last commit if that isn't tagged yet. `make srpm`
 builds the source package alone.

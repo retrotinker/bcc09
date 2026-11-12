@@ -350,6 +350,16 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   linking those with `main()` (with the assembly) as `-Mo`. Its programs were run under
   sim6809 --os9 and all of them (the clock too) on NitrOS-9 in XRoar (2026-11-11);
   do that again when changing one.
+- `doc/flex.md` is "bcc09 for FLEX Programmers" (added 2026-11-11): a command
+  (`-X-T0x1000`, objcopy09 -O flex; hello 4431 bytes, with write() 755), start-up and
+  WARMS (no exit status; sim6809's), argv (the word before LPOINT; blanks and
+  commas), the terminal (PUTCHR, so P/O; INCH lines, CR LF), files (FMS: names,
+  new-file writes, text compression, binary's padding, lseek reading, errno), memory
+  (to MEMEND, malloc 256 short of S), FLEX's routines from assembly (PSTRNG, PCRLF
+  with `__sysdp`), what isn't there, testing. `make docs` (`doc/mkflex.sh`) makes
+  `doc/flex.pdf`, in bcc09-doc; `flexdoc.result` as `os9doc.result`. Its programs ran
+  under sim6809 --flex, and all but the name prompt (no typing into FLEX) on
+  Compusense FLEX in XRoar, NOTES.TXT the same as sim6809's (2026-11-11).
 - The manual's chapter 10, "Questions and answers" (added 2026-11-11; TODO's FAQ), answers
   the questions a newcomer hits: a `-Me` program without `-X-T` is linked at 0 (on
   BASIC's variables), CR line ends, trying programs on sim6809, 16-bit `int` and
@@ -440,7 +450,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 873 reference
+  `tests/src/` with this tree's tools and compare every result with the 874 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

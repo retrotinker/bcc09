@@ -37,7 +37,7 @@ Color Computer and Dragon (Color BASIC and Disk BASIC), OS-9 and
 NitrOS-9, and FLEX.
 
 %package doc
-Summary:        Manuals for bcc09, with guides for BASIC, Vectrex and OS-9 programmers
+Summary:        Manuals for bcc09, with guides for BASIC, Vectrex, OS-9 and FLEX
 # and doc/rocks.c and doc/worm.c, example games, under the ISC license, to
 # be copied
 License:        %{bcc09_license} AND ISC
@@ -50,8 +50,8 @@ the C library, the calling conventions, the tools and the tests, with the
 manual pages as an appendix); bcc09 for BASIC Programmers, a guide to C
 for those who know the Color Computer's and Dragon's Color BASIC, and bcc09
 for Vectrex Programmers, C on the Vectrex for those who know its BIOS and
-6809 assembly, each with an example game; and bcc09 for OS-9 Programmers,
-C for OS-9 and NitrOS-9 for those who know the system.
+6809 assembly, each with an example game; and bcc09 for OS-9 Programmers
+and bcc09 for FLEX Programmers, C for each system for those who know it.
 
 %prep
 %autosetup
@@ -94,7 +94,8 @@ cp -p libc/math/README README.libm
 
 %files doc
 %license COPYING libc/COPYING.LIB
-%doc doc/manual.pdf doc/basic.pdf doc/vectrex.pdf doc/os9.pdf doc/rocks.c doc/worm.c
+%doc doc/manual.pdf doc/basic.pdf doc/vectrex.pdf doc/os9.pdf doc/flex.pdf
+%doc doc/rocks.c doc/worm.c
 
 %changelog
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.14.0-1

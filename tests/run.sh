@@ -774,6 +774,39 @@ awk 'mode == "" && /^```c$/ { n++; f = sprintf("os9doc%02d.c", n)
 	done
 } > os9doc.result
 rm -f os9doc[0-9]*.[cso] os9doc.out os9doc.o os9doc.err
+# and those in doc/flex.md (bcc09 for FLEX Programmers), as FLEX
+# commands, the same way
+awk 'mode == "" && /^```c$/ { n++; f = sprintf("flexdoc%02d.c", n)
+				 mode = "c"; next }
+     mode == "" && /^```$/ { mode = "first"; next }
+     mode != "" && /^```$/ { mode = ""; next }
+     mode == "first" { if (/^;/) { n++; f = sprintf("flexdoc%02d.s", n)
+				   mode = "s" } else mode = "other" }
+     mode == "c" || mode == "s" { print > f }' "$top/doc/flex.md"
+{
+	for f in flexdoc[0-9]*.s; do
+		if "$AS" -o ${f%.s}.o $f > flexdoc.err 2>&1; then
+			echo "ok   $f"
+		else
+			echo "FAIL $f:"
+			cat flexdoc.err
+		fi
+	done
+	for f in flexdoc[0-9]*.c; do
+		if grep -q 'main(' $f; then
+			cmd="$BCC -Mf -O -o flexdoc.out -X-T0x1000 $f $(ls flexdoc[0-9]*.o)"
+		else
+			cmd="$BCC -Mf -O -c -o flexdoc.o $f"
+		fi
+		if $cmd > flexdoc.err 2>&1; then
+			echo "ok   $f"
+		else
+			echo "FAIL $f:"
+			cat flexdoc.err
+		fi
+	done
+} > flexdoc.result
+rm -f flexdoc[0-9]*.[cso] flexdoc.out flexdoc.o flexdoc.err
 # FAQ.md is the manual's chapter "Questions and answers" on its own
 # (doc/mkfaq.sh makes it): it must be what the manual has now
 if "$top/doc/mkfaq.sh" -c; then
