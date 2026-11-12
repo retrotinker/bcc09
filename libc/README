@@ -87,8 +87,8 @@ Changes from dev86:
     scanf.c had no license, and its printf departed from the C standard
     (precision on integers, %X, # and %p); see stdio/printf.c and
     stdio/scanf.c
-What C89 has that libc doesn't yet: time.h, tmpfile, tmpnam, and
-rename but on FLEX.  The rest of C89 is written for bcc09:
+What C89 has that libc doesn't: rename, but on FLEX.  The rest of C89
+is written for bcc09:
 assert.h (stdlib/assert.c), setjmp.h (stdlib/setjmp.s: S, the return
 address and U), signal.h (stdlib/signal.c: raised only by raise(), the
 default _exit(128 + sig)), locale.h ("C" only), float.h, abort, div,
@@ -97,6 +97,16 @@ the multibyte functions (a char each), strerror (glibc's messages),
 strcoll, strxfrm, perror, fgetpos and fsetpos.  perror() and assert()
 end their line with __eol, which each target's library defines: "\r"
 for Color BASIC and OS-9, "\r\n" for FLEX, "\n" for the others.
+time.h (time/time.c, time/strftime.c): time_t is seconds from 1970 in a
+long; local time is UTC (the systems keep no zone); the calendar is
+computed in longs (Hinnant's days_from_civil and civil_from_days);
+asctime and strftime format without printf.  time() is each target's:
+os9/time.c (F$Time), flex/time.c (the date at $CC0E: month, day, year of
+two digits, at midnight), and sa/time.c (-1: no clock) for the others.
+tmpnam and tmpfile (stdio/tmpnam.c, its tmpnam module named tmpnm, as
+L_tmpnam is stdio.h's macro): TMPnnnnn names; tmpfile's file is removed
+when fclose(), or exit's closing of the streams, calls __stdio_closed
+(in stdlib/exit.c, so that programs without tmpfile carry only it).
 
 Floating point in text: printf's %e, %f, %g and %a (and %E, %F, %G,
 %A), and strtod, atof and scanf's %a, %e, %f and %g, are exact, as the

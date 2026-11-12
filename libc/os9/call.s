@@ -30,6 +30,7 @@ I$ChgDir	equ	$86
 F$Mem	equ	$07
 F$Fork	equ	$03
 F$Wait	equ	$04
+F$Time	equ	$15
 
 RCC	equ	0		; struct os9regs
 RA	equ	1
@@ -105,4 +106,6 @@ stubs:	os9	F$Exit		; 0
 	os9	F$Fork		; 14
 	rts
 	os9	F$Wait		; 15
+	rts
+	os9	F$Time		; 16
 	rts

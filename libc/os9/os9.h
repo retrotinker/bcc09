@@ -32,6 +32,7 @@ extern int __os9errno();	/* (b): errno for OS-9's error code b */
 #define OS9_MEM		13
 #define OS9_FORK	14
 #define OS9_WAIT	15
+#define OS9_TIME	16
 
 #define OS9_FAILED(r)	((r)->cc & 1)
 

@@ -2,3 +2,7 @@ fgetpos 2
 then s
 fsetpos back: sr
 c89file.tmp: No such file or directory
+tmpnam TMP00000 TMP00001
+tmpfile read scratch
+
+closed: TMP00002 there 0

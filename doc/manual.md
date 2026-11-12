@@ -558,8 +558,8 @@ are no files.
 The headers are `assert.h`, `ctype.h`, `dirent.h`, `errno.h`, `fcntl.h`,
 `float.h`, `limits.h`, `locale.h`, `malloc.h`, `math.h`, `setjmp.h`,
 `signal.h`, `stdarg.h`, `stdbool.h`, `stddef.h`, `stdint.h`, `stdio.h`,
-`stdlib.h`, `string.h`, `unistd.h`, `sys/stat.h` and `sys/types.h`, and the
-targets' own `coco.h` and `vectrex.h` (chapter 5). Most of the library is dev86's, fixed; the parts that
+`stdlib.h`, `string.h`, `time.h`, `unistd.h`, `sys/stat.h` and
+`sys/types.h`, and the targets' own `coco.h` and `vectrex.h` (chapter 5). Most of the library is dev86's, fixed; the parts that
 needed it were written for bcc09. Each function is a module of its own,
 so a program carries only what it uses.
 
@@ -590,9 +590,20 @@ so a program carries only what it uses.
   (`system(NULL)` is 0); and the only locale is `"C"`, whose characters
   are a byte each (`MB_CUR_MAX` is 1; `wchar_t` is a `char`).
 
-What C89 has that the library doesn't yet: `time.h`, `tmpfile()`,
-`tmpnam()`, and `rename()` (but on FLEX). Nor does it have the functions
-later C standards added, beyond those named here.
+* **time.h:** `time_t` counts seconds from 1970 in a `long` (to 2038).
+  The systems keep local time with no time zone, which is taken as UTC.
+  `time()` reads OS-9's clock (`F$Time`) and FLEX's date (at midnight);
+  Color BASIC, cartridges and the Vectrex have no clock, and it gives -1,
+  as `clock()` does everywhere. `mktime()`, `gmtime()`, `asctime()` and
+  `strftime()` (C89's conversions and some of C99's) need no clock, and
+  give what the GNU C library does.
+* **Temporary files:** `tmpnam()` gives names `TMP00000` and on;
+  `tmpfile()`'s file is removed when it is closed, or at exit. FLEX can't
+  open a file for update, so `tmpfile()` fails there.
+
+Only `rename()` is missing from C89's library, but on FLEX; nor does the
+library have the functions later C standards added, beyond those named
+here.
 
 # Calling conventions and assembly
 

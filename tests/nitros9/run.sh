@@ -18,7 +18,8 @@
 # /usr/share/mame/roms/coco3.rom).  XRoar runs without a window (-ui
 # null), and is stopped after 15 minutes if it hasn't finished.
 # NITROS9_KEEP=1 keeps the files (the disk, the outputs), and
-# NITROS9_PROGS="a b" runs only those programs.
+# NITROS9_PROGS="a b" runs only those programs.  ttime.c checks time()
+# there too (sim6809 has no F$Time).
 
 top=$(cd "$(dirname "$0")/../.." && pwd)
 dir=$top/tests/nitros9
@@ -74,9 +75,9 @@ os9 copy -r empty $img,empty.in > /dev/null || exit 1
 
 # the modules, and the startup script (-x: go on after an error)
 printf -- '-x\rchd /d1\rchx /d1/CMDS\r' > startup
-for f in $progs tdone trun; do
+for f in $progs ttime tdone trun; do
 	src=$top/tests/src/$f.c
-	case $f in tdone|trun) src=$dir/$f.c ;; esac
+	case $f in ttime|tdone|trun) src=$dir/$f.c ;; esac
 	if ! BCC_PREFIX=$work/prefix "$top/bcc/bcc09" -Mo -o $f.out "$src" ||
 	   ! "$top/ld/objcopy09" -O os9 -n $f $f.out $f.mod ||
 	   ! os9 copy -r $f.mod $img,CMDS/$f > /dev/null ||
@@ -86,6 +87,7 @@ for f in $progs tdone trun; do
 	fi
 	case $f in tdone|trun) continue ;; esac
 	params=
+	[ $f = ttime ] && { printf 'trun ttime <empty.in >ttime.run\r' >> startup; continue; }
 	[ $f = os9io ] && params=" one two"
 	printf 'trun %s%s <empty.in >%s.run\r' $f "$params" $f >> startup
 done
@@ -119,4 +121,12 @@ for f in $progs; do
 		echo "ok   $f (exit status $(cat $f.rc))"
 	fi
 done
+# time(): F$Time, which sim6809 doesn't have (ttime.c), whatever the date
+os9 copy $img,ttime.run ttime.run > /dev/null 2>&1 || : > ttime.run
+if cmp -s ttime.run "$dir/expected-time"; then
+	echo "ok   ttime (time() is OS-9's clock)"
+else
+	echo "FAIL ttime: $(tr '\r' '\n' < ttime.run)"
+	failed=$((failed + 1))
+fi
 exit $failed

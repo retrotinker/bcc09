@@ -24,3 +24,4 @@ ok   nancmp runs the same with -O
 ok   structret runs the same with -O
 ok   voidcond runs the same with -O
 ok   c89test runs the same with -O
+ok   timetest runs the same with -O

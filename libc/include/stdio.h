@@ -68,6 +68,8 @@ typedef struct __stdio_file FILE;
 #define BUFSIZ	(256)
 #define FOPEN_MAX	8	/* (FLEX: 3 and 4 files) */
 #define FILENAME_MAX	128
+#define L_tmpnam	9	/* "TMPnnnnn" */
+#define TMP_MAX		32767
 
 extern FILE stdin[1];
 extern FILE stdout[1];
@@ -135,6 +137,9 @@ extern int fsetpos __P((FILE*, __const fpos_t*));
    the system ends one: '\r' on Color BASIC and OS-9, "\r\n" on FLEX),
    to stderr */
 extern void perror __P((__const char*));
+
+extern char *tmpnam __P((char*));
+extern FILE *tmpfile __P((void));
 
 extern int fputs __P((__const char*, FILE*));
 extern int puts __P((__const char*));

@@ -33,6 +33,10 @@ extern FILE *__IO_list;		/* For fflush at exit */
 #define Inline_init __io_init_vars()
 extern void __io_init_vars();
 
+/* tmpfile()'s, if it is used: called with a stream just closed (in
+   stdlib/exit.c, which every program has) */
+extern void (*__stdio_closed)();
+
 #ifdef L__stdio_init
 
 #define buferr (stderr->unbuf)	/* Stderr is unbuffered */
@@ -92,6 +96,8 @@ __stdio_close_all()
       /* Note we're not de-allocating the memory */
       /* There doesn't seem to be much point :-) */
       fp->fd = -1;
+      if (__stdio_closed)	/* (tmpfile()'s: it removes the file) */
+	 (*__stdio_closed)(fp);
    }
 }
 
@@ -752,6 +758,8 @@ FILE *fp;
       if (close(fp->fd))
 	 rv = EOF;
       fp->fd = -1;
+      if (__stdio_closed)	/* (tmpfile()'s: it removes the file) */
+	 (*__stdio_closed)(fp);
    }
 
    if (fp->mode & __MODE_FREEBUF)

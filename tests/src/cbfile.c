@@ -153,6 +153,17 @@ int main()
 	errno = 0;
 	ok(28, read(9, buf, 1) == -1 && errno == EBADF);
 
+	/* tmpfile(): a file for update, removed when it is closed */
+	{
+		FILE *t = tmpfile();
+
+		ok(29, t != NULL && fputs("tmp", t) >= 0 &&
+		   fseek(t, 0L, SEEK_SET) == 0 && fgetc(t) == 't');
+		if (t)
+			fclose(t);
+		ok(30, open("TMP00000", O_RDONLY) == -1);
+	}
+
 	printf("checks %d failures %d\r", checks, failures);
 	return failures;
 }

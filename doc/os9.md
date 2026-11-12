@@ -331,6 +331,7 @@ call's code, and takes OS-9's names with a `$` in them:
 
 ```
 ; int os9time(char *buf): F$Time, the date and time into buf's
+; (time() does this, as a time_t; this is an example)
 ; 6 bytes (year - 1900, month, day, hours, minutes, seconds);
 ; 0, or OS-9's error code
 F$Time  equ     $15
@@ -389,13 +390,16 @@ int main()
 
 # What's there, and what isn't
 
-* **There:** `stdio` (with `printf`'s and `scanf`'s whole formats, floating
-  point among them), `string.h`, `ctype.h`, `stdlib.h` (`malloc`,
-  `qsort`, `strtol`, `rand`), `stdint.h`, `stdbool.h`, `math.h`, and the
-  file and directory calls above.
-* **Not there:** `time()` and `getenv()`, signals, and starting other
-  processes (`F$Fork` and `F$Wait`); write them in assembly, as above, if
-  a program needs them.
+* **There:** all of C89's library: `stdio` (with `printf`'s and `scanf`'s
+  whole formats, floating point among them, and `tmpfile()`), `string.h`,
+  `ctype.h`, `stdlib.h`, `math.h`, `setjmp.h`, `assert.h`, and `time.h`,
+  whose `time()` reads OS-9's clock (`F$Time`; local time, taken as UTC);
+  and `stdint.h`, `stdbool.h`, and the file and directory calls above.
+* **There only as far as C needs:** signals, raised only by `raise()` and
+  `abort()` (OS-9's own signals don't reach the program), and
+  `getenv()`, which finds nothing.
+* **Not there:** starting other processes (`F$Fork` and `F$Wait`), and
+  `rename()`; write them in assembly, as above, if a program needs them.
 * **Floating point** is in software, exact, and optional: a program that
   doesn't use it doesn't carry it, and one that prints a `double` carries
   about 6K more for it.

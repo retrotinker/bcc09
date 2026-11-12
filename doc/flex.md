@@ -288,12 +288,14 @@ assembly: `MEMEND` is `*(unsigned *)0xCC2B`.
 
 # What's there, and what isn't
 
-* **There:** `stdio` (with `printf`'s and `scanf`'s whole formats,
-  floating point among them), `string.h`, `ctype.h`, `stdlib.h`
-  (`malloc`, `qsort`, `strtol`, `rand`), `stdint.h`, `stdbool.h`,
-  `math.h`, and the files above.
-* **Not there:** directories (FLEX has none), `time()` (FLEX keeps only
-  a date), `getenv()`, and exit statuses.
+* **There:** all of C89's library: `stdio` (with `printf`'s and `scanf`'s
+  whole formats, floating point among them), `string.h`, `ctype.h`,
+  `stdlib.h`, `math.h`, `setjmp.h`, `assert.h`, and `time.h`, whose
+  `time()` is FLEX's date, at midnight (-1 if it has none); and
+  `stdint.h`, `stdbool.h`, and the files above.
+* **Not there:** directories (FLEX has none), `tmpfile()` (FLEX can't open
+  a file for update; `tmpnam()` works), `getenv()` (it finds nothing),
+  and exit statuses.
 * **Floating point** is in software, exact, and optional: a program that
   doesn't use it doesn't carry it, and one that prints a `double` carries
   about 6K more for it.

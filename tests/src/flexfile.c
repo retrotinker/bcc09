@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <time.h>
 
 int checks, failures;
 
@@ -60,6 +61,7 @@ int main()
 	char *line = 0;
 	size_t size = 0;
 	int i, n, fd, good;
+	time_t t;
 
 	/* a text file, and its lines read back */
 	run[0] = 'x';
@@ -170,6 +172,12 @@ int main()
 	ok(26, unlink("RENAMED.TXT") == 0);
 	errno = 0;
 	ok(27, unlink("RENAMED.TXT") == -1 && errno == ENOENT);
+
+	/* FLEX can't open a file for update, so no tmpfile(); time() is its
+	   date, or -1 if it has none (sim6809's) */
+	ok(28, tmpfile() == NULL);
+	t = time(NULL);
+	ok(29, t == (time_t) -1 || t >= 0);
 
 	printf("checks %d failures %d\r\n", checks, failures);
 	return failures;

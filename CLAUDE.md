@@ -488,6 +488,16 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   line. Tests: `c89test.c` (host-compared, -O, as an OS-9 module), `asserttest.c`
   (status 134 after a SIGABRT handler returns), `c89file.c` (fgetpos on OS-9 files).
   Writing them found cc1's struct-return and void-conditional bugs (fixed).
+  Phase 2 (2026-11-12): time.h (`time/`: `__days`/`__civil` in longs; local time is
+  UTC; asctime/strftime without printf; mktime's range checked to the second, as
+  `days * 86400` overflows on 1901-12-13) and time() per target (`os9/time.c` F$Time,
+  stub 16 in `call.s`; `flex/time.c` the date at $CC0E; `sa/time.c` -1 for sa, cb,
+  rom, sim, vec); tmpnam/tmpfile (`stdio/tmpnam.c`, module `tmpnm` because `-DL_tmpnam`
+  would redefine stdio.h's macro; tmpfile's files removed through `__stdio_closed`,
+  which fclose() and exit's close-all call; FLEX can't "wb+"). Only rename() (but
+  FLEX's) is missing from C89. `timetest.c` (host, TZ=UTC; time() not in OS-9 module
+  runs: sim6809 has no F$Time), `c89file.c` (tmpfile, nothing left), `cbfile.c`,
+  `flexfile.c`, and `tests/nitros9/ttime.c` (time() on NitrOS-9).
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
@@ -495,7 +505,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 919 reference
+  `tests/src/` with this tree's tools and compare every result with the 925 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

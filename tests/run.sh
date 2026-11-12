@@ -593,11 +593,12 @@ rm -f dpret.srec
 # signed and unsigned chars with constants and each other; nancmp.c
 # compares with a NaN; structret.c returns structures; voidcond.c
 # conditional expressions of type void; c89test.c checks the C89
-# functions libc added last; asserttest.c assert() and abort(); and a
-# target with no
+# functions libc added last; asserttest.c assert() and abort();
+# timetest.c time.h's functions; and a target with no
 # start-up code yet can't be linked
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 atexitio dptest charcmp nancmp structret voidcond c89test asserttest; do
+	 atexitio dptest charcmp nancmp structret voidcond c89test asserttest \
+	 timetest; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -608,18 +609,19 @@ for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest
 done
 # pftest.c, chartest.c, sadd.c, sftest.c, fltcc.c, fpio.c, mtest.c,
 # inttest.c, protoarg.c, gltest.c, charcmp.c, nancmp.c, structret.c,
-# voidcond.c and c89test.c must print the same with the host's compiler and C library (but for
-# the count of checks, which differs); mtest.c with libc/math, the same
+# voidcond.c, c89test.c and timetest.c (TZ=UTC) must print the same with
+# the host's compiler and C library (but for the count of checks, which
+# differs); mtest.c with libc/math, the same
 # fdlibm code built on the host, without fused multiply-adds or builtins,
 # which must give the same results bit for bit
 for f in pftest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest charcmp \
-	 nancmp structret voidcond c89test; do
+	 nancmp structret voidcond c89test timetest; do
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
 	extra=
 	[ $f = mtest ] && extra="-fno-builtin -ffp-contract=off -I$top/libc/math $top/libc/math/*.c"
 	if ${CC:-cc} -std=gnu89 -w -o $f-host $f.c $extra > /dev/null 2>&1 &&
-	   ./$f-host < $input > $f-host.run 2>&1 &&
+	   TZ=UTC ./$f-host < $input > $f-host.run 2>&1 &&
 	   grep -v '^checks ' $f.run > $f.cmp &&
 	   grep -v '^checks ' $f-host.run > $f-host.cmp &&
 	   cmp -s $f.cmp $f-host.cmp; then
@@ -671,11 +673,13 @@ os9run os9path
 mv os9path-os9.run os9path.run
 mv os9path-os9.run.rc os9path.run.rc
 rm -rf QA QF
-# fgetpos(), fsetpos() and perror() (c89file.c) on a file
+# fgetpos(), fsetpos(), perror(), tmpnam() and tmpfile() (c89file.c)
+# on files; no temporary file may be left
 os9run c89file
 mv c89file-os9.run c89file.run
 mv c89file-os9.run.rc c89file.run.rc
-rm -f c89file.tmp
+ls TMP* > /dev/null 2>&1 && echo "TMP files left: $(ls TMP*)" >> c89file.run
+rm -f c89file.tmp TMP[0-9]*
 for f in hello pftest chartest sadd fltcc fpio inttest protoarg dptest \
 	 c89test structret; do
 	os9run $f
@@ -1076,7 +1080,7 @@ for f in ops longops fptest strtest stdtest maltest vatest; do
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 dptest charcmp nancmp structret voidcond c89test; do
+	 dptest charcmp nancmp structret voidcond c89test timetest; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null
