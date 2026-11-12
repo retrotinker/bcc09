@@ -478,9 +478,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   X. `structret.c` (host-compared, -O, and -Mo by hand) tests them.
 - C89's library completed (2026-11-12, phase 1): assert.h (`__assert`; `__ASSERT_DECLARED`
   so it can come again inside a function), setjmp.h (`stdlib/setjmp.s`: S, return
-  address, U; PIC), signal.h (`__sighandler_t` typedef: unproto can't give a function
-  returning a function pointer, defined with a prototype, the declaration's prototype;
-  raise() only; SIG_DFL `_exit(128 + sig)`; a handler is reset to SIG_DFL), locale.h
+  address, U; PIC), signal.h (`__sighandler_t` typedef, as glibc's; raise() only; SIG_DFL `_exit(128 + sig)`; a handler is reset to SIG_DFL), locale.h
   ("C"), float.h, abort (raise, then `_exit(134)`), div/ldiv, getenv (NULL), system
   (NULL: 0, else -1), mb* (a char; `wchar_t` char), strerror (glibc's words: errno.h
   has Linux's numbers), strcoll/strxfrm, perror, fgetpos/fsetpos. `__eol` per target
@@ -498,6 +496,14 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   FLEX's) is missing from C89. `timetest.c` (host, TZ=UTC; time() not in OS-9 module
   runs: sim6809 has no F$Time), `c89file.c` (tmpfile, nothing left), `cbfile.c`,
   `flexfile.c`, and `tests/nitros9/ttime.c` (time() on NitrOS-9).
+- Declarators unproto now takes apart (2026-11-12): a function returning a pointer to
+  a function got no `__proto` in its heading (`fpf_header()`: its own args' and the
+  returned pointer's), so a prototyped declaration and definition disagreed ("already
+  declared"); a function returning a pointer to an array, `int (*row(int n))[4]`, was
+  left in ANSI form, which cc1 can't read (`has_inner_func()`, `fpa_dcl_flush()`: a
+  heading is rewritten as `fpf_header` does, a declaration as a type). And cc1's
+  `address()` takes `&tab[i]` (an array that indexing gave, which `indirec()` leaves as
+  its address, indcount 0): it was "taking address of non-lvalue". `declarator.c`.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
@@ -505,7 +511,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 925 reference
+  `tests/src/` with this tree's tools and compare every result with the 931 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

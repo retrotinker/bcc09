@@ -32,7 +32,12 @@ struct symstruct *source;
 PUBLIC void address(source)
 struct symstruct *source;
 {
-	if (source->indcount == 0)
+	if (source->indcount == 0 && source->type->constructor & ARRAY)
+		/* an array that indexing gave (as tab[i] of int tab[2][4]),
+		   which indirec() left as its address: & makes that a
+		   pointer to the array */
+		source->type = pointype(source->type);
+	else if (source->indcount == 0)
 		bugerror("taking address of non-lvalue");
 	else {
 		if (source->type->constructor & (ARRAY | FUNCTION))

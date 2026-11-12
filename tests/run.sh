@@ -594,11 +594,12 @@ rm -f dpret.srec
 # compares with a NaN; structret.c returns structures; voidcond.c
 # conditional expressions of type void; c89test.c checks the C89
 # functions libc added last; asserttest.c assert() and abort();
-# timetest.c time.h's functions; and a target with no
+# timetest.c time.h's functions; declarator.c functions returning
+# pointers to functions and arrays; and a target with no
 # start-up code yet can't be linked
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
 	 atexitio dptest charcmp nancmp structret voidcond c89test asserttest \
-	 timetest; do
+	 timetest declarator; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -609,13 +610,13 @@ for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest
 done
 # pftest.c, chartest.c, sadd.c, sftest.c, fltcc.c, fpio.c, mtest.c,
 # inttest.c, protoarg.c, gltest.c, charcmp.c, nancmp.c, structret.c,
-# voidcond.c, c89test.c and timetest.c (TZ=UTC) must print the same with
-# the host's compiler and C library (but for the count of checks, which
-# differs); mtest.c with libc/math, the same
+# voidcond.c, c89test.c, timetest.c (TZ=UTC) and declarator.c must print
+# the same with the host's compiler and C library (but for the count of
+# checks, which differs); mtest.c with libc/math, the same
 # fdlibm code built on the host, without fused multiply-adds or builtins,
 # which must give the same results bit for bit
 for f in pftest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest charcmp \
-	 nancmp structret voidcond c89test timetest; do
+	 nancmp structret voidcond c89test timetest declarator; do
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
 	extra=
@@ -681,7 +682,7 @@ mv c89file-os9.run.rc c89file.run.rc
 ls TMP* > /dev/null 2>&1 && echo "TMP files left: $(ls TMP*)" >> c89file.run
 rm -f c89file.tmp TMP[0-9]*
 for f in hello pftest chartest sadd fltcc fpio inttest protoarg dptest \
-	 c89test structret; do
+	 c89test structret declarator; do
 	os9run $f
 	if cmp -s $f.run $f-os9.run &&
 	   cmp -s $f.run.rc $f-os9.run.rc; then
@@ -1080,7 +1081,7 @@ for f in ops longops fptest strtest stdtest maltest vatest; do
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 dptest charcmp nancmp structret voidcond c89test timetest; do
+	 dptest charcmp nancmp structret voidcond c89test timetest declarator; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null

@@ -9,3 +9,4 @@ ok   protoarg runs the same as an OS-9 module
 ok   dptest runs the same as an OS-9 module
 ok   c89test runs the same as an OS-9 module
 ok   structret runs the same as an OS-9 module
+ok   declarator runs the same as an OS-9 module

@@ -173,6 +173,17 @@ takes the place of the ..., for
 to take the address of (the first argument is passed in a register, so
 the last named one can't lead to the others).
 .PP
+A function that returns a pointer to a function, or to an array, is
+rewritten too, in a declaration and in its heading:
+.B "int (*row(int n))[4] {"
+becomes
+.B "int (*row(n) __proto(int n))[4]"
+and the old-style declaration of
+.IR n ,
+and the prototypes of a function that returns a pointer to a function
+(its own, and the returned pointer's) are the same in its heading as in
+its declaration, so the two agree.
+.PP
 The BUGS above are dev86's: with
 .B _PROTO_
 arguments are converted, between floating point types too.

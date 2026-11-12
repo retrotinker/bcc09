@@ -162,6 +162,8 @@ static struct token *dcl_flush();
 static void block_flush();
 static void block_dcls();
 static struct token *show_func_ptr_type();
+static int has_inner_func();
+static struct token *fpa_dcl_flush();
 static struct token *show_struct_type();
 static void show_arg_name();
 static void show_type();
@@ -485,6 +487,7 @@ struct token *list;
 					show_empty_list(p = p->next);
 				} else {	/* display argument names */
 					show_arg_names(p);
+					show_proto(p, 1);	/* (for cc1) */
 				}
 			} else {	/* pass through other stuff */
 				tok_show(p);
@@ -529,6 +532,7 @@ struct token *l2;
 {
 	fpf_header_names(l1);	/* strip argument types */
 	show_empty_list(l2);	/* strip prototype */
+	show_proto(l2, 0);	/* (for cc1: the pointer's) */
 	put_nl();		/* nicer output */
 	fpf_header_types(l1);	/* show argument types */
 }
@@ -919,6 +923,12 @@ register struct token *list;
 			if (t2)
 				tok_unget(t2);
 			return (0);
+		case '[':
+			/* Function returning pointer to array: (*f(args))[n]... */
+			if (has_inner_func(list))
+				return (fpa_dcl_flush(list, t));
+			tok_unget(t);
+			return (list);
 		default:	/* not a declaration */
 			tok_unget(t);
 			return (list);
@@ -928,6 +938,79 @@ register struct token *list;
 	/* Hit EOF; must be mistake, but do not waste any information. */
 
 	return (list);
+}
+
+/* has_inner_func - (... name (args)): a function declarator inside */
+
+static int has_inner_func(list)
+struct token *list;
+{
+	register struct token *p;
+
+	if (list->head == 0)
+		return (0);
+	for (p = list->head->head; p; p = p->next)	/* (the first element) */
+		if (p->tokno == TOK_WORD && p->next && p->next->tokno == TOK_LIST
+		    && p->next->next == 0)
+			return (1);
+	return (0);
+}
+
+/* fpa_dcl_flush - (*f(args))[n]... (t is the first '['): a function
+   returning a pointer to an array.  A heading ({ follows the dimensions)
+   is rewritten to old style, as fpf_header does; anything else is a
+   declaration, rewritten as a type, as show_func_ptr_type does */
+
+#define FPA_MAX 64
+
+static struct token *fpa_dcl_flush(list, t)
+struct token *list;
+struct token *t;
+{
+	struct token *dims[FPA_MAX];
+	register struct token *s;
+	int n = 0, i;
+
+	/* the dimensions, [ ... ] [ ... ] (blanks between them dropped); t is
+	   then the token after them */
+	while (t) {
+		if (t->tokno == '[') {
+			dims[n++] = t;
+			while ((t = tok_class()) && n < FPA_MAX) {
+				dims[n++] = t;
+				if (t->tokno == ']')
+					break;
+			}
+			if (n == FPA_MAX)
+				t = 0;	/* (too long: already in dims[]) */
+			if (t == 0)
+				break;
+		} else if (t->tokno == TOK_WSPACE || t->tokno == '\n') {
+			tok_free(t);
+		} else
+			break;
+		t = tok_class();
+	}
+	if (t && t->tokno == '{') {	/* function heading (new) */
+		fpf_header_names(list);
+		for (i = 0; i < n; i++)
+			tok_show(dims[i]);
+		put_nl();
+		fpf_header_types(list);
+	} else {			/* declaration: a type */
+		for (s = list->head; s; s = s->next) {
+			tok_show_ch(s);	/* '(' or ',' or ')' */
+			show_type(s);
+		}
+		for (i = 0; i < n; i++)
+			tok_show(dims[i]);
+	}
+	for (i = 0; i < n; i++)
+		tok_free(dims[i]);
+	tok_free(list);
+	if (t)
+		tok_unget(t);
+	return (0);
 }
 
 /* function_dcl_flush - rewrite function { heading, type declaration } */
