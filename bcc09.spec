@@ -1,5 +1,5 @@
 Name:           bcc09
-Version:        0.14.0
+Version:        0.15.0
 Release:        1%{?dist}
 Summary:        C compiler, assembler, linker and C library for the Motorola 6809
 
@@ -98,6 +98,22 @@ cp -p libc/math/README README.libm
 %doc doc/rocks.c doc/worm.c
 
 %changelog
+* Thu Nov 12 2026 John W. Linville <linville@tuxdriver.com> - 0.15.0-1
+- cc1: chars are compared as C says, as ints: a signed char compared
+  with a constant from 0 to 255 was compared unsigned ("c < 0" was
+  never true), as were a signed and an unsigned char, and an unsigned
+  char and a negative int
+- ld09: a ONEPAGE whose contents end at the page's end stays in that
+  page (128 bytes of __direct variables on the Vectrex moved)
+- coco.h: inkey() writes out what stdout has buffered first, so a
+  prompt shows before a program waits for a key
+- doc/os9.pdf and doc/flex.pdf: bcc09 for OS-9 Programmers and for
+  FLEX Programmers, in bcc09-doc
+- doc/worm.c: an example game for the Color Computer and the Dragon,
+  in bcc09-doc, described in bcc09 for BASIC Programmers
+- Documentation corrected throughout; BUGS lists comparisons with a
+  NaN (> and >= are true)
+
 * Wed Nov 11 2026 John W. Linville <linville@tuxdriver.com> - 0.14.0-1
 - libvec: more of the Vectrex BIOS from C: vector lists (Draw_VL_a,
   Draw_VLcs, Draw_VLp, Mov_Draw_VL_a, Draw_Pat_VL_a, Dot_List,
