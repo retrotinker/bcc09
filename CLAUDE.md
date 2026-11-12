@@ -465,6 +465,17 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
   `>` and `>=` BHI and BHS, which C makes false for a NaN; their opposites BLS and BLO
   are true for one. `nancmp.c` checks every relation, both sides, floats, the
   constant 0, and if/!/?: against the host.
+- Structures returned and passed (fixed 2026-11-12, found writing div()): a function
+  returning a structure gets the result's address pushed after its arguments, just
+  above the return address. The caller loaded the first argument into X and then
+  took X for that address (`push(structarg)` in `gencode.c`: X wasn't in `reguse`; now
+  marked, so U, or Y with -Mo); the callee, after a first argument in X, put the rest
+  2 bytes low (`declare.c`, `argsp`). A structure as the first argument is passed on
+  the stack, as a double is (`listargs()`, `declare.c`): loading it into X was "compiler
+  bug? - attempting to load non-scalar". And a first argument is evaluated after the
+  others are pushed, so a structure a call in it returned stayed between them and the
+  call: ROOTLISTOP now pops back to `lastargsp` (or its mark) once the argument is in
+  X. `structret.c` (host-compared, -O, and -Mo by hand) tests them.
 - `bcc09` defines `__BCC__` (as dev86's headers expect), `__6809__`, `__STDC__` and a
   macro for the `-M` target (`__SIM6809__` for `-Mi`). `cc1` doesn't understand `const` or `volatile`;
   `libc/include/features.h` defines them away. `char` is unsigned.
@@ -472,7 +483,7 @@ Bruce Evans' C compiler (dev86). GitHub: `retrotinker/bcc09`.
 ## Tests
 
 - `make check` (or `tests/run.sh`) runs the regression tests. They build the sources in
-  `tests/src/` with this tree's tools and compare every result with the 894 reference
+  `tests/src/` with this tree's tools and compare every result with the 900 reference
   files in `tests/ref/`. `tests/run.sh -u` refreshes the references; read the changed
   files before committing them.
 - The references record current behavior, bugs included. `BUGS` lists the known bugs

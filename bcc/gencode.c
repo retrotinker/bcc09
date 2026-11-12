@@ -512,8 +512,14 @@ struct nodestruct *exp;
 		savereturn(regmark & callermask & regregs,
 			   spmark - 2 * (offset_T) pshregsize);
 		if (exp->nodetype->constructor & STRUCTU) {
+			/* the result's address, pushed after the arguments:
+			   not through X, which may hold the first one */
+			store_t argmark = reguse;
+
+			reguse |= ARGREG;
 			address(structarg);
 			push(structarg);
+			reguse = argmark;
 		}
 		function(target);
 		break;
@@ -544,6 +550,16 @@ struct nodestruct *exp;
 		break;
 	case ROOTLISTOP:
 		listroot(target);
+		/* the first argument is evaluated after the others are
+		   pushed: what it left on the stack (a structure a function
+		   returned, whose member it is) would come between them and
+		   the call, so it goes, now that the argument is in its
+		   register */
+		if (exp->right != NULL) {
+			if (sp < lastargsp)
+				modstk(lastargsp);
+		} else if (sp < spmark)
+			modstk(spmark);
 		lastargsp = sp;
 		break;
 	case STRUCELTOP:

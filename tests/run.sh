@@ -591,10 +591,10 @@ rm -f dpret.srec
 # functions; gltest.c reads gltest.in with getline() and getdelim();
 # dptest.c uses __direct variables (DP their page); charcmp.c compares
 # signed and unsigned chars with constants and each other; nancmp.c
-# compares with a NaN; and a target with no
+# compares with a NaN; structret.c returns structures; and a target with no
 # start-up code yet can't be linked
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 atexitio dptest charcmp nancmp; do
+	 atexitio dptest charcmp nancmp structret; do
 	run $f.bcc "$BCC" -Mi -o $f.out -X-T0x1000 $f.c
 	"$OC" -O srec $f.out $f.srec
 	input=/dev/null
@@ -604,13 +604,13 @@ for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest
 	rm -f $f.srec
 done
 # pftest.c, chartest.c, sadd.c, sftest.c, fltcc.c, fpio.c, mtest.c,
-# inttest.c, protoarg.c, gltest.c, charcmp.c and nancmp.c must print the same with the host's
-# compiler and C library (but for the count of checks, which differs);
-# mtest.c with libc/math, the same
+# inttest.c, protoarg.c, gltest.c, charcmp.c, nancmp.c and structret.c
+# must print the same with the host's compiler and C library (but for
+# the count of checks, which differs); mtest.c with libc/math, the same
 # fdlibm code built on the host, without fused multiply-adds or builtins,
 # which must give the same results bit for bit
 for f in pftest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest charcmp \
-	 nancmp; do
+	 nancmp structret; do
 	input=/dev/null
 	[ -f $f.in ] && input=$f.in
 	extra=
@@ -1067,7 +1067,7 @@ for f in ops longops fptest strtest stdtest maltest vatest; do
 	rm -f $f-O.o $f-O.out $f-O.srec $f-O.run $f-plain.run
 done > optimize.result
 for f in hello echo pftest siotest chartest sadd sftest fltcc fpio mtest inttest protoarg gltest \
-	 dptest charcmp nancmp; do
+	 dptest charcmp nancmp structret; do
 	"$BCC" -Mi -O -o $f-O.out -X-T0x1000 $f.c > /dev/null 2>&1
 	"$OC" -O srec $f-O.out $f-O.srec > /dev/null 2>&1
 	input=/dev/null

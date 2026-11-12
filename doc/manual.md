@@ -593,8 +593,11 @@ have the functions later C standards added, beyond those named here.
 A C function's first argument is passed in X (a `long`'s in D and X,
 high word in D); the others are on the stack, above the return address,
 in order, and the caller removes them. A `float` argument is passed as a
-`double`, and a `double` is always on the stack, even as the first
-argument. The result:
+`double`, and a `double` or a structure is always on the stack, even as the
+first argument. A function that returns a structure gets the address to
+put it at pushed after the arguments, just above the return address (the
+other arguments are then above it), and returns that address in X. The
+result:
 
 | Type | Result in |
 |---|---|

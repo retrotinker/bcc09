@@ -736,7 +736,8 @@ PRIVATE void declfunc()
 #endif
 		if (arg1inreg && symptr == &locsyms[0]
 		    && symptr->flags != REGVAR
-		    && !(symptr->type->scalar & DOUBLE)) {
+		    && !(symptr->type->scalar & DOUBLE)
+		    && !(symptr->type->constructor & STRUCTU)) {
 			if ((arg1size = argsize) < itypesize)
 				arg1size = itypesize;
 			argsp = softsp -= arg1size;
@@ -754,8 +755,12 @@ PRIVATE void declfunc()
 			argsp += itypesize;
 #endif
 		if (arg1inreg && symptr == &locsyms[0]
-		    && !(symptr->type->scalar & DOUBLE))
+		    && !(symptr->type->scalar & DOUBLE)
+		    && !(symptr->type->constructor & STRUCTU)) {
 			argsp = returnadrsize;	/* skip return adr after 1st arg */
+			if (returntype->constructor & STRUCTU)
+				argsp += ptypesize;	/* and the result's address */
+		}
 	}
 	lbrace();
 	compound();

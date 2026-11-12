@@ -207,9 +207,11 @@ struct proto *proto;
 	}
 	parent = node(arg1op, protoarg(proto, n++, assignment_exp()),
 		      NULLNODE);
-	/* a double (a float is one, as an argument) is always passed on
-	   the stack: it doesn't fit in the registers for the first one */
-	if (parent->nodetype->scalar & RSCALAR)
+	/* a double (a float is one, as an argument) or a structure is
+	   always passed on the stack: it doesn't fit in the registers for
+	   the first one */
+	if (parent->nodetype->scalar & RSCALAR ||
+	    parent->nodetype->constructor & STRUCTU)
 		parent->tag = LISTOP;
 	nextright = parent;
 	while (sym == COMMA) {
