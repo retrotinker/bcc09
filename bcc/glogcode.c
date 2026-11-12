@@ -295,6 +295,25 @@ struct nodestruct *exp;
 		exp->left.symptr = truesym;
 		return;
 	}
+	if (exp->nodetype == vtype) {
+		/* void (as assert()'s "e ? (void) 0 : f()"): each operand
+		   for what it does, with no value to load */
+		offset_T spmark = sp;
+
+		jumpcond(exp->left.nodeptr, truelab = getlabel(),
+			 falselab = getlabel(), ~0);
+		deflabel(truelab);
+		makeleaf(truenode = exp->right->left.nodeptr);
+		modstk(spmark);
+		jump(exitlab = getlabel());
+		deflabel(falselab);
+		makeleaf(exp->right->right);
+		modstk(spmark);
+		deflabel(exitlab);
+		exp->tag = LEAF;
+		exp->left.symptr = truenode->left.symptr;
+		return;
+	}
 	jumpcond(exp->left.nodeptr, truelab = getlabel(),
 		 falselab = getlabel(), ~0);
 	deflabel(truelab);

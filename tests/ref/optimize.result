@@ -22,3 +22,4 @@ ok   dptest runs the same with -O
 ok   charcmp runs the same with -O
 ok   nancmp runs the same with -O
 ok   structret runs the same with -O
+ok   voidcond runs the same with -O
